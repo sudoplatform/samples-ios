@@ -1,0 +1,14 @@
+source 'https://cdn.cocoapods.org/'
+
+platform :ios, '13.2'
+
+target 'DecentralizedIdentityExample' do
+  use_frameworks! :linkage => :static
+  use_modular_headers!
+
+  # Pods for DecentralizedIdentityExample
+  pod 'SudoDecentralizedIdentity', '~> 1.0.1'
+  pod 'Firebase/Firestore', '~> 6.23.0'
+  pod 'FirebaseFirestoreSwift'
+  pod 'Firebase/Auth', '~> 6.23.0'
+end

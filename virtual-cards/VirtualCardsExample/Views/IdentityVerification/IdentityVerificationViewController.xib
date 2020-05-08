@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="16096" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16087"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="IdentityVerificationViewController" customModule="VirtualCardsExample" customModuleProvider="target">
+            <connections>
+                <outlet property="learnMoreView" destination="oIu-hW-zH7" id="tHv-EB-4IG"/>
+                <outlet property="statusLabel" destination="IMa-ia-0UA" id="9wI-M1-5eX"/>
+                <outlet property="tableFooterView" destination="5Cu-G9-7lx" id="Msm-Kx-rsy"/>
+                <outlet property="tableView" destination="3MF-Ct-yww" id="qos-vE-Trt"/>
+                <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="i5M-Pr-FkT">
+            <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="3MF-Ct-yww">
+                    <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                    <color key="backgroundColor" systemColor="systemGray5Color" red="0.8980392157" green="0.8980392157" blue="0.91764705879999997" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                    <connections>
+                        <outlet property="dataSource" destination="-1" id="gGR-pT-cJb"/>
+                        <outlet property="delegate" destination="-1" id="sqR-y1-Jee"/>
+                    </connections>
+                </tableView>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="5Cu-G9-7lx" userLabel="tableFooterView">
+                    <rect key="frame" x="0.0" y="417" width="375" height="250"/>
+                    <subviews>
+                        <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="24" translatesAutoresizingMaskIntoConstraints="NO" id="7un-uh-2iX">
+                            <rect key="frame" x="0.0" y="0.0" width="375" height="250"/>
+                            <subviews>
+                                <stackView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="kFa-FL-t7Z">
+                                    <rect key="frame" x="16" y="24" width="343" height="20.5"/>
+                                    <subviews>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Status" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="yus-9P-LxF">
+                                            <rect key="frame" x="0.0" y="0.0" width="335" height="20.5"/>
+                                            <fontDescription key="fontDescription" style="UICTFontTextStyleHeadline"/>
+                                            <nil key="textColor"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="252" verticalHuggingPriority="251" text="-" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="IMa-ia-0UA" userLabel="statusLabel">
+                                            <rect key="frame" x="335" y="0.0" width="8" height="20.5"/>
+                                            <fontDescription key="fontDescription" style="UICTFontTextStyleHeadline"/>
+                                            <nil key="textColor"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                    </subviews>
+                                </stackView>
+                                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="oIu-hW-zH7" userLabel="learnMoreView" customClass="LearnMoreView" customModule="VirtualCardsExample" customModuleProvider="target">
+                                    <rect key="frame" x="16" y="68.5" width="343" height="173.5"/>
+                                    <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                                </view>
+                            </subviews>
+                            <edgeInsets key="layoutMargins" top="24" left="16" bottom="8" right="16"/>
+                        </stackView>
+                    </subviews>
+                    <color key="backgroundColor" systemColor="systemGray5Color" red="0.8980392157" green="0.8980392157" blue="0.91764705879999997" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="250" placeholder="YES" id="WkV-4J-vAo"/>
+                        <constraint firstItem="7un-uh-2iX" firstAttribute="leading" secondItem="5Cu-G9-7lx" secondAttribute="leading" id="dX5-25-WhJ"/>
+                        <constraint firstAttribute="trailing" secondItem="7un-uh-2iX" secondAttribute="trailing" id="ndW-G2-qrQ"/>
+                        <constraint firstItem="7un-uh-2iX" firstAttribute="top" secondItem="5Cu-G9-7lx" secondAttribute="top" id="p0d-WT-ekj"/>
+                        <constraint firstAttribute="bottom" secondItem="7un-uh-2iX" secondAttribute="bottom" id="xwb-zi-hKv"/>
+                    </constraints>
+                </view>
+            </subviews>
+            <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+            <constraints>
+                <constraint firstItem="5Cu-G9-7lx" firstAttribute="leading" secondItem="fnl-2z-Ty3" secondAttribute="leading" id="CCX-q3-Jam"/>
+                <constraint firstItem="5Cu-G9-7lx" firstAttribute="bottom" secondItem="i5M-Pr-FkT" secondAttribute="bottom" placeholder="YES" id="HhD-AR-6FF"/>
+                <constraint firstItem="5Cu-G9-7lx" firstAttribute="trailing" secondItem="fnl-2z-Ty3" secondAttribute="trailing" id="QB8-4D-xME"/>
+                <constraint firstItem="3MF-Ct-yww" firstAttribute="top" secondItem="fnl-2z-Ty3" secondAttribute="top" id="cnU-MP-IAi"/>
+                <constraint firstItem="3MF-Ct-yww" firstAttribute="leading" secondItem="fnl-2z-Ty3" secondAttribute="leading" id="ftZ-cF-Y7u"/>
+                <constraint firstItem="fnl-2z-Ty3" firstAttribute="trailing" secondItem="3MF-Ct-yww" secondAttribute="trailing" id="kWx-cr-4go"/>
+                <constraint firstItem="3MF-Ct-yww" firstAttribute="bottom" secondItem="i5M-Pr-FkT" secondAttribute="bottom" id="zkO-8r-gIa"/>
+            </constraints>
+            <viewLayoutGuide key="safeArea" id="fnl-2z-Ty3"/>
+            <point key="canvasLocation" x="-46.376811594202906" y="147.99107142857142"/>
+        </view>
+    </objects>
+</document>

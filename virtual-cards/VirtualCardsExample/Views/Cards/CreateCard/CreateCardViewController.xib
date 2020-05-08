@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="16096" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16087"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="CreateCardViewController" customModule="VirtualCardsExample" customModuleProvider="target">
+            <connections>
+                <outlet property="errorLabel" destination="wyk-qF-S9h" id="hC7-Sd-TA8"/>
+                <outlet property="fundingSourceLabel" destination="jpQ-SI-o02" id="AaU-5O-VPv"/>
+                <outlet property="idStackView" destination="0nb-gn-Od9" id="LeT-8t-NNw"/>
+                <outlet property="learnMoreView" destination="rpw-Iy-aYV" id="SAB-MJ-b8i"/>
+                <outlet property="sudoLabel" destination="1jF-rW-4I4" id="STM-UH-bgg"/>
+                <outlet property="tableFooterView" destination="glY-qI-iVO" id="D9h-F5-Tm7"/>
+                <outlet property="tableView" destination="XQF-Kr-0NB" id="cji-m5-c2W"/>
+                <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="i5M-Pr-FkT">
+            <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" bouncesZoom="NO" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="XQF-Kr-0NB">
+                    <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                    <color key="backgroundColor" systemColor="systemGray5Color" red="0.8980392157" green="0.8980392157" blue="0.91764705879999997" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                    <connections>
+                        <outlet property="dataSource" destination="-1" id="66l-Ip-Kkk"/>
+                        <outlet property="delegate" destination="-1" id="bTo-cc-Yfu"/>
+                    </connections>
+                </tableView>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="glY-qI-iVO" userLabel="tableFooterView">
+                    <rect key="frame" x="0.0" y="438.5" width="375" height="228.5"/>
+                    <subviews>
+                        <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="32" translatesAutoresizingMaskIntoConstraints="NO" id="dne-Af-C8A">
+                            <rect key="frame" x="0.0" y="0.0" width="375" height="228.5"/>
+                            <subviews>
+                                <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="0nb-gn-Od9" userLabel="idStackView">
+                                    <rect key="frame" x="16" y="24" width="343" height="75"/>
+                                    <subviews>
+                                        <stackView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="MuI-vS-JbY">
+                                            <rect key="frame" x="0.0" y="0.0" width="343" height="20.5"/>
+                                            <subviews>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Sudo" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="a3x-Kt-aVj">
+                                                    <rect key="frame" x="0.0" y="0.0" width="335" height="20.5"/>
+                                                    <fontDescription key="fontDescription" style="UICTFontTextStyleHeadline"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="252" verticalHuggingPriority="251" text="-" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="1jF-rW-4I4" userLabel="sudoLabel">
+                                                    <rect key="frame" x="335" y="0.0" width="8" height="20.5"/>
+                                                    <fontDescription key="fontDescription" style="UICTFontTextStyleHeadline"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
+                                        </stackView>
+                                        <stackView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="cwB-WQ-Qht">
+                                            <rect key="frame" x="0.0" y="28.5" width="343" height="20.5"/>
+                                            <subviews>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="252" verticalHuggingPriority="251" text="Funding Source" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="laS-Qa-DUI">
+                                                    <rect key="frame" x="0.0" y="0.0" width="125.5" height="20.5"/>
+                                                    <fontDescription key="fontDescription" style="UICTFontTextStyleHeadline"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="-" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="jpQ-SI-o02" userLabel="fundingSourceLabel">
+                                                    <rect key="frame" x="125.5" y="0.0" width="217.5" height="20.5"/>
+                                                    <fontDescription key="fontDescription" style="UICTFontTextStyleHeadline"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
+                                        </stackView>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Funding Source is required to add a card" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wyk-qF-S9h" userLabel="errorLabel">
+                                            <rect key="frame" x="0.0" y="57" width="343" height="18"/>
+                                            <fontDescription key="fontDescription" style="UICTFontTextStyleSubhead"/>
+                                            <color key="textColor" systemColor="systemRedColor" red="1" green="0.23137254900000001" blue="0.18823529410000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                    </subviews>
+                                </stackView>
+                                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="rpw-Iy-aYV" userLabel="learnMore" customClass="LearnMoreView" customModule="VirtualCardsExample" customModuleProvider="target">
+                                    <rect key="frame" x="16" y="131" width="343" height="81.5"/>
+                                    <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                                </view>
+                            </subviews>
+                            <edgeInsets key="layoutMargins" top="24" left="16" bottom="16" right="16"/>
+                        </stackView>
+                    </subviews>
+                    <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                    <constraints>
+                        <constraint firstAttribute="trailing" secondItem="dne-Af-C8A" secondAttribute="trailing" id="0Tu-FZ-PIZ"/>
+                        <constraint firstAttribute="height" constant="228.5" placeholder="YES" id="Chb-Dx-x2d"/>
+                        <constraint firstItem="dne-Af-C8A" firstAttribute="top" secondItem="glY-qI-iVO" secondAttribute="top" id="UNk-rZ-GFz"/>
+                        <constraint firstItem="dne-Af-C8A" firstAttribute="leading" secondItem="glY-qI-iVO" secondAttribute="leading" id="ePf-Of-1ap"/>
+                        <constraint firstAttribute="bottom" secondItem="dne-Af-C8A" secondAttribute="bottom" id="tHP-GL-3Jo"/>
+                    </constraints>
+                </view>
+            </subviews>
+            <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+            <constraints>
+                <constraint firstItem="glY-qI-iVO" firstAttribute="leading" secondItem="ND2-b0-gfP" secondAttribute="leading" id="3aQ-R0-14B"/>
+                <constraint firstItem="XQF-Kr-0NB" firstAttribute="bottom" secondItem="i5M-Pr-FkT" secondAttribute="bottom" id="5dK-Yd-tpv"/>
+                <constraint firstItem="XQF-Kr-0NB" firstAttribute="trailing" secondItem="ND2-b0-gfP" secondAttribute="trailing" id="6oH-dz-ycm"/>
+                <constraint firstItem="XQF-Kr-0NB" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" id="QdF-kE-6xL"/>
+                <constraint firstItem="ND2-b0-gfP" firstAttribute="trailing" secondItem="glY-qI-iVO" secondAttribute="trailing" id="bfe-Xa-vM7"/>
+                <constraint firstItem="XQF-Kr-0NB" firstAttribute="leading" secondItem="ND2-b0-gfP" secondAttribute="leading" id="mUw-GH-Z4Y"/>
+                <constraint firstItem="glY-qI-iVO" firstAttribute="bottom" secondItem="i5M-Pr-FkT" secondAttribute="bottom" placeholder="YES" id="yTV-sP-QG7"/>
+            </constraints>
+            <viewLayoutGuide key="safeArea" id="ND2-b0-gfP"/>
+            <point key="canvasLocation" x="138.40000000000001" y="152.47376311844079"/>
+        </view>
+    </objects>
+</document>

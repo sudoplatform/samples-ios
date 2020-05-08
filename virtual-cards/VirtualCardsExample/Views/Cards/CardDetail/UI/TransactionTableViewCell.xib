@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="16096" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_1" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16087"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="TransactionTableViewCell" customModule="VirtualCardsExample" customModuleProvider="target"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" rowHeight="151" id="KGk-i7-Jjw" customClass="TransactionTableViewCell" customModule="VirtualCardsExample" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="60"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
+                <rect key="frame" x="0.0" y="0.0" width="320" height="60"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <stackView opaque="NO" contentMode="scaleToFill" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="Dr4-fb-WFH">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="60"/>
+                        <subviews>
+                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="4" translatesAutoresizingMaskIntoConstraints="NO" id="rkg-Rx-b3n" userLabel="labels">
+                                <rect key="frame" x="16" y="12" width="214.5" height="36"/>
+                                <subviews>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" horizontalCompressionResistancePriority="1000" text="Amazon" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="GMy-CP-6bE" userLabel="descriptionLabel">
+                                        <rect key="frame" x="0.0" y="0.0" width="214.5" height="18"/>
+                                        <fontDescription key="fontDescription" style="UICTFontTextStyleSubhead"/>
+                                        <color key="textColor" red="0.070588235294117646" green="0.078431372549019607" blue="0.082352941176470587" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" horizontalCompressionResistancePriority="1000" text="10/13/2019" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="rrP-Cc-yHF" userLabel="dateLabel">
+                                        <rect key="frame" x="0.0" y="22" width="214.5" height="14"/>
+                                        <fontDescription key="fontDescription" style="UICTFontTextStyleCaption2"/>
+                                        <color key="textColor" red="0.4823529411764706" green="0.50980392156862742" blue="0.56470588235294117" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                </subviews>
+                            </stackView>
+                            <stackView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="1000" horizontalCompressionResistancePriority="1000" axis="vertical" spacing="4" translatesAutoresizingMaskIntoConstraints="NO" id="dC0-ym-igm" userLabel="amounts">
+                                <rect key="frame" x="238.5" y="12" width="65.5" height="36"/>
+                                <subviews>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="1000" verticalHuggingPriority="251" horizontalCompressionResistancePriority="1000" text="$1234.56" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="QHx-ye-a74" userLabel="amountLabel">
+                                        <rect key="frame" x="0.0" y="0.0" width="65.5" height="18"/>
+                                        <fontDescription key="fontDescription" style="UICTFontTextStyleSubhead"/>
+                                        <color key="textColor" red="0.070588235294117646" green="0.078431372549019607" blue="0.082352941176470587" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalCompressionResistancePriority="1000" text="$1.66" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="9jC-qM-iuF" userLabel="feeLabel">
+                                        <rect key="frame" x="0.0" y="22" width="65.5" height="14"/>
+                                        <fontDescription key="fontDescription" style="UICTFontTextStyleCaption2"/>
+                                        <color key="textColor" red="0.4823529411764706" green="0.50980392156862742" blue="0.56470588235294117" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="44" id="Wv2-b7-1hc"/>
+                                </constraints>
+                            </stackView>
+                        </subviews>
+                        <edgeInsets key="layoutMargins" top="12" left="16" bottom="12" right="16"/>
+                    </stackView>
+                </subviews>
+                <constraints>
+                    <constraint firstItem="Dr4-fb-WFH" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" id="9zg-xW-iCi"/>
+                    <constraint firstAttribute="bottom" secondItem="Dr4-fb-WFH" secondAttribute="bottom" id="DHU-Fu-eWG"/>
+                    <constraint firstAttribute="trailing" secondItem="Dr4-fb-WFH" secondAttribute="trailing" id="VVz-hS-oA9"/>
+                    <constraint firstItem="Dr4-fb-WFH" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" id="YhM-aI-6dq"/>
+                </constraints>
+            </tableViewCellContentView>
+            <connections>
+                <outlet property="amountLabel" destination="QHx-ye-a74" id="wgK-DS-I4N"/>
+                <outlet property="dateLabel" destination="rrP-Cc-yHF" id="Vg9-O8-z0s"/>
+                <outlet property="desciptionLabel" destination="GMy-CP-6bE" id="29X-an-GrW"/>
+                <outlet property="feeLabel" destination="9jC-qM-iuF" id="Gu3-Lg-wle"/>
+            </connections>
+            <point key="canvasLocation" x="137.68115942028987" y="84.040178571428569"/>
+        </tableViewCell>
+    </objects>
+</document>

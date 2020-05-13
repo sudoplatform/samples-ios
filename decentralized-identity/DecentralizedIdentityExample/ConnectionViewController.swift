@@ -7,14 +7,30 @@
 import UIKit
 import SudoDecentralizedIdentity
 import Combine
+import Firebase
 
 struct DecryptedMessage {
     let body: String
+    let encryptedBody: Data
     let date: Date
-    let direction: Direction?
+    let senderVerkey: String?
+    let recipientVerkey: String
+    let direction: Direction
 
     enum Direction {
         case incoming, outgoing
+    }
+}
+
+enum MessageDecryptionResult {
+    case decrypted(DecryptedMessage)
+    case notDecrypted(RelayedMessage, SudoDecentralizedIdentityClientError)
+
+    var date: Date {
+        switch self {
+        case .decrypted(let decryptedMessage): return decryptedMessage.date
+        case .notDecrypted(let encryptedMessage, _): return encryptedMessage.date
+        }
     }
 }
 
@@ -23,107 +39,241 @@ class ConnectionViewController: UIViewController, UITableViewDelegate, UITableVi
 
     var walletId: String!
     var pairwiseConnection: Pairwise!
-    var messages: [DecryptedMessage] = []
-    private var myVerkey: String?
+    var messages: [MessageDecryptionResult] = []
+
+    private var myPostboxId: String!
+    private var theirEndpoint: String!
+    private var myVerkey: String!
+    private var theirVerkey: String!
     private var messageCancellable: AnyCancellable?
 
-    // MARK: Controller
+    // MARK: Receive messages
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 
-        // Retrieve local verkey.
-        Dependencies.sudoDecentralizedIdentityClient.keyForDid(
-            walletId: self.walletId,
-            did: self.pairwiseConnection.myDid
-        ) { result in
-            switch result {
-            case .success(let verkey):
-                self.myVerkey = verkey
+        messageBodyTextField.isEnabled = false
+
+        fetchMetadataDependencies {
+            DispatchQueue.main.async {
+                self.messageBodyTextField.isEnabled = true
                 self.subscribeToMessages()
+            }
+        }
+    }
+
+    func fetchMetadataDependencies(onSuccess: @escaping () -> Void) {
+        let group = DispatchGroup()
+
+        func retrieveDidDocOrAlert(forDid did: String) -> DidDoc? {
+            switch Result(catching: {
+                try KeychainDIDDocStorage().retrieve(for: did)
+            }) {
+            case .success(.some(let didDoc)):
+                return didDoc
+            case .success(.none):
+                self.presentErrorAlert(message: "Failed to retrieve stored DID doc:\nNot found")
+                return nil
             case .failure(let error):
-                DispatchQueue.main.async {
-                    self.presentErrorAlert(message: "Failed to retrieve local verkey", error: error)
+                self.presentErrorAlert(message: "Failed to retrieve stored DID doc", error: error)
+                return nil
+            }
+        }
+
+        // Retrieve my DID doc to get the service endpoint used.
+        guard let myDidDoc = retrieveDidDocOrAlert(forDid: pairwiseConnection.myDid) else { return }
+
+        // Retrieve relay postbox ID from my service endpoint to subscribe to.
+        guard let myPostboxId = Dependencies.firebaseRelay.postboxId(
+            fromServiceEndpoint: myDidDoc.service[0].endpoint
+        ) else {
+            self.presentErrorAlert(message: "Failed to retrieve local postbox ID from stored DID doc service endpoint")
+            return
+        }
+
+        // Retrieve their DID doc to get the service endpoint to send messages to.
+        guard let theirDidDoc = retrieveDidDocOrAlert(forDid: pairwiseConnection.theirDid) else { return }
+
+        // Attempt to find an endpoint from the sender's DID Doc.
+        // TODO: We may need to be smarter about finding the right endpoint in the future.
+        guard let theirEndpoint: String = theirDidDoc.service
+            .first(where: { ["http", "https"].contains(URL(string: $0.endpoint)?.scheme) })?
+            .endpoint else {
+                self.presentErrorAlert(message: "No supported service endpoint found in recipient's DID Doc")
+                return
+        }
+
+        func retrieveVerkeyOrAlert(forDid did: String, onSuccess: @escaping (String) -> Void) {
+            group.enter()
+
+            Dependencies.sudoDecentralizedIdentityClient.keyForDid(
+                walletId: self.walletId,
+                did: did
+            ) { result in
+                defer { group.leave() }
+
+                switch result {
+                case .success(let verkey):
+                    onSuccess(verkey)
+                case .failure(let error):
+                    DispatchQueue.main.async {
+                        self.presentErrorAlert(message: "Failed to retrieve stored verkey", error: error)
+                    }
                 }
+            }
+        }
+
+        // Retrieve local verkey to determine direction of messages.
+        var myVerkey: String?
+        retrieveVerkeyOrAlert(forDid: pairwiseConnection.myDid) { myVerkey = $0 }
+
+        // Retrieve recipient verkey to encrypt outgoing messages.
+        var theirVerkey: String?
+        retrieveVerkeyOrAlert(forDid: pairwiseConnection.theirDid) { theirVerkey = $0 }
+
+        group.notify(queue: .main) {
+            // subscribe to messages after verkeys are retrieved
+            self.myPostboxId = myPostboxId
+            self.theirEndpoint = theirEndpoint
+            self.myVerkey = myVerkey
+            self.theirVerkey = theirVerkey
+
+            if myVerkey != nil, theirVerkey != nil {
+                onSuccess()
             }
         }
     }
 
     private func subscribeToMessages() {
-        // Retrieve service URL from pairwise metadata
-        guard let messageEndpointString = pairwiseConnection.metadataForKey(.serviceEndpoint),
-            let messageEndpoint = URLComponents(string: messageEndpointString) else {
-                DispatchQueue.main.async {
-                    self.presentErrorAlert(message: "Failed to retrieve message endpoint")
-                }
-                return
-        }
-        assert(messageEndpoint.scheme == "samplefirebase")
-
-        messageCancellable = FirebaseMessageTransport().messages(pairwiseDid: messageEndpoint.path)
+        messageCancellable = Dependencies.firebaseRelay.subscribeToMessages(atPostboxId: myPostboxId)
             .flatMap { messages in
                 // decrypt all messages, then emit the array of decrypted messages
                 return Publishers.Sequence(sequence:
                     messages.map { encryptedMessage in
                         self.decryptMessage(encryptedMessage)
+                            .map(MessageDecryptionResult.decrypted)
                             .catch { error in
-                                Just(DecryptedMessage(
-                                    body: "(Failed to decrypt message: \(error.localizedDescription))",
-                                    date: encryptedMessage.date,
-                                    direction: nil
-                                ))
+                                Just(MessageDecryptionResult.notDecrypted(
+                                    encryptedMessage, error))
                             }
                     }
                 )
                 .flatMap { $0 }
                 .collect()
+                // We have to sort again since collect() will take elements in the order they decrypt.
+                .map { $0.sorted(by: { $0.date > $1.date }) }
             }
             .receive(on: DispatchQueue.main)
-            .sink { (messages: [DecryptedMessage]) in
+            .sink { (messages: [MessageDecryptionResult]) in
                 self.messages = messages
                 self.tableView.reloadData()
             }
     }
 
-    func decryptMessage(_ encryptedMessage: Message) -> AnyPublisher<DecryptedMessage, SudoDecentralizedIdentityClientError> {
+    func decryptMessage(_ encryptedMessage: RelayedMessage) -> AnyPublisher<DecryptedMessage, SudoDecentralizedIdentityClientError> {
         return Future { completion in
-            guard let encryptedBodyData = encryptedMessage.body.data(using: .utf8) else {
-                return completion(.failure(.failedToEncodeMessageUtf8))
-            }
-
-            Dependencies.sudoDecentralizedIdentityClient.decryptPairwiseMessage(
+            Dependencies.sudoDecentralizedIdentityClient.unpackMessage(
                 walletId: self.walletId,
-                theirDid: self.pairwiseConnection.theirDid,
-                message: encryptedBodyData,
+                message: encryptedMessage.body,
                 completion: completion
             )
         }
-        .map { (pairwiseMessage: PairwiseMessage) -> DecryptedMessage in
+        .map { (unpackedMessage: UnpackedMessage) -> DecryptedMessage in
             let direction: DecryptedMessage.Direction =
-                (pairwiseMessage.senderVerkey == self.myVerkey) ? .outgoing : .incoming
+                (unpackedMessage.senderVerkey == self.myVerkey) ? .outgoing : .incoming
 
             return DecryptedMessage(
-                body: pairwiseMessage.message,
+                body: unpackedMessage.message,
+                encryptedBody: encryptedMessage.body,
                 date: encryptedMessage.date,
+                senderVerkey: unpackedMessage.senderVerkey,
+                recipientVerkey: unpackedMessage.recipientVerkey,
                 direction: direction
             )
         }
         .eraseToAnyPublisher()
     }
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
+    // MARK: Send message
 
-        navigationItem.title = pairwiseConnection.label
+    @IBOutlet weak var messageBodyTextField: UITextField!
+    @IBOutlet weak var sendMessageButton: UIButton!
+
+    @IBAction func sendMessageButtonTapped() {
+        guard let outgoingData = messageBodyTextField.text?.data(using: .utf8) else {
+            self.presentErrorAlert(message: "No outgoing data")
+            return
+        }
+
+        Dependencies.sudoDecentralizedIdentityClient.packMessage(
+            walletId: walletId,
+            message: outgoingData,
+            recipientVerkeys: [myVerkey, theirVerkey],
+            senderVerkey: myVerkey
+        ) { result in
+            switch result {
+            case .success(let packedMessage):
+                // Transmit the encrypted message to the recipient's service endpoint.
+                DIDCommTransports.transmit(
+                    data: packedMessage,
+                    to: self.theirEndpoint
+                ) { result in
+                    if case .failure(let error) = result {
+                        DispatchQueue.main.async {
+                            self.presentErrorAlert(message: "Failed to transmit encrypted message", error: error)
+                        }
+                    }
+                }
+
+                // Persist encrypted message to our own DB so we have a copy.
+                Firestore.firestore(app: Dependencies.firebaseRelay.app)
+                    .collection("postboxes")
+                    .document(self.myPostboxId)
+                    .collection("messages")
+                    .addDocument(data: [
+                        "message": packedMessage,
+                        "createdAt": FieldValue.serverTimestamp()
+                    ]) { error in
+                        if let error = error {
+                            DispatchQueue.main.async {
+                                self.presentErrorAlert(message: "Failed to persist encrypted message to local DB", error: error)
+                            }
+                        }
+                    }
+
+                // Clear the body text field.
+                DispatchQueue.main.async {
+                    self.messageBodyTextField.text = ""
+                }
+            case .failure(let error):
+                DispatchQueue.main.async {
+                    self.presentErrorAlert(message: "Failed to encrypt message", error: error)
+                }
+            }
+        }
+    }
+
+    @IBAction func messageBodyChanged() {
+        sendMessageButton.isEnabled = !(messageBodyTextField.text?.isEmpty ?? true)
     }
 
     // MARK: Table View
 
-    let incomingMessageImage = UIImage(systemName: "square.and.arrow.down")
-    let outgoingMessageImage = UIImage(systemName: "square.and.arrow.up")
-    let failedMessageImage = UIImage(systemName: "exclamationmark.bubble")
-
     @IBOutlet weak var tableView: UITableView!
+    @IBOutlet weak var bottomOffsetConstraint: NSLayoutConstraint!
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+
+        tableView.transform = CGAffineTransform(a: 1, b: 0, c: 0, d: -1, tx: 0, ty: 0)
+
+        navigationItem.title = pairwiseConnection.label
+
+        NotificationCenter.default.addObserver(self, selector: #selector(handleKeyboardChange), name: UIResponder.keyboardWillHideNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(handleKeyboardChange), name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
+
+        messageBodyChanged()
+    }
 
     func numberOfSections(in tableView: UITableView) -> Int {
         return 1
@@ -131,28 +281,37 @@ class ConnectionViewController: UIViewController, UITableViewDelegate, UITableVi
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         assert(section == 0)
-        return messages.count + 1
+        return messages.count
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         assert(indexPath.section == 0)
 
-        if indexPath.row == 0 {
-            return tableView.dequeueReusableCell(withIdentifier: "createMessageCell", for: indexPath)
-        } else {
-            let message = messages[indexPath.row - 1]
-            let cell = tableView.dequeueReusableCell(withIdentifier: "messageCell", for: indexPath) as! ConnectionMessageTableViewCell
+        let messageResult = messages[indexPath.row]
+
+        let cell: ConnectionMessageTableViewCell
+
+        switch messageResult {
+        case .decrypted(let message):
+            switch message.direction {
+            case .incoming:
+                cell = tableView.dequeueReusableCell(withIdentifier: "incomingMessageCell", for: indexPath) as! ConnectionMessageTableViewCell
+            case .outgoing:
+                cell = tableView.dequeueReusableCell(withIdentifier: "outgoingMessageCell", for: indexPath) as! ConnectionMessageTableViewCell
+            }
+
             cell.bodyLabel.text = message.body
             cell.dateLabel.text = DateFormatter.localizedString(from: message.date, dateStyle: .short, timeStyle: .short)
 
-            switch message.direction {
-            case .incoming: cell.messageTypeImageView.image = incomingMessageImage
-            case .outgoing: cell.messageTypeImageView.image = outgoingMessageImage
-            case .none: cell.messageTypeImageView.image = failedMessageImage
-            }
-
-            return cell
+        case .notDecrypted(let encryptedMessage, let error):
+            cell = tableView.dequeueReusableCell(withIdentifier: "incomingMessageCell", for: indexPath) as! ConnectionMessageTableViewCell
+            cell.bodyLabel.text = "(Failed to decrypt message: \(error.localizedDescription))"
+            cell.dateLabel.text = DateFormatter.localizedString(from: encryptedMessage.date, dateStyle: .short, timeStyle: .short)
         }
+
+        cell.transform = CGAffineTransform(a: 1, b: 0, c: 0, d: -1, tx: 0, ty: 0)
+
+        return cell
     }
 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -160,8 +319,18 @@ class ConnectionViewController: UIViewController, UITableViewDelegate, UITableVi
 
         tableView.deselectRow(at: indexPath, animated: true)
 
-        if indexPath.row == 0 {
-            performSegue(withIdentifier: "navigateToCreateMessage", sender: self)
+        performSegue(withIdentifier: "navigateToMessageDetails", sender: messages[indexPath.row])
+    }
+
+    @objc func handleKeyboardChange(notification: Notification) {
+        guard let frameEnd = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else { return }
+
+        bottomOffsetConstraint.constant = notification.name == UIResponder.keyboardWillHideNotification
+            ? 0
+            : frameEnd.height - view.safeAreaInsets.bottom
+
+        UIView.animate(withDuration: 0.5) {
+           self.view.layoutIfNeeded()
         }
     }
 
@@ -172,19 +341,18 @@ class ConnectionViewController: UIViewController, UITableViewDelegate, UITableVi
         case "navigateToConnectionDetails":
             let destination = segue.destination as! ConnectionDetailsViewController
             destination.pairwiseConnection = self.pairwiseConnection
-        case "navigateToCreateMessage":
-            let destination = segue.destination as! CreateMessageViewController
-            destination.walletId = self.walletId
-            destination.pairwiseConnection = self.pairwiseConnection
+
+            view.endEditing(true)
+        case "navigateToMessageDetails":
+            let messageResult = sender as! MessageDecryptionResult
+            let destination = segue.destination as! MessageDetailsViewController
+            destination.messageResult = messageResult
         default: break
         }
     }
-
-    @IBAction func returnToConnection(unwindSegue: UIStoryboardSegue) {}
 }
 
 class ConnectionMessageTableViewCell: UITableViewCell {
-    @IBOutlet weak var messageTypeImageView: UIImageView!
     @IBOutlet weak var bodyLabel: UILabel!
     @IBOutlet weak var dateLabel: UILabel!
 }

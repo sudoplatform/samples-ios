@@ -8,7 +8,7 @@
       "idiom" : "universal",
       "color" : {
         "platform" : "ios",
-        "reference" : "systemBackgroundColor"
+        "reference" : "groupTableViewBackgroundColor"
       }
     },
     {
@@ -20,11 +20,8 @@
         }
       ],
       "color" : {
-        "color-space" : "extended-gray",
-        "components" : {
-          "white" : "0.000",
-          "alpha" : "1.000"
-        }
+        "platform" : "ios",
+        "reference" : "secondarySystemGroupedBackgroundColor"
       }
     }
   ]

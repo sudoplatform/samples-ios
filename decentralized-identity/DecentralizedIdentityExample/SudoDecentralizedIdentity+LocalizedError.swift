@@ -52,18 +52,31 @@ extension PairwiseServiceError: LocalizedError {
 extension CryptoServiceError: LocalizedError {
     public var errorDescription: String? {
         switch self {
+        case .failedToEncodeReceiverVerkeys(let error):
+            return "Failed to encode receiver verkeys: \(error)"
+        case .failedToDecodeUnpackedData(let error):
+            return "Failed to decode unpacked data: \(error)"
+        case .indyError(.none):
+            return "An unknown Indy error occurred"
+        case .indyError(.some(let indyCode, let message)):
+            return message ?? "Indy error \(indyCode.rawValue)"
+        }
+    }
+}
+
+extension WalletServiceError: LocalizedError {
+    public var errorDescription: String? {
+        switch self {
         case .general(let error):
             return error.localizedDescription
         case .indy(let error):
             return "Indy error: \(descriptionForIndyError(error))"
         case .invalidJson:
             return "Invalid JSON"
-        case .failedToEncodeVerkeys:
-            return "Failed to encode verkeys"
-        case .noDataAfterPack:
-            return "No data after pack"
         case .unknown:
             return "An unknown error occurred"
+        case .keyNotFoundForWalletId:
+            return "Key for wallet not found"
         }
     }
 }

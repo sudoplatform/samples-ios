@@ -30,20 +30,34 @@ class CreateInvitationCodeViewController: UIViewController {
     var localDid: Did!
     var connectionName: String!
 
+    private var currentInvitationJson: Data?
+    private var presentedActivityAlert: UIAlertController?
+
     // MARK: Connection Establishment
 
     func createInvitationCode() {
-        generateInvitationString { invitation, invitationString in
-            let qrCodeImage = UIImage.qrCode(from: invitationString)
+        generateInvitationString { invitation, invitationData, invitationURL, mediatorPostboxId in
+            let qrCodeImage = UIImage.qrCode(from: invitationURL)
 
+            self.currentInvitationJson = invitationData
             self.qrCodeImageView.image = qrCodeImage
 
-            self.waitForExchangeRequest(from: invitation, at: invitation.serviceEndpoint) { exchangeRequest in
-                self.createAndUploadExchangeResponse(to: exchangeRequest) { exchangeResponse in
+            self.waitForExchangeRequest(from: invitation, at: mediatorPostboxId) { exchangeRequest in
+                DispatchQueue.main.async {
+                    self.presentedActivityAlert = self.presentActivityAlert(message: "Sending Response")
+                }
+
+                self.createAndTransmitExchangeResponse(to: exchangeRequest) { exchangeResponse in
                     // TODO: wait for "Exchange Complete" message.
+                    DispatchQueue.main.async {
+                        self.presentedActivityAlert?.message = "Creating Pairwise"
+                    }
+
                     self.createPairwise(exchangeRequest: exchangeRequest, exchangeResponse: exchangeResponse) { pairwise in
                         DispatchQueue.main.async {
-                            self.performSegue(withIdentifier: "returnToWallet", sender: self)
+                            self.dismiss(animated: true) {
+                                self.performSegue(withIdentifier: "returnToWallet", sender: self)
+                            }
                         }
                     }
                 }
@@ -51,8 +65,21 @@ class CreateInvitationCodeViewController: UIViewController {
         }
     }
 
-    private func generateInvitationString(onSuccess: @escaping (Invitation, String) -> Void) {
-        let serviceEndpoint = "samplefirebase:\(UUID().uuidString)"
+    private func onFailure(_ message: String, error: Error?) {
+        DispatchQueue.main.async {
+            if self.presentedActivityAlert != nil {
+                self.dismiss(animated: true) {
+                    self.presentErrorAlert(message: message, error: error)
+                }
+            } else {
+                self.presentErrorAlert(message: message, error: error)
+            }
+        }
+    }
+
+    private func generateInvitationString(onSuccess: @escaping (Invitation, Data, String, String) -> Void) {
+        let mediatorPostboxId = UUID().uuidString
+        let serviceEndpoint = Dependencies.firebaseRelay.serviceEndpoint(forPostboxId: mediatorPostboxId)
 
         Dependencies.sudoDecentralizedIdentityClient.invitation(
             walletId: walletId,
@@ -63,61 +90,65 @@ class CreateInvitationCodeViewController: UIViewController {
             DispatchQueue.main.async {
                 switch result {
                 case .success(let invitation):
-                    guard let invitationJson = try? JSONEncoder().encode(invitation),
-                        let invitationString = String(data: invitationJson, encoding: .utf8) else {
-                            self.presentErrorAlert(message: "Failed to encode invitation")
-                            return
+                    let invitationJson: Data
+                    do {
+                        invitationJson = try JSONEncoder().encode(invitation)
+                    } catch let error {
+                        self.onFailure("Failed to encode invitation", error: error)
+                        return
                     }
 
-                    onSuccess(invitation, invitationString)
+                    // Encode the invitation JSON using the Standard Invitation Encoding:
+                    // https://github.com/hyperledger/aries-rfcs/tree/master/features/0023-did-exchange#standard-invitation-encoding
+                    // The base URL here is arbitrary - we don't have iOS Associated Domains set up anyway.
+                    var invitationURL = URLComponents()
+                    invitationURL.host = Dependencies.firebaseRelay.app.options.databaseURL ?? "https://example.com"
+                    invitationURL.queryItems = [URLQueryItem(name: "c_i", value: invitationJson.base64URLEncodedString())]
+
+                    guard let invitationURLString = invitationURL.string else {
+                        self.onFailure("Failed to encode invitation URL", error: nil)
+                        return
+                    }
+
+                    onSuccess(invitation, invitationJson, invitationURLString, mediatorPostboxId)
                 case .failure(let error):
-                    self.presentErrorAlert(message: "Failed to create invitation", error: error)
+                    self.onFailure("Failed to create invitation", error: error)
                 }
             }
         }
     }
 
-    private func waitForExchangeRequest(from invitation: Invitation, at serviceEndpoint: String, onSuccess: @escaping (ExchangeRequest) -> Void) {
-        let serviceEndpointUri = URLComponents(string: serviceEndpoint)!
-        assert(serviceEndpointUri.scheme == "samplefirebase")
+    private func waitForExchangeRequest(from invitation: Invitation, at mediatorPostboxId: String, onSuccess: @escaping (ExchangeRequest) -> Void) {
 
-        let transport: ExchangeRequestTransport = FirebaseExchangeRequestTransport()
-        transport.waitForExchangeRequest(at: serviceEndpointUri.path) { result in
+        Dependencies.firebaseRelay.waitForMessage(atPostboxId: mediatorPostboxId, timeout: 3600) { result in
             switch result {
             case .success(let encryptedRequestJson):
-                Dependencies.sudoDecentralizedIdentityClient.decryptMessage(
+                Dependencies.sudoDecentralizedIdentityClient.unpackMessage(
                     walletId: self.walletId,
-                    verkey: invitation.recipientKeys[0],
                     message: encryptedRequestJson
                 ) { result in
                     switch result {
                     case .success(let decryptedRequestData):
-                        guard let exchangeRequest = try? JSONDecoder().decode(ExchangeRequest.self, from: decryptedRequestData) else {
-                            DispatchQueue.main.async {
-                                self.presentErrorAlert(message: "Failed to decode exchange request")
-                            }
+                        let exchangeRequest: ExchangeRequest
+                        do {
+                            exchangeRequest = try JSONDecoder().decode(ExchangeRequest.self, from: Data(decryptedRequestData.message.utf8))
+                        } catch let error {
+                            self.onFailure("Failed to decode exchange request", error: error)
                             return
                         }
 
                         onSuccess(exchangeRequest)
                     case .failure(let error):
-                        DispatchQueue.main.async {
-                            self.presentErrorAlert(message: "Failed to decrypt exchange request", error: error)
-                        }
+                        self.onFailure("Failed to decrypt exchange request", error: error)
                     }
                 }
             case .failure(let error):
-                DispatchQueue.main.async {
-                    self.presentErrorAlert(message: "Failed to receive exchange response", error: error)
-                }
+                self.onFailure("Failed to receive exchange request", error: error)
             }
         }
     }
 
-    private func createAndUploadExchangeResponse(to exchangeRequest: ExchangeRequest, onSuccess: @escaping (ExchangeResponse) -> Void) {
-        let destinationEndpointUri = URLComponents(string: exchangeRequest.connection.didDoc.serviceEndpoint)!
-        assert(destinationEndpointUri.scheme == "samplefirebase")
-
+    private func createAndTransmitExchangeResponse(to exchangeRequest: ExchangeRequest, onSuccess: @escaping (ExchangeResponse) -> Void) {
         // Create a new DID for the response to allow the peer to connect with us multiple times.
         // This isn't required by the spec.
         Dependencies.sudoDecentralizedIdentityClient.createDid(
@@ -126,69 +157,119 @@ class CreateInvitationCodeViewController: UIViewController {
         ) { result in
             switch result {
             case .success(let did):
-                let newEndpoint = "samplefirebase:\(UUID().uuidString)"
+                // Create a new service endpoint for chatting.
+                let chatPostboxId = UUID().uuidString
+                let chatServiceEndpoint = Dependencies.firebaseRelay.serviceEndpoint(forPostboxId: chatPostboxId)
 
-                let exchangeResponse = Dependencies.sudoDecentralizedIdentityClient.exchangeResponse(
+                let unsignedExchangeResponse = Dependencies.sudoDecentralizedIdentityClient.exchangeResponse(
                     did: did,
-                    serviceEndpoint: newEndpoint,
+                    serviceEndpoint: chatServiceEndpoint,
                     label: self.connectionName,
                     exchangeRequest: exchangeRequest
                 )
 
-                guard let plaintextResponseJson = try? JSONEncoder().encode(exchangeResponse) else {
-                    DispatchQueue.main.async {
-                        self.presentErrorAlert(message: "Failed to encode exchange response")
-                    }
-                    return
-                }
-
-                Dependencies.sudoDecentralizedIdentityClient.encryptMessage(
+                Dependencies.sudoDecentralizedIdentityClient.signExchangeResponse(
                     walletId: self.walletId,
-                    verkey: exchangeRequest.connection.didDoc.verKey,
-                    message: plaintextResponseJson
+                    exchangeResponse: unsignedExchangeResponse
                 ) { result in
                     switch result {
-                    case .success(let encryptedResponseJson):
-                        let transport: ExchangeRequestTransport = FirebaseExchangeRequestTransport()
-                        transport.sendExchangeResponse(at: destinationEndpointUri.path, response: encryptedResponseJson) { result in
+                    case .success(let signedExchangeResponse):
+                        let signedResponseJson: Data
+                        do {
+                            signedResponseJson = try JSONEncoder().encode(signedExchangeResponse)
+                        } catch let error {
+                            self.onFailure("Failed to encode exchange response", error: error)
+                            return
+                        }
+
+                        // Attempt to find a public key from the sender's DID Doc.
+                        // TODO: We may need to be smarter about finding the right key in the future.
+                        let recipientVerkeys: [String] = exchangeRequest.connection.didDoc.publicKey.compactMap { key -> String? in
+                            guard case .ed25519VerificationKey2018 = key.type else {
+                                return nil
+                            }
+                            return key.specifier
+                        }
+
+                        guard !recipientVerkeys.isEmpty else {
+                            self.onFailure("No verkeys found in recipient's DID Doc", error: nil)
+                            return
+                        }
+
+                        // Attempt to find an endpoint from the sender's DID Doc.
+                        // TODO: We may need to be smarter about finding the right endpoint in the future.
+                        guard let recipientEndpoint: String = exchangeRequest.connection.didDoc.service
+                            .first(where: { ["http", "https"].contains(URL(string: $0.endpoint)?.scheme) })?
+                            .endpoint else {
+                                self.onFailure("No supported service endpoint found in recipient's DID Doc", error: nil)
+                                return
+                        }
+
+                        Dependencies.sudoDecentralizedIdentityClient.packMessage(
+                            walletId: self.walletId,
+                            message: signedResponseJson,
+                            recipientVerkeys: recipientVerkeys,
+                            senderVerkey: did.verkey
+                        ) { result in
                             switch result {
-                            case .success:
-                                onSuccess(exchangeResponse)
-                            case .failure(let error):
-                                DispatchQueue.main.async {
-                                    self.presentErrorAlert(message: "Failed to upload exchange response", error: error)
+                            case .success(let encryptedResponseJson):
+                                DIDCommTransports.transmit(
+                                    data: encryptedResponseJson,
+                                    to: recipientEndpoint
+                                ) { result in
+                                    switch result {
+                                    case .success:
+                                        onSuccess(unsignedExchangeResponse)
+                                    case .failure(let error):
+                                        self.onFailure("Failed to transmit exchange response", error: error)
+                                    }
                                 }
+                            case .failure(let error):
+                                self.onFailure("Failed to encrypt exchange response", error: error)
                             }
                         }
                     case .failure(let error):
-                        DispatchQueue.main.async {
-                            self.presentErrorAlert(message: "Failed to encrypt exchange response", error: error)
-                        }
+                        self.onFailure("Failed to sign exchange response", error: error)
                     }
                 }
             case .failure(let error):
-                DispatchQueue.main.async {
-                    self.presentErrorAlert(message: "Failed to create new DID", error: error)
-                }
+                self.onFailure("Failed to create new DID", error: error)
             }
         }
     }
 
     private func createPairwise(exchangeRequest: ExchangeRequest, exchangeResponse: ExchangeResponse, onSuccess: @escaping (Pairwise) -> Void) {
-        let myDid = exchangeResponse.connection.didDoc.did
-        let theirDid = exchangeRequest.connection.didDoc.did
+        let myDidDoc = exchangeResponse.connection.didDoc
+        let theirDidDoc = exchangeRequest.connection.didDoc
         let label = exchangeRequest.label
 
-        // The final service endpoint is a new endpoint where chats will be exchanged.
-        let finalServiceEndpoint = exchangeResponse.connection.didDoc.serviceEndpoint
+        do {
+            try KeychainDIDDocStorage().store(doc: myDidDoc, for: myDidDoc.id)
+            try KeychainDIDDocStorage().store(doc: theirDidDoc, for: theirDidDoc.id)
+        } catch let error {
+            self.onFailure("Failed to persist DID doc", error: error)
+            return
+        }
+
+        // Attempt to find a public key from the sender's DID Doc.
+        // TODO: We may need to be smarter about finding the right key in the future.
+        guard let recipientVerkey: String = exchangeRequest.connection.didDoc.publicKey
+            .first(where: { key in
+                if case .ed25519VerificationKey2018 = key.type {
+                    return true
+                }
+                return false
+            })?.specifier else {
+                self.onFailure("No verkey found in recipient's DID Doc", error: nil)
+                return
+        }
 
         Dependencies.sudoDecentralizedIdentityClient.createPairwise(
             walletId: walletId,
-            theirDid: theirDid,
-            theirVerkey: exchangeRequest.connection.didDoc.verKey,
+            theirDid: theirDidDoc.id,
+            theirVerkey: recipientVerkey,
             label: label,
-            myDid: myDid,
-            serviceEndpoint: finalServiceEndpoint
+            myDid: myDidDoc.id
         ) { result in
             switch result {
             case .success:
@@ -196,25 +277,19 @@ class CreateInvitationCodeViewController: UIViewController {
                     switch result {
                     case .success(let pairwiseConnections):
                         guard let pairwiseConnection = pairwiseConnections.first(where: {
-                            $0.myDid == myDid && $0.theirDid == theirDid
+                            $0.myDid == myDidDoc.id && $0.theirDid == theirDidDoc.id
                         }) else {
-                            DispatchQueue.main.async {
-                                self.presentErrorAlert(message: "Failed to retrieve pairwise connection")
-                            }
+                            self.onFailure("Failed to retrieve pairwise connection", error: nil)
                             return
                         }
 
                         onSuccess(pairwiseConnection)
                     case .failure(let error):
-                        DispatchQueue.main.async {
-                            self.presentErrorAlert(message: "Failed to retrieve pairwise connection", error: error)
-                        }
+                        self.onFailure("Failed to retrieve pairwise connection", error: error)
                     }
                 }
             case .failure(let error):
-                DispatchQueue.main.async {
-                    self.presentErrorAlert(message: "Failed to create pairwise connection", error: error)
-                }
+                self.onFailure("Failed to create pairwise connection", error: error)
             }
         }
     }
@@ -231,5 +306,9 @@ class CreateInvitationCodeViewController: UIViewController {
         connectionNameLabel.text = connectionName
 
         createInvitationCode()
+    }
+
+    @IBAction func copyRawInvitation() {
+        UIPasteboard.general.string = currentInvitationJson.flatMap { String(data: $0, encoding: .utf8) }
     }
 }

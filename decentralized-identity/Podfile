@@ -7,7 +7,7 @@ target 'DecentralizedIdentityExample' do
   use_modular_headers!
 
   # Pods for DecentralizedIdentityExample
-  pod 'SudoDecentralizedIdentity', '~> 1.0.1'
+  pod 'SudoDecentralizedIdentity', '~> 3.0'
   pod 'Firebase/Firestore', '~> 6.23.0'
   pod 'FirebaseFirestoreSwift'
   pod 'Firebase/Auth', '~> 6.23.0'

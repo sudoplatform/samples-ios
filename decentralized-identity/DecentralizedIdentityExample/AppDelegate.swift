@@ -10,12 +10,25 @@ import Firebase
 
 struct Dependencies {
     static let sudoDecentralizedIdentityClient = DefaultSudoDecentralizedIdentityClient()
+
+    static let firebaseRelay: FirebaseRelay = {
+        // If this line fails, this object is being initialized on a background thread.
+        // Firebase requires initialization to occur on the main thread.
+        assert(Thread.isMainThread)
+
+        // If this line fails, GoogleService-Info.plist is missing.
+        // Please refer to the README for Firebase configuration instructions.
+        FirebaseApp.configure()
+        let firebaseApp = FirebaseApp.app()!
+
+        return FirebaseRelay(app: firebaseApp)
+    }()
 }
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        FirebaseApp.configure()
+        NSLog("Initialized Firebase relay \(Dependencies.firebaseRelay)")
         return true
     }
 

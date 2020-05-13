@@ -54,32 +54,14 @@ class WelcomeViewController: UIViewController {
         }
     }
 
-    private func authenticateWithFirebase(onSuccess: @escaping (AuthDataResult?) -> Void) {
-        Auth.auth().signInAnonymously() { (authResult, error) in
-            if let error = error {
-                DispatchQueue.main.async {
-                    self.dismiss(animated: true) {
-                        self.presentErrorAlert(message: "Failed to authenticate with Firebase", error: error)
-                    }
-                }
-                return
-            }
-
-            NSLog("Logged in with Firebase uid=\(authResult?.user.uid ?? "(none)")")
-            onSuccess(authResult)
-        }
-    }
-
     @IBAction func getStartedTapped() {
         self.presentActivityAlert(message: "Initializing Wallet")
 
         initializeWallet(walletId: "my-wallet") { walletId in
             self.retrievePrimaryDid(walletId: walletId) { primaryDid in
-                self.authenticateWithFirebase { authResult in
-                    DispatchQueue.main.async {
-                        self.dismiss(animated: true) {
-                            self.performSegue(withIdentifier: "navigateToWallet", sender: (walletId, primaryDid))
-                        }
+                DispatchQueue.main.async {
+                    self.dismiss(animated: true) {
+                        self.performSegue(withIdentifier: "navigateToWallet", sender: (walletId, primaryDid))
                     }
                 }
             }

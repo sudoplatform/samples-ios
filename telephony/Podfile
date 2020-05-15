@@ -8,5 +8,5 @@ source 'https://cdn.cocoapods.org/'
 
 target 'TelephonyExample' do
     pod 'SudoUser', '~> 7.2'
-    pod 'SudoTelephony', '~> 2.0'
+    pod 'SudoTelephony', '~> 3.0'
 end

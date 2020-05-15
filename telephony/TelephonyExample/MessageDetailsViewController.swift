@@ -46,10 +46,10 @@ class MessageDetailsViewController: UIViewController, UITableViewDelegate, UITab
         }
     }
     
-    private func downloadAttachment(mediaObject: S3MediaObject, completion: @escaping ((UIImage) -> Void)) {
+    private func downloadAttachment(mediaObject: MediaObject, completion: @escaping ((UIImage) -> Void)) {
         let telephonyClient = (UIApplication.shared.delegate as! AppDelegate).telephonyClient!
         
-        telephonyClient.downloadData(s3Object: mediaObject) { result in
+        telephonyClient.downloadData(for: mediaObject) { result in
             DispatchQueue.main.async {
                 switch result {
                 case .success(let data):

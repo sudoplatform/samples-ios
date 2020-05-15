@@ -41,7 +41,7 @@ class PhoneNumberListViewController: UIViewController, UITableViewDelegate, UITa
 
         func fetchPageOfPhoneNumbers(listToken: String?) {
             do {
-                try telephonyClient.listPhoneNumbers(limit: nil, nextToken: listToken) { result in
+                try telephonyClient.listPhoneNumbers(sudoId: sudo.id, limit: nil, nextToken: listToken) { result in
                     switch result {
                     case .failure(let error):
                         DispatchQueue.main.async {

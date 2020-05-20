@@ -249,13 +249,13 @@ PODS:
   - nanopb/decode (0.3.9011)
   - nanopb/encode (0.3.9011)
   - PromisesObjC (1.2.8)
-  - SudoDecentralizedIdentity (3.0.0)
+  - SudoDecentralizedIdentity (4.0.0)
 
 DEPENDENCIES:
   - Firebase/Auth (~> 6.23.0)
   - Firebase/Firestore (~> 6.23.0)
   - FirebaseFirestoreSwift
-  - SudoDecentralizedIdentity (~> 3.0)
+  - SudoDecentralizedIdentity (~> 4.0)
 
 SPEC REPOS:
   https://cdn.cocoapods.org/:
@@ -300,8 +300,8 @@ SPEC CHECKSUMS:
   leveldb-library: 55d93ee664b4007aac644a782d11da33fba316f7
   nanopb: 18003b5e52dab79db540fe93fe9579f399bd1ccd
   PromisesObjC: c119f3cd559f50b7ae681fa59dc1acd19173b7e6
-  SudoDecentralizedIdentity: 1af3189d8713cf558ce2e65d69fba75233a8b78a
+  SudoDecentralizedIdentity: 22433e30e987e85c57b37a2a493f5f5113f1017e
 
-PODFILE CHECKSUM: c5c06d09e4b9eb5dc1a70b2eae0dfd15d1988e26
+PODFILE CHECKSUM: e20588c61e4bab8d1ad7b309da80d75e692a27ea
 
 COCOAPODS: 1.9.1

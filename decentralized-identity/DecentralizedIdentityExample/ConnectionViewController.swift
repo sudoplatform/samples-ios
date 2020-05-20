@@ -10,12 +10,17 @@ import Combine
 import Firebase
 
 struct DecryptedMessage {
-    let body: String
+    let body: Body
     let encryptedBody: Data
     let date: Date
     let senderVerkey: String?
     let recipientVerkey: String
     let direction: Direction
+
+    enum Body {
+        case message(DIDCommMessage, String)
+        case text(String)
+    }
 
     enum Direction {
         case incoming, outgoing
@@ -42,7 +47,7 @@ class ConnectionViewController: UIViewController, UITableViewDelegate, UITableVi
     var messages: [MessageDecryptionResult] = []
 
     private var myPostboxId: String!
-    private var theirEndpoint: String!
+    private var theirService: DidDoc.Service!
     private var myVerkey: String!
     private var theirVerkey: String!
     private var messageCancellable: AnyCancellable?
@@ -96,9 +101,8 @@ class ConnectionViewController: UIViewController, UITableViewDelegate, UITableVi
 
         // Attempt to find an endpoint from the sender's DID Doc.
         // TODO: We may need to be smarter about finding the right endpoint in the future.
-        guard let theirEndpoint: String = theirDidDoc.service
-            .first(where: { ["http", "https"].contains(URL(string: $0.endpoint)?.scheme) })?
-            .endpoint else {
+        guard let theirService = theirDidDoc.service
+            .first(where: { ["http", "https"].contains(URL(string: $0.endpoint)?.scheme) }) else {
                 self.presentErrorAlert(message: "No supported service endpoint found in recipient's DID Doc")
                 return
         }
@@ -134,7 +138,7 @@ class ConnectionViewController: UIViewController, UITableViewDelegate, UITableVi
         group.notify(queue: .main) {
             // subscribe to messages after verkeys are retrieved
             self.myPostboxId = myPostboxId
-            self.theirEndpoint = theirEndpoint
+            self.theirService = theirService
             self.myVerkey = myVerkey
             self.theirVerkey = theirVerkey
 
@@ -182,8 +186,17 @@ class ConnectionViewController: UIViewController, UITableViewDelegate, UITableVi
             let direction: DecryptedMessage.Direction =
                 (unpackedMessage.senderVerkey == self.myVerkey) ? .outgoing : .incoming
 
+            let body: DecryptedMessage.Body
+
+            switch ClientContainer().parseDIDCommJSON(data: Data(unpackedMessage.message.utf8)) {
+            case .success(let message):
+                body = .message(message, unpackedMessage.message)
+            case .failure:
+                body = .text(unpackedMessage.message)
+            }
+
             return DecryptedMessage(
-                body: unpackedMessage.message,
+                body: body,
                 encryptedBody: encryptedMessage.body,
                 date: encryptedMessage.date,
                 senderVerkey: unpackedMessage.senderVerkey,
@@ -200,29 +213,82 @@ class ConnectionViewController: UIViewController, UITableViewDelegate, UITableVi
     @IBOutlet weak var sendMessageButton: UIButton!
 
     @IBAction func sendMessageButtonTapped() {
-        guard let outgoingData = messageBodyTextField.text?.data(using: .utf8) else {
-            self.presentErrorAlert(message: "No outgoing data")
+        let basicMessage = BasicMessage(
+            id: UUID().uuidString,
+            thread: nil, // TODO?
+            content: messageBodyTextField.text ?? "",
+            sent: Date(),
+            l10n: nil
+        )
+
+        let basicMessageJson: Data
+
+        do {
+            let encoder = JSONEncoder()
+            encoder.outputFormatting = [.withoutEscapingSlashes]
+            encoder.dateEncodingStrategy = .iso8601
+            basicMessageJson = try encoder.encode(basicMessage)
+        } catch let error {
+            self.presentErrorAlert(message: "Failed to encode basic message", error: error)
             return
         }
 
         Dependencies.sudoDecentralizedIdentityClient.packMessage(
             walletId: walletId,
-            message: outgoingData,
+            message: basicMessageJson,
             recipientVerkeys: [myVerkey, theirVerkey],
             senderVerkey: myVerkey
         ) { result in
             switch result {
-            case .success(let packedMessage):
-                // Transmit the encrypted message to the recipient's service endpoint.
-                DIDCommTransports.transmit(
-                    data: packedMessage,
-                    to: self.theirEndpoint
+            case .success(let packedMessageForSelfAndRecipient):
+                DecentralizedIdentityExample.encryptForRoutingKeys(
+                    walletId: self.walletId,
+                    message: packedMessageForSelfAndRecipient,
+                    to: self.theirVerkey,
+                    routingKeys: ArraySlice(self.theirService.routingKeys)
                 ) { result in
-                    if case .failure(let error) = result {
+                    switch result {
+                    case .success(let packedMessage):
+                        let packedMessageJson: Data
+                        do {
+                            let encoder = JSONEncoder()
+                            encoder.outputFormatting = [.withoutEscapingSlashes]
+                            packedMessageJson = try encoder.encode(packedMessage)
+                        } catch let error {
+                            DispatchQueue.main.async {
+                                self.presentErrorAlert(message: "Failed to encode packed message", error: error)
+                            }
+                            return
+                        }
+
+                        // Transmit the encrypted message to the recipient's service endpoint.
+                        DIDCommTransports.transmit(
+                            data: packedMessageJson,
+                            to: self.theirService.endpoint
+                        ) { result in
+                            if case .failure(let error) = result {
+                                DispatchQueue.main.async {
+                                    self.presentErrorAlert(message: "Failed to transmit encrypted message", error: error)
+                                }
+                            }
+                        }
+                    case .failure(let error):
                         DispatchQueue.main.async {
-                            self.presentErrorAlert(message: "Failed to transmit encrypted message", error: error)
+                            self.presentErrorAlert(message: "Failed to encrypt message for recipient routing keys", error: error)
                         }
                     }
+                }
+
+                let packedMessageJson: Data
+                do {
+                    let encoder = JSONEncoder()
+                    encoder.outputFormatting = [.withoutEscapingSlashes]
+                    packedMessageJson = try encoder.encode(packedMessageForSelfAndRecipient)
+                } catch let error {
+                    DispatchQueue.main.async {
+                        self.presentErrorAlert(message: "Failed to encode packed message", error: error)
+                    }
+                    return
                 }
 
                 // Persist encrypted message to our own DB so we have a copy.
@@ -231,7 +297,7 @@ class ConnectionViewController: UIViewController, UITableViewDelegate, UITableVi
                     .document(self.myPostboxId)
                     .collection("messages")
                     .addDocument(data: [
-                        "message": packedMessage,
+                        "message": packedMessageJson,
                         "createdAt": FieldValue.serverTimestamp()
                     ]) { error in
                         if let error = error {
@@ -300,8 +366,18 @@ class ConnectionViewController: UIViewController, UITableViewDelegate, UITableVi
                 cell = tableView.dequeueReusableCell(withIdentifier: "outgoingMessageCell", for: indexPath) as! ConnectionMessageTableViewCell
             }
 
-            cell.bodyLabel.text = message.body
-            cell.dateLabel.text = DateFormatter.localizedString(from: message.date, dateStyle: .short, timeStyle: .short)
+            switch message.body {
+            case .message(let agentMessage as PreviewableDIDCommMessage, _):
+                cell.bodyLabel.text = agentMessage.preview
+                cell.dateLabel.text = agentMessage.typeDescription
+                // TODO: show the date somewhere
+            case .message(let agentMessage, _):
+                cell.bodyLabel.text = "(\(agentMessage.type))"
+                cell.dateLabel.text = DateFormatter.localizedString(from: message.date, dateStyle: .short, timeStyle: .short)
+            case .text(let text):
+                cell.bodyLabel.text = text
+                cell.dateLabel.text = DateFormatter.localizedString(from: message.date, dateStyle: .short, timeStyle: .short)
+            }
 
         case .notDecrypted(let encryptedMessage, let error):
             cell = tableView.dequeueReusableCell(withIdentifier: "incomingMessageCell", for: indexPath) as! ConnectionMessageTableViewCell

@@ -17,13 +17,14 @@ struct DIDCommTransports {
         case requestFailed(Error?)
         case unexpectedHTTPResponse(Int, Data?)
 
-        var localizedDescription: String {
+        var errorDescription: String? {
             switch self {
             case .unsupportedEndpoint:
                 return "Unsupported endpoint scheme"
             case .requestFailed(let error):
                 return error?.localizedDescription ?? "Request failed"
-            case .unexpectedHTTPResponse(let code, let response):
+            case .unexpectedHTTPResponse(let code, let responseData):
+                let response = responseData.map { String(decoding: $0, as: Unicode.UTF8.self) }
                 return "Unexpected HTTP status code \(code)\(response.map { ": \($0)" } ?? "")"
             }
         }
@@ -42,7 +43,7 @@ struct DIDCommTransports {
 
         var request = URLRequest(url: endpointUrl)
         request.httpMethod = "POST"
-        request.addValue("application/didcomm-enc-env", forHTTPHeaderField: "Content-Type")
+        request.addValue("application/ssi-agent-wire", forHTTPHeaderField: "Content-Type")
         request.httpBody = data
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
             guard let response = response as? HTTPURLResponse else {

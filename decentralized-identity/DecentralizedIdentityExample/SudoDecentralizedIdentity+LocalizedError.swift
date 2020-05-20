@@ -54,8 +54,8 @@ extension CryptoServiceError: LocalizedError {
         switch self {
         case .failedToEncodeReceiverVerkeys(let error):
             return "Failed to encode receiver verkeys: \(error)"
-        case .failedToDecodeUnpackedData(let error):
-            return "Failed to decode unpacked data: \(error)"
+        case .failedToDecodeResultingData(let error):
+            return "Failed to decode packed/unpacked data: \(error)"
         case .indyError(.none):
             return "An unknown Indy error occurred"
         case .indyError(.some(let indyCode, let message)):

@@ -19,45 +19,50 @@ class ScanInvitationViewController: UIViewController, AVCaptureMetadataOutputObj
     // MARK: Connection Establishment
 
     func handleInvitationObtained(_ invitationURLString: String) {
-        // parse the invitation URL to retrieve invitation data
-        guard let uri = URLComponents(string: invitationURLString),
-            let base64URLEncodedInvitationData = uri.queryItems?.first(where: { $0.name == "c_i" })?.value,
-            let invitationData = Data(base64URLEncoded: base64URLEncodedInvitationData) else {
-                self.onFailure("Failed to decode invitation URL", error: nil)
-                return
-        }
-
-        // deserialize the invitation data
-        let invitation: Invitation
-        do {
-            invitation = try JSONDecoder().decode(Invitation.self, from: invitationData)
-        } catch let error {
-            self.onFailure("Failed to decode invitation", error: error)
-            return
-        }
-
-        // create an exchange request
-        DispatchQueue.main.async {
-            self.presentedActivityAlert = self.presentActivityAlert(message: "Sending Request")
-        }
-
-        createAndTransmitExchangeRequest(inResponseTo: invitation) { exchangeRequest, newDid in
-            DispatchQueue.main.async {
-                self.presentedActivityAlert?.message = "Waiting for Response"
-            }
-
-            self.waitForExchangeResponse(to: exchangeRequest) { response in
+        // Retrieve invitation data from the scanned the URL.
+        retrieveInvitation(fromURLString: invitationURLString) { result in
+            switch result {
+            case .success(let invitation):
+                // create an exchange request
                 DispatchQueue.main.async {
-                    self.presentedActivityAlert?.message = "Creating Pairwise"
+                    self.presentedActivityAlert = self.presentActivityAlert(message: "Sending Request")
                 }
 
-                self.acknowledgeExchangeResponse(response, did: newDid)
-                self.createPairwise(exchangeRequest: exchangeRequest, exchangeResponse: response, invitation: invitation) { pairwise in
+                self.createAndTransmitExchangeRequest(inResponseTo: invitation) { exchangeRequest, newDid in
                     DispatchQueue.main.async {
-                        self.dismiss(animated: true) {
-                            self.performSegue(withIdentifier: "returnToWallet", sender: self)
+                        self.presentedActivityAlert?.message = "Waiting for Response"
+                    }
+
+                    // wait for an exchange response
+                    self.waitForExchangeResponse(to: exchangeRequest) { response in
+                        DispatchQueue.main.async {
+                            self.presentedActivityAlert?.message = "Creating Pairwise"
+                        }
+
+                        // acknowledge the response
+                        self.acknowledgeExchangeResponse(response, did: newDid)
+                        self.createPairwise(exchangeRequest: exchangeRequest, exchangeResponse: response, invitation: invitation) { pairwise in
+                            DispatchQueue.main.async {
+                                self.dismiss(animated: true) {
+                                    self.performSegue(withIdentifier: "returnToWallet", sender: self)
+                                }
+                            }
                         }
                     }
+                }
+            case .failure(let error):
+                let title = "Failed to parse invitation URI"
+
+                if case .invitationParameterNotPresent(.some(let url)) = error {
+                    // if we didn't find an invitation but the URL is valid,
+                    // ask the user to open the URL in Safari
+                    self.presentOpenURLInSafari(
+                        title: title,
+                        message: error.localizedDescription,
+                        url: url
+                    )
+                } else {
+                    self.onFailure(title, error: error)
                 }
             }
         }
@@ -72,6 +77,134 @@ class ScanInvitationViewController: UIViewController, AVCaptureMetadataOutputObj
             } else {
                 self.presentErrorAlert(message: message, error: error)
             }
+        }
+    }
+
+    /// An error returned from `retrieveInvitation(fromURLString:)`
+    enum ParseInvitationURLStringError: Error, LocalizedError {
+        /// The provided string was not a valid URI.
+        case invalidURI
+
+        /// Neither the provided URI nor any redirects from it contain an invitation query parameter.
+        case invitationParameterNotPresent(URL?)
+
+        /// Failed to decode the discovered invitation query parameter.
+        case failedToDecodeInvitation(Error)
+
+        var errorDescription: String? {
+            switch self {
+            case .invalidURI:
+                return "Invalid URI"
+            case .invitationParameterNotPresent:
+                return "Invitation parameter not present"
+            case .failedToDecodeInvitation(let error):
+                return "Failed to decode invitation: \(error.localizedDescription)"
+            }
+        }
+    }
+
+    /// Attempts to retrieve an `Invitation` from the provided URL string.
+    ///
+    /// - Parameter urlString: URL string to decode.
+    /// - Parameter resolvingRedirects: If this parameter is true and an invitation is not found within the given URL, will attempt to follow HTTP redirects from the URL to discover an invitation.
+    /// - Parameter completion: Completion handler.
+    private func retrieveInvitation(
+        fromURLString urlString: String,
+        resolvingRedirects: Bool = true,
+        completion: @escaping (Result<Invitation, ParseInvitationURLStringError>) -> Void
+    ) {
+        guard let uri = URLComponents(string: urlString) else {
+            return completion(.failure(.invalidURI))
+        }
+
+        /// Parses a URL encoded according to Aries RFC 0160 Standard Invitation Encoding.
+        ///
+        /// # Reference
+        /// [Aries RFC 0160](https://github.com/hyperledger/aries-rfcs/tree/master/features/0160-connection-protocol#standard-invitation-encoding)
+        let invitationFromURI: (URLComponents) -> Result<Invitation, ParseInvitationURLStringError>? = { uri in
+            return uri.queryItems?
+                .first(where: { $0.name == "c_i" })?
+                .value
+                .flatMap(Data.init(base64URLEncoded:))
+                .map { invitationData in
+                    // deserialize the invitation data
+                    do {
+                        let invitation = try JSONDecoder().decode(Invitation.self, from: invitationData)
+                        return Result.success(invitation)
+                    } catch let error {
+                        return Result.failure(.failedToDecodeInvitation(error))
+                    }
+                }
+        }
+
+        // If the URI we're given contains an invitation parameter, attempt to decode it.
+        if let invitationDataResult = invitationFromURI(uri) {
+            return completion(invitationDataResult)
+        }
+
+        // Otherwise, assume the URI is an HTTP URL that redirects to an invitation URI.
+        guard resolvingRedirects, ["http", "https"].contains(uri.scheme), let url = uri.url else {
+            return completion(.failure(.invitationParameterNotPresent(nil)))
+        }
+
+        /// `URLSessionTaskDelegate` that calls a provided callback upon HTTP redirection.
+        class BlockRedirectHandlingDelegate: NSObject, URLSessionTaskDelegate {
+            let onRedirect: (URLRequest) -> Bool
+
+            init(onRedirect: @escaping (URLRequest) -> Bool) {
+                self.onRedirect = onRedirect
+            }
+
+            func urlSession(_ session: URLSession, task: URLSessionTask, willPerformHTTPRedirection response: HTTPURLResponse, newRequest request: URLRequest, completionHandler: @escaping (URLRequest?) -> Void) {
+                if onRedirect(request) {
+                    completionHandler(request)
+                } else {
+                    completionHandler(nil)
+                }
+            }
+        }
+
+        var obtainedInvitation = false
+
+        // Fire off an HTTP request that checks if we're redirected to an invitation URI.
+        let session = URLSession(
+            configuration: .default,
+            delegate: BlockRedirectHandlingDelegate { request in
+                if let newURL = request.url?.absoluteString,
+                    let newURI = URLComponents(string: newURL),
+                    let invitationDataResult = invitationFromURI(newURI) {
+
+                    obtainedInvitation = true
+                    completion(invitationDataResult)
+                    return false
+                } else {
+                    return true
+                }
+            },
+            delegateQueue: nil
+        )
+
+        let task = session.dataTask(with: url) { data, response, error in
+            if !obtainedInvitation {
+                completion(.failure(.invitationParameterNotPresent(url)))
+            }
+        }
+
+        task.resume()
+    }
+
+    private func presentOpenURLInSafari(title: String, message: String, url: URL) {
+        DispatchQueue.main.async {
+            let alert = UIAlertController(
+                title: title,
+                message: message,
+                preferredStyle: .alert
+            )
+            alert.addAction(UIAlertAction(title: "Open in Safari", style: .default) { action in
+                UIApplication.shared.open(url, options: [:], completionHandler: nil)
+            })
+            alert.addAction(UIAlertAction(title: "Dismiss", style: .default, handler: nil))
+            self.present(alert, animated: true, completion: nil)
         }
     }
 
@@ -96,34 +229,64 @@ class ScanInvitationViewController: UIViewController, AVCaptureMetadataOutputObj
 
                 let plaintextRequestJson: Data
                 do {
-                    plaintextRequestJson = try JSONEncoder().encode(exchangeRequest)
+                    let encoder = JSONEncoder()
+                    encoder.outputFormatting = .withoutEscapingSlashes
+                    plaintextRequestJson = try encoder.encode(exchangeRequest)
                 } catch let error {
                     self.onFailure("Failed to encode exchange request", error: error)
+                    return
+                }
+
+                guard !invitation.recipientKeys.isEmpty else {
+                    self.onFailure("No recipient keys present in invitation", error: nil)
                     return
                 }
 
                 Dependencies.sudoDecentralizedIdentityClient.packMessage(
                     walletId: self.walletId,
                     message: plaintextRequestJson,
-                    recipientVerkeys: [invitation.recipientKeys[0]],
+                    recipientVerkeys: invitation.recipientKeys,
                     senderVerkey: did.verkey
                 ) { result in
                     switch result {
-                    case .success(let encryptedRequestJson):
-                        DIDCommTransports.transmit(
-                            data: encryptedRequestJson,
-                            to: invitation.serviceEndpoint
+                    case .success(let encryptedForRecipientRequest):
+                        DecentralizedIdentityExample.encryptForRoutingKeys(
+                            walletId: self.walletId,
+                            message: encryptedForRecipientRequest,
+                            to: invitation.recipientKeys[0],
+                            routingKeys: ArraySlice(invitation.routingKeys ?? [])
                         ) { result in
                             switch result {
-                            case .success:
-                                onSuccess(exchangeRequest, did)
+                            case .success(let encryptedRequest):
+                                let encryptedRequestJson: Data
+                                do {
+                                    let encoder = JSONEncoder()
+                                    encoder.outputFormatting = [.withoutEscapingSlashes]
+                                    encryptedRequestJson = try encoder.encode(encryptedRequest)
+                                } catch let error {
+                                    DispatchQueue.main.async {
+                                        self.presentErrorAlert(message: "Failed to encode packed message", error: error)
+                                    }
+                                    return
+                                }
+
+                                DIDCommTransports.transmit(
+                                    data: encryptedRequestJson,
+                                    to: invitation.serviceEndpoint
+                                ) { result in
+                                    switch result {
+                                    case .success:
+                                        onSuccess(exchangeRequest, did)
+                                    case .failure(let error):
+                                        self.onFailure("Failed to transmit exchange request", error: error)
+                                    }
+                                }
                             case .failure(let error):
-                                self.onFailure("Failed to transmit exchange request", error: error)
+                                self.onFailure("Failed to encrypt exchange request for intermediate routers", error: error)
                             }
                         }
                     case .failure(let error):
                         self.onFailure("Failed to encrypt exchange request", error: error)
-                        return
                     }
                 }
             case .failure(let error):
@@ -181,59 +344,16 @@ class ScanInvitationViewController: UIViewController, AVCaptureMetadataOutputObj
     }
 
     private func createPairwise(exchangeRequest: ExchangeRequest, exchangeResponse: ExchangeResponse, invitation: Invitation, onSuccess: @escaping (Pairwise) -> Void) {
-        let myDidDoc = exchangeRequest.connection.didDoc
-        let theirDidDoc = exchangeResponse.connection.didDoc
-        let label = invitation.label
-
-        do {
-            try KeychainDIDDocStorage().store(doc: myDidDoc, for: myDidDoc.id)
-            try KeychainDIDDocStorage().store(doc: theirDidDoc, for: theirDidDoc.id)
-        } catch let error {
-            self.onFailure("Failed to persist DID doc", error: error)
-            return
-        }
-
-        // Attempt to find a public key from the sender's DID Doc.
-        // TODO: We may need to be smarter about finding the right key in the future.
-        guard let recipientVerkey: String = exchangeResponse.connection.didDoc.publicKey
-            .first(where: { key in
-                if case .ed25519VerificationKey2018 = key.type {
-                    return true
-                }
-                return false
-            })?.specifier else {
-                self.onFailure("No verkey found in recipient's DID Doc", error: nil)
-                return
-        }
-
-        Dependencies.sudoDecentralizedIdentityClient.createPairwise(
+        DecentralizedIdentityExample.createPairwise(
             walletId: walletId,
-            theirDid: theirDidDoc.id,
-            theirVerkey: recipientVerkey,
-            label: label,
-            myDid: myDidDoc.id
-        ) { result in
-            switch result {
-            case .success:
-                Dependencies.sudoDecentralizedIdentityClient.listPairwise(walletId: self.walletId) { result in
-                    switch result {
-                    case .success(let pairwiseConnections):
-                        guard let pairwiseConnection = pairwiseConnections.first(where: {
-                            $0.myDid == myDidDoc.id && $0.theirDid == theirDidDoc.id
-                        }) else {
-                            self.onFailure("Failed to retrieve pairwise connection", error: nil)
-                            return
-                        }
-
-                        onSuccess(pairwiseConnection)
-                    case .failure(let error):
-                        self.onFailure("Failed to retrieve pairwise connection", error: error)
-                    }
-                }
-            case .failure(let error):
-                self.onFailure("Failed to create pairwise connection", error: error)
-            }
-        }
+            label: invitation.label,
+            myDid: exchangeRequest.connection.did,
+            myDidDoc: exchangeRequest.connection.didDoc,
+            theirDid: exchangeResponse.connection.did,
+            theirDidDoc: exchangeResponse.connection.didDoc,
+            onSuccess: onSuccess,
+            onFailure: self.onFailure
+        )
     }
 
     // MARK: AVFoundation Configuration

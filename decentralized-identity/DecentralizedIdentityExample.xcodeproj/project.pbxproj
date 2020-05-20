@@ -11,11 +11,18 @@
 		CF4E6EBE246244C400A672B2 /* DIDCommTransports.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF4E6EBD246244C400A672B2 /* DIDCommTransports.swift */; };
 		CF51068F2465C92700B69629 /* KeychainStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF51068E2465C92700B69629 /* KeychainStorage.swift */; };
 		CF5106912465C92F00B69629 /* DIDDocStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF5106902465C92F00B69629 /* DIDDocStorage.swift */; };
+		CF77A73B2464BE4B0070B5EE /* BasicMessaging.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF77A73A2464BE4B0070B5EE /* BasicMessaging.swift */; };
+		CF77A7422464D4D90070B5EE /* DIDComm.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF77A7412464D4D90070B5EE /* DIDComm.swift */; };
 		CF784DED245B9F7700185CF2 /* ConnectionDetailsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF784DEC245B9F7700185CF2 /* ConnectionDetailsViewController.swift */; };
 		CF784DEF245BEC4F00185CF2 /* SudoDecentralizedIdentity+LocalizedError.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF784DEE245BEC4F00185CF2 /* SudoDecentralizedIdentity+LocalizedError.swift */; };
 		CF7B77322460F73E00872BAF /* FirebaseRelay.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF7B77312460F73E00872BAF /* FirebaseRelay.swift */; };
 		CF7B77392461EB3900872BAF /* MessageDetailsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF7B77382461EB3900872BAF /* MessageDetailsViewController.swift */; };
 		CF9B40D2246A183B003136B4 /* Data+Base64URL.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF9B40D1246A183B003136B4 /* Data+Base64URL.swift */; };
+		CFBB113C246B7AD7005D92EC /* DIDExchange.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFBB113B246B7AD7005D92EC /* DIDExchange.swift */; };
+		CFBB113E246B7B14005D92EC /* DIDCommMessage+Formatting.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFBB113D246B7B14005D92EC /* DIDCommMessage+Formatting.swift */; };
+		CFC407D0246C7AB400F31461 /* ClientContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFC407CF246C7AB400F31461 /* ClientContainer.swift */; };
+		CFC407D2246C807700F31461 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = CFC407D1246C807700F31461 /* GoogleService-Info.plist */; };
+		CFC407D4246DC80600F31461 /* ExchangeUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFC407D3246DC80600F31461 /* ExchangeUtils.swift */; };
 		CFD59909245A47BF00230C6F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFD59908245A47BF00230C6F /* AppDelegate.swift */; };
 		CFD5990B245A47BF00230C6F /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFD5990A245A47BF00230C6F /* SceneDelegate.swift */; };
 		CFD5990D245A47BF00230C6F /* WelcomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFD5990C245A47BF00230C6F /* WelcomeViewController.swift */; };
@@ -38,11 +45,18 @@
 		CF4E6EBD246244C400A672B2 /* DIDCommTransports.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DIDCommTransports.swift; sourceTree = "<group>"; };
 		CF51068E2465C92700B69629 /* KeychainStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainStorage.swift; sourceTree = "<group>"; };
 		CF5106902465C92F00B69629 /* DIDDocStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DIDDocStorage.swift; sourceTree = "<group>"; };
+		CF77A73A2464BE4B0070B5EE /* BasicMessaging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BasicMessaging.swift; sourceTree = "<group>"; };
+		CF77A7412464D4D90070B5EE /* DIDComm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DIDComm.swift; sourceTree = "<group>"; };
 		CF784DEC245B9F7700185CF2 /* ConnectionDetailsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectionDetailsViewController.swift; sourceTree = "<group>"; };
 		CF784DEE245BEC4F00185CF2 /* SudoDecentralizedIdentity+LocalizedError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SudoDecentralizedIdentity+LocalizedError.swift"; sourceTree = "<group>"; };
 		CF7B77312460F73E00872BAF /* FirebaseRelay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseRelay.swift; sourceTree = "<group>"; };
 		CF7B77382461EB3900872BAF /* MessageDetailsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageDetailsViewController.swift; sourceTree = "<group>"; };
 		CF9B40D1246A183B003136B4 /* Data+Base64URL.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Data+Base64URL.swift"; sourceTree = "<group>"; };
+		CFBB113B246B7AD7005D92EC /* DIDExchange.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DIDExchange.swift; sourceTree = "<group>"; };
+		CFBB113D246B7B14005D92EC /* DIDCommMessage+Formatting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DIDCommMessage+Formatting.swift"; sourceTree = "<group>"; };
+		CFC407CF246C7AB400F31461 /* ClientContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClientContainer.swift; sourceTree = "<group>"; };
+		CFC407D1246C807700F31461 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		CFC407D3246DC80600F31461 /* ExchangeUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExchangeUtils.swift; sourceTree = "<group>"; };
 		CFD59905245A47BF00230C6F /* DecentralizedIdentityExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DecentralizedIdentityExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CFD59908245A47BF00230C6F /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		CFD5990A245A47BF00230C6F /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -101,6 +115,19 @@
 			name = Storage;
 			sourceTree = "<group>";
 		};
+		CF77A73E2464D03F0070B5EE /* Protocols */ = {
+			isa = PBXGroup;
+			children = (
+				CF77A7412464D4D90070B5EE /* DIDComm.swift */,
+				CF77A73A2464BE4B0070B5EE /* BasicMessaging.swift */,
+				CFBB113B246B7AD7005D92EC /* DIDExchange.swift */,
+				CFBB113D246B7B14005D92EC /* DIDCommMessage+Formatting.swift */,
+				CFC407CF246C7AB400F31461 /* ClientContainer.swift */,
+				CFC407D3246DC80600F31461 /* ExchangeUtils.swift */,
+			);
+			name = Protocols;
+			sourceTree = "<group>";
+		};
 		CFD598FC245A47BF00230C6F = {
 			isa = PBXGroup;
 			children = (
@@ -124,6 +151,7 @@
 			isa = PBXGroup;
 			children = (
 				CF51068D2465C90C00B69629 /* Storage */,
+				CF77A73E2464D03F0070B5EE /* Protocols */,
 				CFD59939245B777700230C6F /* Transports */,
 				CFD59908245A47BF00230C6F /* AppDelegate.swift */,
 				CFD5990A245A47BF00230C6F /* SceneDelegate.swift */,
@@ -153,6 +181,7 @@
 				CFD59935245B71A800230C6F /* Wait.swift */,
 				CF7B77312460F73E00872BAF /* FirebaseRelay.swift */,
 				CF4E6EBD246244C400A672B2 /* DIDCommTransports.swift */,
+				CFC407D1246C807700F31461 /* GoogleService-Info.plist */,
 			);
 			name = Transports;
 			sourceTree = "<group>";
@@ -218,6 +247,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CFC407D2246C807700F31461 /* GoogleService-Info.plist in Resources */,
 				CFD59915245A47C100230C6F /* LaunchScreen.storyboard in Resources */,
 				CFD59912245A47C100230C6F /* Assets.xcassets in Resources */,
 				CFD59910245A47BF00230C6F /* Main.storyboard in Resources */,
@@ -292,16 +322,21 @@
 			files = (
 				CFD5992E245B5A6D00230C6F /* ScanInvitationViewController.swift in Sources */,
 				CF784DED245B9F7700185CF2 /* ConnectionDetailsViewController.swift in Sources */,
+				CFC407D0246C7AB400F31461 /* ClientContainer.swift in Sources */,
 				CFD5990D245A47BF00230C6F /* WelcomeViewController.swift in Sources */,
 				CFD59926245B4DC200230C6F /* ConnectionViewController.swift in Sources */,
+				CFBB113C246B7AD7005D92EC /* DIDExchange.swift in Sources */,
+				CFBB113E246B7B14005D92EC /* DIDCommMessage+Formatting.swift in Sources */,
 				CFD59928245B4DCC00230C6F /* CreateConnectionViewController.swift in Sources */,
 				CF5106912465C92F00B69629 /* DIDDocStorage.swift in Sources */,
 				CFD5991F245A4FBE00230C6F /* WalletDetailsViewController.swift in Sources */,
 				CFD5991D245A4E7800230C6F /* WalletViewController.swift in Sources */,
 				CF7B77392461EB3900872BAF /* MessageDetailsViewController.swift in Sources */,
+				CF77A7422464D4D90070B5EE /* DIDComm.swift in Sources */,
 				CF784DEF245BEC4F00185CF2 /* SudoDecentralizedIdentity+LocalizedError.swift in Sources */,
 				CFD59936245B71A800230C6F /* Wait.swift in Sources */,
 				CF9B40D2246A183B003136B4 /* Data+Base64URL.swift in Sources */,
+				CFC407D4246DC80600F31461 /* ExchangeUtils.swift in Sources */,
 				CF4E6EBE246244C400A672B2 /* DIDCommTransports.swift in Sources */,
 				CFD59909245A47BF00230C6F /* AppDelegate.swift in Sources */,
 				CF7B77322460F73E00872BAF /* FirebaseRelay.swift in Sources */,
@@ -309,6 +344,7 @@
 				CFD5990B245A47BF00230C6F /* SceneDelegate.swift in Sources */,
 				CF51068F2465C92700B69629 /* KeychainStorage.swift in Sources */,
 				CFD5992C245B52CE00230C6F /* CreateInvitationCodeViewController.swift in Sources */,
+				CF77A73B2464BE4B0070B5EE /* BasicMessaging.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

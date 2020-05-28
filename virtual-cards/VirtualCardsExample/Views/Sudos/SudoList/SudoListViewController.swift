@@ -16,6 +16,8 @@ import SudoVirtualCards
 ///  - Links To:
 ///     - `CreateSudoViewController`: If a user taps the "Create Sudo" button, the `CreateSudoViewController` will
 ///         be presented so the user can create a new Sudo.
+///     - `CardListViewController`:  If a user chooses a `Sudo` from the list, the `CardListViewController` will be presented so the user can add a new card
+///         to their sudo.
 class SudoListViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
 
     // MARK: - Outlets
@@ -106,6 +108,31 @@ class SudoListViewController: UIViewController, UITableViewDelegate, UITableView
         }
     }
 
+    /// Delete a selected Sudo.
+    ///
+    /// - Parameter sudo: The selected Sudo to delete.
+    func deleteSudo(sudo: Sudo, _ completion: @escaping (Bool) -> Void) {
+        do {
+            presentActivityAlert(message: "Deleting Sudo")
+            try profilesClient.deleteSudo(sudo: sudo) { [weak self] result in
+                DispatchQueue.main.async {
+                    switch result {
+                    case .success:
+                        completion(true)
+                        self?.dismissActivityAlert()
+                    case let .failure(error):
+                        completion(false)
+                        self?.dismissActivityAlert {
+                            self?.presentErrorAlert(message: "Failed to delete Sudo", error: error)
+                        }
+                    }
+                }
+            }
+        } catch {
+            presentErrorAlert(message: "Failed to delete Sudo", error: error)
+        }
+    }
+
     // MARK: - Helpers: Configuration
 
     /// Configures the table view used to display the navigation elements.
@@ -175,5 +202,23 @@ class SudoListViewController: UIViewController, UITableViewDelegate, UITableView
         }
 
         tableView.deselectRow(at: indexPath, animated: true)
+    }
+
+    func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        if indexPath.row != sudos.count {
+            let delete = UIContextualAction(style: .destructive, title: "Delete") { _, _, completion in
+                let sudo = self.sudos[indexPath.row]
+                self.deleteSudo(sudo: sudo) { success in
+                    if success {
+                        self.sudos.remove(at: indexPath.row)
+                        self.tableView.deleteRows(at: [indexPath], with: .automatic)
+                    }
+                    completion(success)
+                }
+            }
+            delete.backgroundColor = .red
+            return UISwipeActionsConfiguration(actions: [delete])
+        }
+        return nil
     }
 }

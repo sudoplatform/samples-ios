@@ -8,14 +8,13 @@ import UIKit
 import SudoVirtualCards
 import SudoProfiles
 
-// Reusable tableview cell
-
 /// This View Controller presents a form so that a user can add a `Card`.
 ///
 /// - Links From:
-///     - `CardListViewController`: A user chooses the "Create" option from the naviationg bar of the table view.
+///     - `CardListViewController`: A user chooses the "Create Virtual Card" option from the bottom of the table view list.
 /// - Links To:
-///     - `CardListViewController`: If a user successfully creates a card, they will be returned to this form.
+///     - `CardDetailViewController`: If a user successfully creates a card, the `CardDetailViewController` will be presented so the user can
+///         view card details and transactions.
 class CreateCardViewController: UIViewController,
     UITableViewDelegate,
     UITableViewDataSource,
@@ -31,8 +30,10 @@ class CreateCardViewController: UIViewController,
     /// Shows supplementary information to the input form, such as the chosen sudo, funding source, and learn more.
     @IBOutlet var tableFooterView: UIView!
 
+    /// View appearing on the table footer providing sudo, funding source and error information.
     @IBOutlet var idStackView: UIStackView!
 
+    /// View appearing at the end of the content providing learn more labels and buttons.
     @IBOutlet var learnMoreView: LearnMoreView!
 
     // MARK: Outlets: UILabel
@@ -43,6 +44,7 @@ class CreateCardViewController: UIViewController,
     /// Label that shows the first available `FundingSource` identifier that is used to fund the `Card`.
     @IBOutlet var fundingSourceLabel: UILabel!
 
+    /// Label that shows error information.
     @IBOutlet var errorLabel: UILabel!
 
     // MARK: - Supplementary
@@ -73,7 +75,7 @@ class CreateCardViewController: UIViewController,
     enum InputField: Int, CaseIterable {
         /// Name associated with the card to be created.
         case cardHolder
-        /// Alias label for the cards.
+        /// Alias label for the card.
         case cardLabel
         /// Address line 1 of the card.
         case addressLine1
@@ -167,7 +169,7 @@ class CreateCardViewController: UIViewController,
     /// Funding source to use to add a card.
     var fundingSource: FundingSource?
 
-    /// The created card
+    /// The created card.
     var card: Card?
 
     /// The frame of the visible keyboard. This will be updated alongside show/hide notifications.
@@ -207,7 +209,7 @@ class CreateCardViewController: UIViewController,
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         startListeningForKeyboardNotifications()
-        loadFirstFundingSource()
+        loadFirstActiveFundingSource()
     }
 
     override func viewWillDisappear(_ animated: Bool) {
@@ -245,7 +247,7 @@ class CreateCardViewController: UIViewController,
 
     // MARK: - Operations
 
-    /// Validates and creates a card based on the views form inputs.
+    /// Validates and creates a card based on the view's form inputs.
     func createCard() {
         view.endEditing(true)
         guard validateFormData() else {
@@ -277,7 +279,7 @@ class CreateCardViewController: UIViewController,
             currency: Defaults.provisionCurrency
         )
         setCreateButtonEnabled(false)
-        presentActivityAlert(message: "Creating Card")
+        presentActivityAlert(message: "Creating card")
         virtualCardsClient.provisionCardWithInput(
             input,
             completion: { [weak self] result in
@@ -322,10 +324,8 @@ class CreateCardViewController: UIViewController,
 
     /// Configure the view's navigation bar.
     ///
-    /// Sets the title of the navigation to "Create Card". Also sets the right bar to a create button, which will validate the form and attempt to create a
-    /// card.
+    /// Sets the right bar to a create button, which will validate the form and attempt to create a card.
     func configureNavigationBar() {
-        navigationItem.title = "Create Card"
         let createBarButton = UIBarButtonItem(title: "Create", style: .plain, target: self, action: #selector(didTapCreateCardButton))
         navigationItem.rightBarButtonItem = createBarButton
     }
@@ -343,7 +343,7 @@ class CreateCardViewController: UIViewController,
 
     /// Configures the table footer values from the passed in `Sudo`.
     ///
-    /// If a valid sudo is not found, an error will be presented to the suer, which results in a segue back to the `CardListViewController`.
+    /// If a valid sudo is not found, an error will be presented to the user, which results in a segue back to the `CardListViewController`.
     func configureFooterValues() {
         guard let sudoLabelText = sudo.label, !sudoLabelText.isEmpty else {
             presentErrorAlert(
@@ -374,16 +374,16 @@ class CreateCardViewController: UIViewController,
 
     // MARK: - Helpers
 
-    /// Load the first funding source associated with the user's account.
-    func loadFirstFundingSource() {
+    /// Load the first active funding source associated with the user's account.
+    func loadFirstActiveFundingSource() {
         listFundingSource(
             cachePolicy: .useOnline,
             success: { [weak self] fundingSources in
                 DispatchQueue.main.async {
                     guard let weakSelf = self else { return }
-                    if let fundingSource = fundingSources.first {
+                    if let fundingSource = fundingSources.first(where: { $0.state == .active }) {
                         weakSelf.fundingSource = fundingSource
-                        let fundingSourceText = "\(fundingSource.network.string) ****\(fundingSource.last4)"
+                        let fundingSourceText = "\(fundingSource.network.string) ••••\(fundingSource.last4)"
                         weakSelf.fundingSourceLabel.text = fundingSourceText
                         weakSelf.setCreateButtonEnabled(true)
                     } else {

@@ -64,7 +64,6 @@ class FundingSourceListViewController: UIViewController, UITableViewDelegate, UI
     override func viewDidLoad() {
         super.viewDidLoad()
         configureTableView()
-        title = "Funding Sources"
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -100,6 +99,26 @@ class FundingSourceListViewController: UIViewController, UITableViewDelegate, UI
                 success(output.items)
             case let .failure(error):
                 failure(error)
+            }
+        }
+    }
+
+    /// Cancel a funding source based on the input id.
+    ///
+    /// - Parameter id: The id of the funding source to cancel.
+    func cancelFundingSource(id: String, _ completion: @escaping (Result<FundingSource, Error>) -> Void) {
+        presentActivityAlert(message: "Cancelling funding source")
+        virtualCardsClient.cancelFundingSourceWithId(id) { [weak self] result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success:
+                    self?.dismissActivityAlert()
+                case let .failure(error):
+                    self?.dismissActivityAlert {
+                        self?.presentErrorAlert(message: "Failed to cancel funding source", error: error)
+                    }
+                }
+                completion(result)
             }
         }
     }
@@ -146,6 +165,15 @@ class FundingSourceListViewController: UIViewController, UITableViewDelegate, UI
         )
     }
 
+    /// Formats the title which represents a funding source and is displayed on the table view cell.
+    ///
+    /// - Parameter fundingSource: The funding source to display.
+    func getDisplayTitleForFundingSource(_ fundingSource: FundingSource) -> String {
+        let suffix = (fundingSource.state == .inactive) ? " - Cancelled" : ""
+        let cardNetwork = fundingSource.network.string.capitalized
+        return "\(cardNetwork) ••••\(fundingSource.last4)\(suffix)"
+    }
+
     // MARK: - Conformance: UITableViewDataSource
 
     func numberOfSections(in tableView: UITableView) -> Int {
@@ -168,8 +196,7 @@ class FundingSourceListViewController: UIViewController, UITableViewDelegate, UI
             let fundingSource = fundingSources[indexPath.row]
             cell = tableView.dequeueReusableCell(withIdentifier: "default", for: indexPath)
             cell.textLabel?.textColor = UIColor.black
-            let cardNetwork = ("\(fundingSource.network)").capitalized
-            cell.textLabel?.text = "\(cardNetwork) ••••\(fundingSource.last4)"
+            cell.textLabel?.text = getDisplayTitleForFundingSource(fundingSource)
         }
         return cell
     }
@@ -182,5 +209,28 @@ class FundingSourceListViewController: UIViewController, UITableViewDelegate, UI
             performSegue(withIdentifier: Segue.navigateToCreateFundingSource.rawValue, sender: self)
         }
         tableView.deselectRow(at: indexPath, animated: true)
+    }
+
+    func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        if indexPath.row != fundingSources.count {
+            let cancel = UIContextualAction(style: .destructive, title: "Cancel") { _, _, completion in
+                let fundingSource = self.fundingSources[indexPath.row]
+                self.cancelFundingSource(id: fundingSource.id) { result in
+                    switch result {
+                    case .success(let result):
+                        self.fundingSources.remove(at: indexPath.row)
+                        self.fundingSources.insert(result, at: indexPath.row)
+                        let cell = self.tableView.cellForRow(at: indexPath)
+                        cell?.textLabel?.text = self.getDisplayTitleForFundingSource(result)
+                        completion(true)
+                    case .failure:
+                        completion(false)
+                    }
+                }
+            }
+            cancel.backgroundColor = .red
+            return UISwipeActionsConfiguration(actions: [cancel])
+        }
+        return nil
     }
 }

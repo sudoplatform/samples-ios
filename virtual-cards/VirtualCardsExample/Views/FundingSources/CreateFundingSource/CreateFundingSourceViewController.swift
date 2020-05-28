@@ -10,7 +10,7 @@ import SudoVirtualCards
 /// This View Controller presents a form so that a user can create a `FundingSource`.
 ///
 /// - Links From:
-///     - `FundingSourceListViewController`: A user chooses the "Create" option from the top right corner of the navigation bar.
+///     - `FundingSourceListViewController`:  A user chooses the "Create Funding Source" option at the bottom of the table view list.
 /// - Links To:
 ///     - `FundingSourceListViewController`: If a user successfully creates a funding source, they will be returned to this form.
 class CreateFundingSourceViewController: UIViewController,
@@ -25,9 +25,10 @@ class CreateFundingSourceViewController: UIViewController,
     /// Table view that lists the input fields for the form.
     @IBOutlet var tableView: UITableView!
 
-    /// Shows supplementary information to the input form, such as learn more labels and buttons.
+    /// Shows supplementary information to the input form, such as the "Learn more" view.
     @IBOutlet var tableFooterView: UIView!
 
+    /// View appearing at the end of the content providing learn more labels and buttons.
     @IBOutlet var learnMoreView: LearnMoreView!
 
     // MARK: - Supplementary
@@ -206,7 +207,7 @@ class CreateFundingSourceViewController: UIViewController,
             return
         }
         setCreateButtonEnabled(false)
-        presentActivityAlert(message: "Creating Funding Source")
+        presentActivityAlert(message: "Creating funding source")
         let input = CreditCardFundingSourceInput(
             cardNumber: formData[.cardNumber] ?? "",
             expirationMonth: Int(formData[.expirationMonth] ?? "0") ?? 0,
@@ -243,8 +244,7 @@ class CreateFundingSourceViewController: UIViewController,
 
     /// Configure the view's navigation bar.
     ///
-    /// Sets the title of the navigation to "Create Funding Source" and sets the right bar to a create button, which will validate the form
-    /// and attempt to create a funding source.
+    /// Sets the right bar to a create button, which will validate the form and attempt to create a funding source.
     func configureNavigationBar() {
         let createBarButton = UIBarButtonItem(title: "Create", style: .plain, target: self, action: #selector(didTapCreateFundingSourceButton))
         navigationItem.rightBarButtonItem = createBarButton
@@ -262,6 +262,9 @@ class CreateFundingSourceViewController: UIViewController,
         tableView.tableFooterView?.addSubview(tableFooterView)
     }
 
+    /// Configure the view's "Learn more" view.
+    ///
+    /// Sets an informative text label and "Learn more" button which when tapped will redirect the user to a Sudo Platform webpage.
     func configureLearnMoreView() {
         learnMoreView.delegate = self
         learnMoreView.label.text = "A Funding source is required to link a real credit or debit card to a virtual card. This funding source is used to fund a"

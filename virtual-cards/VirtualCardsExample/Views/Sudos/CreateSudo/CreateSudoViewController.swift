@@ -11,9 +11,9 @@ import SudoProfiles
 /// This View Controller presents a form so that a user can create a `Sudo`.
 ///
 /// - Links From:
-///     - `SudoListViewController`: A user chooses the "Create" option from the top right corner of the navigation bar.
+///     - `SudoListViewController`: A user chooses the "Create Sudo" option at the bottom of the table view list.
 /// - Links To:
-///     - `SudoListViewController`: If a user successfully creates a Sudo, they will be returned to this form.
+///     - `CardListViewController`: If a user successfully creates a Sudo, the `CardListViewController` will be presented so the user can create a card.
 class CreateSudoViewController: UIViewController, LearnMoreViewDelegate {
 
     // MARK: - Outlets
@@ -21,7 +21,7 @@ class CreateSudoViewController: UIViewController, LearnMoreViewDelegate {
     /// Label that provides some instruction for the Sudo label.
     @IBOutlet weak var labelTextField: UITextField!
 
-    /// View appearing at the end of the content providing informative text.
+    /// View appearing at the end of the content providing learn more labels and buttons.
     @IBOutlet var learnMoreView: LearnMoreView!
 
     // MARK: - Supplementary
@@ -120,8 +120,7 @@ class CreateSudoViewController: UIViewController, LearnMoreViewDelegate {
 
     /// Configure the view's navigation bar.
     ///
-    /// Sets the title of the navigation to "Create Sudo" and sets the right bar to a create button, which will validate the form
-    /// and attempt to create a Sudo.
+    /// Sets the right bar to a create button, which will validate the form and attempt to create a Sudo.
     func configureNavigationBar() {
         let createBarButton = UIBarButtonItem(title: "Create", style: .plain, target: self, action: #selector(didTapCreateSudoButton))
         navigationItem.rightBarButtonItem = createBarButton

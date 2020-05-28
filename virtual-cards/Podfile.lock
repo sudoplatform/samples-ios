@@ -23,7 +23,7 @@ PODS:
     - SQLite.swift/standard (= 0.12.2)
   - SQLite.swift/standard (0.12.2)
   - Starscream (3.0.6)
-  - Stripe (19.1.1)
+  - Stripe (19.2.0)
   - SudoApiClient (1.3.0):
     - AWSAppSync (~> 3.0)
     - SudoConfigManager (~> 1.2)
@@ -41,7 +41,7 @@ PODS:
   - SudoOperations (1.0.0):
     - AWSAppSync (~> 3.0)
     - SudoLogging (~> 0.2)
-  - SudoProfiles (5.4.2):
+  - SudoProfiles (5.5.0):
     - SudoApiClient (~> 1.3)
     - SudoLogging (~> 0.2)
     - SudoUser (~> 7.8)
@@ -54,7 +54,7 @@ PODS:
     - SudoConfigManager (~> 1.2)
     - SudoKeyManager (~> 1.0)
     - SudoLogging (~> 0.2)
-  - SudoVirtualCards (7.1.0):
+  - SudoVirtualCards (8.0.0):
     - AWSAppSync (~> 3.1)
     - Stripe (~> 19.1)
     - SudoApiClient (~> 1.3)
@@ -67,7 +67,7 @@ PODS:
 DEPENDENCIES:
   - SudoIdentityVerification (~> 4.7)
   - SudoUser (~> 7.8)
-  - SudoVirtualCards (~> 7.1)
+  - SudoVirtualCards (~> 8.0)
 
 SPEC REPOS:
   trunk:
@@ -105,17 +105,17 @@ SPEC CHECKSUMS:
   ReachabilitySwift: 985039c6f7b23a1da463388634119492ff86c825
   SQLite.swift: d2b4642190917051ce6bd1d49aab565fe794eea3
   Starscream: ef3ece99d765eeccb67de105bfa143f929026cf5
-  Stripe: e4599b6570d82548c62b8d6b7b200241856a2be7
+  Stripe: d481c2dab9a892fd923f097f854661217f70dc7f
   SudoApiClient: d403a1bdb63e258d2d8d23f7358a108239a6f05c
   SudoConfigManager: 0c0f56e23dda98d4cba5991c70d7300b73a72f2d
   SudoIdentityVerification: 487209c2dfac96ed37997ba01a0326e1c301ba15
   SudoKeyManager: ce474fff6ab1219a9d1f8a4451c78847cf9af471
   SudoLogging: adffcc56d4a16aed321a059bc552b3f538fb2851
   SudoOperations: 2e8a3b509dd601190a33cdc9ba0c3ab07006ac6a
-  SudoProfiles: ba8ee5665a0bc63594b7dcc114b8c43c9823f773
+  SudoProfiles: 8b21ca767fc192b0333ab762b19571ad94cce78f
   SudoUser: 95cda148bf653da3950c11e05645a96fb37762da
-  SudoVirtualCards: 2272db52cdccc2f068f14740f658594373c52fbd
+  SudoVirtualCards: 68fe4c29421f90ecd86cee03745e8210dde497a0
 
-PODFILE CHECKSUM: b8dacd15ad499a26e06ba35b16da88a364f70387
+PODFILE CHECKSUM: ac5efab88d0a4a3ddf3246de9f2bdd0f260563ee
 
 COCOAPODS: 1.9.1

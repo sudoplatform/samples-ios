@@ -7,6 +7,11 @@
 import UIKit
 import SudoIdentityVerification
 
+/// This View Controller presents a form so that a user can perform Secure ID Verification.
+///
+/// - Links From:
+///     - `MainMenuViewController`: A user chooses the "Secure ID Verification" option from the main menu table view which will show this view allowing the user
+///         to perform Secure ID Verification.
 class IdentityVerificationViewController: UIViewController,
     UITableViewDataSource,
     UITableViewDelegate,
@@ -16,30 +21,45 @@ class IdentityVerificationViewController: UIViewController,
 
     // MARK: - Outlets
 
+    /// Table view that lists the input fields for the form.
     @IBOutlet var tableView: UITableView!
+
+    /// Shows supplementary information to the input form, such as the status and  "Learn more" view.
     @IBOutlet var tableFooterView: UIView!
 
+    /// Label that shows verification status.
     @IBOutlet var statusLabel: UILabel!
 
+    /// View appearing at the end of the content providing learn more labels and buttons.
     @IBOutlet var learnMoreView: LearnMoreView!
 
     // MARK: - Supplementary
 
+    /// Various types of statuses.
     enum VerificationStatus: String {
         case verified = "Verified"
         case unverified = "Not verified"
         case unknown = "Unknown"
     }
 
+    /// Input fields shown on the form.
     enum InputField: Int, CaseIterable {
+        /// First name associated with the user.
         case firstName
+        /// Last name associated with the user.
         case lastName
+        /// Address associated with the user.
         case address
+        /// Unit number of the address associated with the user.
         case unitNumber
+        /// Zip code of the address associated with the user.
         case zip
+        /// Country of the address associated with the user.
         case country
+        /// Date of birth associated with the user.
         case dateOfBirth
 
+        /// Returns true if the field is an optional input field.
         var isOptional: Bool {
             switch self {
             case .unitNumber:
@@ -49,6 +69,7 @@ class IdentityVerificationViewController: UIViewController,
             }
         }
 
+        /// Label of the field shown to the user.
         var label: String {
             switch self {
             case .firstName:
@@ -68,14 +89,18 @@ class IdentityVerificationViewController: UIViewController,
             }
         }
 
+        /// Placeholder of the field.
         var placeholder: String {
             if isOptional {
-                return "Enter \(label) (Optional"
+                return "Enter \(label) (Optional)"
             } else {
                 return "Enter \(label)"
             }
         }
 
+        /// Default text populated for the field.
+        ///
+        /// Optional fields are not populated by default.
         var defaultText: String? {
             guard !isOptional else {
                 return nil
@@ -104,8 +129,10 @@ class IdentityVerificationViewController: UIViewController,
     /// The frame of the visible keyboard. This will be updated alongside show/hide notifications.
     var keyboardFrame: CGRect = .zero
 
+    /// Array of input fields used on the view.
     let inputFields: [InputField] = InputField.allCases
 
+    /// Inputted form data. Initialized with default data.
     var formData: [InputField: String] = {
         return InputField.allCases.reduce([:], { accumulator, field in
             var accumulator = accumulator
@@ -116,6 +143,7 @@ class IdentityVerificationViewController: UIViewController,
 
     // MARK: - Properties: Computed
 
+    /// Sudo identity verification client used to verify identity.
     var verificationClient: SudoIdentityVerificationClient {
         return AppDelegate.dependencies.identityVerificationClient
     }
@@ -149,12 +177,16 @@ class IdentityVerificationViewController: UIViewController,
 
     // MARK: - Actions
 
+    /// Action associated with tapping the "Verify" button on the navigation bar.
+    ///
+    /// This action will initiate the sequence of validating inputs and verify identity via the `virtualCardsClient`.
     @objc func didTapVerify() {
         verifyUser()
     }
 
     // MARK: - Operations
 
+    /// Validates and verifies identity based on the view's form inputs.
     func verifyUser() {
         view.endEditing(true)
         guard validateFormData() else {
@@ -229,11 +261,18 @@ class IdentityVerificationViewController: UIViewController,
 
     // MARK: - Helpers: Configuration
 
+    /// Configure the view's navigation bar.
+    ///
+    /// Sets the right bar to a verify button, which will validate the form and attempt to verify identity.
     func configureNavigationBar() {
         let verifyBarButton = UIBarButtonItem(title: "Verify", style: UIBarButtonItem.Style.plain, target: self, action: #selector(didTapVerify))
         navigationItem.rightBarButtonItem = verifyBarButton
     }
 
+    /// Configures the table view used to display the input form information.
+    ///
+    /// Registers the custom `InputFormTableViewCell` for use as the `"inputFormCell"` and also sets the table footer to the non-editable
+    /// information.
     func configureTableView() {
         let inputFormTableViewCellNib = UINib(nibName: "InputFormTableViewCell", bundle: .main)
         tableView.register(inputFormTableViewCellNib, forCellReuseIdentifier: "inputFormCell")
@@ -242,6 +281,9 @@ class IdentityVerificationViewController: UIViewController,
         tableView.tableFooterView?.addSubview(tableFooterView)
     }
 
+    /// Configure the view's "Learn more" view.
+    ///
+    /// Sets an informative text label and "Learn more" button which when tapped will redirect the user to a Sudo Platform webpage.
     func configureLearnMoreView() {
         learnMoreView.label.text = "Secure identity verification is required in order ensure legitimate usage of the Sudo Platform virtual cards service.\n\n"
             + "Identity verification needs to be performed successfully once for each user.\n\n"
@@ -251,11 +293,15 @@ class IdentityVerificationViewController: UIViewController,
 
     // MARK: - Helpers
 
+    /// Sets the verify button in the navigation bar to enabled/disabled.
+    ///
+    /// - Parameter isEnabled: If true, the navigation verify button will be enabled.
     func setVerifyButtonEnabled(_ isEnabled: Bool) {
         navigationItem.rightBarButtonItem?.isEnabled = isEnabled
     }
 
-    /// Validate that all fields that require a value have one
+    /// Validates the form data.
+    /// - Returns: `true` if the form data is valid.
     func validateFormData() -> Bool {
         return inputFields.allSatisfy { fieldType in
             guard !fieldType.isOptional else {

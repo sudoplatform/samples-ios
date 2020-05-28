@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="16096" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_1" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16087"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="OrphanCardListViewController" customModule="VirtualCardsExample" customModuleProvider="target">
+            <connections>
+                <outlet property="tableView" destination="pHr-90-NjR" id="Q45-N1-FHJ"/>
+                <outlet property="view" destination="URB-rL-V5D" id="16e-Ud-Mxo"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="URB-rL-V5D">
+            <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="pHr-90-NjR">
+                    <rect key="frame" x="0.0" y="44" width="414" height="852"/>
+                    <color key="backgroundColor" systemColor="systemGray5Color" red="0.8980392157" green="0.8980392157" blue="0.91764705879999997" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                    <connections>
+                        <outlet property="dataSource" destination="-1" id="AmN-Z2-V5z"/>
+                        <outlet property="delegate" destination="-1" id="jll-Ft-u0h"/>
+                    </connections>
+                </tableView>
+            </subviews>
+            <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+            <constraints>
+                <constraint firstItem="pHr-90-NjR" firstAttribute="leading" secondItem="U2A-cq-yty" secondAttribute="leading" id="0Za-Jw-khB"/>
+                <constraint firstItem="pHr-90-NjR" firstAttribute="bottom" secondItem="URB-rL-V5D" secondAttribute="bottom" id="DbD-iu-L9j"/>
+                <constraint firstItem="pHr-90-NjR" firstAttribute="top" secondItem="U2A-cq-yty" secondAttribute="top" id="I9m-Rl-sOz"/>
+                <constraint firstItem="pHr-90-NjR" firstAttribute="trailing" secondItem="U2A-cq-yty" secondAttribute="trailing" id="smU-yR-F79"/>
+            </constraints>
+            <viewLayoutGuide key="safeArea" id="U2A-cq-yty"/>
+            <point key="canvasLocation" x="139" y="154"/>
+        </view>
+    </objects>
+</document>

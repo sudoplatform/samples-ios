@@ -9,22 +9,24 @@ import SudoVirtualCards
 import SudoProfiles
 
 /// This View Controller presents a list of `Cards` associated with a `Sudo`.
-/// `Cards` can also be created using the final table option, which opens the `CreateCardViewController`.
 ///
 /// - Links From:
-///     - `SudoListViewController`: A user chooses a `Sudo` which will show this view with the list of cards created against this sudo. The cards `alias`
+///     - `CreateSudoViewController`: A user chooses the "Create" option from the top right corner of the navigation bar.
+///     - `SudoListViewController`: A user chooses a `Sudo` which will show this view with the list of cards created against this sudo. The card's `alias`
 ///         property is used as the text for each card.
 /// - Links To:
-///     - `CreateCardViewController`: If a user chooses a `Card` from the list, the `CreateCardViewController` will be presented so the user can add a new card
-///         to their sudo.
+///     - `CreateCardViewController`: If a user taps the "Create Virtual Card" button, the `CreateCardViewController` will be presented
+///         so the user can add a new card to their sudo.
+///     - `CardDetailViewController`: If a user chooses a `Card` from the list, the `CardDetailViewController` will be presented so the user can
+///         view card details and transactions.
 class CardListViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
 
     // MARK: - Outlets
 
     /// The table view that lists each card associated with the chosen `Sudo` from the previous view.
     ///
-    /// If the user does not have any `Cards` associated to this `Sudo`, then only the "Create Card" entry will be seen. This can be tapped to add a card to the
-    /// sudo.
+    /// If the user does not have any `Cards` associated to this `Sudo`, then only the "Create Virtual Card" entry will be seen. This can be tapped to add a
+    /// card to the sudo.
     @IBOutlet weak var tableView: UITableView!
 
     // MARK: - Supplementary
@@ -100,7 +102,7 @@ class CardListViewController: UIViewController, UITableViewDataSource, UITableVi
     }
 
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        let segueType = Segue.init(rawValue: segue.identifier ?? "")
+        let segueType = Segue(rawValue: segue.identifier ?? "")
         switch segueType {
         case .navigateToCreateCard:
             guard let createCard = segue.destination as? CreateCardViewController else {
@@ -141,6 +143,26 @@ class CardListViewController: UIViewController, UITableViewDataSource, UITableVi
                 success(output.items)
             case let .failure(error):
                 failure(error)
+            }
+        }
+    }
+
+    /// Cancel a card based on the input id.
+    ///
+    /// - Parameter id: The id of the card to cancel.
+    func cancelCard(id: String, _ completion: @escaping (Result<Card, Error>) -> Void) {
+        presentActivityAlert(message: "Cancelling card")
+        virtualCardsClient.cancelCardWithId(id) { [weak self] result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success:
+                    self?.dismissActivityAlert()
+                case let .failure(error):
+                    self?.dismissActivityAlert {
+                        self?.presentErrorAlert(message: "Failed to cancel card", error: error)
+                    }
+                }
+                completion(result)
             }
         }
     }
@@ -199,6 +221,14 @@ class CardListViewController: UIViewController, UITableViewDataSource, UITableVi
         return cards.filter { $0.owners.contains { $0.id == sudoId } }
     }
 
+    /// Formats the title which represents a card and is displayed on the table view cell.
+    ///
+    /// - Parameter card: The card to display.
+    func getDisplayTitleForCard(_ card: Card) -> String {
+        let suffix = (card.state == .closed) ? " - Cancelled" : ""
+        return "\(card.alias) \(suffix)"
+    }
+
     // MARK: - Conformance: UITableViewDataSource
 
     func numberOfSections(in tableView: UITableView) -> Int {
@@ -221,7 +251,7 @@ class CardListViewController: UIViewController, UITableViewDataSource, UITableVi
             let card = cards[indexPath.row]
             cell = tableView.dequeueReusableCell(withIdentifier: "default", for: indexPath)
             cell.textLabel?.textColor = UIColor.black
-            cell.textLabel?.text = card.alias
+            cell.textLabel?.text = getDisplayTitleForCard(card)
             cell.accessoryType = .disclosureIndicator
         }
         return cell
@@ -237,5 +267,28 @@ class CardListViewController: UIViewController, UITableViewDataSource, UITableVi
             performSegue(withIdentifier: Segue.navigateToCardDetail.rawValue, sender: self)
         }
         tableView.deselectRow(at: indexPath, animated: true)
+    }
+
+    func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        if indexPath.row != cards.count {
+            let cancel = UIContextualAction(style: .destructive, title: "Cancel") { _, _, completion in
+                let card = self.cards[indexPath.row]
+                self.cancelCard(id: card.id) { result in
+                    switch result {
+                    case .success(let result):
+                        self.cards.remove(at: indexPath.row)
+                        self.cards.insert(result, at: indexPath.row)
+                        let cell = self.tableView.cellForRow(at: indexPath)
+                        cell?.textLabel?.text = self.getDisplayTitleForCard(result)
+                        completion(true)
+                    case .failure:
+                        completion(false)
+                    }
+                }
+            }
+            cancel.backgroundColor = .red
+            return UISwipeActionsConfiguration(actions: [cancel])
+        }
+        return nil
     }
 }

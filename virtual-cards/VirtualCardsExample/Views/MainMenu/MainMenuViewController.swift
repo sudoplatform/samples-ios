@@ -20,6 +20,8 @@ import SudoVirtualCards
 ///         be presented so the user can view or choose to create funding sources.
 ///     - `SudoListViewController`: If a user taps the "Sudos" button, the`SudoListViewController` will
 ///         be presented so the user can view or choose to create Sudos.
+///     - `OrphanCardListViewController`: If a user taps the "Orphan Cards" button, the `OrphanCardListViewController` will
+///         be presented so the user can view each orphaned card and its details.
 ///     - `RegistrationViewController`: If a user taps the "Deregister" button, the`RegistrationViewController` will
 ///         be presented so the user can perform registration again.
 class MainMenuViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
@@ -39,6 +41,8 @@ class MainMenuViewController: UIViewController, UITableViewDelegate, UITableView
         case navigateToFundingSourceList
         /// Used to navigate to the `SudoListViewController`.
         case navigateToSudoList
+        /// Used to navigate to the `OrphanCardListViewController`.
+        case navigateToOrphanCardList
     }
 
     /// Menu items shown on the table view.
@@ -49,6 +53,8 @@ class MainMenuViewController: UIViewController, UITableViewDelegate, UITableView
         case fundingSources
         /// Sudos table view item.
         case sudos
+        /// Orphan cards table view item.
+        case orphanCards
 
         /// Title label of the table view item shown to the user.
         var displayTitle: String {
@@ -59,6 +65,8 @@ class MainMenuViewController: UIViewController, UITableViewDelegate, UITableView
                 return "Funding Sources"
             case .sudos:
                 return "Sudos"
+            case .orphanCards:
+                return "Orphan Cards"
             }
         }
     }
@@ -158,8 +166,8 @@ class MainMenuViewController: UIViewController, UITableViewDelegate, UITableView
 
     /// Configure the view's navigation bar.
     ///
-    /// Sets the title of the navigation to Virtual Cards Sample App". Sets the left bar to a deregister button, which will execute the
-    /// de-registration operation and sets the right bar to an info button which will display an informative alert.
+    /// Sets the left bar to a deregister button, which will execute the de-registration operation and sets the right bar to an info button which will
+    /// display an informative alert.
     func configureNavigationBar() {
         let deregisterBarButton = UIBarButtonItem(title: "Deregister", style: .plain, target: self, action: #selector(didTapDeregisterButton))
         navigationItem.leftBarButtonItem = deregisterBarButton
@@ -181,10 +189,11 @@ class MainMenuViewController: UIViewController, UITableViewDelegate, UITableView
     func showInfoAlert() {
         let alert = UIAlertController(
             title: "What is a Virtual Card?",
-            message: "Virtual cards must belong to a Sudo. A Sudo is a digital identity created and owned by a real person.",
+            message: "Virtual cards must belong to a Sudo. Before a virtual card can be created, a user's identity needs "
+                + "to be verified and a funding source needs to be created.",
             preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Learn More", style: .default) { _ in
-            let docURL = URL(string: "https://docs.sudoplatform.com/concepts/sudo-digital-identities")!
+            let docURL = URL(string: "https://docs.sudoplatform.com/guides/virtual-cards")!
             UIApplication.shared.open(docURL, options: [:], completionHandler: nil)
         })
         alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
@@ -243,6 +252,8 @@ class MainMenuViewController: UIViewController, UITableViewDelegate, UITableView
                 sender: self)
         case .sudos:
             performSegue(withIdentifier: Segue.navigateToSudoList.rawValue, sender: self)
+        case .orphanCards:
+            performSegue(withIdentifier: Segue.navigateToOrphanCardList.rawValue, sender: self)
         }
     }
 

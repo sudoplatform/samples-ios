@@ -6,10 +6,19 @@ inhibit_all_warnings!
 
 source 'https://cdn.cocoapods.org/'
 
+acknowledgementsFields = ['name', 'version', 'licenseType', 'licenseText', 'homepage']
+acknowledgementsExclude = ['SudoUser', 'SudoTelephony', 'SudoApiClient', 'SudoConfigManager', 'SudoKeyManager', 'SudoLogging', 'SudoOperations', 'SudoProfiles', 'SudoIdentityVerification', 'SudoVirtualCards']
+
+pre_install do |installer|
+	unless installer.deployment?
+		plugin 'cocoapods-acknowledgements', :fields => acknowledgementsFields, :exclude => acknowledgementsExclude
+	end
+end
+
 target 'VirtualCardsExample' do
     pod 'SudoUser', '~> 7.8'
     pod 'SudoIdentityVerification', '~> 4.7'
-    pod 'SudoVirtualCards', '~> 7.1'
+    pod 'SudoVirtualCards', '~> 8.0'
 end
 
 # Fix Xcode nagging warning on pod install/update

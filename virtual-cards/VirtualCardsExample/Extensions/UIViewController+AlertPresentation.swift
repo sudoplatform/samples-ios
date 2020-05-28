@@ -10,6 +10,8 @@ extension UIViewController {
 
     // MARK: - Supplementary
 
+    typealias UIAlertPresentationCompletion = () -> Void
+
     /// Typealias for Alert Action OK Handler buttons.
     typealias UIAlertActionHandler = (UIAlertAction) -> Void
 
@@ -22,14 +24,16 @@ extension UIViewController {
     }
 
     /// Presents a `UIAlertController` containing a `UIActivityIndicatorView` and the given message.
-    func presentActivityAlert(message: String) {
-        let alert = UIAlertController(title: nil, message: message, preferredStyle: .alert)
+    func presentActivityAlert(message: String, completion: UIAlertPresentationCompletion? = nil) {
+        let alert = ActivityAlertViewController(message: message)
         alert.view.accessibilityIdentifier = activityIdentifier
-        let activityIndicator = UIActivityIndicatorView(style: .medium)
-        activityIndicator.frame = CGRect(x: -5, y: 5, width: 50, height: 50)
-        activityIndicator.startAnimating()
-        alert.view.addSubview(activityIndicator)
-        present(alert, animated: true)
+        present(alert, animated: false, completion: completion)
+    }
+
+    func presentCancellableActivityAlert(message: String, delegate: ActivityAlertViewControllerDelegate, completion: UIAlertPresentationCompletion? = nil) {
+        let alert = ActivityAlertViewController(message: message, cancellable: true, delegate: delegate)
+        alert.view.accessibilityIdentifier = activityIdentifier
+        present(alert, animated: false, completion: completion)
     }
 
     /// Dismisses an activity alert spawned using `presentActivityAlert(message:)`.
@@ -38,13 +42,13 @@ extension UIViewController {
     ///     specify nil for this parameter.
     func dismissActivityAlert(_ completion: (() -> Void)? = nil) {
         guard
-            let presentedAlert = presentedViewController as? UIAlertController,
+            let presentedAlert = presentedViewController as? ActivityAlertViewController,
             presentedAlert.view.accessibilityIdentifier == activityIdentifier
         else {
             print("No activity indicator found")
             return
         }
-        dismiss(animated: true, completion: completion)
+        dismiss(animated: false, completion: completion)
     }
 
     /// Presents a `UIAlertController` presenting with the `title` and `message`.

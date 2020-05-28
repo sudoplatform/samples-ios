@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="16096" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_1" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16087"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="ActivityAlertViewController" customModule="VirtualCardsExample" customModuleProvider="target">
+            <connections>
+                <outlet property="activityBoxView" destination="qFQ-lP-CgY" id="U53-Aq-Gtx"/>
+                <outlet property="cancelButton" destination="ros-sb-3kq" id="AIo-f5-Mfe"/>
+                <outlet property="cancelView" destination="llg-hP-lwM" id="15W-95-cZF"/>
+                <outlet property="label" destination="gVL-Ue-oBL" id="qeQ-pM-bxD"/>
+                <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="i5M-Pr-FkT">
+            <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <view hidden="YES" contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="3Bh-Re-7Re" userLabel="Default Text View (Hidden)">
+                    <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                    <subviews>
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="dfk-Xd-NVG">
+                            <rect key="frame" x="8" y="52" width="398" height="844"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <string key="text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec nec congue felis, quis pretium est. Ut non semper lacus. Pellentesque ipsum tortor, eleifend in mi ut, fringilla auctor turpis. Nunc augue elit, fermentum in lobortis sed, pretium et massa. Nulla facilisi. Sed condimentum eros ut ipsum cursus interdum. In hac habitasse platea dictumst. Donec sit amet scelerisque magna. Sed faucibus lorem ut ultrices mollis.
+
+Duis placerat sollicitudin tellus, at aliquet orci interdum id. Praesent nisl lorem, volutpat sed libero ac, malesuada imperdiet turpis. Praesent aliquam feugiat sagittis. Proin neque ligula, vehicula in rhoncus nec, aliquam id nibh. Nunc mattis luctus sem nec fringilla. Sed aliquet lacus ac enim volutpat, a suscipit ex faucibus. Curabitur vitae semper nisl.
+
+Ut vestibulum vulputate nisi, sit amet accumsan eros tincidunt et. Donec rhoncus ex nec commodo viverra. Aliquam erat volutpat. Sed dui tellus, suscipit in malesuada nec, commodo nec orci. Proin ullamcorper blandit leo ut pharetra. Phasellus in sem massa. Pellentesque risus nisi, condimentum vitae est at, sodales fermentum diam. Phasellus ac tincidunt felis. In at nisi id dui vehicula blandit et id ligula. Nam consequat, quam ac volutpat posuere, turpis mauris ornare nulla, sed mollis augue nulla interdum sapien. Proin in faucibus felis. Donec feugiat nulla ac lectus sagittis dictum. Pellentesque quis imperdiet massa. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum quis finibus sem.
+
+Phasellus ornare aliquet lorem. Praesent et malesuada eros. Mauris leo magna, faucibus at leo a, lobortis volutpat augue. Etiam sed risus scelerisque, faucibus ex condimentum, varius odio. Nam in pharetra quam. Ut dictum bibendum nisl ut ullamcorper. Nunc quis molestie nibh. In rhoncus neque orci, quis feugiat diam feugiat at. Aenean elit est, elementum sed tellus id, ultrices vehicula metus. Etiam et blandit mauris. Sed finibus lectus eros, ac laoreet dolor maximus non. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Ut rutrum fermentum quam quis hendrerit. Vivamus posuere ultricies venenatis. Fusce ut finibus urna. In eu augue vitae dolor gravida tempus eu semper leo.
+
+Curabitur vitae justo orci. Ut maximus ex ac nisi aliquet euismod. Curabitur vitae ornare sapien. Phasellus scelerisque augue sed iaculis fringilla. Suspendisse vitae congue dolor, vitae tincidunt arcu. Vivamus volutpat risus massa, quis fringilla erat malesuada sit amet. Sed vehicula interdum malesuada. Pellentesque ullamcorper dignissim mattis. Duis auctor dui ac tortor congue sagittis. Nulla et leo sodales, vestibulum turpis vel, molestie elit. Nunc tempus massa at metus dignissim, quis lobortis ipsum dapibus. Nam ac feugiat lectus, eu pellentesque purus. Phasellus quis bibendum arcu. Etiam non dolor sit amet sem gravida lobortis vitae vehicula quam.</string>
+                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                            <nil key="textColor"/>
+                            <nil key="highlightedColor"/>
+                        </label>
+                    </subviews>
+                    <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                </view>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="pFn-MN-bSM" userLabel="background">
+                    <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                    <color key="backgroundColor" white="0.0" alpha="0.5" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                </view>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="qFQ-lP-CgY" userLabel="activityBox">
+                    <rect key="frame" x="87" y="390.5" width="240" height="115"/>
+                    <subviews>
+                        <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="Zv8-g8-3zz">
+                            <rect key="frame" x="0.0" y="0.0" width="240" height="115"/>
+                            <subviews>
+                                <stackView contentMode="scaleToFill" spacing="16" translatesAutoresizingMaskIntoConstraints="NO" id="1Jn-qi-4B6">
+                                    <rect key="frame" x="0.0" y="0.0" width="240" height="68"/>
+                                    <subviews>
+                                        <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" animating="YES" style="medium" translatesAutoresizingMaskIntoConstraints="NO" id="5MX-Oz-UEB">
+                                            <rect key="frame" x="30" y="24" width="20" height="20"/>
+                                        </activityIndicatorView>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="gVL-Ue-oBL">
+                                            <rect key="frame" x="66" y="24" width="134" height="20"/>
+                                            <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="17"/>
+                                            <nil key="textColor"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                    </subviews>
+                                    <edgeInsets key="layoutMargins" top="24" left="30" bottom="24" right="40"/>
+                                </stackView>
+                                <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="llg-hP-lwM">
+                                    <rect key="frame" x="0.0" y="68" width="240" height="47"/>
+                                    <subviews>
+                                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="gor-o6-ZYL">
+                                            <rect key="frame" x="0.0" y="0.0" width="240" height="1"/>
+                                            <color key="backgroundColor" red="0.23529411759999999" green="0.23529411759999999" blue="0.26274509800000001" alpha="0.18211047535211267" colorSpace="custom" customColorSpace="sRGB"/>
+                                            <constraints>
+                                                <constraint firstAttribute="height" constant="1" id="w4p-h3-7ET"/>
+                                            </constraints>
+                                        </view>
+                                        <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="NhH-UY-gsZ">
+                                            <rect key="frame" x="0.0" y="1" width="240" height="46"/>
+                                            <subviews>
+                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ros-sb-3kq" userLabel="cancelButton">
+                                                    <rect key="frame" x="8" y="8" width="224" height="30"/>
+                                                    <state key="normal" title="Cancel"/>
+                                                    <connections>
+                                                        <action selector="didTapCancelButton" destination="-1" eventType="touchUpInside" id="LDJ-6g-pEb"/>
+                                                    </connections>
+                                                </button>
+                                            </subviews>
+                                            <edgeInsets key="layoutMargins" top="8" left="8" bottom="8" right="8"/>
+                                        </stackView>
+                                    </subviews>
+                                </stackView>
+                            </subviews>
+                        </stackView>
+                    </subviews>
+                    <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
+                    <constraints>
+                        <constraint firstAttribute="trailing" secondItem="Zv8-g8-3zz" secondAttribute="trailing" id="5oU-Nd-ets"/>
+                        <constraint firstItem="Zv8-g8-3zz" firstAttribute="top" secondItem="qFQ-lP-CgY" secondAttribute="top" id="Bs9-va-fud"/>
+                        <constraint firstAttribute="bottom" secondItem="Zv8-g8-3zz" secondAttribute="bottom" id="OFW-H6-fZ3"/>
+                        <constraint firstItem="Zv8-g8-3zz" firstAttribute="leading" secondItem="qFQ-lP-CgY" secondAttribute="leading" id="YTN-sG-akO"/>
+                    </constraints>
+                </view>
+            </subviews>
+            <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+            <constraints>
+                <constraint firstAttribute="bottom" secondItem="pFn-MN-bSM" secondAttribute="bottom" id="2e0-Bb-TiF"/>
+                <constraint firstItem="qFQ-lP-CgY" firstAttribute="centerX" secondItem="i5M-Pr-FkT" secondAttribute="centerX" id="Ohc-xV-MrT"/>
+                <constraint firstItem="pFn-MN-bSM" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="kYt-Rt-yeT"/>
+                <constraint firstAttribute="trailing" secondItem="pFn-MN-bSM" secondAttribute="trailing" id="olP-cQ-WrO"/>
+                <constraint firstItem="pFn-MN-bSM" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" id="usq-Pf-Kw1"/>
+                <constraint firstItem="qFQ-lP-CgY" firstAttribute="centerY" secondItem="i5M-Pr-FkT" secondAttribute="centerY" id="v4g-ne-CTB"/>
+            </constraints>
+            <viewLayoutGuide key="safeArea" id="fnl-2z-Ty3"/>
+            <point key="canvasLocation" x="137.68115942028987" y="101.78571428571428"/>
+        </view>
+    </objects>
+</document>

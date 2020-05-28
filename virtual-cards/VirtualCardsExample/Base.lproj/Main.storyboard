@@ -2,7 +2,7 @@
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="16096" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="yY4-In-UjB">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16086"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16087"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -23,10 +23,13 @@
         <scene sceneID="mn0-sL-Aze">
             <objects>
                 <navigationController id="9Ja-Y6-Yga" sceneMemberID="viewController">
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="FRn-Dv-2Re">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translucent="NO" id="FRn-Dv-2Re">
                         <rect key="frame" x="0.0" y="44" width="414" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
+                    <toolbar key="toolbar" opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="RuM-pU-aIi">
+                        <autoresizingMask key="autoresizingMask"/>
+                    </toolbar>
                     <connections>
                         <segue destination="U3R-rA-vTn" kind="relationship" relationship="rootViewController" id="Fzj-b0-T6O"/>
                     </connections>
@@ -45,6 +48,7 @@
                         <segue destination="ubV-y7-Lxc" kind="show" identifier="navigateToFundingSourceList" id="GPn-HW-WO2"/>
                         <segue destination="Hjk-9I-wy4" kind="unwind" identifier="returnToRegistration" unwindAction="returnToRegistrationWithSegue:" id="rOt-bm-ziO"/>
                         <segue destination="bZa-Hg-rSq" kind="show" identifier="navigateToIdentityVerification" id="nRB-9g-sfJ"/>
+                        <segue destination="XUj-or-Byn" kind="show" identifier="navigateToOrphanCardList" id="n86-3d-YOZ"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="eqV-vH-cjW" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -97,22 +101,30 @@
             </objects>
             <point key="canvasLocation" x="2438" y="-295"/>
         </scene>
-        <!--Card Detail View Controller-->
+        <!--Card Detail-->
         <scene sceneID="jqX-kC-OiK">
             <objects>
-                <viewController id="SVk-YH-KHX" customClass="CardDetailViewController" customModule="VirtualCardsExample" customModuleProvider="target" sceneMemberID="viewController">
-                    <navigationItem key="navigationItem" id="7Nk-kq-ofe">
-                        <barButtonItem key="leftBarButtonItem" style="done" systemItem="done" id="md0-bX-3Cm">
-                            <connections>
-                                <segue destination="QTo-A9-qFv" kind="unwind" unwindAction="returnToCardListWithSegue:" id="Dfu-EJ-xlh"/>
-                            </connections>
-                        </barButtonItem>
-                    </navigationItem>
+                <viewController id="SVk-YH-KHX" userLabel="Card Detail" customClass="CardDetailViewController" customModule="VirtualCardsExample" customModuleProvider="target" sceneMemberID="viewController">
+                    <connections>
+                        <segue destination="QTo-A9-qFv" kind="unwind" identifier="returnToCardList" unwindAction="returnToCardListWithSegue:" id="Alx-Qd-kbW"/>
+                        <segue destination="QTo-A9-qFv" kind="unwind" identifier="returnToOrphanCardList" unwindAction="returnToOrphanCardListWithSegue:" id="eG0-Kz-HVa"/>
+                        <segue destination="Lki-gM-ksE" kind="show" identifier="navigateToTransactionDetail" id="d3j-gd-prP"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="OXP-LO-AHF" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
                 <exit id="QTo-A9-qFv" userLabel="Exit" sceneMemberID="exit"/>
             </objects>
             <point key="canvasLocation" x="3541" y="-972"/>
+        </scene>
+        <!--Transaction Detail View Controller-->
+        <scene sceneID="ptB-DT-KX1">
+            <objects>
+                <viewController id="Lki-gM-ksE" customClass="TransactionDetailViewController" customModule="VirtualCardsExample" customModuleProvider="target" sceneMemberID="viewController">
+                    <navigationItem key="navigationItem" id="v3z-k6-fu2"/>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="CCP-V1-2WV" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="4758" y="-972"/>
         </scene>
         <!--Create Card-->
         <scene sceneID="cSF-Po-jVB">
@@ -165,6 +177,19 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="5dt-dS-Qf0" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="1390" y="1822"/>
+        </scene>
+        <!--Orphan Cards-->
+        <scene sceneID="rRL-62-ocd">
+            <objects>
+                <viewController id="XUj-or-Byn" userLabel="Orphan Cards" customClass="OrphanCardListViewController" customModule="VirtualCardsExample" customModuleProvider="target" sceneMemberID="viewController">
+                    <navigationItem key="navigationItem" title="Orphan Cards" id="exh-9A-JZK" userLabel="Orphan Cards"/>
+                    <connections>
+                        <segue destination="SVk-YH-KHX" kind="show" identifier="navigateToCardDetail" id="wbO-ex-SxJ"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="KJ9-FV-Xhn" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="232" y="-295"/>
         </scene>
     </scenes>
     <inferredMetricsTieBreakers>

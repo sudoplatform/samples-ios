@@ -40,7 +40,7 @@ class ConversationDetailsViewController: UIViewController, UITableViewDelegate, 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
-        if conversation.latestPhoneMessage != nil {
+        if conversation?.latestPhoneMessage != nil {
             self.subscribeToMessages()
             
             self.listMessages { messages in
@@ -51,9 +51,7 @@ class ConversationDetailsViewController: UIViewController, UITableViewDelegate, 
             }
         } else {
             let alert = UIAlertController(title: "Error", message: "Unable to determine latest message in conversation", preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: "OK", style: .default) { _ in
-                self.navigationController?.dismiss(animated: true, completion: nil)
-            })
+            alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
             present(alert, animated: true, completion: nil)
         }
     }
@@ -158,7 +156,7 @@ class ConversationDetailsViewController: UIViewController, UITableViewDelegate, 
         case (0, 0):
             let cell = tableView.dequeueReusableCell(withIdentifier: "detailCell")!
             cell.textLabel?.text = "Your Number"
-            cell.detailTextLabel?.text = formatAsUSNumber(number: localNumber.phoneNumber)
+            cell.detailTextLabel?.text = formatAsUSNumber(number: localNumber?.phoneNumber ?? "?")
             return cell
         case (0, 1):
             let cell = tableView.dequeueReusableCell(withIdentifier: "detailCell")!

@@ -129,8 +129,9 @@ class ConversationListViewController: UIViewController, UITableViewDelegate, UIT
         case "navigateToConversationDetails":
             let conversationDetails = segue.destination as! ConversationDetailsViewController
             let conversation = sender as! PhoneMessageConversation
+            guard let message = conversation.latestPhoneMessage else { return }
             conversationDetails.localNumber = self.localNumber
-            conversationDetails.remoteNumber = conversation.latestPhoneMessage!.remotePhoneNumber
+            conversationDetails.remoteNumber = message.remotePhoneNumber
             conversationDetails.conversation = conversation
         default:
             break
@@ -164,7 +165,7 @@ class ConversationListViewController: UIViewController, UITableViewDelegate, UIT
         default:
             let cell = tableView.dequeueReusableCell(withIdentifier: "conversationCell")!
             let conversation = self.conversations[indexPath.row - 1]
-            let formattedNumber = formatAsUSNumber(number: conversation.latestPhoneMessage!.remotePhoneNumber)
+            let formattedNumber = conversation.latestPhoneMessage.map { formatAsUSNumber(number: $0.remotePhoneNumber) }
             cell.textLabel?.text = formattedNumber
             return cell
         }

@@ -6,18 +6,18 @@ PODS:
     - AWSCore (~> 2.13.0)
     - ReachabilitySwift (~> 5.0.0)
     - SQLite.swift (~> 0.12.2)
-  - AWSAuthCore (2.13.2):
-    - AWSCore (= 2.13.2)
-  - AWSCognitoIdentityProvider (2.13.2):
+  - AWSAuthCore (2.13.4):
+    - AWSCore (= 2.13.4)
+  - AWSCognitoIdentityProvider (2.13.4):
     - AWSCognitoIdentityProviderASF (= 1.0.1)
-    - AWSCore (= 2.13.2)
+    - AWSCore (= 2.13.4)
   - AWSCognitoIdentityProviderASF (1.0.1)
-  - AWSCore (2.13.2)
-  - AWSMobileClient (2.13.2):
-    - AWSAuthCore (= 2.13.2)
-    - AWSCognitoIdentityProvider (= 2.13.2)
-  - AWSS3 (2.13.2):
-    - AWSCore (= 2.13.2)
+  - AWSCore (2.13.4)
+  - AWSMobileClient (2.13.4):
+    - AWSAuthCore (= 2.13.4)
+    - AWSCognitoIdentityProvider (= 2.13.4)
+  - AWSS3 (2.13.4):
+    - AWSCore (= 2.13.4)
   - ReachabilitySwift (5.0.0)
   - SQLite.swift (0.12.2):
     - SQLite.swift/standard (= 0.12.2)
@@ -38,14 +38,14 @@ PODS:
     - SudoUser (~> 7.8)
   - SudoKeyManager (1.0.0)
   - SudoLogging (0.2.0)
-  - SudoOperations (1.0.0):
+  - SudoOperations (2.0.0):
     - AWSAppSync (~> 3.0)
     - SudoLogging (~> 0.2)
   - SudoProfiles (5.5.0):
     - SudoApiClient (~> 1.3)
     - SudoLogging (~> 0.2)
     - SudoUser (~> 7.8)
-  - SudoUser (7.8.1):
+  - SudoUser (7.8.5):
     - AWSAppSync (~> 3.0)
     - AWSCognitoIdentityProvider (~> 2.12)
     - AWSCore (~> 2.12)
@@ -54,13 +54,13 @@ PODS:
     - SudoConfigManager (~> 1.2)
     - SudoKeyManager (~> 1.0)
     - SudoLogging (~> 0.2)
-  - SudoVirtualCards (8.0.0):
+  - SudoVirtualCards (8.1.0):
     - AWSAppSync (~> 3.1)
     - Stripe (~> 19.1)
     - SudoApiClient (~> 1.3)
     - SudoKeyManager (~> 1.0)
     - SudoLogging (~> 0.2)
-    - SudoOperations (~> 1.0)
+    - SudoOperations (~> 2.0)
     - SudoProfiles (~> 5.4)
     - SudoUser (~> 7.8)
 
@@ -96,12 +96,12 @@ SPEC REPOS:
 SPEC CHECKSUMS:
   AppSyncRealTimeClient: 4a2ccdc1722750a1f4d76e216f9bfb1cf12f10de
   AWSAppSync: 4b91c48712913ca4f2bb38273280190e65d59a45
-  AWSAuthCore: 890aaf36fa3a913a5948851a576c02456bed4c5b
-  AWSCognitoIdentityProvider: 68455a8d170bb6cd0ec17d261da0ab3d623232b0
+  AWSAuthCore: 72b4bd064c28985ea5345c62759632d511de342a
+  AWSCognitoIdentityProvider: a2d1d2857316519c018c03ac8205cf78154db5c0
   AWSCognitoIdentityProviderASF: f94f1a502e72ef3d0a1de93e10bf7a79c8698118
-  AWSCore: 8e878a5b1b99cdf3d7df0c1c86be0bfcd6294c11
-  AWSMobileClient: bdec2a26617590bd3eece9bf208005bc4682d424
-  AWSS3: 8eb4011854de8bee0fbbe25803a29f69cca31256
+  AWSCore: 06beea22b6bdbfe9f5ab5015c6901e8475c746a8
+  AWSMobileClient: 33ecce524fbc011d543dae8306ca29a43ecb72e5
+  AWSS3: ab3965322c8e5ee069eaf9b3201c55557ad21be1
   ReachabilitySwift: 985039c6f7b23a1da463388634119492ff86c825
   SQLite.swift: d2b4642190917051ce6bd1d49aab565fe794eea3
   Starscream: ef3ece99d765eeccb67de105bfa143f929026cf5
@@ -111,10 +111,10 @@ SPEC CHECKSUMS:
   SudoIdentityVerification: 487209c2dfac96ed37997ba01a0326e1c301ba15
   SudoKeyManager: ce474fff6ab1219a9d1f8a4451c78847cf9af471
   SudoLogging: adffcc56d4a16aed321a059bc552b3f538fb2851
-  SudoOperations: 2e8a3b509dd601190a33cdc9ba0c3ab07006ac6a
+  SudoOperations: 71591ab094a50f80bc9f194f19467834e073ff38
   SudoProfiles: 8b21ca767fc192b0333ab762b19571ad94cce78f
-  SudoUser: 95cda148bf653da3950c11e05645a96fb37762da
-  SudoVirtualCards: 68fe4c29421f90ecd86cee03745e8210dde497a0
+  SudoUser: 1b262a24ed5684b84ff8861d4a3d32dce62c910e
+  SudoVirtualCards: b4e2dfb01889348ef2374c3b878d341547468547
 
 PODFILE CHECKSUM: ac5efab88d0a4a3ddf3246de9f2bdd0f260563ee
 

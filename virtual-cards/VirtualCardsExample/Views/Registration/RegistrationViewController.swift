@@ -45,6 +45,16 @@ class RegistrationViewController: UIViewController {
 
     // MARK: - Lifecycle
 
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        self.navigationController?.setNavigationBarHidden(true, animated: animated)
+    }
+
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        self.navigationController?.setNavigationBarHidden(false, animated: animated)
+    }
+
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
 
@@ -109,16 +119,37 @@ class RegistrationViewController: UIViewController {
             }
         }
 
-        if userClient.isRegistered() {
-            signIn()
+        if userClient.getSupportedRegistrationChallengeType().contains(.fsso) {
+            guard let navigationController = self.navigationController else {
+                return completion(false)
+            }
+
+            do {
+                try userClient.presentFederatedSignInUI(navigationController: navigationController) { signInResult in
+                    switch signInResult {
+                    case .failure(let error):
+                        self.showSignInFailureAlert(error: error)
+                        completion(false)
+                    case .success:
+                        completion(true)
+                    }
+                }
+            } catch let signInError {
+                self.showSignInFailureAlert(error: signInError)
+                completion(false)
+            }
         } else {
-            authenticator.register { registerResult in
-                switch registerResult {
-                case .failure(let error):
-                    self.showRegistrationFailureAlert(error: error)
-                    completion(false)
-                case .success:
-                    signIn()
+            if userClient.isRegistered() {
+                signIn()
+            } else {
+                authenticator.register { registerResult in
+                    switch registerResult {
+                    case .failure(let error):
+                        self.showRegistrationFailureAlert(error: error)
+                        completion(false)
+                    case .success:
+                        signIn()
+                    }
                 }
             }
         }

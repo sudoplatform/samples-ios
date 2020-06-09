@@ -146,8 +146,10 @@ class ConversationDetailsViewController: UIViewController, UITableViewDelegate, 
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         switch section {
-        case 1: return messages.count
-        default: return 2
+            case 1:
+                return messages.count + 1
+            default:
+                return 2
         }
     }
     

@@ -77,11 +77,11 @@ class IdentityVerificationViewController: UIViewController,
             case .lastName:
                 return "Last Name"
             case .address:
-                return "Adress"
+                return "Address"
             case .unitNumber:
                 return "Unit #"
             case .zip:
-                return "ZIP"
+                return "Zip"
             case .country:
                 return "Country"
             case .dateOfBirth:
@@ -285,7 +285,8 @@ class IdentityVerificationViewController: UIViewController,
     ///
     /// Sets an informative text label and "Learn more" button which when tapped will redirect the user to a Sudo Platform webpage.
     func configureLearnMoreView() {
-        learnMoreView.label.text = "Secure identity verification is required in order ensure legitimate usage of the Sudo Platform virtual cards service.\n\n"
+        learnMoreView.label.text = "Secure identity verification is required in order to ensure legitimate usage of the Sudo Platform virtual "
+            + "cards service.\n\n"
             + "Identity verification needs to be performed successfully once for each user.\n\n"
             + "The default identity information in this form will verify successfully in the sandbox environment."
         learnMoreView.delegate = self

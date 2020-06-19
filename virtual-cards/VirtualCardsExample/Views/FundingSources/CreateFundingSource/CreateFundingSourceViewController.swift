@@ -57,8 +57,8 @@ class CreateFundingSourceViewController: UIViewController,
         case city
         /// State of the address associated with the funding source.
         case state
-        /// Postal code of the address associated with the funding source.
-        case postalCode
+        /// Zip code of the address associated with the funding source.
+        case zip
         /// Country of the address associated with the funding source.
         case country
 
@@ -91,8 +91,8 @@ class CreateFundingSourceViewController: UIViewController,
                 return "City"
             case .state:
                 return "State"
-            case .postalCode:
-                return "Postal Code"
+            case .zip:
+                return "Zip"
             case .country:
                 return "Country"
             }
@@ -124,13 +124,13 @@ class CreateFundingSourceViewController: UIViewController,
             case .securityCode:
                 return "123"
             case .address:
-                return "address_full_match"
+                return "222333 Peachtree Place"
             case .city:
-                return "Salt Lake City"
+                return "Atlanta"
             case .state:
-                return "UT"
-            case .postalCode:
-                return "84101"
+                return "GA"
+            case .zip:
+                return "30318"
             case .country:
                 return "US"
             default:
@@ -217,7 +217,7 @@ class CreateFundingSourceViewController: UIViewController,
             unitNumber: formData[.unitNumber],
             city: formData[.city] ?? "",
             state: formData[.state] ?? "",
-            postalCode: formData[.postalCode] ?? "",
+            postalCode: formData[.zip] ?? "",
             country: formData[.country] ?? ""
         )
         virtualCardsClient.createFundingSource(

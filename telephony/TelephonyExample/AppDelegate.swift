@@ -43,7 +43,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             self.keyManager = SudoKeyManagerImpl(serviceName: "com.sudoplatform.appservicename", keyTag: "com.sudoplatform", namespace: "tel")
             self.authenticator = Authenticator(userClient: userClient, keyManager: keyManager)
 
-            self.telephonyClient = try DefaultSudoTelephonyClient(sudoUserClient: self.userClient, sudoProfilesClient: self.sudoProfilesClient)
+            self.telephonyClient = try DefaultSudoTelephonyClient(
+                sudoUserClient: self.userClient,
+                sudoProfilesClient: self.sudoProfilesClient,
+                callProviderConfiguration: CallProviderConfiguration(
+                    localizedName: "TelephonyExample",
+                    iconTemplate: nil,
+                    ringtoneSound: nil,
+                    includesCallsInRecents: true
+                )
+            )
         } catch let error {
             fatalError("Failed to initialize the telephony client: \(error)")
         }

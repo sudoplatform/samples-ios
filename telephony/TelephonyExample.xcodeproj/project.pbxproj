@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		32C1C9B624562D98005F1F5D /* ConversationListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32C1C9B524562D97005F1F5D /* ConversationListViewController.swift */; };
+		32C1C9B624562D98005F1F5D /* PhoneNumberDetailsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32C1C9B524562D97005F1F5D /* PhoneNumberDetailsViewController.swift */; };
 		32D367622457497900AE1D4D /* PhoneNumberFormatting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32D367612457497900AE1D4D /* PhoneNumberFormatting.swift */; };
 		AB023E422457610400265D96 /* ConversationDetailsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB023E412457610400265D96 /* ConversationDetailsViewController.swift */; };
 		AB5B9DB3240EC5D100E4E5D8 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB5B9DB2240EC5D100E4E5D8 /* AppDelegate.swift */; };
@@ -26,11 +26,13 @@
 		CF2571CB2444ED850053334E /* MessageDetailsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF2571CA2444ED850053334E /* MessageDetailsViewController.swift */; };
 		CF2571CD2444ED8D0053334E /* CreateMessageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF2571CC2444ED8D0053334E /* CreateMessageViewController.swift */; };
 		CF2571D2245109BF0053334E /* UIViewController+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF2571D1245109BF0053334E /* UIViewController+Extensions.swift */; };
+		CF76028F2485881E0090445B /* CreateVoiceCallViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF76028E2485881E0090445B /* CreateVoiceCallViewController.swift */; };
+		CF76029124858EF70090445B /* ActiveVoiceCallViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF76029024858EF70090445B /* ActiveVoiceCallViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		321080A2D07D770E685C7534 /* Pods_TelephonyExample.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_TelephonyExample.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		32C1C9B524562D97005F1F5D /* ConversationListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationListViewController.swift; sourceTree = "<group>"; };
+		32C1C9B524562D97005F1F5D /* PhoneNumberDetailsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneNumberDetailsViewController.swift; sourceTree = "<group>"; };
 		32D367612457497900AE1D4D /* PhoneNumberFormatting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneNumberFormatting.swift; sourceTree = "<group>"; };
 		AB023E412457610400265D96 /* ConversationDetailsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConversationDetailsViewController.swift; sourceTree = "<group>"; };
 		AB5B9DAF240EC5D100E4E5D8 /* TelephonyExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TelephonyExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -51,6 +53,8 @@
 		CF2571CA2444ED850053334E /* MessageDetailsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageDetailsViewController.swift; sourceTree = "<group>"; };
 		CF2571CC2444ED8D0053334E /* CreateMessageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateMessageViewController.swift; sourceTree = "<group>"; };
 		CF2571D1245109BF0053334E /* UIViewController+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+Extensions.swift"; sourceTree = "<group>"; };
+		CF76028E2485881E0090445B /* CreateVoiceCallViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateVoiceCallViewController.swift; sourceTree = "<group>"; };
+		CF76029024858EF70090445B /* ActiveVoiceCallViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveVoiceCallViewController.swift; sourceTree = "<group>"; };
 		D58BEBBC6E3D6BD7ADF021A1 /* Pods-TelephonyExample.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TelephonyExample.debug.xcconfig"; path = "Target Support Files/Pods-TelephonyExample/Pods-TelephonyExample.debug.xcconfig"; sourceTree = "<group>"; };
 		F574D92214CBFF8EF1E4DA41 /* Pods-TelephonyExample.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TelephonyExample.release.xcconfig"; path = "Target Support Files/Pods-TelephonyExample/Pods-TelephonyExample.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -95,8 +99,12 @@
 				CF2571C22444EC0B0053334E /* CreateSudoViewController.swift */,
 				CF2571C42444ECE80053334E /* PhoneNumberListViewController.swift */,
 				CF2571C62444ED420053334E /* CreatePhoneNumberViewController.swift */,
-				CF2571CA2444ED850053334E /* MessageDetailsViewController.swift */,
+				32C1C9B524562D97005F1F5D /* PhoneNumberDetailsViewController.swift */,
+				AB023E412457610400265D96 /* ConversationDetailsViewController.swift */,
 				CF2571CC2444ED8D0053334E /* CreateMessageViewController.swift */,
+				CF2571CA2444ED850053334E /* MessageDetailsViewController.swift */,
+				CF76028E2485881E0090445B /* CreateVoiceCallViewController.swift */,
+				CF76029024858EF70090445B /* ActiveVoiceCallViewController.swift */,
 				AB5B9DBB240EC5D300E4E5D8 /* Assets.xcassets */,
 				AB5B9DBD240EC5D300E4E5D8 /* LaunchScreen.storyboard */,
 				AB5B9DC0240EC5D300E4E5D8 /* Info.plist */,
@@ -104,8 +112,6 @@
 				AB93CAD2240EF6FB0065AF50 /* Authenticator.swift */,
 				CF2571D1245109BF0053334E /* UIViewController+Extensions.swift */,
 				C358815524536CCB00F21192 /* UIImage+Extensions.swift */,
-				32C1C9B524562D97005F1F5D /* ConversationListViewController.swift */,
-				AB023E412457610400265D96 /* ConversationDetailsViewController.swift */,
 				32D367612457497900AE1D4D /* PhoneNumberFormatting.swift */,
 			);
 			path = TelephonyExample;
@@ -215,7 +221,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "returncode=0\n\necho \"Copy test key to bundle\"\nSOURCE=${PROJECT_DIR}/config/register_key.private\ncp -f ${SOURCE} \"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/\"\nif [ $? -ne 0 ]\nthen\n    echo \"error: Failed to copy test registration key. Make sure the file config/register_key.private exists in the project directory (see README.md).\"\n    returncode=1\nfi\n\necho \"Copy Sudo Platform config to bundle\"\nSOURCE=${PROJECT_DIR}/config/sudoplatformconfig.json\ncp -f ${SOURCE} \"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/\"\nif [ $? -ne 0 ]\nthen\n    echo \"error: Failed to copy sudoplatformconfig.json. Make sure the file config/sudoplatformconfig.json exists in the project directory (see README.md).\"\n    returncode=1\nfi\n\nexit ${returncode}\n";
+			shellScript = "returncode=0\n\necho \"Copy test key to bundle\"\nSOURCE=${PROJECT_DIR}/config/register_key.private \ncp -f ${SOURCE} \"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/\"\nif [ $? -ne 0 ]\nthen\n    echo \"error: Failed to copy test registration key. Make sure the file config/register_key.private exists in the project directory (see README.md).\"\n    returncode=1\nfi\n\necho \"Copy test key ID to bundle\"\nSOURCE=${PROJECT_DIR}/config/register_key.id \ncp -f ${SOURCE} \"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/\"\nif [ $? -ne 0 ]\nthen\n    echo \"error: Failed to copy test registration key ID. Make sure the file config/register_key.id exists in the project directory (see README.md).\"\n    returncode=1\nfi\n\necho \"Copy Sudo Platform config to bundle\"\nSOURCE=${PROJECT_DIR}/config/sudoplatformconfig.json\ncp -f ${SOURCE} \"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/\"\nif [ $? -ne 0 ]\nthen\n    echo \"error: Failed to copy sudoplatformconfig.json. Make sure the file config/sudoplatformconfig.json exists in the project directory (see README.md).\"\n    returncode=1\nfi\n\nexit ${returncode}\n";
 		};
 		CE75CDA275F0AC4CCB426AE7 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -266,7 +272,8 @@
 				CF2571C72444ED420053334E /* CreatePhoneNumberViewController.swift in Sources */,
 				AB023E422457610400265D96 /* ConversationDetailsViewController.swift in Sources */,
 				CF2571C32444EC0B0053334E /* CreateSudoViewController.swift in Sources */,
-				32C1C9B624562D98005F1F5D /* ConversationListViewController.swift in Sources */,
+				32C1C9B624562D98005F1F5D /* PhoneNumberDetailsViewController.swift in Sources */,
+				CF76029124858EF70090445B /* ActiveVoiceCallViewController.swift in Sources */,
 				CF2571CB2444ED850053334E /* MessageDetailsViewController.swift in Sources */,
 				CF2571D2245109BF0053334E /* UIViewController+Extensions.swift in Sources */,
 				AB93CADA240EF6FB0065AF50 /* Authenticator.swift in Sources */,
@@ -274,6 +281,7 @@
 				CF2571BF2444EB7B0053334E /* RegistrationViewController.swift in Sources */,
 				AB5B9DB3240EC5D100E4E5D8 /* AppDelegate.swift in Sources */,
 				CF2571CD2444ED8D0053334E /* CreateMessageViewController.swift in Sources */,
+				CF76028F2485881E0090445B /* CreateVoiceCallViewController.swift in Sources */,
 				C358815624536CCB00F21192 /* UIImage+Extensions.swift in Sources */,
 				CF2571C52444ECE80053334E /* PhoneNumberListViewController.swift in Sources */,
 				CF2571C12444EBB80053334E /* SudoListViewController.swift in Sources */,

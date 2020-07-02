@@ -31,19 +31,20 @@ PODS:
     - SudoLogging (~> 0.2)
   - SudoKeyManager (1.0.0)
   - SudoLogging (0.2.0)
-  - SudoOperations (1.0.0):
+  - SudoOperations (2.1.0):
     - AWSAppSync (~> 3.0)
     - SudoLogging (~> 0.2)
   - SudoProfiles (5.5.0):
     - SudoApiClient (~> 1.3)
     - SudoLogging (~> 0.2)
     - SudoUser (~> 7.8)
-  - SudoTelephony (3.0.0):
+  - SudoTelephony (3.1.1):
     - SudoApiClient (~> 1.3)
-    - SudoOperations (~> 1.0)
+    - SudoOperations (~> 2.0)
     - SudoProfiles (~> 5.4)
     - SudoUser (~> 7.8)
-  - SudoUser (7.8.5):
+    - TwilioVoice (~> 5.3)
+  - SudoUser (7.9.0):
     - AWSAppSync (~> 3.0)
     - AWSCognitoIdentityProvider (~> 2.12)
     - AWSCore (~> 2.12)
@@ -52,10 +53,11 @@ PODS:
     - SudoConfigManager (~> 1.2)
     - SudoKeyManager (~> 1.0)
     - SudoLogging (~> 0.2)
+  - TwilioVoice (5.4.1)
 
 DEPENDENCIES:
-  - SudoTelephony (~> 3.0)
-  - SudoUser (~> 7.2)
+  - SudoTelephony (~> 3.1.1)
+  - SudoUser (~> 7.9)
 
 SPEC REPOS:
   trunk:
@@ -78,6 +80,7 @@ SPEC REPOS:
     - SudoProfiles
     - SudoTelephony
     - SudoUser
+    - TwilioVoice
 
 SPEC CHECKSUMS:
   AppSyncRealTimeClient: 4a2ccdc1722750a1f4d76e216f9bfb1cf12f10de
@@ -95,11 +98,12 @@ SPEC CHECKSUMS:
   SudoConfigManager: 0c0f56e23dda98d4cba5991c70d7300b73a72f2d
   SudoKeyManager: ce474fff6ab1219a9d1f8a4451c78847cf9af471
   SudoLogging: adffcc56d4a16aed321a059bc552b3f538fb2851
-  SudoOperations: 2e8a3b509dd601190a33cdc9ba0c3ab07006ac6a
+  SudoOperations: 5fc89094d8cc7cbe93262575a1ac7736f2f43e58
   SudoProfiles: 8b21ca767fc192b0333ab762b19571ad94cce78f
-  SudoTelephony: 0e13d8da8adc73cd4ff6343d7b34878956a8d739
-  SudoUser: 1b262a24ed5684b84ff8861d4a3d32dce62c910e
+  SudoTelephony: e5fd19b2e158a812b48b04c1e1e80d001be13d96
+  SudoUser: 7a52cf1637f3d1e24e114e42e1fc84e48fad09df
+  TwilioVoice: 0e224c0d7511c68029b05ee93c83877ba9f070dd
 
-PODFILE CHECKSUM: d1ab7be7aeea81d08cdb82f7d86dbad2eccd01b3
+PODFILE CHECKSUM: daee7dc222c20033cee0da2e8ec12b6a57e24010
 
-COCOAPODS: 1.9.2
+COCOAPODS: 1.9.3

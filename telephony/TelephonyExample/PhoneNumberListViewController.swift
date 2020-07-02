@@ -114,8 +114,8 @@ class PhoneNumberListViewController: UIViewController, UITableViewDelegate, UITa
             let sudoId = sender as! String
             createViewController.sudoId = sudoId
         case "navigateToConversations":
-            let conversationList = segue.destination as! ConversationListViewController
-            conversationList.localNumber = sender as! PhoneNumber
+            let conversationList = segue.destination as! PhoneNumberDetailsViewController
+            conversationList.localNumber = (sender as! PhoneNumber)
         default: break
         }
     }

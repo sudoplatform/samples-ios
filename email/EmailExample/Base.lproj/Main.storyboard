@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="16096" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="eKo-Lo-gZk">
+    <device id="retina5_9" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16087"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--Navigation Controller-->
+        <scene sceneID="wzo-U8-824">
+            <objects>
+                <navigationController navigationBarHidden="YES" id="eKo-Lo-gZk" sceneMemberID="viewController">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="Hhj-iD-DEQ">
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <connections>
+                        <segue destination="yY4-In-UjB" kind="relationship" relationship="rootViewController" id="Oms-p0-qXt"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Vid-Cm-bAk" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-2726" y="1039"/>
+        </scene>
+        <!--Registration View Controller-->
+        <scene sceneID="xWf-YM-DMx">
+            <objects>
+                <viewController storyboardIdentifier="registration" id="yY4-In-UjB" customClass="RegistrationViewController" customModule="EmailExample" customModuleProvider="target" sceneMemberID="viewController">
+                    <navigationItem key="navigationItem" id="Pxi-sp-5gt"/>
+                    <connections>
+                        <segue destination="9Ja-Y6-Yga" kind="presentation" identifier="navigateToMainMenu" modalPresentationStyle="fullScreen" modalTransitionStyle="crossDissolve" id="6GC-MQ-MN2"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="ef5-mr-aLy" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-1688" y="1039"/>
+        </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="mn0-sL-Aze">
+            <objects>
+                <navigationController storyboardIdentifier="navigation" id="9Ja-Y6-Yga" sceneMemberID="viewController">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translucent="NO" id="FRn-Dv-2Re">
+                        <rect key="frame" x="0.0" y="44" width="375" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <toolbar key="toolbar" opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="RuM-pU-aIi">
+                        <autoresizingMask key="autoresizingMask"/>
+                    </toolbar>
+                    <connections>
+                        <segue destination="U3R-rA-vTn" kind="relationship" relationship="rootViewController" id="Fzj-b0-T6O"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="ocT-KG-g4R" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-725" y="1039"/>
+        </scene>
+        <!--Email Sample App-->
+        <scene sceneID="SSp-Yc-OlP">
+            <objects>
+                <viewController storyboardIdentifier="mainMenu" id="U3R-rA-vTn" customClass="MainMenuViewController" customModule="EmailExample" customModuleProvider="target" sceneMemberID="viewController">
+                    <navigationItem key="navigationItem" title="Email Sample App" id="N2j-d0-xh0"/>
+                    <connections>
+                        <segue destination="hgL-Ca-Z5m" kind="show" identifier="navigateToSudoList" id="qXW-GD-841"/>
+                        <segue destination="Hjk-9I-wy4" kind="unwind" identifier="returnToRegistration" unwindAction="returnToRegistrationWithSegue:" id="rOt-bm-ziO"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="eqV-vH-cjW" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+                <exit id="Hjk-9I-wy4" userLabel="Exit" sceneMemberID="exit"/>
+            </objects>
+            <point key="canvasLocation" x="232" y="1039"/>
+        </scene>
+        <!--Sudos-->
+        <scene sceneID="Qvx-dM-of8">
+            <objects>
+                <viewController storyboardIdentifier="sudoList" id="hgL-Ca-Z5m" customClass="SudoListViewController" customModule="EmailExample" customModuleProvider="target" sceneMemberID="viewController">
+                    <navigationItem key="navigationItem" title="Sudos" id="wYJ-M0-qwW"/>
+                    <connections>
+                        <segue destination="AJu-c6-VpU" kind="show" identifier="navigateToCreateSudo" id="zFU-L0-AkI"/>
+                        <segue destination="Sdp-mu-3eh" kind="show" identifier="navigateToEmailAddressList" id="oMH-4O-ijr"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="B8a-Gb-2M8" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1390" y="407"/>
+        </scene>
+        <!--Email Addresses-->
+        <scene sceneID="1QB-Lm-LQh">
+            <objects>
+                <viewController storyboardIdentifier="emailAddressList" id="Sdp-mu-3eh" customClass="EmailAddressListViewController" customModule="EmailExample" customModuleProvider="target" sceneMemberID="viewController">
+                    <navigationItem key="navigationItem" title="Email Addresses" id="qbl-pc-Ewk"/>
+                    <connections>
+                        <segue destination="Q5b-Pg-S2T" kind="show" identifier="navigateToCreateEmailAddress" id="8m2-jT-ZFl"/>
+                        <segue destination="Alc-eI-aBz" kind="show" identifier="navigateToEmailMessageList" id="DvY-a5-WXK"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="3V9-IM-SiJ" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+                <exit id="3CT-5k-rqI" userLabel="Exit" sceneMemberID="exit"/>
+            </objects>
+            <point key="canvasLocation" x="2454" y="-66"/>
+        </scene>
+        <!--Provision Email Address-->
+        <scene sceneID="rcc-Tc-DVt">
+            <objects>
+                <viewController storyboardIdentifier="createEmailAddressList" id="Q5b-Pg-S2T" customClass="CreateEmailAddressViewController" customModule="EmailExample" customModuleProvider="target" sceneMemberID="viewController">
+                    <navigationItem key="navigationItem" title="Provision Email Address" id="c5o-uE-7n0"/>
+                    <connections>
+                        <segue destination="3CT-5k-rqI" kind="unwind" identifier="returnToEmailAddressList" unwindAction="returnToEmailAddressListWithSegue:" id="KqA-Wj-e5c"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="vyc-PW-M1T" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="3596" y="-90"/>
+        </scene>
+        <!--Create Sudo-->
+        <scene sceneID="g1f-NQ-lZv">
+            <objects>
+                <viewController storyboardIdentifier="createSudo" id="AJu-c6-VpU" customClass="CreateSudoViewController" customModule="EmailExample" customModuleProvider="target" sceneMemberID="viewController">
+                    <navigationItem key="navigationItem" title="Create Sudo" id="EoN-fF-eN4"/>
+                    <connections>
+                        <segue destination="we5-Jv-IFC" kind="unwind" identifier="returnToSudoList" unwindAction="returnToSudoListWithSegue:" id="tWn-ux-2lv"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="qNe-ct-oJo" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+                <exit id="we5-Jv-IFC" userLabel="Exit" sceneMemberID="exit"/>
+            </objects>
+            <point key="canvasLocation" x="2423" y="704"/>
+        </scene>
+        <!--Email Messages-->
+        <scene sceneID="INA-9W-y1P">
+            <objects>
+                <viewController storyboardIdentifier="emailMessageList" id="Alc-eI-aBz" customClass="EmailMessageListViewController" customModule="EmailExample" customModuleProvider="target" sceneMemberID="viewController">
+                    <navigationItem key="navigationItem" title="Email Messages" id="FQv-jB-o9F"/>
+                    <connections>
+                        <segue destination="E7v-bc-vE2" kind="show" identifier="navigateToReadEmailMessage" id="pLq-UM-DFE"/>
+                        <segue destination="oij-Dx-RIa" kind="show" identifier="navigateToSendEmailMessage" id="yFb-Zt-iO5"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="6Zy-8b-Wgz" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="3596" y="703"/>
+        </scene>
+        <!--Send Email Message View Controller-->
+        <scene sceneID="LqC-V8-3gN">
+            <objects>
+                <viewController storyboardIdentifier="sendEmailMessage" id="oij-Dx-RIa" customClass="SendEmailMessageViewController" customModule="EmailExample" customModuleProvider="target" sceneMemberID="viewController">
+                    <navigationItem key="navigationItem" id="oM9-Fo-6Bn"/>
+                    <connections>
+                        <segue destination="MMW-Lt-Ahs" kind="unwind" identifier="returnToEmailMessageList" unwindAction="returnToEmailMessageListWithSegue:" id="PPR-tu-7JY"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="plQ-W4-6qB" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+                <exit id="MMW-Lt-Ahs" userLabel="Exit" sceneMemberID="exit"/>
+            </objects>
+            <point key="canvasLocation" x="4614" y="1026"/>
+        </scene>
+        <!--Read Email Message View Controller-->
+        <scene sceneID="JxX-kH-JRv">
+            <objects>
+                <viewController storyboardIdentifier="readEmailMessage" id="E7v-bc-vE2" customClass="ReadEmailMessageViewController" customModule="EmailExample" customModuleProvider="target" sceneMemberID="viewController">
+                    <navigationItem key="navigationItem" id="3VR-Mz-gPV"/>
+                    <connections>
+                        <segue destination="swp-Gg-aeJ" kind="unwind" identifier="returnToEmailMessageList" unwindAction="returnToEmailMessageListWithSegue:" id="a2F-bJ-JKl"/>
+                        <segue destination="oij-Dx-RIa" kind="show" identifier="replyToEmailMessage" id="caM-Uq-BNH"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="QuA-su-9vr" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+                <exit id="swp-Gg-aeJ" userLabel="Exit" sceneMemberID="exit"/>
+            </objects>
+            <point key="canvasLocation" x="4551" y="335"/>
+        </scene>
+    </scenes>
+    <inferredMetricsTieBreakers>
+        <segue reference="yFb-Zt-iO5"/>
+    </inferredMetricsTieBreakers>
+</document>

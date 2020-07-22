@@ -1,0 +1,33 @@
+#
+platform :ios, '13.0'
+use_frameworks!
+use_modular_headers!
+
+inhibit_all_warnings!
+
+source 'https://github.com/CocoaPods/Specs.git'
+
+acknowledgementsFields = ['name', 'version', 'licenseType', 'licenseText', 'homepage']
+acknowledgementsExclude = ['SudoUser', 'SudoApiClient', 'SudoConfigManager', 'SudoKeyManager', 'SudoLogging', 'SudoOperations', 'SudoProfiles']
+
+pre_install do |installer|
+	unless installer.deployment?
+		plugin 'cocoapods-acknowledgements', :fields => acknowledgementsFields, :exclude => acknowledgementsExclude
+	end
+end
+
+target 'EmailExample' do
+    pod 'SudoUser', '~> 7.9'
+    pod 'SudoProfiles', '~> 5.5'
+    pod 'SudoEmail', '~> 1.0'
+    pod 'MimeParser', '~> 0.1'
+
+    target 'EmailExampleTests'
+end
+
+# Fix Xcode nagging warning on pod install/update
+post_install do |installer|
+  installer.pods_project.build_configurations.each do |config|
+    config.build_settings['CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED'] = 'YES'
+  end
+end

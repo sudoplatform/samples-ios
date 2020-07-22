@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="16096" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16087"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="LearnMoreView" customModule="EmailExample" customModuleProvider="target"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="iN0-l3-epB" customClass="LearnMoreView" customModule="EmailExample" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="414" height="128"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="LsB-gl-wIL">
+                    <rect key="frame" x="0.0" y="0.0" width="414" height="128"/>
+                    <subviews>
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="UtW-yd-fqP" userLabel="label">
+                            <rect key="frame" x="0.0" y="0.0" width="414" height="86"/>
+                            <string key="text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla dapibus tristique risus, in sodales nulla dignissim at. Etiam tincidunt neque rhoncus augue consectetur.</string>
+                            <fontDescription key="fontDescription" style="UICTFontTextStyleSubhead"/>
+                            <color key="textColor" red="0.070588235289999995" green="0.078431372550000003" blue="0.08235294118" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <nil key="highlightedColor"/>
+                        </label>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="1Zb-bo-JkC" userLabel="learnMoreButton">
+                            <rect key="frame" x="0.0" y="94" width="414" height="34"/>
+                            <constraints>
+                                <constraint firstAttribute="height" constant="34" id="Y5P-iz-s1w"/>
+                            </constraints>
+                            <state key="normal" title="Learn more"/>
+                            <connections>
+                                <action selector="didTapLearnMoreButton" destination="-1" eventType="touchUpInside" id="7LA-ce-piK"/>
+                            </connections>
+                        </button>
+                    </subviews>
+                    <constraints>
+                        <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="128" id="EFY-Qi-iMT"/>
+                    </constraints>
+                </stackView>
+            </subviews>
+            <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+            <constraints>
+                <constraint firstAttribute="trailing" secondItem="LsB-gl-wIL" secondAttribute="trailing" id="EXN-OT-NKm"/>
+                <constraint firstAttribute="bottom" secondItem="LsB-gl-wIL" secondAttribute="bottom" id="L5F-D4-qOX"/>
+                <constraint firstItem="LsB-gl-wIL" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="YML-7v-l4Z"/>
+                <constraint firstItem="LsB-gl-wIL" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="kCT-Tr-sqh"/>
+            </constraints>
+            <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+            <connections>
+                <outlet property="label" destination="UtW-yd-fqP" id="cH0-UR-CCX"/>
+                <outlet property="learnMoreButton" destination="1Zb-bo-JkC" id="dKf-uy-eco"/>
+            </connections>
+            <point key="canvasLocation" x="139" y="113"/>
+        </view>
+    </objects>
+</document>

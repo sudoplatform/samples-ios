@@ -188,7 +188,9 @@ class EmailMessageListViewController: UIViewController, UITableViewDataSource, U
                     failure: nil
                 )
             case let .failure(error):
-                weakSelf.presentErrorAlert(message: "Email message created subscription failure", error: error)
+                DispatchQueue.main.async {
+                    weakSelf.presentErrorAlert(message: "Email message created subscription failure", error: error)
+                }
             }
         }
     }
@@ -213,7 +215,9 @@ class EmailMessageListViewController: UIViewController, UITableViewDataSource, U
                     failure: nil
                 )
             case let .failure(error):
-                weakSelf.presentErrorAlert(message: "Email message deleted subscription failure", error: error)
+                DispatchQueue.main.async {
+                    weakSelf.presentErrorAlert(message: "Email message deleted subscription failure", error: error)
+                }
             }
         }
     }

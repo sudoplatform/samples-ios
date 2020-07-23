@@ -40,6 +40,10 @@
 		8470C8F2245AD0E200439F92 /* MainMenuViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8470C8F0245AD0E200439F92 /* MainMenuViewController.swift */; };
 		8470C8F3245AD0E200439F92 /* MainMenuViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8470C8F1245AD0E200439F92 /* MainMenuViewController.xib */; };
 		8470C8F5245AD55700439F92 /* SudoListViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8470C8F4245AD55700439F92 /* SudoListViewController.xib */; };
+		84770AC124C9008E00FC8C8D /* ComplexBase64Email.txt in Resources */ = {isa = PBXBuildFile; fileRef = 84770AC024C9008E00FC8C8D /* ComplexBase64Email.txt */; };
+		84770AC324C9020200FC8C8D /* DataFactory+TestData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84770AC224C9020200FC8C8D /* DataFactory+TestData.swift */; };
+		84770AC524C9072A00FC8C8D /* ComplexDataEmail.txt in Resources */ = {isa = PBXBuildFile; fileRef = 84770AC424C9072A00FC8C8D /* ComplexDataEmail.txt */; };
+		84770AC724C9127300FC8C8D /* Base64EncodedBody.txt in Resources */ = {isa = PBXBuildFile; fileRef = 84770AC624C9127300FC8C8D /* Base64EncodedBody.txt */; };
 		847EF2BD24BE77B400423B74 /* EmailMessage+CreatedDescending.swift in Sources */ = {isa = PBXBuildFile; fileRef = 847EF2BC24BE77B400423B74 /* EmailMessage+CreatedDescending.swift */; };
 		847EF2C024BE790C00423B74 /* EmailMessage+CreatedDescendingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 847EF2BF24BE790C00423B74 /* EmailMessage+CreatedDescendingTests.swift */; };
 		847EF2C224BE796F00423B74 /* DataFactoryNamespace.swift in Sources */ = {isa = PBXBuildFile; fileRef = 847EF2C124BE796F00423B74 /* DataFactoryNamespace.swift */; };
@@ -67,7 +71,6 @@
 		95C0CE0424AAC8AB0024BFBB /* XCTestCase+Utility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95C0CE0324AAC8AB0024BFBB /* XCTestCase+Utility.swift */; };
 		95C0CE0624AAC90E0024BFBB /* XCTestCaseExpectation+Convenience.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95C0CE0524AAC90E0024BFBB /* XCTestCaseExpectation+Convenience.swift */; };
 		95C0CE0824AACE190024BFBB /* ReadEmailMessageViewControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95C0CE0724AACE190024BFBB /* ReadEmailMessageViewControllerTests.swift */; };
-		95C0CE0A24AC56A60024BFBB /* EmailExampleTestData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95C0CE0924AC56A60024BFBB /* EmailExampleTestData.swift */; };
 		AB5B9DB3240EC5D100E4E5D8 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB5B9DB2240EC5D100E4E5D8 /* AppDelegate.swift */; };
 		AB5B9DBA240EC5D100E4E5D8 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AB5B9DB8240EC5D100E4E5D8 /* Main.storyboard */; };
 		AB5B9DBC240EC5D300E4E5D8 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AB5B9DBB240EC5D300E4E5D8 /* Assets.xcassets */; };
@@ -134,6 +137,10 @@
 		8470C8F0245AD0E200439F92 /* MainMenuViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainMenuViewController.swift; sourceTree = "<group>"; };
 		8470C8F1245AD0E200439F92 /* MainMenuViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = MainMenuViewController.xib; sourceTree = "<group>"; };
 		8470C8F4245AD55700439F92 /* SudoListViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SudoListViewController.xib; sourceTree = "<group>"; };
+		84770AC024C9008E00FC8C8D /* ComplexBase64Email.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = ComplexBase64Email.txt; sourceTree = "<group>"; };
+		84770AC224C9020200FC8C8D /* DataFactory+TestData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DataFactory+TestData.swift"; sourceTree = "<group>"; };
+		84770AC424C9072A00FC8C8D /* ComplexDataEmail.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = ComplexDataEmail.txt; sourceTree = "<group>"; };
+		84770AC624C9127300FC8C8D /* Base64EncodedBody.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Base64EncodedBody.txt; sourceTree = "<group>"; };
 		847EF2BC24BE77B400423B74 /* EmailMessage+CreatedDescending.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EmailMessage+CreatedDescending.swift"; sourceTree = "<group>"; };
 		847EF2BF24BE790C00423B74 /* EmailMessage+CreatedDescendingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EmailMessage+CreatedDescendingTests.swift"; sourceTree = "<group>"; };
 		847EF2C124BE796F00423B74 /* DataFactoryNamespace.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataFactoryNamespace.swift; sourceTree = "<group>"; };
@@ -162,7 +169,6 @@
 		95C0CE0324AAC8AB0024BFBB /* XCTestCase+Utility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "XCTestCase+Utility.swift"; sourceTree = "<group>"; };
 		95C0CE0524AAC90E0024BFBB /* XCTestCaseExpectation+Convenience.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "XCTestCaseExpectation+Convenience.swift"; sourceTree = "<group>"; };
 		95C0CE0724AACE190024BFBB /* ReadEmailMessageViewControllerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadEmailMessageViewControllerTests.swift; sourceTree = "<group>"; };
-		95C0CE0924AC56A60024BFBB /* EmailExampleTestData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmailExampleTestData.swift; sourceTree = "<group>"; };
 		9991870B6EA4AEA026F74718 /* Pods_EmailExample_EmailExampleTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_EmailExample_EmailExampleTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		AB5B9DAF240EC5D100E4E5D8 /* EmailExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = EmailExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AB5B9DB2240EC5D100E4E5D8 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -401,6 +407,27 @@
 			path = "Main Menu";
 			sourceTree = "<group>";
 		};
+		84770ABE24C8FF7A00FC8C8D /* Data */ = {
+			isa = PBXGroup;
+			children = (
+				84770ABF24C8FF8500FC8C8D /* Files */,
+				847EF2C124BE796F00423B74 /* DataFactoryNamespace.swift */,
+				847EF2C324BE799000423B74 /* DataFactory+EmailSDK.swift */,
+				84770AC224C9020200FC8C8D /* DataFactory+TestData.swift */,
+			);
+			path = Data;
+			sourceTree = "<group>";
+		};
+		84770ABF24C8FF8500FC8C8D /* Files */ = {
+			isa = PBXGroup;
+			children = (
+				84770AC624C9127300FC8C8D /* Base64EncodedBody.txt */,
+				84770AC024C9008E00FC8C8D /* ComplexBase64Email.txt */,
+				84770AC424C9072A00FC8C8D /* ComplexDataEmail.txt */,
+			);
+			path = Files;
+			sourceTree = "<group>";
+		};
 		847EF2BE24BE789300423B74 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
@@ -584,13 +611,11 @@
 		9557447F24A5C0D80057A845 /* Test Utilities */ = {
 			isa = PBXGroup;
 			children = (
+				84770ABE24C8FF7A00FC8C8D /* Data */,
 				95C0CDFC24A9A1330024BFBB /* Spies */,
 				9557448224A5C28B0057A845 /* Mocks */,
 				9557448024A5C1120057A845 /* EmailExampleTestUtility.swift */,
-				95C0CE0924AC56A60024BFBB /* EmailExampleTestData.swift */,
 				8483152124BC3B11004E89EA /* AnyError.swift */,
-				847EF2C124BE796F00423B74 /* DataFactoryNamespace.swift */,
-				847EF2C324BE799000423B74 /* DataFactory+EmailSDK.swift */,
 			);
 			path = "Test Utilities";
 			sourceTree = "<group>";
@@ -777,7 +802,10 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				84770AC524C9072A00FC8C8D /* ComplexDataEmail.txt in Resources */,
+				84770AC124C9008E00FC8C8D /* ComplexBase64Email.txt in Resources */,
 				6F903244C2174DCB336FC9A1 /* Pods-EmailExampleTests-metadata.plist in Resources */,
+				84770AC724C9127300FC8C8D /* Base64EncodedBody.txt in Resources */,
 				C672B77943C3479C17815045 /* Pods-EmailExample-EmailExampleTests-metadata.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -936,6 +964,7 @@
 				95C0CE0624AAC90E0024BFBB /* XCTestCaseExpectation+Convenience.swift in Sources */,
 				847EF2C424BE799000423B74 /* DataFactory+EmailSDK.swift in Sources */,
 				8483152224BC3B11004E89EA /* AnyError.swift in Sources */,
+				84770AC324C9020200FC8C8D /* DataFactory+TestData.swift in Sources */,
 				95C0CE0824AACE190024BFBB /* ReadEmailMessageViewControllerTests.swift in Sources */,
 				8483151124B84ABF004E89EA /* EmailMessageTableViewCellTests.swift in Sources */,
 				847EF2C224BE796F00423B74 /* DataFactoryNamespace.swift in Sources */,
@@ -948,7 +977,6 @@
 				84A4560B24B59916002DBF0D /* EmailMessageListViewControllerTests.swift in Sources */,
 				95C0CE0024A9A6230024BFBB /* SudoEmailClientMock.swift in Sources */,
 				95C0CE0424AAC8AB0024BFBB /* XCTestCase+Utility.swift in Sources */,
-				95C0CE0A24AC56A60024BFBB /* EmailExampleTestData.swift in Sources */,
 				8403255F24C51C000049C403 /* AuthenticatorTests.swift in Sources */,
 				848314EA24B7E564004E89EA /* AuthenticatorMock.swift in Sources */,
 				67C8208024B2AEDD00E5D113 /* SendEmailMessageViewControllerTests.swift in Sources */,

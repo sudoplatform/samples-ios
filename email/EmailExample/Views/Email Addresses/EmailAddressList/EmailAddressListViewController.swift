@@ -178,7 +178,9 @@ class EmailAddressListViewController: UIViewController, UITableViewDataSource, U
     /// All email addresses will be filtered using the `sudoId` to ensure only email addresses associated with the sudo are listed.
     func loadCacheEmailAddressesAndFetchRemote() {
         let failureCompletion: EmailAddressListErrorCompletion = { [weak self] error in
-            self?.presentErrorAlert(message: "Failed to list Email Addresses", error: error)
+            DispatchQueue.main.async {
+                self?.presentErrorAlert(message: "Failed to list Email Addresses", error: error)
+            }
         }
         listEmailAddresses(
             cachePolicy: .useCache,

@@ -169,8 +169,18 @@ class ReadEmailMessageViewController: UIViewController, ActivityAlertViewControl
                 messageId: message.id,
                 success: { [weak self] rfc822Data in
                     guard let weakSelf = self else { return }
-                    let parsedMessage = RFC822Util.fromPlainText(rfc822Data)
-                    let body = parsedMessage?.body ?? ""
+                    let parsedMessage: BasicRFC822Message
+                    do {
+                        parsedMessage = try RFC822Util.fromPlainText(rfc822Data)
+                    } catch {
+                        DispatchQueue.main.async {
+                            weakSelf.presentErrorAlert(message: "Failed load email message", error: error) { _ in
+                                self?.performSegue(withIdentifier: Segue.returnToEmailMessageList.rawValue, sender: self)
+                            }
+                        }
+                        return
+                    }
+                    let body = parsedMessage.body
                     DispatchQueue.main.async {
                         let toLabels: [UILabel] = message.to.map {
                             let label = UILabel()

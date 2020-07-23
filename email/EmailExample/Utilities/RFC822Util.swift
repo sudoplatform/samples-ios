@@ -7,6 +7,24 @@
 import Foundation
 import MimeParser
 
+enum RFC822Error: Error, LocalizedError, Equatable {
+    case mimeParserError
+    case contentDecoderError(_ cause: String?)
+
+    var errorDescription: String? {
+        switch self {
+        case .mimeParserError:
+            return "Mime Parser Error: Invalid message structure"
+        case let .contentDecoderError(cause):
+            var description = "Content could not be decoded"
+            if let cause = cause {
+                description += ": \(cause)"
+            }
+            return description
+        }
+    }
+}
+
 struct BasicRFC822Message {
     public var from: String
     public var to: [String]
@@ -18,83 +36,76 @@ struct BasicRFC822Message {
 
 class RFC822Util {
 
-    static func fromPlainText(_ data: Data) -> BasicRFC822Message? {
+    static func fromPlainText(_ data: Data) throws -> BasicRFC822Message {
         let parser = MimeParser()
         let stringData = String(decoding: data, as: UTF8.self)
-
-        let mime: Mime
-        do {
-            mime = try parser.parse(stringData)
-        } catch {
-            NSLog("Parsing Failure: \(error)")
-            return nil
+        guard let mime = try? parser.parse(stringData) else {
+            throw RFC822Error.mimeParserError
         }
-
+        /// Handle Headers.
         var from = ""
         var to: [String] = []
         var cc: [String] = []
         var bcc: [String]  = []
         var subject = ""
-        var body = ""
-
         for header in mime.header.other {
-            if header.name.lowercased() == "from" {
+            let headerName = header.name.lowercased()
+            switch headerName {
+            case "from":
                 from = header.body
-            }
-
-            if header.name.lowercased() == "to" {
-                header.body.split(separator: ",").forEach { s in
-                    to.append(String(s))
-                }
-            }
-
-            if header.name.lowercased() == "cc" {
-                header.body.split(separator: ",").forEach { s in
-                    cc.append(String(s))
-                }
-            }
-
-            if header.name.lowercased() == "bcc" {
-                header.body.split(separator: ",").forEach { s in
-                    bcc.append(String(s))
-                }
-            }
-
-            if header.name.lowercased() == "subject" {
+            case "to":
+                to = header.body.components(separatedBy: ",")
+            case "cc":
+                cc = header.body.components(separatedBy: ",")
+            case "bcc":
+                bcc = header.body.components(separatedBy: ",")
+            case "subject":
                 subject = header.body
+            default:
+                break
             }
         }
-
-        if case .body(let content) = mime.content {
-            body = content.raw
-        }
-
-        if case .mixed(let mime) = mime.content {
-            for m in mime {
-                if m.header.contentType?.type == "multipart" && m.header.contentType?.subtype == "alternative" {
-                    if case .alternative(let mime) = m.content {
-                        if let s = self.processAlternative(mime: mime) {
-                            body = s
-                            break
-                        }
-                    }
+        /// Handle Body.
+        var body = ""
+        switch mime.content {
+        case let .body(content):
+            let decodedBodyData: Data
+            do {
+                decodedBodyData = try content.decodedContentData()
+            } catch {
+                throw RFC822Error.contentDecoderError(error.localizedDescription)
+            }
+            guard let decodedBody = String(data: decodedBodyData, encoding: .utf8) else {
+                throw RFC822Error.contentDecoderError("Content data not UTF-8 encoded")
+            }
+            body = decodedBody
+        case let .mixed(mimes):
+            for mime in mimes {
+                guard
+                    mime.header.contentType?.type == "multipart",
+                    mime.header.contentType?.subtype == "alternative",
+                    case let .alternative(alternativeContentMimes) = mime.content
+                else {
+                    continue
+                }
+                if let bodyString = processAlternativeMimes(alternativeContentMimes) {
+                    body = bodyString
+                    break
                 }
             }
-        }
-
-        if case .alternative(let mime) = mime.content {
-            if let s = self.processAlternative(mime: mime) {
-                body = s
+        case let .alternative(mimes):
+            if let string = processAlternativeMimes(mimes) {
+                body = string
             }
         }
-
         return BasicRFC822Message(from: from, to: to, cc: cc, bcc: bcc, subject: subject, body: body)
     }
 
     static func fromBasicRFC822(_ message: BasicRFC822Message) -> Data? {
-        let toFormatted = message.to.reduce("", accumulate(accumulator:item:))
-        let ccFormatted = message.cc.reduce("", accumulate(accumulator:item:))
-        let bccFormatted = message.bcc.reduce("", accumulate(accumulator:item:))
+        let isNotEmpty: (String) -> Bool = { !$0.isEmpty }
+        let toFormatted = message.to.filter(isNotEmpty).joined(separator: ",")
+        let ccFormatted = message.cc.filter(isNotEmpty).joined(separator: ",")
+        let bccFormatted = message.bcc.filter(isNotEmpty).joined(separator: ",")
         var formatted = """
         From: \(message.from)
         """
@@ -126,24 +137,16 @@ class RFC822Util {
         return formatted.data(using: .utf8)
     }
 
-    static func processAlternative(mime: [Mime]) -> String? {
+    static func processAlternativeMimes(_ mimes: [Mime]) -> String? {
         var body: String?
-        for m in mime {
-            if m.header.contentType?.type == "text" && m.header.contentType?.subtype == "plain" {
-                if let content = try? m.decodedContentData(), let s = String(data: content, encoding: .utf8) {
+        for mime in mimes {
+            if mime.header.contentType?.type == "text" && mime.header.contentType?.subtype == "plain" {
+                if let content = try? mime.decodedContentData(), let s = String(data: content, encoding: .utf8) {
                     body = s
                     break
                 }
             }
         }
         return body
-    }
-
-    static func accumulate(accumulator: String, item: String) -> String {
-        var accumulator = accumulator
-        if !accumulator.isEmpty {
-            accumulator.append(",")
-        }
-        return accumulator + item
     }
 }

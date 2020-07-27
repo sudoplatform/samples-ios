@@ -7,8 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2D52C81FE5B1D176CB7708CC /* Pods-TelephonyExample-metadata.plist in Resources */ = {isa = PBXBuildFile; fileRef = EE06106D2E4F9F3DDCA524C1 /* Pods-TelephonyExample-metadata.plist */; };
+		324AC24924B4E46C000C9951 /* CallRecordDetailTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 324AC24824B4E46C000C9951 /* CallRecordDetailTableViewController.swift */; };
 		32C1C9B624562D98005F1F5D /* PhoneNumberDetailsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32C1C9B524562D97005F1F5D /* PhoneNumberDetailsViewController.swift */; };
 		32D367622457497900AE1D4D /* PhoneNumberFormatting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32D367612457497900AE1D4D /* PhoneNumberFormatting.swift */; };
+		A07CC2E324B4C8BE006C891B /* VoicemailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A07CC2E224B4C8BE006C891B /* VoicemailViewController.swift */; };
+		A07CC2E724B5068B006C891B /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A07CC2E624B5068B006C891B /* AVFoundation.framework */; };
 		AB023E422457610400265D96 /* ConversationDetailsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB023E412457610400265D96 /* ConversationDetailsViewController.swift */; };
 		AB5B9DB3240EC5D100E4E5D8 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB5B9DB2240EC5D100E4E5D8 /* AppDelegate.swift */; };
 		AB5B9DBA240EC5D100E4E5D8 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AB5B9DB8240EC5D100E4E5D8 /* Main.storyboard */; };
@@ -32,8 +36,12 @@
 
 /* Begin PBXFileReference section */
 		321080A2D07D770E685C7534 /* Pods_TelephonyExample.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_TelephonyExample.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		324AC24824B4E46C000C9951 /* CallRecordDetailTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CallRecordDetailTableViewController.swift; sourceTree = "<group>"; };
 		32C1C9B524562D97005F1F5D /* PhoneNumberDetailsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneNumberDetailsViewController.swift; sourceTree = "<group>"; };
 		32D367612457497900AE1D4D /* PhoneNumberFormatting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneNumberFormatting.swift; sourceTree = "<group>"; };
+		32E8352324998E4000190D4F /* TelephonyExample.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TelephonyExample.entitlements; sourceTree = "<group>"; };
+		A07CC2E224B4C8BE006C891B /* VoicemailViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VoicemailViewController.swift; sourceTree = "<group>"; };
+		A07CC2E624B5068B006C891B /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		AB023E412457610400265D96 /* ConversationDetailsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConversationDetailsViewController.swift; sourceTree = "<group>"; };
 		AB5B9DAF240EC5D100E4E5D8 /* TelephonyExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TelephonyExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AB5B9DB2240EC5D100E4E5D8 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -56,6 +64,7 @@
 		CF76028E2485881E0090445B /* CreateVoiceCallViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateVoiceCallViewController.swift; sourceTree = "<group>"; };
 		CF76029024858EF70090445B /* ActiveVoiceCallViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveVoiceCallViewController.swift; sourceTree = "<group>"; };
 		D58BEBBC6E3D6BD7ADF021A1 /* Pods-TelephonyExample.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TelephonyExample.debug.xcconfig"; path = "Target Support Files/Pods-TelephonyExample/Pods-TelephonyExample.debug.xcconfig"; sourceTree = "<group>"; };
+		EE06106D2E4F9F3DDCA524C1 /* Pods-TelephonyExample-metadata.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-TelephonyExample-metadata.plist"; sourceTree = "<group>"; };
 		F574D92214CBFF8EF1E4DA41 /* Pods-TelephonyExample.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TelephonyExample.release.xcconfig"; path = "Target Support Files/Pods-TelephonyExample/Pods-TelephonyExample.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -64,6 +73,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A07CC2E724B5068B006C891B /* AVFoundation.framework in Frameworks */,
 				C0FFFD07D8773C5490369F8E /* Pods_TelephonyExample.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -92,6 +102,7 @@
 		AB5B9DB1240EC5D100E4E5D8 /* TelephonyExample */ = {
 			isa = PBXGroup;
 			children = (
+				32E8352324998E4000190D4F /* TelephonyExample.entitlements */,
 				AB5B9DB2240EC5D100E4E5D8 /* AppDelegate.swift */,
 				AB5B9DB8240EC5D100E4E5D8 /* Main.storyboard */,
 				CF2571BE2444EB7B0053334E /* RegistrationViewController.swift */,
@@ -113,6 +124,8 @@
 				CF2571D1245109BF0053334E /* UIViewController+Extensions.swift */,
 				C358815524536CCB00F21192 /* UIImage+Extensions.swift */,
 				32D367612457497900AE1D4D /* PhoneNumberFormatting.swift */,
+				324AC24824B4E46C000C9951 /* CallRecordDetailTableViewController.swift */,
+				A07CC2E224B4C8BE006C891B /* VoicemailViewController.swift */,
 			);
 			path = TelephonyExample;
 			sourceTree = "<group>";
@@ -120,6 +133,7 @@
 		C5CDFF5F36907F29DC780D9A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				A07CC2E624B5068B006C891B /* AVFoundation.framework */,
 				AB93CAE1240EFFBE0065AF50 /* SudoTelephony.framework */,
 				321080A2D07D770E685C7534 /* Pods_TelephonyExample.framework */,
 			);
@@ -131,6 +145,7 @@
 			children = (
 				D58BEBBC6E3D6BD7ADF021A1 /* Pods-TelephonyExample.debug.xcconfig */,
 				F574D92214CBFF8EF1E4DA41 /* Pods-TelephonyExample.release.xcconfig */,
+				EE06106D2E4F9F3DDCA524C1 /* Pods-TelephonyExample-metadata.plist */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -199,6 +214,7 @@
 				AB5B9DBF240EC5D300E4E5D8 /* LaunchScreen.storyboard in Resources */,
 				AB5B9DBC240EC5D300E4E5D8 /* Assets.xcassets in Resources */,
 				AB5B9DBA240EC5D100E4E5D8 /* Main.storyboard in Resources */,
+				2D52C81FE5B1D176CB7708CC /* Pods-TelephonyExample-metadata.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -269,6 +285,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A07CC2E324B4C8BE006C891B /* VoicemailViewController.swift in Sources */,
 				CF2571C72444ED420053334E /* CreatePhoneNumberViewController.swift in Sources */,
 				AB023E422457610400265D96 /* ConversationDetailsViewController.swift in Sources */,
 				CF2571C32444EC0B0053334E /* CreateSudoViewController.swift in Sources */,
@@ -278,6 +295,7 @@
 				CF2571D2245109BF0053334E /* UIViewController+Extensions.swift in Sources */,
 				AB93CADA240EF6FB0065AF50 /* Authenticator.swift in Sources */,
 				AB93CAD9240EF6FB0065AF50 /* ConfigurationProvider.swift in Sources */,
+				324AC24924B4E46C000C9951 /* CallRecordDetailTableViewController.swift in Sources */,
 				CF2571BF2444EB7B0053334E /* RegistrationViewController.swift in Sources */,
 				AB5B9DB3240EC5D100E4E5D8 /* AppDelegate.swift in Sources */,
 				CF2571CD2444ED8D0053334E /* CreateMessageViewController.swift in Sources */,
@@ -430,8 +448,9 @@
 			baseConfigurationReference = D58BEBBC6E3D6BD7ADF021A1 /* Pods-TelephonyExample.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = TelephonyExample/TelephonyExample.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = UU2W43R8JA;
 				INFOPLIST_FILE = TelephonyExample/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -440,7 +459,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.sudoplatform.telephonyexample;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -449,8 +468,9 @@
 			baseConfigurationReference = F574D92214CBFF8EF1E4DA41 /* Pods-TelephonyExample.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = TelephonyExample/TelephonyExample.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = UU2W43R8JA;
 				INFOPLIST_FILE = TelephonyExample/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -459,7 +479,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.sudoplatform.telephonyexample;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};

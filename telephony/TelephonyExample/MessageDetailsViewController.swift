@@ -86,8 +86,8 @@ class MessageDetailsViewController: UIViewController, UITableViewDelegate, UITab
             return detailCell(tableView, title: "Status", detail: self.message.state.description)
         case 4:
             let cell = tableView.dequeueReusableCell(withIdentifier: "bodyCell") as! MessageBodyCell
-            let trimmedBody = self.message.body.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
-            if trimmedBody.count == 0 {
+            let trimmedBody = self.message.body?.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
+            if (trimmedBody ?? "").isEmpty {
                 cell.bodyLabel.text = "(No Body)"
             }
             else {

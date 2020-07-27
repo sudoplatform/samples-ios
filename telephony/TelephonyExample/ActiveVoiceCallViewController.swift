@@ -8,17 +8,20 @@ import Foundation
 import UIKit
 import SudoTelephony
 import AVFoundation
+import AVKit
 
 class ActiveVoiceCallViewController: UITableViewController {
-    var callParameters: (localNumber: PhoneNumber, remoteNumber: String)!
+
+    typealias OutgoingCallParameters = (localNumber: PhoneNumber, remoteNumber: String)
 
     enum State {
-        case initial
+        case outgoing(OutgoingCallParameters)
         case initiating
         case active(ActiveVoiceCall)
         case disconnected
     }
-    private var state: State = .initial
+
+    private var state: State!
 
     @IBOutlet weak var callStatusLabel: UILabel!
     @IBOutlet weak var localNumberLabel: UILabel!
@@ -30,7 +33,7 @@ class ActiveVoiceCallViewController: UITableViewController {
     @IBOutlet weak var speakerSwitch: UISwitch!
 
     private var callDuration: TimeInterval = 0
-    private var durationTickTimer: Timer!
+    private var durationTickTimer: Timer?
     private let durationFormatter: DateComponentsFormatter = {
         let formatter = DateComponentsFormatter()
         formatter.allowedUnits = [.minute, .second]
@@ -39,44 +42,48 @@ class ActiveVoiceCallViewController: UITableViewController {
         return formatter
     }()
 
-    private var notificationCenterToken: NSObjectProtocol?
+    // Use the OS route picker as a bar button item to allow the audio route to be easily selected.
+    lazy var routePickerButton: UIBarButtonItem = {
+        let pickerview = AVRoutePickerView(frame: CGRect.init(x: 0, y: 0, width: 0, height: 0))
+        return UIBarButtonItem(customView: pickerview)
+    }()
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        callStatusLabel.text = "Initiating"
         callStatusLabel.textColor = .label
-        localNumberLabel.text = callParameters.localNumber.phoneNumber
-        remoteNumberLabel.text = callParameters.remoteNumber
+        self.navigationItem.leftBarButtonItem = self.routePickerButton
     }
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 
-        if case .initial = state {
-            initiateCall()
+        if case .outgoing(let parameters) = state {
+            callStatusLabel.text = "Initiating"
+            localNumberLabel.text = parameters.localNumber.phoneNumber
+            remoteNumberLabel.text = parameters.remoteNumber
+            initiateCallWith(parameters)
         }
-
-        // Observe audio route changes and update the speakerphone switch
-        notificationCenterToken = NotificationCenter.default.addObserver(forName: AVAudioSession.routeChangeNotification, object: nil, queue: OperationQueue.main) { [weak self] (note) in
-            guard let self = self else { return }
-
-            let currentOutputs = AVAudioSession.sharedInstance().currentRoute.outputs
-            let isSpeakerOn = currentOutputs.filter { $0.portType == AVAudioSession.Port.builtInSpeaker }.count > 0
-            self.speakerSwitch.isOn = isSpeakerOn
+        else if case .active(let call) = state {
+            callStatusLabel.text = "Connecting"
+            localNumberLabel.text = call.localPhoneNumber
+            remoteNumberLabel.text = call.remotePhoneNumber
+            self.handleActiveCall(call)
         }
     }
 
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        if let token = notificationCenterToken {
-            NotificationCenter.default.removeObserver(token)
-        }
+    // Start with an active call
+    func startWithActive(call: ActiveVoiceCall) {
+        self.state = .active(call)
+    }
+
+    // Start with an outgoing call
+    func startWithOutgoingCall(parameters: OutgoingCallParameters) {
+        self.state = .outgoing(parameters)
     }
 
     // MARK: Initiate Call
 
-    private func initiateCall() {
+    private func initiateCallWith(_ parameters: OutgoingCallParameters) {
         state = .initiating
 
         // We want to disable the end call button to prevent this view controller from being dismissed while the call is connecting.
@@ -86,7 +93,7 @@ class ActiveVoiceCallViewController: UITableViewController {
 
         let telephonyClient = (UIApplication.shared.delegate as! AppDelegate).telephonyClient!
 
-        try! telephonyClient.createVoiceCall(localNumber: callParameters.localNumber, remoteNumber: callParameters.remoteNumber, delegate: self)
+        try! telephonyClient.createVoiceCall(localNumber: parameters.localNumber, remoteNumber: parameters.remoteNumber, delegate: self)
     }
 
     private func handleActiveCall(_ call: ActiveVoiceCall) {
@@ -99,6 +106,7 @@ class ActiveVoiceCallViewController: UITableViewController {
         muteSwitch.setOn(call.isMuted, animated: true)
 
         callDuration = 0
+        durationTickTimer?.invalidate()
         durationTickTimer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(updateDuration), userInfo: nil, repeats: true)
 
         state = .active(call)
@@ -136,7 +144,8 @@ class ActiveVoiceCallViewController: UITableViewController {
     /// Updates the UI to reflect the call disconnecting.
     private func callDisconnected() {
         state = .disconnected
-        durationTickTimer.invalidate()
+        durationTickTimer?.invalidate()
+        durationTickTimer = nil
         callStatusLabel.text = "Ended"
         callStatusLabel.textColor = .label
         barButtonItem.title = "Done"
@@ -185,9 +194,12 @@ extension ActiveVoiceCallViewController: ActiveCallDelegate {
     /// - Parameters:
     ///     - error: `CallingError` that occurred.
     func activeVoiceCallDidFailToConnect(withError error: CallingError) {
-        self.callStatusLabel.text = "Failed"
-        self.callStatusLabel.textColor = .systemRed
-        self.presentErrorAlert(message: "Failed to initiate call", error: error)
+        DispatchQueue.main.async {
+            self.callStatusLabel.text = "Failed"
+            self.callStatusLabel.textColor = .systemRed
+            self.presentErrorAlert(message: "Failed to initiate call", error: error)
+            self.barButtonItem.isEnabled = true
+        }
     }
 
     /// Notifies the delegate that the call has been disconnected
@@ -204,5 +216,9 @@ extension ActiveVoiceCallViewController: ActiveCallDelegate {
     ///     - isMuted: Whether outgoing call audio is muted
     func activeVoiceCall(_ call: ActiveVoiceCall, didChangeMuteState isMuted: Bool) {
         self.muteSwitch.setOn(isMuted, animated: true)
+    }
+
+    func activeVoiceCallAudioRouteDidChange(_ call: ActiveVoiceCall) {
+        self.speakerSwitch.isOn = call.isOnSpeaker
     }
 }

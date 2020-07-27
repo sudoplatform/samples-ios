@@ -21,6 +21,16 @@ class RegistrationViewController: UIViewController {
         }
     }
 
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        self.navigationController?.setNavigationBarHidden(true, animated: true)
+    }
+
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        self.navigationController?.setNavigationBarHidden(false, animated: true)
+    }
+
     @IBAction func registerButtonTapped() {
         activityIndicator.startAnimating()
         registerButton.isEnabled = false
@@ -33,6 +43,9 @@ class RegistrationViewController: UIViewController {
                 if registered {
                     self.navigateToSudoList()
                 }
+
+                //register for incoming calls after sign in complete
+                (UIApplication.shared.delegate as! AppDelegate).registerForIncomingCalls()
             }
         }
     }

@@ -79,12 +79,17 @@ class CreateMessageViewController: UIViewController, UITextViewDelegate {
         }
     }
 
+    private func updateSendButtonEnabled() {
+        sendButton.isEnabled = !(recipientTextField.text ?? "").isEmpty &&
+            (!(bodyTextView.text ?? "").isEmpty || attachmentImageURL != nil)
+    }
+
     @IBAction func recipientChanged(_ sender: UITextField, forEvent event: UIEvent) {
-        sendButton.isEnabled = !(recipientTextField.text?.isEmpty ?? true) && !(bodyTextView.text?.isEmpty ?? true)
+        updateSendButtonEnabled()
     }
 
     @objc func textViewDidChange(_ textView: UITextView) {
-        sendButton.isEnabled = !(recipientTextField.text?.isEmpty ?? true) && !(bodyTextView.text?.isEmpty ?? true)
+        updateSendButtonEnabled()
     }
 
     @IBAction func deleteAttachment() {
@@ -93,6 +98,7 @@ class CreateMessageViewController: UIViewController, UITextViewDelegate {
         self.attachmentPreview.isHidden = true
         self.deleteAttachmentButton.isHidden = true
         self.insertAttachmentButton.isHidden = false
+        updateSendButtonEnabled()
     }
 
     @IBAction func insertAttachment() {
@@ -134,6 +140,7 @@ class CreateMessageViewController: UIViewController, UITextViewDelegate {
                 self.attachmentPreview.isHidden = false
                 self.deleteAttachmentButton.isHidden = false
                 self.insertAttachmentButton.isHidden = true
+                self.updateSendButtonEnabled()
             }
             picker.delegate = delegate
             self.present(picker, animated: true)

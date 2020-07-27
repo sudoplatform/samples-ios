@@ -38,10 +38,7 @@ class CreateVoiceCallViewController: UIViewController {
         switch segue.identifier {
         case "navigateToActiveCall":
             let destination = (segue.destination as! UINavigationController).topViewController! as! ActiveVoiceCallViewController
-            destination.callParameters = (
-                localNumber: localNumber,
-                remoteNumber: phoneNumberField.text ?? ""
-            )
+            destination.startWithOutgoingCall(parameters: (localNumber, phoneNumberField.text ?? ""))
         default: break
         }
     }

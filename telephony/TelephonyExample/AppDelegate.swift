@@ -10,6 +10,8 @@ import AWSAppSync
 import SudoKeyManager
 import SudoUser
 import SudoProfiles
+import SudoConfigManager
+import PushKit
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -21,6 +23,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var keyManager: SudoKeyManager!
     var authenticator: Authenticator!
     var sudoProfilesClient: SudoProfilesClient!
+    var pushRegistry: PKPushRegistry!
+    var callDelegate: ActiveVoiceCallViewController?
+
+    var lastPushToken: Data?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         do {
@@ -57,6 +63,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             fatalError("Failed to initialize the telephony client: \(error)")
         }
 
+        self.pushRegistry = PKPushRegistry(queue: nil)
+        pushRegistry.delegate = self
+        pushRegistry.desiredPushTypes = [.voIP]
+
         return true
     }
 
@@ -80,5 +90,83 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func applicationWillTerminate(_ application: UIApplication) {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
+    }
+}
+
+
+// MARK: PKPushRegistryDelegate
+
+
+extension AppDelegate: PKPushRegistryDelegate {
+
+    func pushRegistry(_ registry: PKPushRegistry, didUpdate pushCredentials: PKPushCredentials, for type: PKPushType) {
+        let description = pushCredentials.token.reduce("", {$0 + String(format: "%02X", $1)}).uppercased()
+        print("didUpdatePushToken: \(description)")
+        self.lastPushToken = pushCredentials.token
+        self.registerForIncomingCalls()
+    }
+
+    func registerForIncomingCalls() {
+        guard let pushtoken = self.lastPushToken else { return }
+        try! self.telephonyClient.registerForIncomingCalls(with: pushtoken, useSandbox: true, completion: { (error) in
+            if let error = error {
+                print("Error updating push credentials: \(error)")
+            }
+            else {
+                print("Push credentials updated with telephony SDK.")
+            }
+        })
+    }
+
+    func pushRegistry(_ registry: PKPushRegistry, didReceiveIncomingPushWith payload: PKPushPayload, for type: PKPushType, completion: @escaping () -> Void) {
+        print("Did receive incoming push: \(payload.dictionaryPayload)")
+        let _ = try! self.telephonyClient.handleIncomingPushNotificationPayload(payload.dictionaryPayload, notificationDelegate: self)
+        completion()
+    }
+
+    func pushRegistry(_ registry: PKPushRegistry, didInvalidatePushTokenFor type: PKPushType) {
+        try! self.telephonyClient.deregisterForIncomingCalls(completion: { (maybeError) in
+            if let error = maybeError {
+                NSLog("Error de-registering for push notifications: \(error)")
+            }
+        })
+    }
+}
+
+
+// MARK: IncomingCallNotificationDelegate
+
+
+extension AppDelegate: IncomingCallNotificationDelegate {
+
+    func incomingCallReceived(_ call: IncomingCall) {
+        NSLog("Incoming Call received: \(call)")
+        let activeCallController = UIStoryboard(name: "Main", bundle: Bundle.main).instantiateViewController(identifier: "ActiveVoiceCallViewController") as! ActiveVoiceCallViewController
+        call.delegate = activeCallController
+        self.callDelegate = activeCallController
+    }
+
+
+    func incomingCall(_ call: IncomingCall, cancelledWithError error: Error?) {
+        NSLog("Incoming Call canceled: \(call), with error: \(String(describing: error))")
+        self.callDelegate = nil
+    }
+
+    func incomingCallAnswered(_ call: ActiveVoiceCall) {
+
+        guard let activeCallController = self.callDelegate else { return }
+
+        activeCallController.startWithActive(call: call)
+
+        let nav = UINavigationController(rootViewController: activeCallController)
+        nav.modalPresentationStyle = .fullScreen
+
+        if var topController = self.window?.rootViewController {
+            while let presentedViewController = topController.presentedViewController {
+                topController = presentedViewController
+            }
+
+            topController.present(nav, animated: true, completion: nil)
+        }
     }
 }

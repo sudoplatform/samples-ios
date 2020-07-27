@@ -97,13 +97,7 @@ class ConversationDetailsViewController: UIViewController, UITableViewDelegate, 
     
     private func subscribeToMessages() {
         let telephonyClient = (UIApplication.shared.delegate as! AppDelegate).telephonyClient!
-        
-        func showFailureAlert(error: Error) {
-            let alert = UIAlertController(title: "Error", message: "Failed to subscribe to messages:\n\(error)", preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
-            self.present(alert, animated: true, completion: nil)
-        }
-        
+
         do {
             self.messageSubscriptionToken = try telephonyClient.subscribeToMessages { [weak self] result in
                 guard let self = self else { return }
@@ -124,12 +118,12 @@ class ConversationDetailsViewController: UIViewController, UITableViewDelegate, 
                     }
                 case .failure(let error):
                     DispatchQueue.main.async {
-                        showFailureAlert(error: error)
+                        self.presentErrorAlert(message: "Failed to subscribe to messages", error: error)
                     }
                 }
             }
         } catch let error {
-            showFailureAlert(error: error)
+            self.presentErrorAlert(message: "Failed to subscribe to messages", error: error)
         }
     }
 

@@ -6,7 +6,16 @@ inhibit_all_warnings!
 
 source 'https://cdn.cocoapods.org/'
 
+acknowledgementsFields = ['name', 'version', 'licenseType', 'licenseText', 'homepage']
+acknowledgementsExclude = ['SudoUser', 'SudoTelephony', 'SudoApiClient', 'SudoConfigManager', 'SudoKeyManager', 'SudoLogging', 'SudoOperations', 'SudoProfiles']
+
+pre_install do |installer|
+	unless installer.deployment?
+		plugin 'cocoapods-acknowledgements', :fields => acknowledgementsFields, :exclude => acknowledgementsExclude
+	end
+end
+
 target 'TelephonyExample' do
+    pod 'SudoTelephony', '~> 4.0.0-beta2'
     pod 'SudoUser', '~> 7.9'
-    pod 'SudoTelephony', '~> 3.1.1'
 end

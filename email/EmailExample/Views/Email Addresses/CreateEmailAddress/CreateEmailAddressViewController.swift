@@ -68,7 +68,7 @@ class CreateEmailAddressViewController: UIViewController,
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         presentCancellableActivityAlert(message: "Loading", delegate: self) {
-            self.emailClient.getSupportedEmailDomainsWithCachePolicy(.useOnline) { [weak self] result in
+            self.emailClient.getSupportedEmailDomainsWithCachePolicy(.remoteOnly) { [weak self] result in
                 DispatchQueue.main.async {
                     guard let weakSelf = self else { return }
                     switch result {

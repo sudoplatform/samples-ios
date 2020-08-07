@@ -29,10 +29,10 @@ class EmailMessageListViewController: UIViewController, UITableViewDataSource, U
 
     // MARK: - Supplementary
 
-    /// Typealias for a successful response call to `SudoEmailClient.getEmailMessagesWithFilter(_:limit:nextToken:cachePolicy:completion:)`.
+    /// Typealias for a successful response call to `SudoEmailClient.listEmailMessagesWithFilter(_:limit:nextToken:cachePolicy:completion:)`.
     typealias EmailMessageListSuccessCompletion = ([EmailMessage]) -> Void
 
-    /// Typealias for a error response call to `SudoEmailClient.getEmailMessagesWithFilter(_:limit:nextToken:cachePolicy:completion:)`.
+    /// Typealias for a error response call to `SudoEmailClient.listEmailMessagesWithFilter(_:limit:nextToken:cachePolicy:completion:)`.
     typealias EmailMessageListErrorCompletion = (Error) -> Void
 
     /// Defaults used in `EmailMessageListViewController`.
@@ -141,7 +141,7 @@ class EmailMessageListViewController: UIViewController, UITableViewDataSource, U
         success: EmailMessageListSuccessCompletion? = nil,
         failure: EmailMessageListErrorCompletion? = nil
     ) {
-        emailClient.getEmailMessagesWithFilter(nil, limit: Defaults.emailListLimit, nextToken: nil, cachePolicy: cachePolicy) { result in
+        emailClient.listEmailMessagesWithFilter(nil, limit: Defaults.emailListLimit, nextToken: nil, cachePolicy: cachePolicy) { result in
             switch result {
             case let .success(output):
                 success?(output.items)
@@ -174,7 +174,7 @@ class EmailMessageListViewController: UIViewController, UITableViewDataSource, U
             switch result {
             case .success:
                 weakSelf.listEmailMessages(
-                    cachePolicy: .useOnline,
+                    cachePolicy: .remoteOnly,
                     success: { messages in
                         DispatchQueue.main.async {
                             let emailAddress = weakSelf.emailAddress?.address ?? ""
@@ -201,7 +201,7 @@ class EmailMessageListViewController: UIViewController, UITableViewDataSource, U
             switch result {
             case .success:
                 weakSelf.listEmailMessages(
-                    cachePolicy: .useOnline,
+                    cachePolicy: .remoteOnly,
                     success: { messages in
                         DispatchQueue.main.async {
                             let emailAddress = weakSelf.emailAddress?.address ?? ""
@@ -266,14 +266,14 @@ class EmailMessageListViewController: UIViewController, UITableViewDataSource, U
             weakSelf.tableView.reloadData()
         }
         listEmailMessages(
-            cachePolicy: .useCache,
+            cachePolicy: .cacheOnly,
             success: { [weak self] emailMessages in
                 guard let weakSelf = self else { return }
                 DispatchQueue.main.async {
                     filterCompletion(emailMessages)
                 }
                 weakSelf.listEmailMessages(
-                    cachePolicy: .useOnline,
+                    cachePolicy: .remoteOnly,
                     success: { emailMessages in
                         DispatchQueue.main.async {
                             filterCompletion(emailMessages)
@@ -320,7 +320,7 @@ class EmailMessageListViewController: UIViewController, UITableViewDataSource, U
             switch result {
             case .success:
                 // Do a call to service to update cache.
-                weakSelf.listEmailMessages(cachePolicy: .useOnline)
+                weakSelf.listEmailMessages(cachePolicy: .remoteOnly)
                 completion(true)
             case .failure:
                 DispatchQueue.main.async {

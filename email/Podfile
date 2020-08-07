@@ -19,7 +19,7 @@ end
 target 'EmailExample' do
     pod 'SudoUser', '~> 7.9'
     pod 'SudoProfiles', '~> 5.5'
-    pod 'SudoEmail', '~> 1.0'
+    pod 'SudoEmail', '~> 2.0'
     pod 'MimeParser', '~> 0.1'
 
     target 'EmailExampleTests'

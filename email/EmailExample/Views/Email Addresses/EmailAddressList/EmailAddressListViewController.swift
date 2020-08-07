@@ -133,7 +133,7 @@ class EmailAddressListViewController: UIViewController, UITableViewDataSource, U
         success: EmailAddressListSuccessCompletion? = nil,
         failure: EmailAddressListErrorCompletion? = nil
     ) {
-        emailClient.getEmailAddressesWithFilter(nil, limit: Defaults.emailListLimit, nextToken: nil, cachePolicy: cachePolicy) { result in
+        emailClient.listEmailAddressesWithFilter(nil, limit: Defaults.emailListLimit, nextToken: nil, cachePolicy: cachePolicy) { result in
             switch result {
             case let .success(output):
                 success?(output.items)
@@ -183,7 +183,7 @@ class EmailAddressListViewController: UIViewController, UITableViewDataSource, U
             }
         }
         listEmailAddresses(
-            cachePolicy: .useCache,
+            cachePolicy: .cacheOnly,
             success: { [weak self] emailAddresses in
                 guard let weakSelf = self else { return }
                 DispatchQueue.main.async {
@@ -191,7 +191,7 @@ class EmailAddressListViewController: UIViewController, UITableViewDataSource, U
                     weakSelf.tableView.reloadData()
                 }
                 weakSelf.listEmailAddresses(
-                    cachePolicy: .useOnline,
+                    cachePolicy: .remoteOnly,
                     success: { [weak self] emailAddresses in
                         DispatchQueue.main.async {
                             guard let weakSelf = self else { return }
@@ -272,7 +272,7 @@ class EmailAddressListViewController: UIViewController, UITableViewDataSource, U
                 switch result {
                 case .success:
                     // Do a call to service to update cache.
-                    weakSelf.listEmailAddresses(cachePolicy: .useOnline)
+                    weakSelf.listEmailAddresses(cachePolicy: .remoteOnly)
                     completion(true)
                 case .failure:
                     DispatchQueue.main.async {

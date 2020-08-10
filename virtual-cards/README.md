@@ -25,9 +25,15 @@ ${PROJECT_DIR}/config/sudoplatformconfig.json
 ${PROJECT_DIR}/config/register_key.private
 ```
 
-3. Run `pod install` from the project root
+3. Create a text file containing the test registration key ID at the following location:
 
-4. Build the app
+```
+${PROJECT_DIR}/config/register_key.id
+```
+
+4. Run `pod install` from the project root
+
+5. Build the app
 
 ## More Documentation
 

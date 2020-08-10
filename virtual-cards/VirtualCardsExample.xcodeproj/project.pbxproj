@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		0CE6FED1246B74AE00944FAC /* OrphanCardListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE6FECF246B74AE00944FAC /* OrphanCardListViewController.swift */; };
 		0CE6FED2246B74AE00944FAC /* OrphanCardListViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0CE6FED0246B74AE00944FAC /* OrphanCardListViewController.xib */; };
+		839BAE971A0D7170ECAD88A0 /* Pods-VirtualCardsExample-metadata.plist in Resources */ = {isa = PBXBuildFile; fileRef = EDDA09A0D095904167270AAC /* Pods-VirtualCardsExample-metadata.plist */; };
 		84077A2B245A9053004186BE /* VirtualCardsExampleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84077A2A245A9053004186BE /* VirtualCardsExampleTests.swift */; };
 		84309D382462B96F00F48ECC /* TransactionTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84309D362462B96F00F48ECC /* TransactionTableViewCell.swift */; };
 		84309D392462B96F00F48ECC /* TransactionTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 84309D372462B96F00F48ECC /* TransactionTableViewCell.xib */; };
@@ -140,6 +141,7 @@
 		CF2571C02444EBB80053334E /* SudoListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SudoListViewController.swift; sourceTree = "<group>"; };
 		CF2571C22444EC0B0053334E /* CreateSudoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateSudoViewController.swift; sourceTree = "<group>"; };
 		CF2571D1245109BF0053334E /* UIViewController+AlertPresentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+AlertPresentation.swift"; sourceTree = "<group>"; };
+		EDDA09A0D095904167270AAC /* Pods-VirtualCardsExample-metadata.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-VirtualCardsExample-metadata.plist"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -482,6 +484,7 @@
 			children = (
 				15697D79B0AE529ABAB92D9C /* Pods-VirtualCardsExample.debug.xcconfig */,
 				0CFC38B6FCD6BD70C8132238 /* Pods-VirtualCardsExample.release.xcconfig */,
+				EDDA09A0D095904167270AAC /* Pods-VirtualCardsExample-metadata.plist */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -599,6 +602,7 @@
 				84403FEB245AB02F00B2EBF2 /* IdentityVerificationViewController.xib in Resources */,
 				84403FEF245AB07600B2EBF2 /* CreateFundingSourceViewController.xib in Resources */,
 				8470C8F5245AD55700439F92 /* SudoListViewController.xib in Resources */,
+				839BAE971A0D7170ECAD88A0 /* Pods-VirtualCardsExample-metadata.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -639,7 +643,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "returncode=0\n\necho \"Copy test key to bundle\"\nSOURCE=${PROJECT_DIR}/config/register_key.private\ncp -f ${SOURCE} \"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/\"\nif [ $? -ne 0 ]\nthen\n    echo \"error: Failed to copy test registration key. Make sure the file config/register_key.private exists in the project directory (see README.md).\"\n    returncode=1\nfi\n\necho \"Copy Sudo Platform config to bundle\"\nSOURCE=${PROJECT_DIR}/config/sudoplatformconfig.json\ncp -f ${SOURCE} \"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/\"\nif [ $? -ne 0 ]\nthen\n    echo \"error: Failed to copy sudoplatformconfig.json. Make sure the file config/sudoplatformconfig.json exists in the project directory (see README.md).\"\n    returncode=1\nfi\n\nexit ${returncode}\n";
+			shellScript = "returncode=0\n\necho \"Copy test key to bundle\"\nSOURCE=${PROJECT_DIR}/config/register_key.private\ncp -f ${SOURCE} \"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/\"\nif [ $? -ne 0 ]\nthen\n    echo \"error: Failed to copy test registration key. Make sure the file config/register_key.private exists in the project directory (see README.md).\"\n    returncode=1\nfi\n\necho \"Copy test key ID to bundle\"\nSOURCE=${PROJECT_DIR}/config/register_key.id \ncp -f ${SOURCE} \"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/\"\nif [ $? -ne 0 ]\nthen\n    echo \"error: Failed to copy test registration key ID. Make sure the file config/register_key.id exists in the project directory (see README.md).\"\n    returncode=1\nfi\n\necho \"Copy Sudo Platform config to bundle\"\nSOURCE=${PROJECT_DIR}/config/sudoplatformconfig.json\ncp -f ${SOURCE} \"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/\"\nif [ $? -ne 0 ]\nthen\n    echo \"error: Failed to copy sudoplatformconfig.json. Make sure the file config/sudoplatformconfig.json exists in the project directory (see README.md).\"\n    returncode=1\nfi\n\nexit ${returncode}\n";
 		};
 		CE75CDA275F0AC4CCB426AE7 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;

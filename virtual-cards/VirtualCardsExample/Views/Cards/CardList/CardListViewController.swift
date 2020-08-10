@@ -137,7 +137,7 @@ class CardListViewController: UIViewController, UITableViewDataSource, UITableVi
     ///   - success: Closure that executes on a successful retrieval of cards.
     ///   - failure: Closure that executes on an error during the retrieval of cards.
     func listCards(cachePolicy: SudoVirtualCards.CachePolicy, success: @escaping CardListSuccessCompletion, failure: @escaping CardListErrorCompletion) {
-        virtualCardsClient.getCardsWithFilter(nil, limit: Defaults.cardListLimit, nextToken: nil, cachePolicy: cachePolicy) { result in
+        virtualCardsClient.listCardsWithFilter(nil, limit: Defaults.cardListLimit, nextToken: nil, cachePolicy: cachePolicy) { result in
             switch result {
             case let .success(output):
                 success(output.items)
@@ -188,7 +188,7 @@ class CardListViewController: UIViewController, UITableViewDataSource, UITableVi
             self?.presentErrorAlert(message: "Failed to list Cards", error: error)
         }
         listCards(
-            cachePolicy: .useCache,
+            cachePolicy: .cacheOnly,
             success: { [weak self] cards in
                 guard let weakSelf = self else { return }
                 DispatchQueue.main.async {
@@ -196,7 +196,7 @@ class CardListViewController: UIViewController, UITableViewDataSource, UITableVi
                     weakSelf.tableView.reloadData()
                 }
                 weakSelf.listCards(
-                    cachePolicy: .useOnline,
+                    cachePolicy: .remoteOnly,
                     success: { [weak self] cards in
                         DispatchQueue.main.async {
                             guard let weakSelf = self else { return }

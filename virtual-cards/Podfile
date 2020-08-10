@@ -1,10 +1,11 @@
+#
+source 'https://github.com/CocoaPods/Specs.git'
+
 platform :ios, '13.0'
 use_frameworks!
 use_modular_headers!
 
 inhibit_all_warnings!
-
-source 'https://cdn.cocoapods.org/'
 
 acknowledgementsFields = ['name', 'version', 'licenseType', 'licenseText', 'homepage']
 acknowledgementsExclude = ['SudoUser', 'SudoTelephony', 'SudoApiClient', 'SudoConfigManager', 'SudoKeyManager', 'SudoLogging', 'SudoOperations', 'SudoProfiles', 'SudoIdentityVerification', 'SudoVirtualCards']
@@ -16,9 +17,9 @@ pre_install do |installer|
 end
 
 target 'VirtualCardsExample' do
-    pod 'SudoUser', '~> 7.8'
+    pod 'SudoUser', '~> 7.9'
     pod 'SudoIdentityVerification', '~> 4.7'
-    pod 'SudoVirtualCards', '~> 8.0'
+    pod 'SudoVirtualCards', '~> 9.0'
 end
 
 # Fix Xcode nagging warning on pod install/update

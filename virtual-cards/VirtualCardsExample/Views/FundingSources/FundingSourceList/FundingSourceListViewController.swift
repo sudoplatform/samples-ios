@@ -93,7 +93,7 @@ class FundingSourceListViewController: UIViewController, UITableViewDelegate, UI
         success: @escaping FundingSourceListSuccessCompletion,
         failure: @escaping FundingSourceListErrorCompletion
     ) {
-        virtualCardsClient.getFundingSourcesWithLimit(Defaults.fundingSourceLimit, nextToken: nil, cachePolicy: cachePolicy) { result in
+        virtualCardsClient.listFundingSourcesWithLimit(Defaults.fundingSourceLimit, nextToken: nil, cachePolicy: cachePolicy) { result in
             switch result {
             case let .success(output):
                 success(output.items)
@@ -142,7 +142,7 @@ class FundingSourceListViewController: UIViewController, UITableViewDelegate, UI
              self?.presentErrorAlert(message: "Failed to list Funding Sources", error: error)
          }
         listFundingSources(
-            cachePolicy: .useCache,
+            cachePolicy: .cacheOnly,
             success: { [weak self] fundingSources in
                 guard let weakSelf = self else { return }
                 DispatchQueue.main.async {
@@ -150,7 +150,7 @@ class FundingSourceListViewController: UIViewController, UITableViewDelegate, UI
                     weakSelf.tableView.reloadData()
                 }
                 weakSelf.listFundingSources(
-                    cachePolicy: .useOnline,
+                    cachePolicy: .remoteOnly,
                     success: { [weak self] fundingSources in
                         DispatchQueue.main.async {
                             guard let weakSelf = self else { return }

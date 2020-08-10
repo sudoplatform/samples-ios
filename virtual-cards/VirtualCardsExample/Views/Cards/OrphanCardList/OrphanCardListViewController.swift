@@ -113,7 +113,7 @@ class OrphanCardListViewController: UIViewController, UITableViewDataSource, UIT
         success: @escaping OrphanCardListSuccessCompletion,
         failure: @escaping OrphanCardListErrorCompletion
     ) {
-        virtualCardsClient.getCardsWithFilter(nil, limit: Defaults.orphanCardListLimit, nextToken: nil, cachePolicy: cachePolicy) { result in
+        virtualCardsClient.listCardsWithFilter(nil, limit: Defaults.orphanCardListLimit, nextToken: nil, cachePolicy: cachePolicy) { result in
             switch result {
             case let .success(output):
                 success(output.items)
@@ -165,7 +165,7 @@ class OrphanCardListViewController: UIViewController, UITableViewDataSource, UIT
             self?.presentErrorAlert(message: "Failed to list orphan Cards", error: error)
         }
         listOrphanCards(
-            cachePolicy: .useCache,
+            cachePolicy: .cacheOnly,
             success: { [weak self] cards in
                 guard let weakSelf = self else { return }
                 DispatchQueue.main.async {
@@ -174,7 +174,7 @@ class OrphanCardListViewController: UIViewController, UITableViewDataSource, UIT
                     weakSelf.tableView.reloadData()
                 }
                 weakSelf.listOrphanCards(
-                    cachePolicy: .useOnline,
+                    cachePolicy: .remoteOnly,
                     success: { [weak self] cards in
                         DispatchQueue.main.async {
                             guard let weakSelf = self else { return }

@@ -104,12 +104,12 @@ class TransactionDetailViewController: UIViewController, UITableViewDataSource, 
             var sudoResult: Swift.Result<Sudo, Error>?
             let group = DispatchGroup()
             group.enter()
-            self.listTransactions(withSequenceId: self.inputTransaction.sequenceId, cachePolicy: .useOnline) { result in
+            self.listTransactions(withSequenceId: self.inputTransaction.sequenceId, cachePolicy: .remoteOnly) { result in
                 transactionResult = result
                 group.leave()
             }
             group.enter()
-            self.virtualCardsClient.getFundingSourceWithId(self.inputCard.fundingSourceId, cachePolicy: .useOnline) { result in
+            self.virtualCardsClient.getFundingSourceWithId(self.inputCard.fundingSourceId, cachePolicy: .remoteOnly) { result in
                 defer { group.leave() }
                 switch result {
                 case let .success(optionalFundingSource):
@@ -193,7 +193,7 @@ class TransactionDetailViewController: UIViewController, UITableViewDataSource, 
         if let sequenceId = sequenceId {
             filter = GetTransactionsFilterInput(sequenceId: .equals(sequenceId))
         }
-        virtualCardsClient.getTransactionsWithFilter(filter, limit: Defaults.transactionLimit, nextToken: nil, cachePolicy: cachePolicy) { result in
+        virtualCardsClient.listTransactionsWithFilter(filter, limit: Defaults.transactionLimit, nextToken: nil, cachePolicy: cachePolicy) { result in
             let items = result.map { $0.items }
             completion(items)
         }
@@ -203,8 +203,8 @@ class TransactionDetailViewController: UIViewController, UITableViewDataSource, 
         onCacheLoad cacheCompletion: @escaping TransactionListCompletion,
         onRemoteLoad remoteCompletion: @escaping TransactionListCompletion
     ) {
-        listTransactions(withSequenceId: inputTransaction.sequenceId, cachePolicy: .useCache, completion: cacheCompletion)
-        listTransactions(withSequenceId: inputTransaction.sequenceId, cachePolicy: .useCache, completion: remoteCompletion)
+        listTransactions(withSequenceId: inputTransaction.sequenceId, cachePolicy: .cacheOnly, completion: cacheCompletion)
+        listTransactions(withSequenceId: inputTransaction.sequenceId, cachePolicy: .cacheOnly, completion: remoteCompletion)
     }
 
     // MARK: - Helpers: Configuration

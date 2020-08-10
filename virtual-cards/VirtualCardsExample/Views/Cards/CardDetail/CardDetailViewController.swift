@@ -118,7 +118,7 @@ class CardDetailViewController: UIViewController, UITableViewDataSource, UITable
         failure: @escaping TransactionListErrorCompletion
     ) {
         let filter = GetTransactionsFilterInput(cardId: .equals(card.id))
-        virtualCardsClient.getTransactionsWithFilter(filter, limit: Defaults.transactionLimit, nextToken: nil, cachePolicy: cachePolicy) { result in
+        virtualCardsClient.listTransactionsWithFilter(filter, limit: Defaults.transactionLimit, nextToken: nil, cachePolicy: cachePolicy) { result in
             switch result {
             case let .success(output):
                 success(output.items)
@@ -177,7 +177,7 @@ class CardDetailViewController: UIViewController, UITableViewDataSource, UITable
             self?.presentErrorAlert(message: "Failed to list transactions", error: error)
         }
         listTransactions(
-            cachePolicy: .useCache,
+            cachePolicy: .cacheOnly,
             success: { [weak self] transactions in
                 guard let weakSelf = self else { return }
                 DispatchQueue.main.async {
@@ -185,7 +185,7 @@ class CardDetailViewController: UIViewController, UITableViewDataSource, UITable
                     weakSelf.tableView.reloadData()
                 }
                 weakSelf.listTransactions(
-                    cachePolicy: .useOnline,
+                    cachePolicy: .remoteOnly,
                     success: { [weak self] transactions in
                         guard let weakSelf = self else { return }
                         DispatchQueue.main.async {

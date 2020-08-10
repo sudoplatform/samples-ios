@@ -310,7 +310,7 @@ class CreateCardViewController: UIViewController,
         success: @escaping FundingSourceListSuccessCompletion,
         failure: @escaping FundingSourceListErrorCompletion
     ) {
-        virtualCardsClient.getFundingSourcesWithLimit(Defaults.fundingSourceLimit, nextToken: nil, cachePolicy: cachePolicy) { result in
+        virtualCardsClient.listFundingSourcesWithLimit(Defaults.fundingSourceLimit, nextToken: nil, cachePolicy: cachePolicy) { result in
             switch result {
             case let .success(output):
                 success(output.items)
@@ -377,7 +377,7 @@ class CreateCardViewController: UIViewController,
     /// Load the first active funding source associated with the user's account.
     func loadFirstActiveFundingSource() {
         listFundingSource(
-            cachePolicy: .useOnline,
+            cachePolicy: .remoteOnly,
             success: { [weak self] fundingSources in
                 DispatchQueue.main.async {
                     guard let weakSelf = self else { return }

@@ -107,7 +107,9 @@ class RegistrationViewController: UIViewController {
                 try userClient.signInWithKey { signInResult in
                     switch signInResult {
                     case .failure(let error):
-                        self.showSignInFailureAlert(error: error)
+                        DispatchQueue.main.async {
+                            self.showSignInFailureAlert(error: error)
+                        }
                         completion(false)
                     case .success:
                         completion(true)
@@ -128,7 +130,9 @@ class RegistrationViewController: UIViewController {
                 try userClient.presentFederatedSignInUI(navigationController: navigationController) { signInResult in
                     switch signInResult {
                     case .failure(let error):
-                        self.showSignInFailureAlert(error: error)
+                        DispatchQueue.main.async {
+                            self.showSignInFailureAlert(error: error)
+                        }
                         completion(false)
                     case .success:
                         completion(true)
@@ -145,7 +149,9 @@ class RegistrationViewController: UIViewController {
                 authenticator.register { registerResult in
                     switch registerResult {
                     case .failure(let error):
-                        self.showRegistrationFailureAlert(error: error)
+                        DispatchQueue.main.async {
+                            self.showRegistrationFailureAlert(error: error)
+                        }
                         completion(false)
                     case .success:
                         signIn()

@@ -19,16 +19,25 @@ class RegistrationViewController: UIViewController {
         if userClient.isRegistered() {
             self.registerButtonTapped()
         }
+
+        let resetButton = UIBarButtonItem(title: "Reset", style: .done, target: self, action: #selector(self.resetClientsTapped))
+        self.navigationItem.rightBarButtonItem = resetButton
     }
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        self.navigationController?.setNavigationBarHidden(true, animated: true)
+
+        // Set navigation bar to be translucent
+        navigationController?.navigationBar.setBackgroundImage(UIImage(), for: .default)
+        navigationController?.navigationBar.shadowImage = UIImage()
     }
 
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        self.navigationController?.setNavigationBarHidden(false, animated: true)
+
+        // Restore navigation bar to default state
+        navigationController?.navigationBar.setBackgroundImage(nil, for: .default)
+        navigationController?.navigationBar.shadowImage = nil
     }
 
     @IBAction func registerButtonTapped() {
@@ -133,4 +142,32 @@ class RegistrationViewController: UIViewController {
     }
 
     @IBAction func returnToRegistration(segue: UIStoryboardSegue) {}
+
+    @objc func resetClientsTapped() {
+
+        let alert = UIAlertController(title: "Are you sure?", message: "This will reset the application and clear all local keys associated with accounts registered with this application. This may result in orphaned data on the service, including provisioned phone numbers.", preferredStyle: .alert)
+
+        alert.addAction(UIAlertAction(title: "Reset", style: .destructive, handler: { (_) in
+            self.resetClients()
+        }))
+
+        alert.addAction(UIAlertAction(title: "Not now", style: .cancel, handler: { (_) in
+
+        }))
+
+        self.present(alert, animated: true, completion: nil)
+    }
+
+    private func resetClients() {
+        let authenticator = (UIApplication.shared.delegate as! AppDelegate).authenticator!
+        let sudoProfilesClient = (UIApplication.shared.delegate as! AppDelegate).sudoProfilesClient!
+        let telephonyClient = (UIApplication.shared.delegate as! AppDelegate).telephonyClient!
+        do {
+            try authenticator.userClient.reset()
+            try sudoProfilesClient.reset()
+            try telephonyClient.reset()
+        } catch let error {
+            self.presentErrorAlert(message: "Failed to deregister", error: error)
+        }
+    }
 }

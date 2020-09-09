@@ -66,40 +66,43 @@ class SudoListViewController: UIViewController, UITableViewDelegate, UITableView
 
     func deregister() {
         let authenticator = (UIApplication.shared.delegate as! AppDelegate).authenticator!
-        let sudoProfilesClient = (UIApplication.shared.delegate as! AppDelegate).sudoProfilesClient!
-        let telephonyClient = (UIApplication.shared.delegate as! AppDelegate).telephonyClient!
-
         presentActivityAlert(message: "Deregistering")
 
         do {
-            try authenticator.userClient.deregister { result in
+            try authenticator.userClient.deregister(completion: { (result) in
+                if case .failure(let error) = result {
+                    NSLog("Failed to deregister: \(error)")
+                }
+
                 DispatchQueue.main.async {
-                    // dismiss activity alert
-                    self.dismiss(animated: true, completion: nil)
-
-                    switch result {
-                    case .success:
-                        // after deregistering, clear all local data
-                        do {
-                            try authenticator.userClient.reset()
-                            try sudoProfilesClient.reset()
-                            try telephonyClient.reset()
-                        } catch let error {
-                            self.presentErrorAlert(message: "Failed to deregister", error: error)
-                        }
-
-                        // unwind back to registration view controller
-                        self.performSegue(withIdentifier: "returnToRegistration", sender: self)
-                    case .failure(let error):
-                        self.presentErrorAlert(message: "Failed to deregister", error: error)
+                    self.dismiss(animated: true) {
+                        self.resetClients()
+                        self.navigateToLoginScreen()
                     }
                 }
-            }
-        } catch let error {
+            })
+        }
+        catch {
+            NSLog("Failed to deregister: \(error)")
             self.dismiss(animated: true) {
-                self.presentErrorAlert(message: "Failed to deregister", error: error)
+                self.resetClients()
+                self.navigateToLoginScreen()
             }
         }
+    }
+
+    private func resetClients() {
+        let authenticator = (UIApplication.shared.delegate as! AppDelegate).authenticator!
+        let sudoProfilesClient = (UIApplication.shared.delegate as! AppDelegate).sudoProfilesClient!
+        let telephonyClient = (UIApplication.shared.delegate as! AppDelegate).telephonyClient!
+
+        try? authenticator.userClient.reset()
+        try? sudoProfilesClient.reset()
+        try? telephonyClient.reset()
+    }
+
+    private func navigateToLoginScreen() {
+        self.performSegue(withIdentifier: "returnToRegistration", sender: self)
     }
 
     @IBAction func infoTapped() {

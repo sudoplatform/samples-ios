@@ -22,9 +22,11 @@ extension UIViewController {
     }
 
     /// Presents a `UIAlertController` containing the given error message along with a detailed description from the `Error`.
-    func presentErrorAlert(message: String, error: Error) {
+    func presentErrorAlert(message: String, error: Error, handler: (() -> Void)? = nil) {
         let alert = UIAlertController(title: "Error", message: "\(message):\n\(error.localizedDescription)", preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { _ in
+            handler?()
+        }))
         self.present(alert, animated: true, completion: nil)
     }
 

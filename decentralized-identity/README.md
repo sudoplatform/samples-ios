@@ -11,7 +11,8 @@ This project provides examples for interacting with the [Sudo Decentralized Iden
 | Xcode version          | 11.2+             |
 
 ## Getting Started
-1. Run `pod install` from the project root.
+1. Run `pod install` from the project root.<br>
+*Optional:* To avoid CocoaPods version conflicts, install bundler and use `bundle install && bundle exec pod install` instead.
 2. Open `DecentralizedIdentityExample.xcworkspace` in Xcode.
 3. In Project Settings > DecentralizedIdentityExample Target > Signing & Capabilities, choose a unique bundle identifier, e.g. `yourname.DecentralizedIdentityExample`.
 3. If building to a physical device, select a Development Team from the same menu.

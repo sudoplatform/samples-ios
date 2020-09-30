@@ -8,7 +8,7 @@ target 'DecentralizedIdentityExample' do
 
   # Pods for DecentralizedIdentityExample
   pod 'SudoDecentralizedIdentity', '~> 4.0'
-  pod 'Firebase/Firestore', '~> 6.23.0'
+  pod 'Firebase/Firestore', '~> 6.33.0'
   pod 'FirebaseFirestoreSwift'
-  pod 'Firebase/Auth', '~> 6.23.0'
+  pod 'Firebase/Auth', '~> 6.33.0'
 end

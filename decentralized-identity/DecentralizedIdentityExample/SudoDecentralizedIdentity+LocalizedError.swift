@@ -58,7 +58,7 @@ extension CryptoServiceError: LocalizedError {
             return "Failed to decode packed/unpacked data: \(error)"
         case .indyError(.none):
             return "An unknown Indy error occurred"
-        case .indyError(.some(let indyCode, let message)):
+        case .indyError(.some((let indyCode, let message))):
             return message ?? "Indy error \(indyCode.rawValue)"
         }
     }

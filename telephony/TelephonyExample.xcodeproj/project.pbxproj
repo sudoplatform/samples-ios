@@ -19,13 +19,6 @@
 		AB5B9DBF240EC5D300E4E5D8 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AB5B9DBD240EC5D300E4E5D8 /* LaunchScreen.storyboard */; };
 		AB93CAD9240EF6FB0065AF50 /* ConfigurationProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB93CAD1240EF6FB0065AF50 /* ConfigurationProvider.swift */; };
 		AB93CADA240EF6FB0065AF50 /* Authenticator.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB93CAD2240EF6FB0065AF50 /* Authenticator.swift */; };
-		B3032E8824D34095001E07CF /* BuildValidationUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3032E8724D34095001E07CF /* BuildValidationUITests.swift */; };
-		B3032E8A24D35141001E07CF /* DeregisterAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3032E8924D35141001E07CF /* DeregisterAlert.swift */; };
-		B37BE82124D9C9E9004F9E54 /* SudoDetailsScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = B37BE82024D9C9E9004F9E54 /* SudoDetailsScreen.swift */; };
-		B386101724E1E35A0066FD79 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = B386101624E1E35A0066FD79 /* Constants.swift */; };
-		B3A710152476DBB10044CAD6 /* LoginScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3A710142476DBB10044CAD6 /* LoginScreen.swift */; };
-		B3A710172476DBDD0044CAD6 /* SudosScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3A710162476DBDD0044CAD6 /* SudosScreen.swift */; };
-		B3A710192476DBF60044CAD6 /* CreateSudoScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3A710182476DBF60044CAD6 /* CreateSudoScreen.swift */; };
 		C0FFFD07D8773C5490369F8E /* Pods_TelephonyExample.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 321080A2D07D770E685C7534 /* Pods_TelephonyExample.framework */; };
 		C358815624536CCB00F21192 /* UIImage+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = C358815524536CCB00F21192 /* UIImage+Extensions.swift */; };
 		CF2571BF2444EB7B0053334E /* RegistrationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF2571BE2444EB7B0053334E /* RegistrationViewController.swift */; };
@@ -39,16 +32,6 @@
 		CF76028F2485881E0090445B /* CreateVoiceCallViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF76028E2485881E0090445B /* CreateVoiceCallViewController.swift */; };
 		CF76029124858EF70090445B /* ActiveVoiceCallViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF76029024858EF70090445B /* ActiveVoiceCallViewController.swift */; };
 /* End PBXBuildFile section */
-
-/* Begin PBXContainerItemProxy section */
-		B3A7100C2475CFAB0044CAD6 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = AB5B9DA7240EC5D000E4E5D8 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = AB5B9DAE240EC5D100E4E5D8;
-			remoteInfo = TelephonyExample;
-		};
-/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		321080A2D07D770E685C7534 /* Pods_TelephonyExample.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_TelephonyExample.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -68,15 +51,6 @@
 		AB93CAD1240EF6FB0065AF50 /* ConfigurationProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConfigurationProvider.swift; sourceTree = "<group>"; };
 		AB93CAD2240EF6FB0065AF50 /* Authenticator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Authenticator.swift; sourceTree = "<group>"; };
 		AB93CAE1240EFFBE0065AF50 /* SudoTelephony.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = SudoTelephony.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		B3032E8724D34095001E07CF /* BuildValidationUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BuildValidationUITests.swift; sourceTree = "<group>"; };
-		B3032E8924D35141001E07CF /* DeregisterAlert.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeregisterAlert.swift; sourceTree = "<group>"; };
-		B37BE82024D9C9E9004F9E54 /* SudoDetailsScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SudoDetailsScreen.swift; sourceTree = "<group>"; };
-		B386101624E1E35A0066FD79 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
-		B3A710072475CFAB0044CAD6 /* TelephonyExampleUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TelephonyExampleUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		B3A7100B2475CFAB0044CAD6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		B3A710142476DBB10044CAD6 /* LoginScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginScreen.swift; sourceTree = "<group>"; };
-		B3A710162476DBDD0044CAD6 /* SudosScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SudosScreen.swift; sourceTree = "<group>"; };
-		B3A710182476DBF60044CAD6 /* CreateSudoScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateSudoScreen.swift; sourceTree = "<group>"; };
 		C358815524536CCB00F21192 /* UIImage+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIImage+Extensions.swift"; sourceTree = "<group>"; };
 		CF2571BE2444EB7B0053334E /* RegistrationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegistrationViewController.swift; sourceTree = "<group>"; };
 		CF2571C02444EBB80053334E /* SudoListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SudoListViewController.swift; sourceTree = "<group>"; };
@@ -103,13 +77,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		B3A710042475CFAB0044CAD6 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -117,7 +84,6 @@
 			isa = PBXGroup;
 			children = (
 				AB5B9DB1240EC5D100E4E5D8 /* TelephonyExample */,
-				B3A710082475CFAB0044CAD6 /* TelephonyExampleUITests */,
 				AB5B9DB0240EC5D100E4E5D8 /* Products */,
 				CB142D8F3C8CFF7109D665EA /* Pods */,
 				C5CDFF5F36907F29DC780D9A /* Frameworks */,
@@ -128,7 +94,6 @@
 			isa = PBXGroup;
 			children = (
 				AB5B9DAF240EC5D100E4E5D8 /* TelephonyExample.app */,
-				B3A710072475CFAB0044CAD6 /* TelephonyExampleUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -162,45 +127,6 @@
 				A07CC2E224B4C8BE006C891B /* VoicemailViewController.swift */,
 			);
 			path = TelephonyExample;
-			sourceTree = "<group>";
-		};
-		B3A710082475CFAB0044CAD6 /* TelephonyExampleUITests */ = {
-			isa = PBXGroup;
-			children = (
-				B3A710132476DAD70044CAD6 /* Utilities */,
-				B3A710122476DAC90044CAD6 /* Screens */,
-				B3A710112476DABE0044CAD6 /* Tests */,
-				B3A7100B2475CFAB0044CAD6 /* Info.plist */,
-			);
-			path = TelephonyExampleUITests;
-			sourceTree = "<group>";
-		};
-		B3A710112476DABE0044CAD6 /* Tests */ = {
-			isa = PBXGroup;
-			children = (
-				B3032E8724D34095001E07CF /* BuildValidationUITests.swift */,
-			);
-			path = Tests;
-			sourceTree = "<group>";
-		};
-		B3A710122476DAC90044CAD6 /* Screens */ = {
-			isa = PBXGroup;
-			children = (
-				B3A710142476DBB10044CAD6 /* LoginScreen.swift */,
-				B3A710162476DBDD0044CAD6 /* SudosScreen.swift */,
-				B3A710182476DBF60044CAD6 /* CreateSudoScreen.swift */,
-				B3032E8924D35141001E07CF /* DeregisterAlert.swift */,
-				B37BE82024D9C9E9004F9E54 /* SudoDetailsScreen.swift */,
-			);
-			path = Screens;
-			sourceTree = "<group>";
-		};
-		B3A710132476DAD70044CAD6 /* Utilities */ = {
-			isa = PBXGroup;
-			children = (
-				B386101624E1E35A0066FD79 /* Constants.swift */,
-			);
-			path = Utilities;
 			sourceTree = "<group>";
 		};
 		C5CDFF5F36907F29DC780D9A /* Frameworks */ = {
@@ -246,24 +172,6 @@
 			productReference = AB5B9DAF240EC5D100E4E5D8 /* TelephonyExample.app */;
 			productType = "com.apple.product-type.application";
 		};
-		B3A710062475CFAB0044CAD6 /* TelephonyExampleUITests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = B3A710102475CFAB0044CAD6 /* Build configuration list for PBXNativeTarget "TelephonyExampleUITests" */;
-			buildPhases = (
-				B3A710032475CFAB0044CAD6 /* Sources */,
-				B3A710042475CFAB0044CAD6 /* Frameworks */,
-				B3A710052475CFAB0044CAD6 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				B3A7100D2475CFAB0044CAD6 /* PBXTargetDependency */,
-			);
-			name = TelephonyExampleUITests;
-			productName = TelephonyExampleUITests;
-			productReference = B3A710072475CFAB0044CAD6 /* TelephonyExampleUITests.xctest */;
-			productType = "com.apple.product-type.bundle.ui-testing";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -276,10 +184,6 @@
 				TargetAttributes = {
 					AB5B9DAE240EC5D100E4E5D8 = {
 						CreatedOnToolsVersion = 11.3.1;
-					};
-					B3A710062475CFAB0044CAD6 = {
-						CreatedOnToolsVersion = 11.4;
-						TestTargetID = AB5B9DAE240EC5D100E4E5D8;
 					};
 				};
 			};
@@ -297,7 +201,6 @@
 			projectRoot = "";
 			targets = (
 				AB5B9DAE240EC5D100E4E5D8 /* TelephonyExample */,
-				B3A710062475CFAB0044CAD6 /* TelephonyExampleUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -310,13 +213,6 @@
 				AB5B9DBF240EC5D300E4E5D8 /* LaunchScreen.storyboard in Resources */,
 				AB5B9DBC240EC5D300E4E5D8 /* Assets.xcassets in Resources */,
 				AB5B9DBA240EC5D100E4E5D8 /* Main.storyboard in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		B3A710052475CFAB0044CAD6 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -409,29 +305,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		B3A710032475CFAB0044CAD6 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				B386101724E1E35A0066FD79 /* Constants.swift in Sources */,
-				B3A710152476DBB10044CAD6 /* LoginScreen.swift in Sources */,
-				B3032E8A24D35141001E07CF /* DeregisterAlert.swift in Sources */,
-				B3032E8824D34095001E07CF /* BuildValidationUITests.swift in Sources */,
-				B3A710172476DBDD0044CAD6 /* SudosScreen.swift in Sources */,
-				B37BE82124D9C9E9004F9E54 /* SudoDetailsScreen.swift in Sources */,
-				B3A710192476DBF60044CAD6 /* CreateSudoScreen.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXSourcesBuildPhase section */
-
-/* Begin PBXTargetDependency section */
-		B3A7100D2475CFAB0044CAD6 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = AB5B9DAE240EC5D100E4E5D8 /* TelephonyExample */;
-			targetProxy = B3A7100C2475CFAB0044CAD6 /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		AB5B9DB8240EC5D100E4E5D8 /* Main.storyboard */ = {
@@ -607,46 +481,6 @@
 			};
 			name = Release;
 		};
-		B3A7100E2475CFAB0044CAD6 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = "";
-				INFOPLIST_FILE = TelephonyExampleUITests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.ChipOrgIdentifier.TelephonyExampleUITests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = TelephonyExample;
-			};
-			name = Debug;
-		};
-		B3A7100F2475CFAB0044CAD6 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = "";
-				INFOPLIST_FILE = TelephonyExampleUITests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.ChipOrgIdentifier.TelephonyExampleUITests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = TelephonyExample;
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -664,15 +498,6 @@
 			buildConfigurations = (
 				AB5B9DC4240EC5D300E4E5D8 /* Debug */,
 				AB5B9DC5240EC5D300E4E5D8 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		B3A710102475CFAB0044CAD6 /* Build configuration list for PBXNativeTarget "TelephonyExampleUITests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				B3A7100E2475CFAB0044CAD6 /* Debug */,
-				B3A7100F2475CFAB0044CAD6 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

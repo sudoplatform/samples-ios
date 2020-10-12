@@ -64,6 +64,10 @@
 		9557447E24A5C0320057A845 /* RegistrationViewControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9557447D24A5C0320057A845 /* RegistrationViewControllerTests.swift */; };
 		9557448124A5C1120057A845 /* EmailExampleTestUtility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9557448024A5C1120057A845 /* EmailExampleTestUtility.swift */; };
 		9557448424A5C2BD0057A845 /* SudoProfilesClientMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9557448324A5C2BD0057A845 /* SudoProfilesClientMock.swift */; };
+		9566E3CD2505E8E2002A2DD3 /* CreateEmailAddressViewControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9566E3CC2505E8E2002A2DD3 /* CreateEmailAddressViewControllerTests.swift */; };
+		9566E3D025084FB9002A2DD3 /* EmailAddressListViewControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9566E3CF25084FB9002A2DD3 /* EmailAddressListViewControllerTests.swift */; };
+		9566E3D42509ABFD002A2DD3 /* SudoListViewControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9566E3D32509ABFD002A2DD3 /* SudoListViewControllerTests.swift */; };
+		9566E3D72509F638002A2DD3 /* CreateSudoViewControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9566E3D62509F638002A2DD3 /* CreateSudoViewControllerTests.swift */; };
 		95C0CDFE24A9A1570024BFBB /* SudoEmailClientSpy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95C0CDFD24A9A1570024BFBB /* SudoEmailClientSpy.swift */; };
 		95C0CE0024A9A6230024BFBB /* SudoEmailClientMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95C0CDFF24A9A6230024BFBB /* SudoEmailClientMock.swift */; };
 		95C0CE0224AAAECC0024BFBB /* XCTestCase+CustomAssertions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95C0CE0124AAAECC0024BFBB /* XCTestCase+CustomAssertions.swift */; };
@@ -162,6 +166,10 @@
 		9557447D24A5C0320057A845 /* RegistrationViewControllerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegistrationViewControllerTests.swift; sourceTree = "<group>"; };
 		9557448024A5C1120057A845 /* EmailExampleTestUtility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmailExampleTestUtility.swift; sourceTree = "<group>"; };
 		9557448324A5C2BD0057A845 /* SudoProfilesClientMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SudoProfilesClientMock.swift; sourceTree = "<group>"; };
+		9566E3CC2505E8E2002A2DD3 /* CreateEmailAddressViewControllerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateEmailAddressViewControllerTests.swift; sourceTree = "<group>"; };
+		9566E3CF25084FB9002A2DD3 /* EmailAddressListViewControllerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmailAddressListViewControllerTests.swift; sourceTree = "<group>"; };
+		9566E3D32509ABFD002A2DD3 /* SudoListViewControllerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SudoListViewControllerTests.swift; sourceTree = "<group>"; };
+		9566E3D62509F638002A2DD3 /* CreateSudoViewControllerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateSudoViewControllerTests.swift; sourceTree = "<group>"; };
 		95C0CDFD24A9A1570024BFBB /* SudoEmailClientSpy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SudoEmailClientSpy.swift; sourceTree = "<group>"; };
 		95C0CDFF24A9A6230024BFBB /* SudoEmailClientMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SudoEmailClientMock.swift; sourceTree = "<group>"; };
 		95C0CE0124AAAECC0024BFBB /* XCTestCase+CustomAssertions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "XCTestCase+CustomAssertions.swift"; sourceTree = "<group>"; };
@@ -494,13 +502,6 @@
 			path = "Email Messages";
 			sourceTree = "<group>";
 		};
-		84A4560324B59897002DBF0D /* Email Addresses */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = "Email Addresses";
-			sourceTree = "<group>";
-		};
 		84A4560424B598AD002DBF0D /* Main Menu */ = {
 			isa = PBXGroup;
 			children = (
@@ -514,13 +515,6 @@
 				9557447D24A5C0320057A845 /* RegistrationViewControllerTests.swift */,
 			);
 			path = Registration;
-			sourceTree = "<group>";
-		};
-		84A4560624B598B8002DBF0D /* Sudos */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Sudos;
 			sourceTree = "<group>";
 		};
 		84A4560724B598D6002DBF0D /* ReadEmailMessage */ = {
@@ -597,11 +591,11 @@
 		9557447C24A5BFA60057A845 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				84A4560324B59897002DBF0D /* Email Addresses */,
+				9566E3CA2505E84F002A2DD3 /* Email Addresses */,
 				84A4560224B5988A002DBF0D /* Email Messages */,
 				84A4560424B598AD002DBF0D /* Main Menu */,
 				84A4560524B598B5002DBF0D /* Registration */,
-				84A4560624B598B8002DBF0D /* Sudos */,
+				9566E3D12509ABAA002A2DD3 /* Sudos */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -630,6 +624,56 @@
 				8483150A24B82113004E89EA /* UITableViewMockSpy.swift */,
 			);
 			path = Mocks;
+			sourceTree = "<group>";
+		};
+		9566E3CA2505E84F002A2DD3 /* Email Addresses */ = {
+			isa = PBXGroup;
+			children = (
+				9566E3CB2505E882002A2DD3 /* CreateEmailAddress */,
+				9566E3CE25084F6C002A2DD3 /* EmailAddressList */,
+			);
+			path = "Email Addresses";
+			sourceTree = "<group>";
+		};
+		9566E3CB2505E882002A2DD3 /* CreateEmailAddress */ = {
+			isa = PBXGroup;
+			children = (
+				9566E3CC2505E8E2002A2DD3 /* CreateEmailAddressViewControllerTests.swift */,
+			);
+			path = CreateEmailAddress;
+			sourceTree = "<group>";
+		};
+		9566E3CE25084F6C002A2DD3 /* EmailAddressList */ = {
+			isa = PBXGroup;
+			children = (
+				9566E3CF25084FB9002A2DD3 /* EmailAddressListViewControllerTests.swift */,
+			);
+			path = EmailAddressList;
+			sourceTree = "<group>";
+		};
+		9566E3D12509ABAA002A2DD3 /* Sudos */ = {
+			isa = PBXGroup;
+			children = (
+				9566E3D52509F60A002A2DD3 /* CreateSudo */,
+				9566E3D22509ABBC002A2DD3 /* SudoList */,
+			);
+			path = Sudos;
+			sourceTree = "<group>";
+		};
+		9566E3D22509ABBC002A2DD3 /* SudoList */ = {
+			isa = PBXGroup;
+			children = (
+				9566E3D32509ABFD002A2DD3 /* SudoListViewControllerTests.swift */,
+			);
+			path = SudoList;
+			sourceTree = "<group>";
+		};
+		9566E3D52509F60A002A2DD3 /* CreateSudo */ = {
+			isa = PBXGroup;
+			children = (
+				9566E3D62509F638002A2DD3 /* CreateSudoViewControllerTests.swift */,
+			);
+			path = CreateSudo;
 			sourceTree = "<group>";
 		};
 		95C0CDFC24A9A1330024BFBB /* Spies */ = {
@@ -958,10 +1002,13 @@
 				8483152224BC3B11004E89EA /* AnyError.swift in Sources */,
 				848314EA24B7E564004E89EA /* AuthenticatorMock.swift in Sources */,
 				8403255F24C51C000049C403 /* AuthenticatorTests.swift in Sources */,
+				9566E3CD2505E8E2002A2DD3 /* CreateEmailAddressViewControllerTests.swift in Sources */,
+				9566E3D72509F638002A2DD3 /* CreateSudoViewControllerTests.swift in Sources */,
 				847EF2C424BE799000423B74 /* DataFactory+EmailSDK.swift in Sources */,
 				84770AC324C9020200FC8C8D /* DataFactory+TestData.swift in Sources */,
 				847EF2C224BE796F00423B74 /* DataFactoryNamespace.swift in Sources */,
 				847EF2D024BFE5EB00423B74 /* DateLabelTests.swift in Sources */,
+				9566E3D025084FB9002A2DD3 /* EmailAddressListViewControllerTests.swift in Sources */,
 				9557448124A5C1120057A845 /* EmailExampleTestUtility.swift in Sources */,
 				847EF2C024BE790C00423B74 /* EmailMessage+CreatedDescendingTests.swift in Sources */,
 				84A4560B24B59916002DBF0D /* EmailMessageListViewControllerTests.swift in Sources */,
@@ -975,6 +1022,7 @@
 				67C8208024B2AEDD00E5D113 /* SendEmailMessageViewControllerTests.swift in Sources */,
 				95C0CE0024A9A6230024BFBB /* SudoEmailClientMock.swift in Sources */,
 				95C0CDFE24A9A1570024BFBB /* SudoEmailClientSpy.swift in Sources */,
+				9566E3D42509ABFD002A2DD3 /* SudoListViewControllerTests.swift in Sources */,
 				9557448424A5C2BD0057A845 /* SudoProfilesClientMock.swift in Sources */,
 				8483150D24B82BC7004E89EA /* UITableViewCellMockSpy.swift in Sources */,
 				8483150B24B82113004E89EA /* UITableViewMockSpy.swift in Sources */,

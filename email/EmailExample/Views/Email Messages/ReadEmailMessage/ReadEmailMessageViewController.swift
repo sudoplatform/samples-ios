@@ -63,26 +63,20 @@ class ReadEmailMessageViewController: UIViewController, ActivityAlertViewControl
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        guard let emailMessage = emailMessage, !emailMessage.address.isEmpty else {
-            presentErrorAlert(
-                message: "An error has occurred: no email address found",
-                okHandler: { _ in
-                    self.performSegue(withIdentifier: Segue.returnToEmailMessageList.rawValue, sender: self)
-                }
-            )
+        guard let emailMessage = emailMessage else {
+            presentErrorAlert(message: "An error has occurred: no email message found") { _ in
+                self.performSegue(withIdentifier: Segue.returnToEmailMessageList.rawValue, sender: self)
+            }
             return
         }
-        guard let emailAddress = emailAddress, !emailAddress.address.isEmpty else {
-            presentErrorAlert(
-                message: "An error has occurred: no email address found",
-                okHandler: { _ in
-                    self.performSegue(withIdentifier: Segue.returnToEmailMessageList.rawValue, sender: self)
-                }
-            )
+        guard let emailAddress = emailAddress, !emailAddress.emailAddress.isEmpty else {
+            presentErrorAlert(message: "An error has occurred: no email address found") { _ in
+                self.performSegue(withIdentifier: Segue.returnToEmailMessageList.rawValue, sender: self)
+            }
             return
         }
         if !messageLoaded {
-            loadEmailMessage(emailMessage, emailAddress: emailAddress)
+            loadEmailMessage(emailMessage)
         }
     }
 
@@ -163,7 +157,7 @@ class ReadEmailMessageViewController: UIViewController, ActivityAlertViewControl
     /// Firstly, attempts to load the email message via a remote call.
     ///
     /// On any failure, a "Failed to get Email Message" UIAlert message will be presented to the user.
-    func loadEmailMessage(_ message: EmailMessage, emailAddress: EmailAddress) {
+    func loadEmailMessage(_ message: EmailMessage) {
         presentCancellableActivityAlert(message: "Loading", delegate: self) {
             self.readEmailMessage(
                 messageId: message.id,
@@ -185,7 +179,7 @@ class ReadEmailMessageViewController: UIViewController, ActivityAlertViewControl
                         let toLabels: [UILabel] = message.to.map {
                             let label = UILabel()
                             label.font = UIFont.systemFont(ofSize: 14.0)
-                            label.text = $0
+                            label.text = $0.displayName ?? $0.address
                             label.adjustsFontSizeToFitWidth = true
                             label.minimumScaleFactor = 0.7
                             return label
@@ -193,12 +187,12 @@ class ReadEmailMessageViewController: UIViewController, ActivityAlertViewControl
                         let ccLabels: [UILabel] = message.cc.map {
                             let label = UILabel()
                             label.font = UIFont.systemFont(ofSize: 14.0)
-                            label.text = $0
+                            label.text = $0.displayName ?? $0.address
                             label.adjustsFontSizeToFitWidth = true
                             label.minimumScaleFactor = 0.7
                             return label
                         }
-                        weakSelf.fromLabel.text = message.from.first
+                        weakSelf.fromLabel.text = message.from.first?.displayName ?? message.from.first?.address
                         toLabels.forEach {
                             weakSelf.toMessageStackView.addArrangedSubview($0)
                         }
@@ -227,11 +221,11 @@ class ReadEmailMessageViewController: UIViewController, ActivityAlertViewControl
     func constructReplyInput() -> SendEmailInputData? {
         var replyTo = ""
         if !emailMessage.from.isEmpty {
-            replyTo = emailMessage.from.joined(separator: ", ")
+            replyTo = RFC822Util.toRfc822Address(messageAddresses: emailMessage.from)
         }
         var replyCc = ""
         if !emailMessage.cc.isEmpty {
-            replyCc = emailMessage.cc.joined(separator: ", ")
+            replyCc = RFC822Util.toRfc822Address(messageAddresses: emailMessage.to)
         }
         var replySubject = ""
         if let subject = emailMessage.subject {

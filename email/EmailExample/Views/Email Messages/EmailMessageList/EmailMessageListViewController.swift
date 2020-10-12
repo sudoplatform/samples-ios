@@ -141,7 +141,22 @@ class EmailMessageListViewController: UIViewController, UITableViewDataSource, U
         success: EmailMessageListSuccessCompletion? = nil,
         failure: EmailMessageListErrorCompletion? = nil
     ) {
-        emailClient.listEmailMessagesWithFilter(nil, limit: Defaults.emailListLimit, nextToken: nil, cachePolicy: cachePolicy) { result in
+        var sudoId: String?
+        var emailAddressId: String?
+        if let emailAddress = emailAddress {
+            sudoId = emailAddress.sudoId
+            emailAddressId = emailAddress.id
+        } else {
+            NSLog("Email address could not be found")
+        }
+        emailClient.listEmailMessagesWithSudoId(
+            sudoId,
+            emailAddressId: emailAddressId,
+            filter: nil,
+            limit: Defaults.emailListLimit,
+            nextToken: nil,
+            cachePolicy: cachePolicy
+        ) { result in
             switch result {
             case let .success(output):
                 success?(output.items)
@@ -169,7 +184,7 @@ class EmailMessageListViewController: UIViewController, UITableViewDataSource, U
     }
 
     func subscribeToAllEmailMessagesCreated() throws {
-        allEmailMessagesCreatedSubscriptionToken = try emailClient.subscribeToEmailMessageCreated { [weak self] result in
+        allEmailMessagesCreatedSubscriptionToken = try emailClient.subscribeToEmailMessageCreated(withDirection: nil) { [weak self] result in
             guard let weakSelf = self else { return }
             switch result {
             case .success:
@@ -177,7 +192,7 @@ class EmailMessageListViewController: UIViewController, UITableViewDataSource, U
                     cachePolicy: .remoteOnly,
                     success: { messages in
                         DispatchQueue.main.async {
-                            let emailAddress = weakSelf.emailAddress?.address ?? ""
+                            let emailAddress = weakSelf.emailAddress?.emailAddress ?? ""
                             let sortedMessages = weakSelf
                                 .filterEmailMessages(messages, withEmailAddress: emailAddress)
                                 .sortedByCreatedDescending()
@@ -204,7 +219,7 @@ class EmailMessageListViewController: UIViewController, UITableViewDataSource, U
                     cachePolicy: .remoteOnly,
                     success: { messages in
                         DispatchQueue.main.async {
-                            let emailAddress = weakSelf.emailAddress?.address ?? ""
+                            let emailAddress = weakSelf.emailAddress?.emailAddress ?? ""
                             let sortedMessages = weakSelf
                                 .filterEmailMessages(messages, withEmailAddress: emailAddress)
                                 .sortedByCreatedDescending()
@@ -258,7 +273,7 @@ class EmailMessageListViewController: UIViewController, UITableViewDataSource, U
         /// Called to handle filtering success result and updating data.
         let filterCompletion: (([EmailMessage]) -> Void) = { [weak self] messages in
             guard let weakSelf = self else { return }
-            let emailAddress = weakSelf.emailAddress?.address ?? ""
+            let emailAddress = weakSelf.emailAddress?.emailAddress ?? ""
             let sortedMessages = weakSelf
                 .filterEmailMessages(messages, withEmailAddress: emailAddress)
                 .sortedByCreatedDescending()
@@ -291,7 +306,7 @@ class EmailMessageListViewController: UIViewController, UITableViewDataSource, U
         guard let emailAddress = emailAddress else {
             return false
         }
-        return !emailAddress.address.isEmpty
+        return !emailAddress.emailAddress.isEmpty
     }
 
     /// Filter a list of email messages by an email address.
@@ -304,11 +319,12 @@ class EmailMessageListViewController: UIViewController, UITableViewDataSource, U
     /// - Returns: Filtered email messages.
     func filterEmailMessages(_ emailMessages: [EmailMessage], withEmailAddress address: String) -> [EmailMessage] {
         return emailMessages
-            .filter {
-                $0.address == address
-                || $0.to.contains(address)
-                || $0.cc.contains(address)
-                || $0.bcc.contains(address)
+            .filter { message in
+                let to = message.to.map(\.address)
+                let from = message.from.map(\.address)
+                let cc = message.cc.map(\.address)
+                let bcc = message.bcc.map(\.address)
+                return to.contains(address) || from.contains(address) || cc.contains(address) || bcc.contains(address)
             }
     }
 

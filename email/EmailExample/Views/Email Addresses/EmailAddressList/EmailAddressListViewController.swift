@@ -133,7 +133,19 @@ class EmailAddressListViewController: UIViewController, UITableViewDataSource, U
         success: EmailAddressListSuccessCompletion? = nil,
         failure: EmailAddressListErrorCompletion? = nil
     ) {
-        emailClient.listEmailAddressesWithFilter(nil, limit: Defaults.emailListLimit, nextToken: nil, cachePolicy: cachePolicy) { result in
+        var sudoId: String?
+        if let id = sudo.id {
+            sudoId = id
+        } else {
+            NSLog("No sudo id found when attempting to list email addresses")
+        }
+        emailClient.listEmailAddressesWithSudoId(
+            sudoId,
+            filter: nil,
+            limit: Defaults.emailListLimit,
+            nextToken: nil,
+            cachePolicy: cachePolicy
+        ) { result in
             switch result {
             case let .success(output):
                 success?(output.items)
@@ -143,9 +155,9 @@ class EmailAddressListViewController: UIViewController, UITableViewDataSource, U
         }
     }
 
-    func deleteEmailAddress(_ address: String, _ completion: @escaping (Result<EmailAddress, Error>) -> Void) {
+    func deleteEmailAddressWithId(_ id: String, _ completion: @escaping (Result<EmailAddress, Error>) -> Void) {
         presentActivityAlert(message: "Deleting Email Address")
-        emailClient.deprovisionEmailAddress(address) { [weak self] result in
+        emailClient.deprovisionEmailAddressWithId(id) { [weak self] result in
             DispatchQueue.main.async {
                 switch result {
                 case .success:
@@ -237,7 +249,7 @@ class EmailAddressListViewController: UIViewController, UITableViewDataSource, U
         } else {
             let emailAddress = emailAddresses[indexPath.row]
             cell = tableView.dequeueReusableCell(withIdentifier: "default", for: indexPath)
-            cell.textLabel?.text = emailAddress.address
+            cell.textLabel?.text = emailAddress.emailAddress
             cell.textLabel?.minimumScaleFactor = 0.7
             cell.textLabel?.adjustsFontSizeToFitWidth = true
             cell.accessoryType = .disclosureIndicator
@@ -258,7 +270,7 @@ class EmailAddressListViewController: UIViewController, UITableViewDataSource, U
     }
 
     func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
-        guard indexPath.row != emailAddresses.count else {
+        guard indexPath.row < emailAddresses.count else {
             return nil
         }
         let cancel = UIContextualAction(style: .destructive, title: "Delete") { _, _, completion in
@@ -267,7 +279,7 @@ class EmailAddressListViewController: UIViewController, UITableViewDataSource, U
             DispatchQueue.main.async {
                 tableView.reloadData()
             }
-            self.deleteEmailAddress(emailAddress.address, { [weak self] result in
+            self.deleteEmailAddressWithId(emailAddress.id, { [weak self] result in
                 guard let weakSelf = self else { return }
                 switch result {
                 case .success:

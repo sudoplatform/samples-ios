@@ -89,7 +89,7 @@ class SendEmailMessageViewController: UIViewController, UITextViewDelegate, UITa
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        guard emailAddress?.address != nil else {
+        guard emailAddress?.emailAddress != nil else {
             presentErrorAlert(message: "An error has occurred: no email address found") { _ in
                 self.performSegue(withIdentifier: Segue.returnToEmailMessageList.rawValue, sender: self)
             }
@@ -114,7 +114,8 @@ class SendEmailMessageViewController: UIViewController, UITextViewDelegate, UITa
     // MARK: - Actions
 
     @objc func didTapSendEmailButton() {
-        let address = emailAddress.address
+        let emailAddressId = emailAddress.id
+        let from = emailAddress.emailAddress
         guard
             let to = formData[.to],
             !to.isEmpty,
@@ -146,7 +147,7 @@ class SendEmailMessageViewController: UIViewController, UITextViewDelegate, UITa
             return
         }
         let message = BasicRFC822Message(
-            from: address,
+            from: from,
             to: addressesToArray(to),
             cc: addressesToArray(cc),
             bcc: addressesToArray(bcc),
@@ -158,14 +159,14 @@ class SendEmailMessageViewController: UIViewController, UITextViewDelegate, UITa
             presentErrorAlert(message: "Unable to marshall email message data")
             return
         }
-        self.sendEmailMessage(data, address: address)
+        self.sendEmailMessage(data, emailAddressId: emailAddressId)
     }
 
     // MARK: - Utilities
 
-    func sendEmailMessage(_ data: Data, address: String) {
+    func sendEmailMessage(_ data: Data, emailAddressId: String) {
         presentActivityAlert(message: "Sending Email Message")
-        self.emailClient.sendEmailMessage(withRFC822Data: data, senderEmailAddress: address) { [weak self] result in
+        self.emailClient.sendEmailMessage(withRFC822Data: data, emailAddressId: emailAddressId) { [weak self] result in
             DispatchQueue.main.async {
                 switch result {
                 case .success:
@@ -201,10 +202,17 @@ class SendEmailMessageViewController: UIViewController, UITextViewDelegate, UITa
     }
 
     func validateEmail(_ address: String) -> Bool {
-        guard let regex = try? NSRegularExpression(pattern: "^.+@[^.].*.[a-z]{2,}$") else {
+        guard let addressSpecValidator = try? NSRegularExpression(pattern: "^.+@[^.].*.[a-z]{2,}$") else {
             return false
         }
-        return regex.firstMatch(in: address, options: [], range: NSRange(location: 0, length: address.count)) != nil
+        guard let rfc822AddressValidator = try? NSRegularExpression(pattern: "^.*<.+@[^.].*.[a-z]{2,}>$") else {
+            return false
+        }
+        if address.contains(" ") {
+            return rfc822AddressValidator.firstMatch(in: address, options: [], range: NSRange(location: 0, length: address.count)) != nil
+        } else {
+            return addressSpecValidator.firstMatch(in: address, options: [], range: NSRange(location: 0, length: address.count)) != nil
+        }
     }
 
     // MARK: - Helpers: Configuration

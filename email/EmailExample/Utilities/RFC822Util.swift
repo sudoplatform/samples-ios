@@ -6,6 +6,7 @@
 
 import Foundation
 import MimeParser
+import SudoEmail
 
 enum RFC822Error: Error, LocalizedError, Equatable {
     case mimeParserError
@@ -149,4 +150,17 @@ class RFC822Util {
         }
         return body
     }
+
+    static func toRfc822Address(messageAddresses: [EmailMessage.EmailAddress]) -> String {
+        var rfc822Address: [String] = []
+        messageAddresses.forEach {
+            if let displayName = $0.displayName {
+                rfc822Address.append(displayName + " <\($0.address)>")
+            } else {
+                rfc822Address.append($0.address)
+            }
+        }
+        return rfc822Address.joined(separator: ", ")
+    }
+
 }

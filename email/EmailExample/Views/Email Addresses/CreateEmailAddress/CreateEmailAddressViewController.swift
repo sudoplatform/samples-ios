@@ -29,11 +29,23 @@ class CreateEmailAddressViewController: UIViewController,
 
     // MARK: - Supplementary
 
-    /// Typealias for a successful response call to `SudoEmailClient.getEmailAddresssWithFilter(_:limit:nextToken:cachePolicy:completion:)`.
-       typealias ProvisionEmailAddressSuccessCompletion = (EmailAddress) -> Void
+    /// Typealias for a successful response call to `SudoEmailClient.provisionEmailAddress(_:address:sudoId:completion:)`.
+    typealias ProvisionEmailAddressSuccessCompletion = (EmailAddress) -> Void
 
-       /// Typealias for a error response call to `SudoEmailClient.getEmailAddresssWithFilter(_:limit:nextToken:cachePolicy:completion:)`.
-       typealias ProvisionEmailAddressErrorCompletion = (Error) -> Void
+    /// Typealias for a error response call to `SudoEmailClient.provisionEmailAddresss(_:address:sudoId:completion:)`.
+    typealias ProvisionEmailAddressErrorCompletion = (Error) -> Void
+
+    /// Typealias for a successful response call to `SudoEmailClient.getSupportedEmailDomainsWithCachePolicy(_:cachePolicy:completion:)`.
+    typealias GetSupportedDomainsSuccessCompletion = ([String]) -> Void
+
+    /// Typealias for a error response call to `SudoEmailClient.getSupportedEmailDomainsWithCachePolicy(_:cachePolicy:completion:)`.
+    typealias GetSupportedDomainsErrorCompletion = (Error) -> Void
+
+    /// Typealias for a successful response call to `SudoEmailClient.checkEmailAddressAvailabilityWithLocalParts(_:localParts:domains:completion:)`.
+    typealias AddressAvailabilitySuccessCompletion = ([String]) -> Void
+
+    /// Typealias for a error response call to `SudoEmailClient.checkEmailAddressAvailabilityWithLocalParts(_:localParts:domains:completion:)`.
+    typealias AddressAvailabilityErrorCompletion = (Error) -> Void
 
     enum Segue: String {
         case returnToEmailAddressList
@@ -68,27 +80,33 @@ class CreateEmailAddressViewController: UIViewController,
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         presentCancellableActivityAlert(message: "Loading", delegate: self) {
-            self.emailClient.getSupportedEmailDomainsWithCachePolicy(.remoteOnly) { [weak self] result in
+            let failureCompletion: AddressAvailabilityErrorCompletion = { [weak self] error in
                 DispatchQueue.main.async {
-                    guard let weakSelf = self else { return }
-                    switch result {
-                    case let .failure(error):
-                        weakSelf.dismissActivityAlert {
-                            weakSelf.presentErrorAlert(message: "Error loading view: \(error.localizedDescription)")
-                        }
-                    case let .success(domains):
-                        guard let domain = domains.first else {
-                            weakSelf.dismissActivityAlert {
-                                weakSelf.presentErrorAlert(message: "Error loading view: No supported domains available")
-                            }
-                            return
-                        }
-                        weakSelf.potentialAddresses = weakSelf.generateAddressesForDomain(domain)
-                        weakSelf.tableView.reloadData()
-                        weakSelf.dismissActivityAlert()
-                    }
+                    self?.dismissActivityAlert()
+                    self?.presentErrorAlert(message: "Error loading view: \(error.localizedDescription)")
                 }
             }
+            let localParts = self.generateLocalParts()
+            self.getSupportedEmailDomains(
+                cachePolicy: .cacheOnly,
+                success: { [weak self] domains in
+                    guard let weakSelf = self else { return }
+                    weakSelf.checkEmailAddressAvailability(
+                        localParts: localParts,
+                        domains: domains,
+                        success: { [weak self] emailAddresses in
+                            DispatchQueue.main.async {
+                                guard let weakSelf = self else { return }
+                                weakSelf.potentialAddresses = emailAddresses
+                                weakSelf.tableView.reloadData()
+                                weakSelf.dismissActivityAlert()
+                            }
+                        },
+                        failure: failureCompletion
+                    )
+                },
+                failure: failureCompletion
+            )
         }
     }
 
@@ -103,6 +121,37 @@ class CreateEmailAddressViewController: UIViewController,
             switch result {
             case let .success(address):
                 success(address)
+            case let .failure(error):
+                failure(error)
+            }
+        }
+    }
+
+    func getSupportedEmailDomains(
+        cachePolicy: CachePolicy,
+        success: @escaping GetSupportedDomainsSuccessCompletion,
+        failure: @escaping GetSupportedDomainsErrorCompletion
+    ) {
+        emailClient.getSupportedEmailDomainsWithCachePolicy(cachePolicy) { result in
+            switch result {
+            case let .success(domains):
+                success(domains)
+            case let .failure(error):
+                failure(error)
+            }
+        }
+    }
+
+    func checkEmailAddressAvailability(
+        localParts: [String],
+        domains: [String],
+        success: @escaping AddressAvailabilitySuccessCompletion,
+        failure: @escaping AddressAvailabilityErrorCompletion
+    ) {
+        emailClient.checkEmailAddressAvailabilityWithLocalParts(localParts, domains: domains) { result in
+            switch result {
+            case let .success(addresses):
+                success(addresses)
             case let .failure(error):
                 failure(error)
             }
@@ -152,9 +201,9 @@ class CreateEmailAddressViewController: UIViewController,
 
     // MARK: - Helpers
 
-    func generateAddressesForDomain(_ domain: String, count: Int = 5) -> [String] {
+    func generateLocalParts(count: Int = 5) -> [String] {
         return [String](repeating: "", count: count).map { _ in
-            "\(String(UUID().uuidString.prefix(8).lowercased()))@\(domain)"
+            "\(String(UUID().uuidString.prefix(8).lowercased()))"
         }
     }
 

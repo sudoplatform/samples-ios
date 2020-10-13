@@ -257,7 +257,13 @@ class TransactionDetailViewController: UIViewController, UITableViewDataSource, 
     func generalSectionFromTransaction(_ transaction: Transaction) -> [CellData] {
         let merchantCell = CellData(title: "Merchant", value: transaction.description)
         let statusCell = CellData(title: "Status", value: String(describing: transaction.type))
-        return [merchantCell, statusCell]
+        if transaction.type == .decline {
+            let declineReason = transaction.declineReason ?? Transaction.DeclineReason.declined
+            let declineReasonCell = CellData(title: "Decline Reason", value: String(describing: declineReason))
+            return [merchantCell, statusCell, declineReasonCell]
+        } else {
+            return [merchantCell, statusCell]
+        }
     }
 
     func amountSectionFromTransaction(_ transaction: Transaction) -> [CellData] {

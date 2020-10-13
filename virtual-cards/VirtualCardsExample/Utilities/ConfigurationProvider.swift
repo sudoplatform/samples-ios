@@ -37,6 +37,9 @@ class KeyAuthenticationInfo: AuthenticationInfo {
         return jwt
     }
 
+    func getUsername() -> String {
+        return ""
+    }
 }
 
 class KeyAuthenticationProvider: AuthenticationProvider {

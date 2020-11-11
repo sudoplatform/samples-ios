@@ -63,7 +63,7 @@ class SendEmailMessageViewController: UIViewController, UITextViewDelegate, UITa
     /// Array of input fields used on the view.
     let inputFields: [InputField] = InputField.allCases
 
-    /// Inputted form data. Initialized with default data.
+    /// Form data entered by user   . Initialized with default data.
     var formData: [InputField: String] = {
         return InputField.allCases.reduce([:], { accumulator, field in
             var accumulator = accumulator

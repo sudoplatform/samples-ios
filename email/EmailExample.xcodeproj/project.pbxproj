@@ -24,6 +24,8 @@
 		840D86D3249315C8008E4BE5 /* EmailAddressListViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 840D86D1249315C8008E4BE5 /* EmailAddressListViewController.xib */; };
 		840D86D924932C8A008E4BE5 /* CreateEmailAddressViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 840D86D724932C8A008E4BE5 /* CreateEmailAddressViewController.swift */; };
 		840D86DA24932C8A008E4BE5 /* CreateEmailAddressViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 840D86D824932C8A008E4BE5 /* CreateEmailAddressViewController.xib */; };
+		8412525F2533D7A100C98ED3 /* InputFormTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8412525D2533D7A100C98ED3 /* InputFormTableViewCell.xib */; };
+		841252602533D7A100C98ED3 /* InputFormTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8412525E2533D7A100C98ED3 /* InputFormTableViewCell.swift */; };
 		8428891C249AE3EB00D39E6C /* ReadEmailMessageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8428891A249AE3EB00D39E6C /* ReadEmailMessageViewController.swift */; };
 		8428891D249AE3EB00D39E6C /* ReadEmailMessageViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8428891B249AE3EB00D39E6C /* ReadEmailMessageViewController.xib */; };
 		84288920249AE44F00D39E6C /* SendEmailMessageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8428891E249AE44F00D39E6C /* SendEmailMessageViewController.swift */; };
@@ -125,6 +127,8 @@
 		840D86D1249315C8008E4BE5 /* EmailAddressListViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = EmailAddressListViewController.xib; sourceTree = "<group>"; };
 		840D86D724932C8A008E4BE5 /* CreateEmailAddressViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateEmailAddressViewController.swift; sourceTree = "<group>"; };
 		840D86D824932C8A008E4BE5 /* CreateEmailAddressViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = CreateEmailAddressViewController.xib; sourceTree = "<group>"; };
+		8412525D2533D7A100C98ED3 /* InputFormTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = InputFormTableViewCell.xib; sourceTree = "<group>"; };
+		8412525E2533D7A100C98ED3 /* InputFormTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InputFormTableViewCell.swift; sourceTree = "<group>"; };
 		8428891A249AE3EB00D39E6C /* ReadEmailMessageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadEmailMessageViewController.swift; sourceTree = "<group>"; };
 		8428891B249AE3EB00D39E6C /* ReadEmailMessageViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ReadEmailMessageViewController.xib; sourceTree = "<group>"; };
 		8428891E249AE44F00D39E6C /* SendEmailMessageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SendEmailMessageViewController.swift; sourceTree = "<group>"; };
@@ -332,6 +336,15 @@
 			path = CreateEmailAddress;
 			sourceTree = "<group>";
 		};
+		841252582533D70900C98ED3 /* InputFormTableViewCell */ = {
+			isa = PBXGroup;
+			children = (
+				8412525E2533D7A100C98ED3 /* InputFormTableViewCell.swift */,
+				8412525D2533D7A100C98ED3 /* InputFormTableViewCell.xib */,
+			);
+			path = InputFormTableViewCell;
+			sourceTree = "<group>";
+		};
 		84309D5D2463FFC900F48ECC /* LearnMoreView */ = {
 			isa = PBXGroup;
 			children = (
@@ -399,6 +412,7 @@
 			children = (
 				845A8B31246E538D00FAFB42 /* ActivityAlertViewController */,
 				847EF2C924BFE46000423B74 /* DateLabel */,
+				841252582533D70900C98ED3 /* InputFormTableViewCell */,
 				84309D5D2463FFC900F48ECC /* LearnMoreView */,
 			);
 			path = UI;
@@ -807,7 +821,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 1140;
-				LastUpgradeCheck = 1130;
+				LastUpgradeCheck = 1210;
 				ORGANIZATIONNAME = "Anonyome Labs";
 				TargetAttributes = {
 					84077A27245A9053004186BE = {
@@ -863,6 +877,7 @@
 				67014B5924983E77008733E8 /* EmailMessageListViewController.xib in Resources */,
 				67014B60249AC360008733E8 /* EmailMessageTableViewCell.xib in Resources */,
 				84EC6CB224C169E3008FDED4 /* HeaderTableViewCell.xib in Resources */,
+				8412525F2533D7A100C98ED3 /* InputFormTableViewCell.xib in Resources */,
 				AB5B9DBF240EC5D300E4E5D8 /* LaunchScreen.storyboard in Resources */,
 				84309D612463FFF900F48ECC /* LearnMoreView.xib in Resources */,
 				AB5B9DBA240EC5D100E4E5D8 /* Main.storyboard in Resources */,
@@ -1052,6 +1067,7 @@
 				67014B62249AC482008733E8 /* EmailMessageTableViewCell.swift in Sources */,
 				8403256324C5213A0049C403 /* FileReadable.swift in Sources */,
 				84EC6CB124C169E3008FDED4 /* HeaderTableViewCell.swift in Sources */,
+				841252602533D7A100C98ED3 /* InputFormTableViewCell.swift in Sources */,
 				84309D5F2463FFEC00F48ECC /* LearnMoreView.swift in Sources */,
 				8470C8F2245AD0E200439F92 /* MainMenuViewController.swift in Sources */,
 				8428891C249AE3EB00D39E6C /* ReadEmailMessageViewController.swift in Sources */,
@@ -1103,7 +1119,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = UU2W43R8JA;
 				INFOPLIST_FILE = EmailExampleTests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1125,7 +1141,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = UU2W43R8JA;
 				INFOPLIST_FILE = EmailExampleTests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1165,6 +1181,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -1189,7 +1206,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -1225,6 +1242,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -1243,7 +1261,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;

@@ -17,9 +17,9 @@ pre_install do |installer|
 end
 
 target 'EmailExample' do
-    pod 'SudoUser', '~> 7.9'
-    pod 'SudoProfiles', '~> 5.5'
-    pod 'SudoEmail', '~> 3.0'
+    pod 'SudoUser', '~> 7.14'
+    pod 'SudoProfiles', '~> 5.6'
+    pod 'SudoEmail', '~> 3.1'
     pod 'MimeParser', '~> 0.1'
 
     target 'EmailExampleTests'

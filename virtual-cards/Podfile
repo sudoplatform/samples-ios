@@ -17,9 +17,11 @@ pre_install do |installer|
 end
 
 target 'VirtualCardsExample' do
-    pod 'SudoUser', '~> 7.9'
-    pod 'SudoIdentityVerification', '~> 4.7'
-    pod 'SudoVirtualCards', '~> 9.0'
+    pod 'SudoUser', '~> 7.14'
+    pod 'SudoIdentityVerification', '~> 4.8'
+    pod 'SudoVirtualCards', '~> 9.1'
+
+    target 'VirtualCardsExampleTests'
 end
 
 # Fix Xcode nagging warning on pod install/update

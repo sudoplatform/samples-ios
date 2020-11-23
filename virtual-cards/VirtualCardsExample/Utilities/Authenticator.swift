@@ -28,26 +28,28 @@ enum AuthenticatorError: LocalizedError {
 
 class Authenticator {
 
-    let userClient: SudoUserClient
+    let fileReadable: FileReadable
+
+    unowned let userClient: SudoUserClient
     let keyManager: SudoKeyManager
 
-    init(userClient: SudoUserClient, keyManager: SudoKeyManager) {
+    init(userClient: SudoUserClient, keyManager: SudoKeyManager, fileReadable: FileReadable = DefaultFileReadable()) {
         self.userClient = userClient
         self.keyManager = keyManager
+        self.fileReadable = fileReadable
     }
 
     func register(completion: @escaping (Swift.Result<Void, Error>) -> Void) {
         do {
             if userClient.isRegistered() { throw AuthenticatorError.alreadyRegistered }
-            guard let testKeyPath = Bundle.main.path(forResource: "register_key", ofType: "private") else {
+            guard let testKeyPath = fileReadable.path(forResource: "register_key", ofType: "private") else {
                 throw AuthenticatorError.missingTestKey
             }
-            guard let testKeyIdPath = Bundle.main.path(forResource: "register_key", ofType: "id") else {
+            guard let testKeyIdPath = fileReadable.path(forResource: "register_key", ofType: "id") else {
                 throw AuthenticatorError.missingTestKeyId
             }
-
-            let testKey = try String(contentsOfFile: testKeyPath)
-            let testKeyId = try String(contentsOfFile: testKeyIdPath).trimmingCharacters(in: .whitespacesAndNewlines)
+            let testKey = try fileReadable.contentsOfFile(forPath: testKeyPath)
+            let testKeyId = try fileReadable.contentsOfFile(forPath: testKeyIdPath).trimmingCharacters(in: .whitespacesAndNewlines)
             let provider = try TESTAuthenticationProvider(
                 name: "testRegisterAudience",
                 key: testKey,
@@ -70,4 +72,13 @@ class Authenticator {
             completion(.failure(error))
         }
     }
+
+    func deregister(completion: @escaping (DeregisterResult) -> Void) throws {
+        try userClient.deregister(completion: completion)
+    }
+
+    func reset() throws {
+        try userClient.reset()
+    }
+
 }

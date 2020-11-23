@@ -17,6 +17,7 @@ DerivedData
 *.hmap
 *.ipa
 *.xcuserstate
+*.idea/
 Carthage/Build/
 node_modules/
 sudoplatformconfig.json

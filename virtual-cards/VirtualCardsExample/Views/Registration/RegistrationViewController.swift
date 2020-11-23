@@ -34,14 +34,10 @@ class RegistrationViewController: UIViewController {
     // MARK: - Properties: Computed
 
     /// Sudo user client used to perform sign in  and registration operations.
-    var userClient: SudoUserClient {
-        return AppDelegate.dependencies.userClient
-    }
+    var userClient: SudoUserClient = AppDelegate.dependencies.userClient
 
     /// Authenticator used to perform authentication during registration.
-    var authenticator: Authenticator {
-        return AppDelegate.dependencies.authenticator
-    }
+    var authenticator: Authenticator = AppDelegate.dependencies.authenticator
 
     // MARK: - Lifecycle
 

@@ -29,11 +29,29 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         _ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
     ) -> Bool {
+
+        #if DEBUG
+        guard !isUnitTestRunning else {
+            return true
+        }
+        #endif
+
         do {
             AppDelegate.dependencies = try AppDependencies()
+        } catch let error as SudoUserClientError {
+            switch error {
+            case .invalidConfig:
+                fatalError("Make sure the file config/sudoplatformconfig.json exists in the project directory (see README.md).")
+            default:
+                fatalError(error.localizedDescription)
+            }
         } catch {
             fatalError(error.localizedDescription)
         }
+
+        window = UIWindow(frame: UIScreen.main.bounds)
+        window!.rootViewController = UIStoryboard(name: "Main", bundle: nil).instantiateInitialViewController()!
+        window!.makeKeyAndVisible()
         return true
     }
 

@@ -24,6 +24,22 @@ struct AppDependencies {
 
     // MARK: - Lifecycle
 
+    init(
+        userClient: SudoUserClient,
+        profilesClient: SudoProfilesClient,
+        identityVerificationClient: SudoIdentityVerificationClient,
+        keyManager: SudoKeyManager,
+        authenticator: Authenticator,
+        virtualCardsClient: SudoVirtualCardsClient
+    ) {
+        self.userClient = userClient
+        self.profilesClient = profilesClient
+        self.identityVerificationClient = identityVerificationClient
+        self.keyManager = keyManager
+        self.authenticator = authenticator
+        self.virtualCardsClient = virtualCardsClient
+    }
+
     init() throws {
         // Setup UserClient
         userClient = try DefaultSudoUserClient(keyNamespace: "ids")

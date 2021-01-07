@@ -33,7 +33,7 @@ protocol Authenticator {
 
     func register(completion: @escaping (Swift.Result<Void, Error>) -> Void)
 
-    func deregister(completion: @escaping (DeregisterResult) -> Void) throws
+    func deregister(completion: @escaping (Swift.Result<String, Error>) -> Void) throws
 
     func reset() throws
 
@@ -72,7 +72,7 @@ class DefaultAuthenticator: Authenticator {
                 name: "testRegisterAudience",
                 key: testKey,
                 keyId: testKeyId,
-                keyMananger: keyManager
+                keyManager: keyManager
             )
             try userClient.registerWithAuthenticationProvider(
                 authenticationProvider: provider,
@@ -91,7 +91,7 @@ class DefaultAuthenticator: Authenticator {
         }
     }
 
-    func deregister(completion: @escaping (DeregisterResult) -> Void) throws {
+    func deregister(completion: @escaping (Swift.Result<String, Error>) -> Void) throws {
         try userClient.deregister(completion: completion)
     }
 

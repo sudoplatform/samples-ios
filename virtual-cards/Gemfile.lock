@@ -78,7 +78,7 @@ GEM
     nokogiri (1.10.10)
       mini_portile2 (~> 2.4.0)
     public_suffix (4.0.6)
-    redcarpet (3.5.0)
+    redcarpet (3.5.1)
     ruby-macho (1.4.0)
     slather (2.5.0)
       CFPropertyList (>= 2.2, < 4)

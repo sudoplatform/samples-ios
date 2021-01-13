@@ -46,8 +46,8 @@ class KeyAuthenticationProvider: AuthenticationProvider {
 
     var authInfo = KeyAuthenticationInfo()
 
-    func getAuthenticationInfo() throws -> AuthenticationInfo {
-        return authInfo
+    func getAuthenticationInfo(completion: @escaping (Swift.Result<AuthenticationInfo, Error>) -> Void) {
+        completion(.success(authInfo))
     }
 
     func reset() {}

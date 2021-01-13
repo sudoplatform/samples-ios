@@ -54,7 +54,7 @@ class Authenticator {
                 name: "testRegisterAudience",
                 key: testKey,
                 keyId: testKeyId,
-                keyMananger: keyManager
+                keyManager: keyManager
             )
             try userClient.registerWithAuthenticationProvider(
                 authenticationProvider: provider,
@@ -73,7 +73,7 @@ class Authenticator {
         }
     }
 
-    func deregister(completion: @escaping (DeregisterResult) -> Void) throws {
+    func deregister(completion: @escaping (Result<String, Error>) -> Void) throws {
         try userClient.deregister(completion: completion)
     }
 

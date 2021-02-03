@@ -17,9 +17,9 @@ pre_install do |installer|
 end
 
 target 'VirtualCardsExample' do
-    pod 'SudoUser', '~> 8.0'
-    pod 'SudoIdentityVerification', '~> 5.0'
-    pod 'SudoVirtualCards', '~> 9.2'
+    pod 'SudoUser', '~> 10.1'
+    pod 'SudoIdentityVerification', '~> 6.0'
+    pod 'SudoVirtualCards', '~> 10.0'
 
     target 'VirtualCardsExampleTests'
 end

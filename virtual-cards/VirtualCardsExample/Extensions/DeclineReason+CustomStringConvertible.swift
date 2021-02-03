@@ -32,6 +32,8 @@ extension Transaction.DeclineReason: CustomStringConvertible {
             return "Address Check Failed"
         case .cscCheckFailed:
             return "Security Code Check Failed"
+        case .expiryCheckFailed:
+            return "Card Expiry Check Failed"
         case .processingError:
             return "Processing Error"
         case .declined:

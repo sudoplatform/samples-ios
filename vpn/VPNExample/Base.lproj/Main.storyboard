@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="hpv-vn-s81">
+    <device id="retina6_1" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17703"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--Navigation Controller-->
+        <scene sceneID="u7I-7S-OyT">
+            <objects>
+                <navigationController navigationBarHidden="YES" id="hpv-vn-s81" sceneMemberID="viewController">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="hGy-s8-Rkd">
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <connections>
+                        <segue destination="BYZ-38-t0r" kind="relationship" relationship="rootViewController" id="7o2-8q-ueX"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="c8K-zd-YFo" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-1257" y="119"/>
+        </scene>
+        <!--Registration View Controller-->
+        <scene sceneID="tne-QT-ifu">
+            <objects>
+                <viewController storyboardIdentifier="registration" id="BYZ-38-t0r" customClass="RegistrationViewController" customModule="VPNExample" customModuleProvider="target" sceneMemberID="viewController">
+                    <navigationItem key="navigationItem" id="fr4-1A-DtU"/>
+                    <connections>
+                        <segue destination="wtL-Kh-KAX" kind="presentation" identifier="navigateToMainMenu" modalPresentationStyle="fullScreen" modalTransitionStyle="crossDissolve" id="Z9a-Q5-JJL"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-201" y="119"/>
+        </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="Onb-Qy-eSc">
+            <objects>
+                <navigationController id="wtL-Kh-KAX" sceneMemberID="viewController">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="Q7t-KT-c1b">
+                        <rect key="frame" x="0.0" y="44" width="414" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <connections>
+                        <segue destination="EoN-i9-awH" kind="relationship" relationship="rootViewController" id="x50-GV-LBS"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="505-g5-d09" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="809" y="119"/>
+        </scene>
+        <!--Server List-->
+        <scene sceneID="hpQ-QX-Nec">
+            <objects>
+                <viewController storyboardIdentifier="server-list" id="icV-qC-Is0" customClass="ServerListViewController" customModule="VPNExample" customModuleProvider="target" sceneMemberID="viewController">
+                    <navigationItem key="navigationItem" title="Server List" id="TBh-37-1dG"/>
+                    <connections>
+                        <segue destination="XBp-Gu-9TI" kind="show" identifier="navigateToServerSelected" id="VCz-RD-uRe"/>
+                        <segue destination="N92-lm-3nE" kind="unwind" identifier="returnToMainMenu" unwindAction="returnToMainMenuWithSegue:" id="dj4-U1-Foy"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="vKq-LJ-Q99" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2867" y="119"/>
+        </scene>
+        <!--Server Selected View Controller-->
+        <scene sceneID="uxh-Xs-Apf">
+            <objects>
+                <viewController storyboardIdentifier="server-selected" id="XBp-Gu-9TI" customClass="ServerSelectedViewController" customModule="VPNExample" customModuleProvider="target" sceneMemberID="viewController">
+                    <navigationItem key="navigationItem" id="sat-JZ-s3a"/>
+                    <connections>
+                        <segue destination="oKr-XR-jDT" kind="unwind" identifier="returnToServerList" unwindAction="returnToServerListWithSegue:" id="gs8-lt-Qhl"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="ynf-YB-rqb" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+                <exit id="oKr-XR-jDT" userLabel="Exit" sceneMemberID="exit"/>
+            </objects>
+            <point key="canvasLocation" x="3772" y="119"/>
+        </scene>
+        <!--Main Menu-->
+        <scene sceneID="9bT-jV-whh">
+            <objects>
+                <viewController storyboardIdentifier="main-menu" id="EoN-i9-awH" userLabel="Main Menu" customClass="MainMenuViewController" customModule="VPNExample" customModuleProvider="target" sceneMemberID="viewController">
+                    <navigationItem key="navigationItem" title="VPN Sample App" id="ntt-uR-rQX" userLabel="VPN Sample App"/>
+                    <connections>
+                        <segue destination="icV-qC-Is0" kind="show" identifier="navigateToServerList" id="O8w-CA-1oK"/>
+                        <segue destination="9cq-in-Hta" kind="show" identifier="navigateToSettings" id="k42-up-M0j"/>
+                        <segue destination="N92-lm-3nE" kind="unwind" identifier="returnToRegistration" unwindAction="returnToRegistrationWithSegue:" id="FV2-68-JKL"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="g7R-vG-BiV" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+                <exit id="N92-lm-3nE" userLabel="Exit" sceneMemberID="exit"/>
+            </objects>
+            <point key="canvasLocation" x="1801" y="439"/>
+        </scene>
+        <!--Settings-->
+        <scene sceneID="n0j-3t-p6z">
+            <objects>
+                <viewController storyboardIdentifier="settings" id="9cq-in-Hta" customClass="SettingsViewController" customModule="VPNExample" customModuleProvider="target" sceneMemberID="viewController">
+                    <navigationItem key="navigationItem" title="Settings" id="gr8-9g-F0L"/>
+                    <connections>
+                        <segue destination="DBS-s3-Ddc" kind="show" identifier="navigateToEntitlements" id="ySw-PU-A79"/>
+                        <segue destination="CuD-ut-pRh" kind="show" identifier="navigateToProtocols" id="91p-Vd-cMJ"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="0Br-qV-jcS" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2796" y="788"/>
+        </scene>
+        <!--Entitlements-->
+        <scene sceneID="aVC-kh-RZZ">
+            <objects>
+                <viewController storyboardIdentifier="entitlements" title="Entitlements" id="DBS-s3-Ddc" customClass="EntitlementsViewController" customModule="VPNExample" customModuleProvider="target" sceneMemberID="viewController">
+                    <navigationItem key="navigationItem" title="Entitlements" id="QuU-54-FEv"/>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="J34-3H-kdO" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="3812" y="1491"/>
+        </scene>
+        <!--Protocols View Controller-->
+        <scene sceneID="kBb-n7-uJC">
+            <objects>
+                <viewController storyboardIdentifier="protocols" id="CuD-ut-pRh" customClass="ProtocolsViewController" customModule="VPNExample" customModuleProvider="target" sceneMemberID="viewController">
+                    <navigationItem key="navigationItem" id="sKA-3p-MYc"/>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="QfE-ax-CLl" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="3784" y="795"/>
+        </scene>
+    </scenes>
+</document>

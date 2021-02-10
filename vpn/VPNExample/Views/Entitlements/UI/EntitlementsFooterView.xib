@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="17701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_1" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17703"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="2Vd-dO-RfI" customClass="EntitlementsFooterView" customModule="VPNExample" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="414" height="241"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="6K3-E8-7aJ">
+                    <rect key="frame" x="0.0" y="0.0" width="414" height="241"/>
+                    <subviews>
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" verticalCompressionResistancePriority="1000" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="aVQ-y4-8xW" userLabel="moreInfoLabel">
+                            <rect key="frame" x="32" y="60" width="350" height="101.5"/>
+                            <string key="text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum non diam sollicitudin, rutrum lorem sit amet, sodales urna. Aliquam hendrerit blandit augue, vel eleifend nibh sodales vel.</string>
+                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                            <nil key="textColor"/>
+                            <nil key="highlightedColor"/>
+                        </label>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="hbp-qU-Qtc" userLabel="button2">
+                            <rect key="frame" x="32" y="169.5" width="350" height="55.5"/>
+                            <state key="normal" title="Learn More"/>
+                            <connections>
+                                <action selector="learnMoreButtonTapped:" destination="2Vd-dO-RfI" eventType="touchUpInside" id="Nro-X3-YuD"/>
+                            </connections>
+                        </button>
+                    </subviews>
+                    <edgeInsets key="layoutMargins" top="16" left="32" bottom="16" right="32"/>
+                </stackView>
+            </subviews>
+            <viewLayoutGuide key="safeArea" id="in4-Fy-8HZ"/>
+            <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+            <constraints>
+                <constraint firstItem="in4-Fy-8HZ" firstAttribute="bottom" secondItem="6K3-E8-7aJ" secondAttribute="bottom" id="06r-FC-D0H"/>
+                <constraint firstItem="6K3-E8-7aJ" firstAttribute="top" secondItem="2Vd-dO-RfI" secondAttribute="top" id="PxD-ft-FlW"/>
+                <constraint firstItem="6K3-E8-7aJ" firstAttribute="leading" secondItem="in4-Fy-8HZ" secondAttribute="leading" id="b5m-GS-xv5"/>
+                <constraint firstItem="in4-Fy-8HZ" firstAttribute="trailing" secondItem="6K3-E8-7aJ" secondAttribute="trailing" id="sXx-Uc-CI5"/>
+            </constraints>
+            <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+            <connections>
+                <outlet property="moreInfoLabel" destination="aVQ-y4-8xW" id="aPn-E9-ztd"/>
+            </connections>
+            <point key="canvasLocation" x="60.869565217391312" y="288.95089285714283"/>
+        </view>
+    </objects>
+    <resources>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+    </resources>
+</document>

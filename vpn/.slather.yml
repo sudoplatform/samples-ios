@@ -1,0 +1,5 @@
+xcodeproj: VPNExample.xcodeproj
+workspace: VPNExample.xcworkspace
+scheme: VPNExample
+ignore:
+  - VPNExampleTests/*

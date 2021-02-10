@@ -1,0 +1,5 @@
+source "https://rubygems.org"
+
+gem 'cocoapods', '1.10.0'
+gem 'cocoapods-acknowledgements', '1.3.0'
+gem 'slather'

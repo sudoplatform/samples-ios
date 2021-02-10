@@ -7,38 +7,59 @@
 import UIKit
 import SudoUser
 
-class RegisterViewController: UIViewController {
+class RegisterViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDelegate {
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     @IBOutlet weak var registerButton: UIButton!
     
-    let sudoProfilesClient = Clients.sudoProfilesClient
-
+    let sudoProfilesClient = Clients.profilesClient
+    @IBOutlet weak var registrationMethodPicker: UIPickerView!
+    var registrationMethods: [ChallengeType] = []
     var hasAutoNavigated: Bool = false
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
 
-        if Clients.authenticator.lastSignInMethod != .none && !hasAutoNavigated {
+        registrationMethodPicker.dataSource = self
+        registrationMethodPicker.delegate = self
+
+        // add TEST and FSSO sign in options if available.
+        registrationMethods = Clients.userClient.getSupportedRegistrationChallengeType()
+            .filter { $0 == .test || $0 == .fsso }
+            .sorted(by: { $0.rawValue < $1.rawValue })
+
+        // reload the registration method picker after options have been added.
+        registrationMethodPicker.reloadAllComponents()
+
+        // automatically sign in if we have signed in before.
+        let lastMethod = Clients.authenticator.lastSignInMethod
+        if let index = registrationMethods.firstIndex(of: lastMethod), !hasAutoNavigated {
             hasAutoNavigated = true
-            self.registerButtonTapped()
+
+            registrationMethodPicker.selectRow(index, inComponent: 0, animated: false)
+            registerButtonTapped()
         }
 
-        if Clients.userClient.getSupportedRegistrationChallengeType().contains(.fsso) {
+        if Clients.authenticator.lastSignInMethod == .fsso {
             let signOut = UIBarButtonItem(title: "Sign Out", style: .done, target: self, action: #selector(self.signOutTapped))
             self.navigationItem.rightBarButtonItem = signOut
-        }
-        else {
-            let resetButton = UIBarButtonItem(title: "Reset", style: .done, target: self, action: #selector(self.resetClientsTapped))
+        } else {
+            let title = Clients.authenticator.lastSignInMethod == .test ? "Deregister" : "Reset"
+            let resetButton = UIBarButtonItem(title: title, style: .done, target: self, action: #selector(self.deregisterTapped))
             self.navigationItem.rightBarButtonItem = resetButton
         }
     }
 
     @objc func signOutTapped() {
-        guard let nav = self.navigationController else { return }
-        Clients.authenticator.doFSSOSignOut(from: nav) { (maybeError) in
-            try? Clients.resetClients()
-            print("Failed to sign out: \(maybeError)")
+        Clients.authenticator.doFSSOSignOut(from: self.view.window!) { (maybeError) in
+            Clients.resetClients()
+            if let error = maybeError {
+                print("Failed to sign out: \(error)")
+            }
         }
+    }
+
+    @objc func deregisterTapped() {
+        Clients.deregisterWithAlert()
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -62,75 +83,16 @@ class RegisterViewController: UIViewController {
         activityIndicator.startAnimating()
         registerButton.isEnabled = false
 
-        Clients.authenticator.registerAndSignIn(from: self.navigationController!) { (result) in
+        let selectedRow = registrationMethodPicker.selectedRow(inComponent: 0)
+        let signInMethod = registrationMethods[selectedRow]
+        Clients.authenticator.registerAndSignIn(from: self.view.window!, signInMethod: signInMethod) { (result) in
             DispatchQueue.main.async {
                 self.activityIndicator.stopAnimating()
                 self.registerButton.isEnabled = true
                 switch result {
                 case .success: self.navigatePostSignIn()
+                case .failure(SudoUserClientError.signInCanceled): break
                 case .failure(let error): self.showRegistrationFailureAlert(error: error)
-                }
-            }
-        }
-    }
-
-    private func registerAndSignIn(completion: @escaping (Bool) -> Void) {
-        let userClient: SudoUserClient = Clients.userClient
-        let authenticator: Authenticator = Clients.authenticator
-
-        func signIn() {
-            do {
-                if try userClient.isSignedIn() {
-                    completion(true)
-                    return
-                }
-
-                try userClient.signInWithKey { signInResult in
-                    switch signInResult {
-                    case .failure(let error):
-                        self.showSignInFailureAlert(error: error)
-                        completion(false)
-                    case .success:
-                        completion(true)
-                    }
-                }
-            } catch let signInError {
-                self.showSignInFailureAlert(error: signInError)
-                completion(false)
-            }
-        }
-
-        if userClient.getSupportedRegistrationChallengeType().contains(.fsso) {
-            guard let navigationController = self.navigationController else {
-                return completion(false)
-            }
-
-            do {
-                try userClient.presentFederatedSignInUI(navigationController: navigationController) { signInResult in
-                    switch signInResult {
-                    case .failure(let error):
-                        self.showSignInFailureAlert(error: error)
-                        completion(false)
-                    case .success:
-                        completion(true)
-                    }
-                }
-            } catch let signInError {
-                self.showSignInFailureAlert(error: signInError)
-                completion(false)
-            }
-        } else {
-            if userClient.isRegistered() {
-                signIn()
-            } else {
-                authenticator.register { registerResult in
-                    switch registerResult {
-                    case .failure(let error):
-                        self.showRegistrationFailureAlert(error: error)
-                        completion(false)
-                    case .success:
-                        signIn()
-                    }
                 }
             }
         }
@@ -153,7 +115,6 @@ class RegisterViewController: UIViewController {
     }
 
     func navigatePostSignIn() {
-
         let nav = UINavigationController()
         let vaultsController = UIStoryboard(name: "Main", bundle: Bundle.main).instantiateViewController(identifier: "UnlockVaultViewController") as! UnlockVaultViewController
 
@@ -162,8 +123,32 @@ class RegisterViewController: UIViewController {
         self.present(nav, animated: true, completion: nil)
     }
 
-    @objc func resetClientsTapped() {
-        (UIApplication.shared.delegate as! AppDelegate).deregister()
+    func numberOfComponents(in pickerView: UIPickerView) -> Int {
+        return 1
+    }
+
+    func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
+        return registrationMethods.count
+    }
+
+    func pickerView(_ pickerView: UIPickerView, viewForRow row: Int, forComponent component: Int, reusing view: UIView?) -> UIView {
+        let label = UILabel()
+        label.font = UIFont.systemFont(ofSize: 14)
+        label.textAlignment = .center
+        label.text = registrationMethods[row].descriptionString
+        return label
     }
 }
 
+extension ChallengeType {
+    var descriptionString: String {
+        switch self {
+        case .test:
+            return "TEST Registration"
+        case .fsso:
+            return "Federated Sign In"
+        default:
+            return self.rawValue
+        }
+    }
+}

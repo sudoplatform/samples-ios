@@ -11,6 +11,7 @@
 xcuserdata/
 build/
 docs/
+Pods/Local Podspecs/
 telephony-example-config/
 *.xccheckout
 *.moved-aside

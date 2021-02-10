@@ -12,7 +12,7 @@
         <!--Sudos-->
         <scene sceneID="YQB-qy-1Bo">
             <objects>
-                <viewController id="xXc-gI-22S" customClass="SudoListViewController" customModule="TelephonyExample" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="xXc-gI-22S" customClass="SudoListViewController" customModule="PasswordManagerExample" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="GJs-Im-VS8">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -72,11 +72,6 @@
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" title="Sudos" id="jnv-4m-xzi">
-                        <barButtonItem key="leftBarButtonItem" title="Deregister" id="4x5-Zm-Fdw">
-                            <connections>
-                                <action selector="deregisterTapped:" destination="xXc-gI-22S" id="jCn-mW-P0d"/>
-                            </connections>
-                        </barButtonItem>
                         <barButtonItem key="rightBarButtonItem" id="3P3-g5-iy5">
                             <button key="customView" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="infoLight" showsTouchWhenHighlighted="YES" lineBreakMode="middleTruncation" id="nhX-oQ-Nvh">
                                 <rect key="frame" x="369" y="10" width="25" height="24"/>
@@ -102,7 +97,7 @@
         <!--Create Sudo View Controller-->
         <scene sceneID="dtf-2u-UIK">
             <objects>
-                <viewController id="Dgu-tp-rl4" customClass="CreateSudoViewController" customModule="TelephonyExample" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="Dgu-tp-rl4" customClass="CreateSudoViewController" customModule="PasswordManagerExample" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="OWT-Ab-MPG">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>

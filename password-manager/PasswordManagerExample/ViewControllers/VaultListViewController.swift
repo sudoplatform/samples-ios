@@ -11,7 +11,7 @@ import SudoProfiles
 class VaultListViewController: UITableViewController {
     var vaults: [Vault] = []
 
-    var passwordManagerClient: PasswordManagerClient!
+    var passwordManagerClient: SudoPasswordManagerClient!
     var sudoID: String!
 
     override func viewDidLoad() {
@@ -19,7 +19,7 @@ class VaultListViewController: UITableViewController {
         title = "Vaults"
         passwordManagerClient = Clients.passwordManagerClient!
 
-        self.tableView.register(LoginCell.self, forCellReuseIdentifier: "Login")
+        self.tableView.register(VaultItemCell.self, forCellReuseIdentifier: "Login")
 
         self.tableView.delegate = self
         self.tableView.dataSource = self
@@ -66,7 +66,9 @@ class VaultListViewController: UITableViewController {
                 guard let self = self else { return }
                 switch result {
                 case .success(let vaults):
-                    self.vaults = vaults.filter({ $0.belongsToSudo(id: self.sudoID) })
+                    self.vaults = vaults.filter({ $0.belongsToSudo(id: self.sudoID) }).sorted(by: { (lhs, rhs) -> Bool in
+                        return lhs.createdAt <= rhs.createdAt
+                    })
                     self.tableView.reloadData()
                 case .failure(let error):
                     self.presentErrorAlert(message: "Failed to list vaults", error: error)
@@ -129,7 +131,7 @@ class VaultListViewController: UITableViewController {
             addNewVault()
         } else {
             let vault = self.vaults[indexPath.row]
-            let vc = UIStoryboard(name: "Main", bundle: Bundle.main).instantiateViewController(identifier: "LoginListViewController") as! LoginListViewController
+            let vc = UIStoryboard(name: "Main", bundle: Bundle.main).instantiateViewController(identifier: "LoginListViewController") as! VaultItemListViewController
             vc.vault = vault
             navigationController?.pushViewController(vc, animated: true)
         }

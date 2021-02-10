@@ -9,6 +9,7 @@ import SudoUser
 import SudoKeyManager
 import UIKit
 import SafariServices
+import AuthenticationServices
 import SudoEntitlements
 
 enum AuthenticatorError: LocalizedError {
@@ -27,24 +28,19 @@ enum AuthenticatorError: LocalizedError {
     }
 }
 
-enum LastSignInMethod: String {
-    case none
-    case fsso
-    case test
-}
-
 class Authenticator {
 
     let userClient: SudoUserClient
     let keyManager: SudoKeyManager
+    let entitlementsClient: SudoEntitlementsClient
 
     // Keep track of the last method used to sign in.  It helps know what kind of UI to show and actions to perform to get back to a clean state.
-    @UserDefaultsBackedWithDefault(key: "lastSignInMethod", defaultValue: LastSignInMethod.none.rawValue)
+    @UserDefaultsBackedWithDefault(key: "lastSignInMethod", defaultValue: ChallengeType.unknown.rawValue)
     private var _lastSignInMethod: String
 
-    var lastSignInMethod: LastSignInMethod {
+    internal private(set) var lastSignInMethod: ChallengeType {
         get {
-            return LastSignInMethod(rawValue: _lastSignInMethod)!
+            return ChallengeType(rawValue: _lastSignInMethod) ?? .unknown
         }
         set {
             _lastSignInMethod = newValue.rawValue
@@ -52,12 +48,13 @@ class Authenticator {
     }
 
 
-    init(userClient: SudoUserClient, keyManager: SudoKeyManager) {
+    init(userClient: SudoUserClient, keyManager: SudoKeyManager, entitlementsClient: SudoEntitlementsClient) {
         self.userClient = userClient
         self.keyManager = keyManager
+        self.entitlementsClient = entitlementsClient
     }
 
-    func register(completion: @escaping (Swift.Result<Void, Error>) -> Void) {
+    private func register(completion: @escaping (Swift.Result<Void, Error>) -> Void) {
         do {
             if userClient.isRegistered() { throw AuthenticatorError.alreadyRegistered }
             guard let testKeyPath = Bundle.main.path(forResource: "register_key", ofType: "private") else {
@@ -74,18 +71,19 @@ class Authenticator {
                 name: "testRegisterAudience",
                 key: testKey,
                 keyId: testKeyId,
-                keyMananger: keyManager
+                keyManager: keyManager
             )
             try userClient.registerWithAuthenticationProvider(
                 authenticationProvider: provider,
-                registrationId: UUID().uuidString) { result in
-                    switch result {
-                    case .failure(let error):
-                        NSLog("Registration Failure: \(error)")
-                        completion(.failure(error))
-                    case .success:
-                        completion(.success(()))
-                    }
+                registrationId: UUID().uuidString
+            ) { result in
+                switch result {
+                case .failure(let error):
+                    NSLog("Registration Failure: \(error)")
+                    completion(.failure(error))
+                case .success:
+                    completion(.success(()))
+                }
             }
         }
         catch let error {
@@ -94,63 +92,38 @@ class Authenticator {
         }
     }
 
-    func doFSSOSignOut(from nav: UINavigationController, completion: ((Error?) -> Void)?) {
+    func doFSSOSignOut(from anchor: UIWindow, completion: ((Error?) -> Void)?) {
         do {
-            let client = Clients.userClient!
-
-                // Present the federated sign out screen.  This will likely trigger a "do you want to allow access" alert.
-                try Clients.userClient!.presentFederatedSignOutUI(navigationController: nav) { (result) in
+            // Present the federated sign out screen.  This will likely trigger a "do you want to allow access" alert.
+            try Clients.userClient!.presentFederatedSignOutUI(presentationAnchor: anchor) { (result) in
+                // There is no way to tap into the authentication session's UI dismissal, so we have issues
+                // dismissing view controllers after sign out.  As a general fix we can delay the completion handler
+                // for one second to let things settle.
+                //
+                //https://developer.apple.com/forums/thread/123667
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                     switch result {
                     case .success:
-
-                        // After federated sign out succeeds, perform global sign out.
-                        do {
-                            try client.globalSignOut { (result) in
-                                switch result {
-                                case .success:
-                                    // If global sign out succeeds, we still have to launch this `SFAuthenticationSession` to really
-                                    // clear the auth cookies.  This will trigger another alert, and the user will have to close the blank
-                                    // page that shows up when the logout page loads.
-                                    self.clearSFAuthCookies(completion: completion)
-                                case .failure(let cause):
-                                    completion?(cause)
-                                }
-                            }
-                        }
-                        catch {
-                            // If global sign out fails we still want to complete the sign out locally, otherwise we can be left in a bad
-                            // state where the auth cookies cannot be cleared.
-                            self.clearSFAuthCookies(completion: completion)
-                            //completion?(error)
-                        }
+                        print("Successly signed out.")
+                        self.lastSignInMethod = .unknown
+                        completion?(nil)
                     case .failure(let cause):
                         completion?(cause)
                     }
                 }
-            } catch let error {
-                completion?(error)
             }
+        } catch let error {
+            completion?(error)
+        }
     }
 
-    private func clearSFAuthCookies(completion: ((Error?) -> Void)?) {
-        self.authSession = SFAuthenticationSession(url: URL(string: "https://dev-98hbdgse.auth0.com/v2/logout")!, callbackURLScheme: nil, completionHandler: { (callBack:URL?, error:Error? ) in
-            // The only option for the user is to cancel to dismiss the webpage, so there will be an error.
-            // that we need to ignore.
-            self.lastSignInMethod = .none
-            completion?(nil)
-        })
-        self.authSession?.start()
-    }
-
-    var authSession: SFAuthenticationSession?
-
-    func registerAndSignIn(from nav: UINavigationController, completion: @escaping (Result<Void,Error>) -> Void) {
+    func registerAndSignIn(from anchor: UIWindow, signInMethod: ChallengeType, completion: @escaping (Result<Void, Error>) -> Void) {
         let userClient: SudoUserClient = Clients.userClient
 
-        func signIn() {
+        func signInWithTestKey() {
             do {
                 if try userClient.isSignedIn() {
-                    try? DefaultSudoEntitlementsClient(userClient: Clients.userClient).redeemEntitlements(completion: { (_) in })
+                    self.entitlementsClient.redeemEntitlements() { result in }
                     completion(.success(()))
                     return
                 }
@@ -160,8 +133,8 @@ class Authenticator {
                     case .failure(let error):
                         completion(.failure(error))
                     case .success:
-                        try? DefaultSudoEntitlementsClient(userClient: Clients.userClient).redeemEntitlements(completion: { (_) in })
                         self.lastSignInMethod = .test
+                        self.entitlementsClient.redeemEntitlements() { result in }
                         completion(.success(()))
                     }
                 }
@@ -170,43 +143,44 @@ class Authenticator {
             }
         }
 
-        if userClient.getSupportedRegistrationChallengeType().contains(.fsso) {
+        switch signInMethod {
+        case .fsso:
             do {
-                try userClient.presentFederatedSignInUI(navigationController: nav) { signInResult in
+                try userClient.presentFederatedSignInUI(presentationAnchor: anchor) { signInResult in
                     switch signInResult {
                     case .failure(let error):
                         completion(.failure(error))
                     case .success:
                         self.lastSignInMethod = .fsso
-
-                        // Redeem entitlements
-                        try? DefaultSudoEntitlementsClient(userClient: Clients.userClient).redeemEntitlements(completion: { (_) in })
+                        self.entitlementsClient.redeemEntitlements() { result in }
                         completion(.success(()))
                     }
                 }
             } catch let signInError {
                 completion(.failure(signInError))
             }
-        } else {
+        case .test:
             if userClient.isRegistered() {
-                signIn()
+                signInWithTestKey()
             } else {
                 self.register { registerResult in
                     switch registerResult {
                     case .failure(let error):
                         completion(.failure(error))
                     case .success:
-                        signIn()
+                        signInWithTestKey()
                     }
                 }
             }
+        default:
+            break
         }
     }
 
-    func deregister(completion: @escaping (DeregisterResult) -> Void) throws {
+    func deregister(completion: @escaping (Result<String, Error>) -> Void) throws {
         try self.userClient.deregister { (result) in
             if case .success(_) = result {
-                self.lastSignInMethod = .none
+                self.lastSignInMethod = .unknown
             }
             completion(result)
         }

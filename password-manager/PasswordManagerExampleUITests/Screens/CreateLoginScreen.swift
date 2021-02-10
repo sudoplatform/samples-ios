@@ -30,7 +30,7 @@ enum CreateLoginScreen: String {
         let webAddressTextField: XCUIElement = CreateLoginScreen.webAddressTextField.element
         let usernameTextField: XCUIElement = CreateLoginScreen.usernameTextField.element
         let passwordTextField: XCUIElement = CreateLoginScreen.passwordTextField.element
-        let backToVaultsButton: XCUIElement = LoginsScreen.backToVaultsButton.element
+        let backToVaultsButton: XCUIElement = VaultItemsScreen.backToVaultsButton.element
 
         XCTAssertTrue(saveButton.waitForExistence(timeout: Constants.timeout), "Cannot locate \(CreateLoginScreen.saveButton)")
         XCTAssertTrue(loginTitleTextField.waitForExistence(timeout: Constants.timeout), "Cannot locate \(CreateLoginScreen.loginTitleTextField)")
@@ -47,14 +47,14 @@ enum CreateLoginScreen: String {
         passwordTextField.tap()
         passwordTextField.typeText(password)
         saveButton.tap()
-        XCTAssertTrue(backToVaultsButton.waitForExistence(timeout: Constants.timeout), "Cannot locate \(LoginsScreen.backToVaultsButton)")
+        XCTAssertTrue(backToVaultsButton.waitForExistence(timeout: Constants.timeout), "Cannot locate \(VaultItemsScreen.backToVaultsButton)")
     }
 
     static func goBackToVaultsScreen() {
-        let goBackToVaultsScreen: XCUIElement = LoginsScreen.backToVaultsButton.element
+        let goBackToVaultsScreen: XCUIElement = VaultItemsScreen.backToVaultsButton.element
         let goBackToSudosScreen: XCUIElement = VaultsScreen.backToSudosButton.element
 
-        XCTAssertTrue(goBackToVaultsScreen.waitForExistence(timeout: Constants.timeout), "Cannot locate \(LoginsScreen.backToVaultsButton)")
+        XCTAssertTrue(goBackToVaultsScreen.waitForExistence(timeout: Constants.timeout), "Cannot locate \(VaultItemsScreen.backToVaultsButton)")
         goBackToVaultsScreen.tap()
         XCTAssertTrue(goBackToSudosScreen.waitForExistence(timeout: Constants.timeout), "Cannot locate \(VaultsScreen.backToSudosButton)")
 

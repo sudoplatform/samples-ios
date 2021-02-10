@@ -15,19 +15,17 @@ class SudoListViewController: UIViewController, UITableViewDelegate, UITableView
     private var sudos: [Sudo] = []
 
     var sudoSelected: ((Sudo) -> Void)?
-    var deregisterSelected: (() -> Void)?
 
     var sudoProfilesClient: SudoProfilesClient!
 
-    static func createWith(sudoProfilesClient: SudoProfilesClient,
-         sudoSelected: @escaping ((Sudo) -> Void),
-         deregisterSelected: @escaping (() -> Void)) -> SudoListViewController {
-
+    static func createWith(
+        sudoProfilesClient: SudoProfilesClient,
+        sudoSelected: @escaping ((Sudo) -> Void)
+    ) -> SudoListViewController {
         let storyboard = UIStoryboard(name: "SudoManagement", bundle: Bundle.main)
         let vc = storyboard.instantiateInitialViewController() as! SudoListViewController
         vc.sudoProfilesClient = sudoProfilesClient
         vc.sudoSelected = sudoSelected
-        vc.deregisterSelected = deregisterSelected
         return vc
     }
 
@@ -87,16 +85,12 @@ class SudoListViewController: UIViewController, UITableViewDelegate, UITableView
         }
     }
 
-    @IBAction func deregisterTapped(_ sender: UIBarButtonItem) {
-        self.deregisterSelected?()
-    }
-
     private func navigateToLoginScreen() {
         self.performSegue(withIdentifier: "returnToRegistration", sender: self)
     }
 
     @IBAction func infoTapped() {
-        let alert = UIAlertController(title: "What is a Sudo?", message: "A Sudo is a digital identity created and owned by a real person. Vaults must belong to a sudo.", preferredStyle: .alert)
+        let alert = UIAlertController(title: "What is a Sudo?", message: "A Sudo is a digital identity created and owned by a real person. Vaults must belong to a Sudo.", preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Learn More", style: .default) { action in
             let docURL = URL(string: "https://docs.sudoplatform.com/concepts/sudo-digital-identities")!
             UIApplication.shared.open(docURL, options: [:], completionHandler: nil)

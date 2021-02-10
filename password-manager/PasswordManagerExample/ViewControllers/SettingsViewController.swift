@@ -1,15 +1,13 @@
 //
-//  SettingsViewController.swift
-//  PasswordManagerExample
+// Copyright © 2020 Anonyome Labs, Inc. All rights reserved.
 //
-//  Created by Brandon Roth on 9/21/20.
-//  Copyright © 2020 Sudo Platform. All rights reserved.
+// SPDX-License-Identifier: Apache-2.0
 //
 
 import UIKit
+import SudoUser
 
 class SettingsViewController: UITableViewController {
-
 
     @IBOutlet weak var deregisterLabel: UILabel!
 
@@ -46,23 +44,64 @@ class SettingsViewController: UITableViewController {
         case 3:
             // deregister / sign out
             if Clients.authenticator.lastSignInMethod == .fsso {
-                Clients.authenticator.doFSSOSignOut(from: self.navigationController!) { (maybeError) in
-                    try? Clients.resetClients()
-                    (UIApplication.shared.delegate as? AppDelegate)?.rootController()?.dismiss(animated: true, completion: nil)
+                Clients.authenticator.doFSSOSignOut(from: self.view.window!) { (maybeError) in
+                    runOnMain {
+                        switch maybeError {
+                        case .some(SudoUserClientError.signInCanceled):
+                            break
+                        case .some(let error):
+                            self.presentErrorAlert(message: "Failed to sign out: \(error)")
+                        case .none:
+                            Clients.resetClients()
+                            UIApplication.shared.rootController?.dismiss(animated: true, completion: nil)
+                        }
+                    }
                 }
             }
             else {
-                (UIApplication.shared.delegate as? AppDelegate)?.deregister()
+                Clients.deregisterWithAlert()
             }
+            break
+        case 4:
+            // Entitlements
+            break
+        case 5:
+            deregisterPasswordManagerWithAlert()
             break
         default:
             break
         }
     }
 
+    func deregisterPasswordManagerWithAlert() {
+        let alert = UIAlertController(title: "All vaults will be lost", message: "This will reset your account with the vault service and all vaults will be lost.  Your secret code/rescue kit will be reset and you will be asked to create a new master password.", cancelActionTitle: "Not now")
+
+        alert.addAction(UIAlertAction(title: "Reset Vaults", style: .destructive, handler: { (_) in
+            self.deregisterPasswordManager()
+        }))
+
+        self.present(alert, animated: true, completion: nil)
+    }
+
+    func deregisterPasswordManager() {
+        self.presentActivityAlert(message: "Resetting Vaults")
+        Clients.passwordManagerClient.deregister { (result) in
+            switch result {
+            case .success:
+                DispatchQueue.main.async {
+                    self.dismissToUnlockScreen()
+                }
+            case .failure(let error):
+                DispatchQueue.main.async {
+                    self.presentErrorAlert(message: "Something went wrong", error: error)
+                }
+            }
+        }
+    }
+
     func dismissToUnlockScreen() {
         ((self.presentingViewController as? UINavigationController) ?? self.presentingViewController?.navigationController)?.popToRootViewController(animated: false)
-        self.dismiss(animated: true, completion: nil)
+        self.presentingViewController?.dismiss(animated: true, completion: nil)
     }
 
     func resetSecretCode() {
@@ -83,4 +122,19 @@ class SettingsViewController: UITableViewController {
         }))
         present(alert, animated: true, completion: nil)
     }
+}
+
+extension UIAlertController {
+
+    convenience init(title: String, message: String, cancelActionTitle: String) {
+        self.init(title: title, message: message, preferredStyle: .alert)
+        self.addAction(UIAlertAction(title: cancelActionTitle, style: .cancel, handler: nil))
+    }
+
+    static func withDefaultCancelActionAndAlert(title: String, message: String, cancelActionTitle: String = "Cancel") -> UIAlertController {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: cancelActionTitle, style: .cancel, handler: nil))
+        return alert
+    }
+
 }

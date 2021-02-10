@@ -15,7 +15,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
         if let url = URLContexts.first?.url {
-            try? Clients.userClient.processFederatedSignInTokens(url: url)
+            _ = try? Clients.userClient.processFederatedSignInTokens(url: url)
         }
     }
 

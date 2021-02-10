@@ -1,8 +1,7 @@
 //
-//  NiceThings.swift
-//  PasswordManagerExample
+// Copyright © 2020 Anonyome Labs, Inc. All rights reserved.
 //
-//  Copyright © 2020 Sudo Platform. All rights reserved.
+// SPDX-License-Identifier: Apache-2.0
 //
 
 import Foundation

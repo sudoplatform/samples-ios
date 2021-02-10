@@ -38,67 +38,29 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Use this method to release any resources that were specific to the discarded scenes, as they will not return.
     }
 
-
-    func resetClients() {
-        let authenticator = Clients.authenticator!
-        let passwordClient = Clients.passwordManagerClient!
+    func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
         do {
-            _ = try? passwordClient.reset()
-            try authenticator.userClient.reset()
-            try Clients.sudoProfilesClient!.reset()
-        } catch let error {
-            NSLog("Failed to reset clients: \(error)")
+            return try Clients.userClient!.processFederatedSignInTokens(url: url)
+        } catch {
+            return true
         }
     }
+}
 
-    func deregister() {
-        let alert = UIAlertController(title: "Are you sure?", message: "This will attempt to deregister any accounts with the Sudo Platform service and clear any keys associated with accounts connected with this device. It is meant as option of last resort if you are unable to login or register and cannot be undone.", preferredStyle: .alert)
-
-        alert.addAction(UIAlertAction(title: "Reset", style: .destructive, handler: { (_) in
-            let authenticator = Clients.authenticator!
-            self.topController()?.presentActivityAlert(message: "Deregistering")
-
-            do {
-                try Clients.authenticator.deregister(completion: { (result) in
-                    if case .failure(let error) = result {
-                        NSLog("Failed to deregister: \(error)")
-                    }
-
-                    DispatchQueue.main.async {
-                        self.resetClients()
-                        self.rootController()?.dismiss(animated: true, completion: nil)
-                    }
-                })
-            }
-            catch {
-                NSLog("Failed to deregister: \(error)")
-                self.resetClients()
-                self.rootController()?.dismiss(animated: true, completion: nil)
-            }
-        }))
-
-        alert.addAction(UIAlertAction(title: "Not now", style: .cancel, handler: { (_) in
-        }))
-
-        self.topController()?.present(alert, animated: true, completion: nil)
+extension UIApplication {
+    var rootWindow: UIWindow? {
+        return self.windows.filter { $0.isKeyWindow }.first
     }
 
-    func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
-        try? Clients.userClient!.processFederatedSignInTokens(url: url)
-        return true
+    var rootController: UIViewController? {
+        return self.windows.filter { $0.isKeyWindow }.first?.rootViewController
     }
 
-    func rootController() -> UIViewController? {
-        return UIApplication.shared.windows.filter {$0.isKeyWindow}.first?.rootViewController
-    }
-
-    func topController() -> UIViewController? {
-        let keyWindow = UIApplication.shared.windows.filter {$0.isKeyWindow}.first
-        guard var topController = keyWindow?.rootViewController else { return nil }
+    var topController: UIViewController? {
+        guard var topController = self.rootController else { return nil }
         while let presentedViewController = topController.presentedViewController {
             topController = presentedViewController
         }
         return topController
     }
 }
-

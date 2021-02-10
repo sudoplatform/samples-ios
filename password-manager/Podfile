@@ -16,9 +16,7 @@ pre_install do |installer|
 end
 
 target 'PasswordManagerExample' do
-  pod 'SudoPasswordManager', '~> 1.0'
-  pod 'SudoProfiles', '~> 5.5'
-  pod 'SudoEntitlements', '~> 1.1'
+  pod 'SudoPasswordManager', '~> 2.0'
 end
 
 # supress warnings for pods

@@ -13,10 +13,6 @@ class NewLoginViewController: UIViewController {
 
     @IBOutlet weak var editLoginView: EditLoginView!
     
-    // When the extension is launched it will pass in identifiers to look for. If we pass it in here, then we can
-    // auto populate the service identifier field
-    var serviceIdentifiers: [ASCredentialServiceIdentifier]?
-
     override func viewDidLoad() {
         super.viewDidLoad()
 

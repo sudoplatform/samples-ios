@@ -1,9 +1,7 @@
 //
-//  SecretCodeViewController.swift
-//  PasswordManagerExample
+// Copyright © 2020 Anonyome Labs, Inc. All rights reserved.
 //
-//  Created by Buster Townsend on 9/23/20.
-//  Copyright © 2020 Sudo Platform. All rights reserved.
+// SPDX-License-Identifier: Apache-2.0
 //
 
 import UIKit

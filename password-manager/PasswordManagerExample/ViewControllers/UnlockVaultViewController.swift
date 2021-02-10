@@ -1,13 +1,12 @@
 //
-//  UnlockVaultViewController.swift
-//  PasswordManagerExample
+// Copyright © 2020 Anonyome Labs, Inc. All rights reserved.
 //
-//  Created by Cody Mace on 9/8/20.
-//  Copyright © 2020 Sudo Platform. All rights reserved.
+// SPDX-License-Identifier: Apache-2.0
 //
 
 import UIKit
 import SudoPasswordManager
+import enum SudoUser.SudoUserClientError
 
 class UnlockVaultViewController: UIViewController {
     @IBOutlet weak var instructionsLabel: UILabel!
@@ -15,7 +14,7 @@ class UnlockVaultViewController: UIViewController {
     @IBOutlet weak var confirmPasswordField: UITextField!
     @IBOutlet weak var registrationStatusLoadingView: UIView!
 
-    var passwordManagerClient: PasswordManagerClient!
+    var passwordManagerClient: SudoPasswordManagerClient!
     var registrationStatus: PasswordManagerRegistrationStatus = .notRegistered
 
     override func viewDidLoad() {
@@ -32,21 +31,22 @@ class UnlockVaultViewController: UIViewController {
 
     @objc func back() {
         if Clients.authenticator.lastSignInMethod == .fsso {
-            Clients.authenticator.doFSSOSignOut(from: self.navigationController!) { (maybeError) in
+            Clients.authenticator.doFSSOSignOut(from: UIApplication.shared.rootWindow!) { (maybeError) in
                 runOnMain {
-                    if let error = maybeError {
+                    switch maybeError {
+                    case .some(SudoUserClientError.signInCanceled):
+                        break
+                    case .some(let error):
                         self.presentErrorAlert(message: "Failed to sign out: \(error)")
-                        return
-                    }
-                    else {
-                        try? Clients.resetClients()
-                        self.dismiss(animated: true, completion: nil)
+                    case .none:
+                        Clients.resetClients()
+                        UIApplication.shared.rootController?.dismiss(animated: true, completion: nil)
                     }
                 }
             }
         }
         else {
-            (UIApplication.shared.delegate as? AppDelegate)?.deregister()
+            Clients.deregisterWithAlert()
         }
     }
 
@@ -172,15 +172,15 @@ class UnlockVaultViewController: UIViewController {
 
     func proceedToVaults() {
         runOnMain {
-            let sudoProfilesClient = Clients.sudoProfilesClient!
-            let vc = SudoListViewController.createWith(sudoProfilesClient: sudoProfilesClient, sudoSelected: { selectedSudo in
-                let vaultsController = UIStoryboard(name: "Main", bundle: Bundle.main).instantiateViewController(identifier: "VaultListViewController") as! VaultListViewController
-                vaultsController.sudoID = selectedSudo.id!
-                self.navigationController?.pushViewController(vaultsController, animated: true)
-            },
-            deregisterSelected: {
-                (UIApplication.shared.delegate as! AppDelegate).deregister()
-            })
+            let sudoProfilesClient = Clients.profilesClient!
+            let vc = SudoListViewController.createWith(
+                sudoProfilesClient: sudoProfilesClient,
+                sudoSelected: { selectedSudo in
+                    let vaultsController = UIStoryboard(name: "Main", bundle: Bundle.main).instantiateViewController(identifier: "VaultListViewController") as! VaultListViewController
+                    vaultsController.sudoID = selectedSudo.id!
+                    self.navigationController?.pushViewController(vaultsController, animated: true)
+                }
+            )
 
             vc.navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Lock", style: .plain, target: self, action: #selector(self.lockVault))
 
@@ -218,21 +218,8 @@ class UnlockVaultViewController: UIViewController {
     }
 
     @objc func lockVault() {
-
-
-
-
         Clients.passwordManagerClient.lock()
         self.navigationController?.popToViewController(self, animated: true)
-    }
-
-    @objc func deregisterTapped() {
-        let alert = UIAlertController(title: "Deregister", message: "Are you sure you want to deregister? All vaults, logins, and associated data will be deleted.", preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
-        alert.addAction(UIAlertAction(title: "Deregister", style: .default) { _ in
-            (UIApplication.shared.delegate as! AppDelegate).deregister()
-        })
-        present(alert, animated: true, completion: nil)
     }
 
     @IBAction func passwordDone(_ sender: Any) {

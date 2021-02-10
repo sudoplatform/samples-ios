@@ -98,11 +98,11 @@ class RegistrationViewController: UIViewController {
 
     func register(completion: @escaping (Result<Void, Error>) -> Void) {
         if userClient.getSupportedRegistrationChallengeType().contains(.fsso) {
-            guard let navigationController = navigationController else {
-                fatalError("No navigation controller for \(String(describing: self))")
+            guard let presentationAnchor = self.view?.window else {
+                fatalError("No window for \(String(describing: self))")
             }
             do {
-                try userClient.presentFederatedSignInUI(navigationController: navigationController) { result in
+                try userClient.presentFederatedSignInUI(presentationAnchor: presentationAnchor) { result in
                     switch result {
                     case .failure(let error):
                         return completion(.failure(error))

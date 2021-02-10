@@ -15,6 +15,7 @@ class ServerSelectedViewController: UIViewController, SudoVPNObserving {
     @IBOutlet var connectedStatusLabel: UILabel!
     @IBOutlet var serverInfoBox: ServerInformationBox!
     @IBOutlet var serverChangeBox: ServerChangeBox!
+    @IBOutlet var learnMoreButton: UIButton!
 
     // MARK: - Supplementary
 
@@ -97,6 +98,13 @@ class ServerSelectedViewController: UIViewController, SudoVPNObserving {
 
     @IBAction func serverChangeBoxTapped() {
         returnToServerList()
+    }
+
+    @IBAction func learnMoreTapped() {
+        guard let docURL = URL(string: "https://docs.sudoplatform.com/guides/virtual-private-network/manage-servers") else {
+            return
+        }
+        UIApplication.shared.open(docURL, options: [:], completionHandler: nil)
     }
 
     // MARK: - Setters

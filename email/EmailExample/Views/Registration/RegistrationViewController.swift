@@ -126,12 +126,11 @@ class RegistrationViewController: UIViewController {
         }
 
         if userClient.getSupportedRegistrationChallengeType().contains(.fsso) {
-            guard let navigationController = self.navigationController else {
-                return completion(false)
+            guard let presentationAnchor = self.view?.window else {
+                fatalError("No window for \(String(describing: self))")
             }
-
             do {
-                try userClient.presentFederatedSignInUI(navigationController: navigationController) { signInResult in
+                try userClient.presentFederatedSignInUI(presentationAnchor: presentationAnchor) { signInResult in
                     switch signInResult {
                     case .failure(let error):
                         DispatchQueue.main.async {

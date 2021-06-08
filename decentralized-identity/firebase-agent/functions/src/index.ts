@@ -13,18 +13,21 @@ admin.initializeApp()
 export const endpoint = functions.https.onRequest(async (request, response) => {
     // validate HTTP method
     if (request.method !== "POST") {
-        return response.status(501).send()
+        response.status(501).send()
+        return
     }
 
     // validate recipient query parameter
     const postbox = request.query.p
 
     if (!postbox || (typeof postbox !== "string")) {
-        return response.status(400).send()
+        response.status(400).send()
+        return
     }
 
     if (postbox.length > 100 || postbox.indexOf("/") !== -1 || postbox.indexOf(".") !== -1) {
-        return response.status(400).send()
+        response.status(400).send()
+        return
     }
 
     // validate the body
@@ -32,7 +35,8 @@ export const endpoint = functions.https.onRequest(async (request, response) => {
     const messageBody = request.rawBody
 
     if (!messageBody) {
-        return response.status(400).send()
+        response.status(400).send()
+        return
     }
 
     console.log(`Creating document of size ${messageBody.byteLength} in postbox ${postbox}`)
@@ -48,5 +52,6 @@ export const endpoint = functions.https.onRequest(async (request, response) => {
         })
 
     // successfully processed
-    return response.status(202).send()
+    response.status(202).send()
+    return
 })

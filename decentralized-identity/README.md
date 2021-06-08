@@ -34,7 +34,7 @@ Currently, the sample app provisions these locations using a Firebase cloud func
 
 ### Creating and Configuring a Firebase Backend
 
-1. Navigate to the [Firebase console](https://console.firebase.google.com/) and create a new project. Use the "Spark" free tier.
+1. Navigate to the [Firebase console](https://console.firebase.google.com/) and create a new project. Note that the "Spark" free plan can no longer be used to deploy this project's Cloud Functions.
 2. Select the "Database" section of this new project and create a Cloud Firestore database.
    - Create this database in "Test Mode". Access control will be automatically configured as part of the deployment process.
 3. Select the "Authentication" section and enable the "Anonymous" sign-in method.

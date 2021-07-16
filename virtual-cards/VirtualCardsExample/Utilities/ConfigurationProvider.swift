@@ -8,6 +8,7 @@
 import Foundation
 import SudoVirtualCards
 import AWSAppSync
+import AWSCore
 import SudoUser
 
 struct ConfigurationProvider: AWSAppSync.AWSAppSyncServiceConfigProvider {

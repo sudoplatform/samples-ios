@@ -239,21 +239,31 @@ class IdentityVerificationViewController: UIViewController,
         }
 
         presentActivityAlert(message: "Checking status")
-        verificationClient.checkIdentityVerification(option: QueryOption.remoteOnly) { result in
-            // dismiss activity alert
+        do {
+            try verificationClient.checkIdentityVerification(option: QueryOption.remoteOnly) { result in
+                // dismiss activity alert
+                DispatchQueue.main.async {
+                    self.setVerifyButtonEnabled(true)
+                    self.dismissActivityAlert {
+                        switch result {
+                        case .success(let verifiedIdentity):
+                            if verifiedIdentity.verified {
+                                self.statusLabel.text = VerificationStatus.verified.rawValue
+                            } else {
+                                self.statusLabel.text = VerificationStatus.unverified.rawValue
+                            }
+                        case .failure:
+                            self.statusLabel.text = VerificationStatus.unknown.rawValue
+                        }
+                    }
+                }
+            }
+        } catch {
+            NSLog("Pre-registration Failure: \(error)")
             DispatchQueue.main.async {
                 self.setVerifyButtonEnabled(true)
                 self.dismissActivityAlert {
-                    switch result {
-                    case .success(let verifiedIdentity):
-                        if verifiedIdentity.verified {
-                            self.statusLabel.text = VerificationStatus.verified.rawValue
-                        } else {
-                            self.statusLabel.text = VerificationStatus.unverified.rawValue
-                        }
-                    case .failure:
-                        self.statusLabel.text = VerificationStatus.unknown.rawValue
-                    }
+                    self.statusLabel.text = VerificationStatus.unknown.rawValue
                 }
             }
         }

@@ -10,6 +10,8 @@
 		0CE6FED1246B74AE00944FAC /* OrphanCardListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE6FECF246B74AE00944FAC /* OrphanCardListViewController.swift */; };
 		0CE6FED2246B74AE00944FAC /* OrphanCardListViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0CE6FED0246B74AE00944FAC /* OrphanCardListViewController.xib */; };
 		5D3A5BE52531CFAA006C7B30 /* DeclineReason+CustomStringConvertible.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D3A5BE42531CFAA006C7B30 /* DeclineReason+CustomStringConvertible.swift */; };
+		5D8AB0B126C2B0000031B9FA /* SudoEntitlementsClientMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D8AB0B026C2B0000031B9FA /* SudoEntitlementsClientMock.swift */; };
+		5D8AB0B326C2B4850031B9FA /* AnyError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D8AB0B226C2B4850031B9FA /* AnyError.swift */; };
 		839BAE971A0D7170ECAD88A0 /* Pods-VirtualCardsExample-metadata.plist in Resources */ = {isa = PBXBuildFile; fileRef = EDDA09A0D095904167270AAC /* Pods-VirtualCardsExample-metadata.plist */; };
 		84309D382462B96F00F48ECC /* TransactionTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84309D362462B96F00F48ECC /* TransactionTableViewCell.swift */; };
 		84309D392462B96F00F48ECC /* TransactionTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 84309D372462B96F00F48ECC /* TransactionTableViewCell.xib */; };
@@ -107,6 +109,8 @@
 		15697D79B0AE529ABAB92D9C /* Pods-VirtualCardsExample.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-VirtualCardsExample.debug.xcconfig"; path = "Target Support Files/Pods-VirtualCardsExample/Pods-VirtualCardsExample.debug.xcconfig"; sourceTree = "<group>"; };
 		4F82DC0DB6CDA8CF0EC891E4 /* Pods_VirtualCardsExample_VirtualCardsExampleTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_VirtualCardsExample_VirtualCardsExampleTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		5D3A5BE42531CFAA006C7B30 /* DeclineReason+CustomStringConvertible.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "DeclineReason+CustomStringConvertible.swift"; sourceTree = "<group>"; };
+		5D8AB0B026C2B0000031B9FA /* SudoEntitlementsClientMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SudoEntitlementsClientMock.swift; sourceTree = "<group>"; };
+		5D8AB0B226C2B4850031B9FA /* AnyError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnyError.swift; sourceTree = "<group>"; };
 		84077A28245A9053004186BE /* VirtualCardsExampleTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = VirtualCardsExampleTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		84077A2C245A9053004186BE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		84309D362462B96F00F48ECC /* TransactionTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionTableViewCell.swift; sourceTree = "<group>"; };
@@ -551,6 +555,7 @@
 			children = (
 				957E60752539420A0019D33A /* Mocks */,
 				957E6076253942150019D33A /* Spies */,
+				5D8AB0B226C2B4850031B9FA /* AnyError.swift */,
 				957E6088253955430019D33A /* VirtualCardsExampleTestUtility.swift */,
 			);
 			path = "Test Utilities";
@@ -583,6 +588,7 @@
 			children = (
 				957E607D253946270019D33A /* AuthenticatorMock.swift */,
 				957E608A253958790019D33A /* KeyManagerMock.swift */,
+				5D8AB0B026C2B0000031B9FA /* SudoEntitlementsClientMock.swift */,
 				957E608C25395F860019D33A /* SudoIdentityVerificationClientMock.swift */,
 				957E60802539492C0019D33A /* SudoProfileClientMock.swift */,
 				957E6082253949770019D33A /* SudoVirtualCardsClientMock.swift */,
@@ -927,6 +933,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5D8AB0B326C2B4850031B9FA /* AnyError.swift in Sources */,
 				957E607E253946270019D33A /* AuthenticatorMock.swift in Sources */,
 				9545BF4525465656002CDE74 /* CreateFundingSourceViewControllerTests.swift in Sources */,
 				9545BF1D25464D74002CDE74 /* CreateSudoViewControllerTests.swift in Sources */,
@@ -935,6 +942,7 @@
 				957E608B253958790019D33A /* KeyManagerMock.swift in Sources */,
 				957E6097253D5D720019D33A /* MainMenuViewControllerTests.swift in Sources */,
 				957E6087253954340019D33A /* RegistrationViewControllerTests.swift in Sources */,
+				5D8AB0B126C2B0000031B9FA /* SudoEntitlementsClientMock.swift in Sources */,
 				957E608D25395F860019D33A /* SudoIdentityVerificationClientMock.swift in Sources */,
 				957E608F253962460019D33A /* SudoIdentityVerificationClientSpy.swift in Sources */,
 				9545BF3F254654AB002CDE74 /* SudoListViewControllerTests.swift in Sources */,

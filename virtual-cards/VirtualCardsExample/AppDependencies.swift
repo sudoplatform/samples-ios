@@ -7,6 +7,7 @@
 import Foundation
 import SudoVirtualCards
 import SudoUser
+import SudoEntitlements
 import SudoKeyManager
 import SudoProfiles
 import SudoIdentityVerification
@@ -16,6 +17,7 @@ struct AppDependencies {
     // MARK: - Properties
 
     let userClient: SudoUserClient
+    let entitlementsClient: SudoEntitlementsClient
     let profilesClient: SudoProfilesClient
     let identityVerificationClient: SudoIdentityVerificationClient
     let keyManager: SudoKeyManager
@@ -26,6 +28,7 @@ struct AppDependencies {
 
     init(
         userClient: SudoUserClient,
+        entitlementsClient: SudoEntitlementsClient,
         profilesClient: SudoProfilesClient,
         identityVerificationClient: SudoIdentityVerificationClient,
         keyManager: SudoKeyManager,
@@ -33,6 +36,7 @@ struct AppDependencies {
         virtualCardsClient: SudoVirtualCardsClient
     ) {
         self.userClient = userClient
+        self.entitlementsClient = entitlementsClient
         self.profilesClient = profilesClient
         self.identityVerificationClient = identityVerificationClient
         self.keyManager = keyManager
@@ -43,6 +47,8 @@ struct AppDependencies {
     init() throws {
         // Setup UserClient
         userClient = try DefaultSudoUserClient(keyNamespace: "ids")
+        // Setup EntitlementsClient
+        entitlementsClient = try DefaultSudoEntitlementsClient(userClient: userClient)
         // Setup ProfilesClient
         let storageURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
         profilesClient = try DefaultSudoProfilesClient(sudoUserClient: userClient, blobContainerURL: storageURL)

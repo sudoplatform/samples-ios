@@ -6,6 +6,7 @@
 
 import UIKit
 import SudoUser
+import SudoEntitlements
 import SudoProfiles
 
 /// This View Controller presents a screen to allow the user to register or login.
@@ -35,6 +36,9 @@ class RegistrationViewController: UIViewController {
 
     /// Sudo user client used to perform sign in  and registration operations.
     var userClient: SudoUserClient = AppDelegate.dependencies.userClient
+
+    /// Sudo user client used to perform sign in  and registration operations.
+    var entitlementsClient: SudoEntitlementsClient = AppDelegate.dependencies.entitlementsClient
 
     /// Authenticator used to perform authentication during registration.
     var authenticator: Authenticator = AppDelegate.dependencies.authenticator
@@ -93,6 +97,20 @@ class RegistrationViewController: UIViewController {
     ///     - completion: Closure that indicates the success or failure of the registration process.
     func registerAndSignIn(completion: @escaping (Bool) -> Void) {
 
+        func redeem() {
+            self.entitlementsClient.redeemEntitlements { [weak self] result in
+                switch result {
+                case .success:
+                    completion(true)
+                case .failure(let error):
+                    DispatchQueue.main.async {
+                        self?.showSignInFailureAlert(error: error)
+                    }
+                    completion(false)
+                }
+            }
+        }
+
         func signIn() {
             do {
                 if try userClient.isSignedIn() {
@@ -100,15 +118,15 @@ class RegistrationViewController: UIViewController {
                     return
                 }
 
-                try userClient.signInWithKey { signInResult in
+                try userClient.signInWithKey { [weak self] signInResult in
                     switch signInResult {
                     case .failure(let error):
                         DispatchQueue.main.async {
-                            self.showSignInFailureAlert(error: error)
+                            self?.showSignInFailureAlert(error: error)
                         }
                         completion(false)
                     case .success:
-                        completion(true)
+                        redeem()
                     }
                 }
             } catch let signInError {
@@ -123,15 +141,15 @@ class RegistrationViewController: UIViewController {
             }
 
             do {
-                try userClient.presentFederatedSignInUI(presentationAnchor: viewControllerWindow) { signInResult in
+                try userClient.presentFederatedSignInUI(presentationAnchor: viewControllerWindow) { [weak self] signInResult in
                     switch signInResult {
                     case .failure(let error):
                         DispatchQueue.main.async {
-                            self.showSignInFailureAlert(error: error)
+                            self?.showSignInFailureAlert(error: error)
                         }
                         completion(false)
                     case .success:
-                        completion(true)
+                        redeem()
                     }
                 }
             } catch let signInError {
@@ -142,11 +160,11 @@ class RegistrationViewController: UIViewController {
             if userClient.isRegistered() {
                 signIn()
             } else {
-                authenticator.register { registerResult in
+                authenticator.register { [weak self] registerResult in
                     switch registerResult {
                     case .failure(let error):
                         DispatchQueue.main.async {
-                            self.showRegistrationFailureAlert(error: error)
+                            self?.showRegistrationFailureAlert(error: error)
                         }
                         completion(false)
                     case .success:

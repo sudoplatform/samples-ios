@@ -6,7 +6,7 @@
 
 import UIKit
 
-protocol ActivityAlertViewControllerDelegate: class {
+protocol ActivityAlertViewControllerDelegate: AnyObject {
 
     /// Cancel button on the Activity Alert overlay has been pressed by the user.
     func didTapAlertCancelButton()

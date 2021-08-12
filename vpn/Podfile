@@ -6,6 +6,7 @@ use_modular_headers!
 inhibit_all_warnings!
 
 source 'https://github.com/CocoaPods/Specs.git'
+source ENV['SUDOVPN_SDK_REPO']
 
 acknowledgementsFields = ['name', 'version', 'licenseType', 'licenseText', 'homepage']
 acknowledgementsExclude = ['SudoUser', 'SudoApiClient', 'SudoConfigManager', 'SudoKeyManager', 'SudoLogging', 'SudoOperations', 'SudoProfiles']
@@ -18,10 +19,10 @@ end
 
 target 'VPNExample' do
     inherit! :search_paths
-    pod 'SudoUser', '~> 10.1'
-    pod 'SudoProfiles', '~> 9.0'
-    pod 'SudoEntitlements', '~> 2.2'
-    pod 'SudoVPN', '~> 2.0'
+    pod 'SudoUser', '~> 12.0'
+    pod 'SudoProfiles', '~> 13.0'
+    pod 'SudoEntitlements', '~> 5.0'
+    pod 'SudoVPN', '~> 10.0'
 
     pod 'FlagKit'
 
@@ -30,8 +31,10 @@ end
 
 # Fix Xcode nagging warning on pod install/update
 post_install do |installer|
-  installer.pods_project.build_configurations.each do |config|
-    config.build_settings['CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED'] = 'YES'
-    config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '13.0'
+  installer.pods_project.targets.each do |target|
+    target.build_configurations.each do |config|
+      config.build_settings['CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED'] = 'YES'
+      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '13.0'
+    end
   end
 end

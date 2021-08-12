@@ -6,7 +6,7 @@
 
 import Foundation
 
-protocol VPNConnectionManager: class {
+protocol VPNConnectionManager: AnyObject {
 
     var isConnected: Bool { get }
 

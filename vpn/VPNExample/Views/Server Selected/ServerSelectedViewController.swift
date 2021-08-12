@@ -36,8 +36,7 @@ class ServerSelectedViewController: UIViewController, SudoVPNObserving {
             let data = UserDefaults.standard.data(forKey: "currentProtocol"),
             let userSetting = try? JSONDecoder().decode(SudoVPNProtocol.self, from: data)
         else {
-            // TODO: Return default from VPN Client
-            return .ikev2
+            return self.vpnClient.defaultProtocol
         }
         return userSetting
     }

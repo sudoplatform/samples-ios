@@ -36,6 +36,8 @@ class RegistrationViewController: UIViewController {
 
     var entitlementsClient = AppDelegate.dependencies.entitlementsClient
 
+    var vpnClient = AppDelegate.dependencies.vpnClient
+
     /// Authenticator used to perform authentication during registration.
     var authenticator: Authenticator = AppDelegate.dependencies.authenticator
 
@@ -83,11 +85,17 @@ class RegistrationViewController: UIViewController {
                 if case .failure(let error) = result {
                     return completion(error)
                 }
-                self.redeemEntitlements { result in
+                self.redeemEntitlements { [weak self] result in
                     if case .failure(let error) = result {
-                        completion(error)
-                    } else {
-                        completion(nil)
+                        return completion(error)
+                    }
+
+                    self?.vpnClient.prepare { result in
+                        if case .failure(let error) = result {
+                            return completion(error)
+                        } else {
+                            completion(nil)
+                        }
                     }
                 }
             }

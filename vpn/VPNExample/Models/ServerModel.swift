@@ -14,7 +14,7 @@ struct ServerModel {
 
     var country: String
     var flag: Flag?
-    var coordinates: SudoVPNServer.Coordinates?
+    var coordinates: SudoVPNCoordinates?
     var region: String?
     var load: Int?
     var ipAddress: String?

@@ -27,8 +27,7 @@ class ProtocolsViewController: UIViewController, UITableViewDelegate, UITableVie
                 let data = UserDefaults.standard.data(forKey: "currentProtocol"),
                 let userSetting = try? JSONDecoder().decode(SudoVPNProtocol.self, from: data)
             else {
-                // TODO: Return default from VPN Client
-                return .ikev2
+                return vpnClient.defaultProtocol
             }
             return userSetting
         }

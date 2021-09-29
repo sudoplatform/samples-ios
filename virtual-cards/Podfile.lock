@@ -54,7 +54,7 @@ PODS:
     - AWSAppSync (~> 3.2)
     - SudoApiClient (~> 7.0)
     - SudoLogging (~> 0.3)
-  - SudoProfiles (13.0.0):
+  - SudoProfiles (14.0.1):
     - SudoApiClient (~> 7.0)
     - SudoConfigManager (~> 1.4)
     - SudoLogging (~> 0.3)
@@ -68,21 +68,21 @@ PODS:
     - SudoConfigManager (~> 1.3)
     - SudoKeyManager (~> 1.2)
     - SudoLogging (~> 0.3)
-  - SudoVirtualCards (13.0.0):
+  - SudoVirtualCards (14.0.0):
     - AWSAppSync (~> 3.2)
     - Stripe (~> 21.2.1)
     - SudoApiClient (~> 7.0)
     - SudoKeyManager (~> 1.2)
     - SudoLogging (~> 0.3)
     - SudoOperations (~> 6.0)
-    - SudoProfiles (~> 13.0)
+    - SudoProfiles (~> 14.0)
     - SudoUser (~> 12.0)
 
 DEPENDENCIES:
   - SudoEntitlements (~> 5.0)
   - SudoIdentityVerification (~> 9.0)
   - SudoUser (~> 12.1)
-  - SudoVirtualCards (~> 13.0)
+  - SudoVirtualCards (~> 14.0)
 
 SPEC REPOS:
   https://github.com/CocoaPods/Specs.git:
@@ -129,10 +129,10 @@ SPEC CHECKSUMS:
   SudoKeyManager: 14159babc8ad32c5ebc41e075fe0164b82e730b1
   SudoLogging: 3a469c7db097b4813d967597d7a62cfd1b580966
   SudoOperations: 43fdcec1fb2265d7ee19090eb7026f36daa1675f
-  SudoProfiles: ed5b98339d2b08716407f86a1127f896d664fb26
+  SudoProfiles: ab3c1fff9dd258b2c4c754150c85fb13317cd609
   SudoUser: eeee5ba26cb59cbf3628f54eedc549266fff0758
-  SudoVirtualCards: bb86feff1fdcdbb779795d3a7d822dc8411ab381
+  SudoVirtualCards: 1874adc6569e173d7b925c0a490aac9fc9442572
 
-PODFILE CHECKSUM: f1c7f160ec5d78c51587b1bafe10fef868afd3f2
+PODFILE CHECKSUM: a11430628df643ddf4953e42b8d1891cc89d64a1
 
 COCOAPODS: 1.10.1

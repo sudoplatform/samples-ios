@@ -20,7 +20,7 @@ target 'VirtualCardsExample' do
     pod 'SudoUser', '~> 12.1'
     pod 'SudoEntitlements', '~> 5.0'
     pod 'SudoIdentityVerification', '~> 9.0'
-    pod 'SudoVirtualCards', '~> 13.0'
+    pod 'SudoVirtualCards', '~> 14.0'
 
     target 'VirtualCardsExampleTests'
 end

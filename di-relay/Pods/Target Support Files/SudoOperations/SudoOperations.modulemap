@@ -1,0 +1,6 @@
+framework module SudoOperations {
+  umbrella header "SudoOperations-umbrella.h"
+
+  export *
+  module * { export * }
+}

@@ -1,0 +1,92 @@
+Return-Path: <lmcculloch@anonyome.com>
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2087.outbound.protection.outlook.com [40.107.93.87])
+ by inbound-smtp.us-east-1.amazonaws.com with SMTP id sjlko6lpboqb1m8jj8p1fva2tg6k5de48gd8hdg1
+ for 6f9385bf@team-email-dev.com;
+ Wed, 22 Jul 2020 22:52:39 +0000 (UTC)
+X-SES-Spam-Verdict: PASS
+X-SES-Virus-Verdict: PASS
+Received-SPF: pass (spfCheck: domain of anonyome.com designates 40.107.93.87 as permitted sender) client-ip=40.107.93.87; envelope-from=lmcculloch@anonyome.com; helo=mail-dm6nam10on2087.outbound.protection.outlook.com;
+Authentication-Results: amazonses.com;
+ spf=pass (spfCheck: domain of anonyome.com designates 40.107.93.87 as permitted sender) client-ip=40.107.93.87; envelope-from=lmcculloch@anonyome.com; helo=mail-dm6nam10on2087.outbound.protection.outlook.com;
+ dkim=pass header.i=@anonyome.com;
+ dmarc=pass header.from=anonyome.com;
+X-SES-RECEIPT: AEFBQUFBQUFBQUFIc0JOT1R2ZlVoVkVoZjBnSEE0Y0JGQ2IyeFQwZlFncHhKU1BvaWhrbDRpQVZhMXNqamQ4WjlQSk1HdE1ZdUxwa1ZJZGxuWGFTYWZEQjNPSUcyQ2MyS0Y3YjNNWDlEcXdsbENSNlpMOVlhZ0pUZW5CQ0g2RFJBbHZaSUxIYVRkbksvaEhISFhzQ0ZPakYyK2dsQkR4RGhYZkY0dk1sVER2NkQ1cURLVFllRVFwbTlBeTh0SjUxZzhJVE5NbTc2WEdqRi9tUHMwdTVlNHBZSzhkbHBFdVA4amdla29QaEQ4UkJRd3djaWM3OGovNnpzWjBkaStXNDgxakZzWjVyeERLbjlQeEw2cEZBSWxQVlFiQlA1Qnl2UTR4eXBsZ1NUci81Tzl5SzZVYjFidGc9PQ==
+X-SES-DKIM-SIGNATURE: a=rsa-sha256; q=dns/txt; b=VJmSeRX420Ychbbl5/Z4RHSRaMLYFOVqBwhw/5I7+cDaWp9BY7M12+BkzJDCS2oy5FrHQg5873+E6j6Ql0AB6eRyWXzv/K32fdWVr/U9HqZDLQyVe9pV4VzqhNbgVnkIgaQGOke0+iT/sDp0Wg8WOGomONzYH4qqjGDsvHzf0B4=; c=relaxed/simple; s=224i4yxa5dv7c2xz3womw6peuasteono; d=amazonses.com; t=1595458359; v=1; bh=rDRsgNHLWa/gYl4m849VMH6pcl4pAGnhAsm2gNLLHCw=; h=From:To:Cc:Bcc:Subject:Date:Message-ID:MIME-Version:Content-Type:X-SES-RECEIPT;
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=cRfVLJDcQKG3B5oIluF4BQc8D2XmtTN1XuIGah+S2LdpTiCSRiP769M570BSltQgc1AN5NJgGnmmvCJXPgEz3oc9RvRf/y83Z6QLzx3LRPgu02Jj9Ke2C/WE6dypYpgB81XzSV9Av+yXFJqrki4PdE0hC6onrV7ZUzCuNOyW9Tu4mRpzhROH7XHawJGvk0+QwDp3Vub6OyaxZ7jx7N5xct5FmfwW60ZwOLQRCtgYQR4YiDYynX7kyGtBlQCucCGQQ8tZMiSlqAvcKu+PHrcDg6uKmYZWtalSnNvtYk02x5J6A7HYTlneGKx3Gh5IyqGury4oZ9/eTT2h98T+a1+IsQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=rDRsgNHLWa/gYl4m849VMH6pcl4pAGnhAsm2gNLLHCw=;
+ b=J2aUsbunFDqKbqJXdNYcJ0mc7yiPStuz1TBRw5Qi82Vs9v6KERH4cRi+TCvLQQbncSlxptpaeIxowDjq/bPRAXnOFIC+dmQZVIevJdKqFe5dKLJ7iawsQ+qPElvICYnZ0GcxsvPwDNIpQHJNCSr9WkeEZ364xXQeO9TvT521jXGfYOntMGWuoZ3flL55//+57mwYlnae2OEr3fGpDTPUSpkI7VmAxg5A4obAKU7niN+0OiR9VLejbugDvDnWqxkLcQ4xHUYFY9NS8jnUfdU4Zwk0RUfO+ThmXZ9cdTdwY8iL57TjR8OEVdIkMmlXnX+/hBKUFf1b54ZOQN8BJz6csQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=anonyome.com; dmarc=pass action=none header.from=anonyome.com;
+ dkim=pass header.d=anonyome.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=anonyome.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=rDRsgNHLWa/gYl4m849VMH6pcl4pAGnhAsm2gNLLHCw=;
+ b=ldzbtbYqAz6j3XSQ5QtAlAEI2sJTo+DNzCzs4Ca5I/q6Wtb/0oAsnCmXiKAmGQfi+2LQaOuPm55SHbh1n1IlXNUU6/VooeWH1p/B2NBUudaB9U7z8B7kffrWn92ikLeqxESKv1iOfPwox6ByU4DGrQyY59FN8xchaeU1NXdBCFc=
+Received: from BYAPR11MB2776.namprd11.prod.outlook.com (2603:10b6:a02:c8::18)
+ by BYAPR11MB3093.namprd11.prod.outlook.com (2603:10b6:a03:88::28) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3195.23; Wed, 22 Jul
+ 2020 22:52:38 +0000
+Received: from BYAPR11MB2776.namprd11.prod.outlook.com
+ ([fe80::318f:1ff2:cd9f:c0a4]) by BYAPR11MB2776.namprd11.prod.outlook.com
+ ([fe80::318f:1ff2:cd9f:c0a4%3]) with mapi id 15.20.3195.026; Wed, 22 Jul 2020
+ 22:52:38 +0000
+From: Lachlan McCulloch <lmcculloch@anonyome.com>
+To: "6f9385bf@team-email-dev.com" <6f9385bf@team-email-dev.com>
+Subject: Re: Sent From my Outlook Address
+Thread-Topic: Sent From my Outlook Address
+Thread-Index: AQHWYHrBvkMzhGUy40uVbdF+BZj4kKkU3ESA
+Date: Wed, 22 Jul 2020 22:52:37 +0000
+Message-ID: <A70F1199-9124-48AE-80D0-0924827C83AF@anonyome.com>
+References:
+ <0100017378ba3967-d57fb18d-79bf-4dc3-a319-d476c4ceac04-000000@email.amazonses.com>
+In-Reply-To:
+ <0100017378ba3967-d57fb18d-79bf-4dc3-a319-d476c4ceac04-000000@email.amazonses.com>
+Accept-Language: en-AU, en-US
+Content-Language: en-GB
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: team-email-dev.com; dkim=none (message not signed)
+ header.d=none;team-email-dev.com; dmarc=none action=none
+ header.from=anonyome.com;
+x-originating-ip: [120.29.8.246]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: b57e3276-d7c9-40c4-1eba-08d82e91ee8d
+x-ms-traffictypediagnostic: BYAPR11MB3093:
+x-microsoft-antispam-prvs:
+ <BYAPR11MB309335AB747FDA92E7B6507AB5790@BYAPR11MB3093.namprd11.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:2089;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info:
+ 7TKcNSIzfDNnlU51NoFskru3sIeQP+kWHKnxVyUWc4AefQjM0fzFGxuY1e6WXugv3KF0fuvBjLoNcZGlOksLxZ5WK2d1R05zXc+j7wiq9EFTqbbzDhHHpNyDziTsLayvmlx6PhqodsxLiOS2tL/t8S2lgPwgJRelSs88yDoNt+Ut9jZb2gPmDVTrcSimd+V1sN9Xl/aEKnAuT1hWO+b/OKMm+sbqUxHbNhLSUEg8Vtuf683cAgyIqyEjXYB+885zdxoL0HKMYERPa4oii7rwh+AzT1SVD08RlVevdxPlyYyX8RnXEr+HWWEvapuQ92Q72DklNi5zWYJVqpB0dfi2CQ==
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR11MB2776.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(136003)(376002)(39830400003)(346002)(366004)(396003)(47540400005)(26005)(2616005)(508600001)(71200400001)(36756003)(186003)(86362001)(6512007)(2906002)(5660300002)(66946007)(316002)(76116006)(66446008)(33656002)(45080400002)(66476007)(91956017)(8676002)(64756008)(66556008)(6506007)(6916009)(8936002)(6486002)(52230400001)(558084003);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata:
+ Q6hMptHuS1AhKnCV8Fmj6iryv+2jLH4aJrDPfvO1+1kDiYANFjudsy/GLeKwvH1nOK5Jy0U/C0jEILUqhQbIsPEeJd9iyd5hfIP2BH6VnuKmDmuMYhgddj5cpcfEu7+spFhb5kO1WZyIdBeLrPxIU0PT8eAEtKDJLM2CGHW8+hGxobXySa67kkzn6P3f0s2khRu+KXKxoCp4tMSxJnYmeyfDWj5jABSP5MOYX/3wTj7js/kueFhLF0OUpp5wiK0SieJxH9Jc7X3lXJI2trxkvh3qR+K87DhFgNttcm9SwLtdAJzodj11Dp2Ejh72QbvESktDXcF8M0fc3Jo3m+1Vv/ZRdzCeogusUFlRolsWge7X6byoNu5FOW33dl0llyuXCrRjaRJi03+ImohlAVZWTd5gOlg6UPYC91E1QvLTw6LhFAhSC0hkrWO56XKrAafZrxEzdnBVfrxOSh4yi+RkWJC9NlKT4n1YMfrdTft8ZVg=
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <EF1226FAE161644AA400AF9CBEB3A967@namprd11.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-OriginatorOrg: anonyome.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BYAPR11MB2776.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b57e3276-d7c9-40c4-1eba-08d82e91ee8d
+X-MS-Exchange-CrossTenant-originalarrivaltime: 22 Jul 2020 22:52:37.8847
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: e5dd2ea3-e8fb-4509-a85d-30f0c43986dc
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: SfMfG6BSMaYyw1fGQ1E7bTlLG1uNMfGQs5SZoVVb9mIuoC3Rz8kyW5FEKcfWCGssfZMYqVzEmilUboRIoBrzUw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR11MB3093
+
+VGVzdA0KDQrvu79PbiAyMy83LzIwLCA4OjUyIGFtLCAiNmY5Mzg1YmZAdGVhbS1lbWFpbC1kZXYu
+Y29tIiA8NmY5Mzg1YmZAdGVhbS1lbWFpbC1kZXYuY29tPiB3cm90ZToNCg0KICAgIFRlc3QNCg0K
+ICAgIC0tLS0tLS0tLS0tLS0tLQ0KDQogICAgICAgICAgICAgICAgICAgIEluaXRpYWxseSBzZW50
+IGZyb20gbXkgT3V0bG9vayBhZGRyZXNzLg0KDQo=

@@ -1,0 +1,6 @@
+framework module SudoUser {
+  umbrella header "SudoUser-umbrella.h"
+
+  export *
+  module * { export * }
+}

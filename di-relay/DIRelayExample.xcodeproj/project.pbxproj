@@ -1,0 +1,894 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 50;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		1293274A5F2F70F37B2A59AC /* Pods_DIRelayExampleTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 28533FCACA7B74F31081AE43 /* Pods_DIRelayExampleTests.framework */; };
+		461E2D4A26A7AD97000A887B /* Invitation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 461E2D4926A7AD97000A887B /* Invitation.swift */; };
+		464A509D269D22FD0062D9CA /* PostBoxIdStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 464A509C269D22FD0062D9CA /* PostBoxIdStorage.swift */; };
+		464A509E269D4E1C0062D9CA /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CFD5990E245A47BF00230C6F /* Main.storyboard */; };
+		464A50A6269E408A0062D9CA /* KeyManagement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 464A50A5269E408A0062D9CA /* KeyManagement.swift */; };
+		464A513D269E603A0062D9CA /* Connection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 464A513C269E603A0062D9CA /* Connection.swift */; };
+		46981E1F26F1B56D00E67FF8 /* AppDelegate+IsUnitTestRunning.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46981E1E26F1B56D00E67FF8 /* AppDelegate+IsUnitTestRunning.swift */; };
+		46B01AAF26F1AC6600099BAF /* AppDependencies.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46B01AAE26F1AC6600099BAF /* AppDependencies.swift */; };
+		4A7D7AD4652C9056C6543271 /* Pods_DIRelayExample.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 907BB649FC6345AD10D66CB2 /* Pods_DIRelayExample.framework */; };
+		CF4E6EBE246244C400A672B2 /* HTTPTransports.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF4E6EBD246244C400A672B2 /* HTTPTransports.swift */; };
+		CF51068F2465C92700B69629 /* KeychainStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF51068E2465C92700B69629 /* KeychainStorage.swift */; };
+		CF784DED245B9F7700185CF2 /* ConnectionDetailsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF784DEC245B9F7700185CF2 /* ConnectionDetailsViewController.swift */; };
+		CF9B40D2246A183B003136B4 /* Data+Base64URL.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF9B40D1246A183B003136B4 /* Data+Base64URL.swift */; };
+		CFD59909245A47BF00230C6F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFD59908245A47BF00230C6F /* AppDelegate.swift */; };
+		CFD5990B245A47BF00230C6F /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFD5990A245A47BF00230C6F /* SceneDelegate.swift */; };
+		CFD5990D245A47BF00230C6F /* WelcomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFD5990C245A47BF00230C6F /* WelcomeViewController.swift */; };
+		CFD59912245A47C100230C6F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CFD59911245A47C100230C6F /* Assets.xcassets */; };
+		CFD59915245A47C100230C6F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CFD59913245A47C100230C6F /* LaunchScreen.storyboard */; };
+		CFD5991D245A4E7800230C6F /* PostboxViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFD5991C245A4E7800230C6F /* PostboxViewController.swift */; };
+		CFD59921245A7C8000230C6F /* UIViewController+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFD59920245A7C8000230C6F /* UIViewController+Extensions.swift */; };
+		CFD59926245B4DC200230C6F /* ConnectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFD59925245B4DC200230C6F /* ConnectionViewController.swift */; };
+		CFD59928245B4DCC00230C6F /* CreateConnectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFD59927245B4DCC00230C6F /* CreateConnectionViewController.swift */; };
+		CFD5992C245B52CE00230C6F /* CreateInvitationCodeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFD5992B245B52CE00230C6F /* CreateInvitationCodeViewController.swift */; };
+		CFD5992E245B5A6D00230C6F /* ScanInvitationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFD5992D245B5A6D00230C6F /* ScanInvitationViewController.swift */; };
+		ED00FDB226F8456500311702 /* XCTestCase+Utility.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED00FDAD26F8456500311702 /* XCTestCase+Utility.swift */; };
+		ED00FDB426F8456500311702 /* UIStoryboard+Convenience.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED00FDAF26F8456500311702 /* UIStoryboard+Convenience.swift */; };
+		ED00FDB526F8456500311702 /* XCTestCaseExpectation+Convenience.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED00FDB026F8456500311702 /* XCTestCaseExpectation+Convenience.swift */; };
+		ED00FDB626F8456500311702 /* XCTestCase+CustomAssertions.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED00FDB126F8456500311702 /* XCTestCase+CustomAssertions.swift */; };
+		ED00FDC826F8457800311702 /* SudoDIRelayClientMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED00FDB926F8457700311702 /* SudoDIRelayClientMock.swift */; };
+		ED00FDC926F8457800311702 /* MockAWSNetworkTransport.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED00FDBA26F8457700311702 /* MockAWSNetworkTransport.swift */; };
+		ED00FDCA26F8457800311702 /* MockAppSyncClientHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED00FDBB26F8457700311702 /* MockAppSyncClientHelper.swift */; };
+		ED00FDCB26F8457800311702 /* SudoDlRelayClientSpy.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED00FDBD26F8457700311702 /* SudoDlRelayClientSpy.swift */; };
+		ED00FDCC26F8457800311702 /* AnyError.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED00FDBE26F8457700311702 /* AnyError.swift */; };
+		ED00FDCD26F8457800311702 /* DataFactoryNamespace.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED00FDC026F8457700311702 /* DataFactoryNamespace.swift */; };
+		ED00FDCE26F8457800311702 /* DataFactory+RelaySDK.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED00FDC126F8457700311702 /* DataFactory+RelaySDK.swift */; };
+		ED00FDCF26F8457800311702 /* ComplexBase64Email.txt in Resources */ = {isa = PBXBuildFile; fileRef = ED00FDC326F8457700311702 /* ComplexBase64Email.txt */; };
+		ED00FDD026F8457800311702 /* Base64EncodedBody.txt in Resources */ = {isa = PBXBuildFile; fileRef = ED00FDC426F8457700311702 /* Base64EncodedBody.txt */; };
+		ED00FDD126F8457800311702 /* ComplexDataEmail.txt in Resources */ = {isa = PBXBuildFile; fileRef = ED00FDC526F8457700311702 /* ComplexDataEmail.txt */; };
+		ED00FDD226F8457800311702 /* DataFactory+TestData.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED00FDC626F8457700311702 /* DataFactory+TestData.swift */; };
+		ED00FDD326F8457800311702 /* DIRelayTestUtility.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED00FDC726F8457700311702 /* DIRelayTestUtility.swift */; };
+		ED00FDD726F845B700311702 /* UIViewController+ExtensionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED00FDD626F845B700311702 /* UIViewController+ExtensionsTests.swift */; };
+		ED00FDDB26F845D100311702 /* ConnectionViewControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED00FDDA26F845D100311702 /* ConnectionViewControllerTests.swift */; };
+		ED00FDDE26F845DC00311702 /* CreateConnectionViewControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED00FDDD26F845DC00311702 /* CreateConnectionViewControllerTests.swift */; };
+		ED00FDE126F845EB00311702 /* CreateInvitationCodeViewControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED00FDE026F845EB00311702 /* CreateInvitationCodeViewControllerTests.swift */; };
+		ED00FDE426F845F100311702 /* PostboxViewControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED00FDE326F845F100311702 /* PostboxViewControllerTests.swift */; };
+		ED00FDE726F845FB00311702 /* ScanInvitationViewControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED00FDE626F845FB00311702 /* ScanInvitationViewControllerTests.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		ED00FDA226F8453300311702 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = CFD598FD245A47BF00230C6F /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = CFD59904245A47BF00230C6F;
+			remoteInfo = DIRelayExample;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		28533FCACA7B74F31081AE43 /* Pods_DIRelayExampleTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_DIRelayExampleTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		334ADB3D43533097A70CD13F /* Pods-DIRelayExampleTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DIRelayExampleTests.debug.xcconfig"; path = "Target Support Files/Pods-DIRelayExampleTests/Pods-DIRelayExampleTests.debug.xcconfig"; sourceTree = "<group>"; };
+		461E2D4926A7AD97000A887B /* Invitation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Invitation.swift; sourceTree = "<group>"; };
+		464A509C269D22FD0062D9CA /* PostBoxIdStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostBoxIdStorage.swift; sourceTree = "<group>"; };
+		464A50A5269E408A0062D9CA /* KeyManagement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyManagement.swift; sourceTree = "<group>"; };
+		464A513C269E603A0062D9CA /* Connection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Connection.swift; sourceTree = "<group>"; };
+		46981E1E26F1B56D00E67FF8 /* AppDelegate+IsUnitTestRunning.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppDelegate+IsUnitTestRunning.swift"; sourceTree = "<group>"; };
+		46B01AAE26F1AC6600099BAF /* AppDependencies.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDependencies.swift; sourceTree = "<group>"; };
+		46CD49F126FB650E00B06649 /* sudoplatformconfig.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = sudoplatformconfig.json; path = config/sudoplatformconfig.json; sourceTree = SOURCE_ROOT; };
+		4C695A525D051217FF089051 /* Pods-DIRelayExampleTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DIRelayExampleTests.release.xcconfig"; path = "Target Support Files/Pods-DIRelayExampleTests/Pods-DIRelayExampleTests.release.xcconfig"; sourceTree = "<group>"; };
+		795962014CB32B90A5280898 /* Pods-DIRelayExampleTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DIRelayExampleTests.release.xcconfig"; path = "Target Support Files/Pods-DIRelayExampleTests/Pods-DIRelayExampleTests.release.xcconfig"; sourceTree = "<group>"; };
+		907BB649FC6345AD10D66CB2 /* Pods_DIRelayExample.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_DIRelayExample.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		9577457D65F50497B6E0378C /* Pods-DIRelayExampleTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DIRelayExampleTests.debug.xcconfig"; path = "Target Support Files/Pods-DIRelayExampleTests/Pods-DIRelayExampleTests.debug.xcconfig"; sourceTree = "<group>"; };
+		CF4E6EBD246244C400A672B2 /* HTTPTransports.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPTransports.swift; sourceTree = "<group>"; };
+		CF51068E2465C92700B69629 /* KeychainStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainStorage.swift; sourceTree = "<group>"; };
+		CF784DEC245B9F7700185CF2 /* ConnectionDetailsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectionDetailsViewController.swift; sourceTree = "<group>"; };
+		CF9B40D1246A183B003136B4 /* Data+Base64URL.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Data+Base64URL.swift"; sourceTree = "<group>"; };
+		CFD59905245A47BF00230C6F /* DIRelayExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DIRelayExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		CFD59908245A47BF00230C6F /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		CFD5990A245A47BF00230C6F /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
+		CFD5990C245A47BF00230C6F /* WelcomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeViewController.swift; sourceTree = "<group>"; };
+		CFD5990F245A47BF00230C6F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		CFD59911245A47C100230C6F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		CFD59914245A47C100230C6F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		CFD59916245A47C100230C6F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		CFD5991C245A4E7800230C6F /* PostboxViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostboxViewController.swift; sourceTree = "<group>"; };
+		CFD59920245A7C8000230C6F /* UIViewController+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+Extensions.swift"; sourceTree = "<group>"; };
+		CFD59922245A7F5900230C6F /* Podfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; path = Podfile; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
+		CFD59925245B4DC200230C6F /* ConnectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectionViewController.swift; sourceTree = "<group>"; };
+		CFD59927245B4DCC00230C6F /* CreateConnectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateConnectionViewController.swift; sourceTree = "<group>"; };
+		CFD5992B245B52CE00230C6F /* CreateInvitationCodeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateInvitationCodeViewController.swift; sourceTree = "<group>"; };
+		CFD5992D245B5A6D00230C6F /* ScanInvitationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanInvitationViewController.swift; sourceTree = "<group>"; };
+		D63CA33F9B4069387E1D2FFF /* Pods-DIRelayExample.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DIRelayExample.debug.xcconfig"; path = "Target Support Files/Pods-DIRelayExample/Pods-DIRelayExample.debug.xcconfig"; sourceTree = "<group>"; };
+		D9DA29EC4AED3245ECF09445 /* Pods-DIRelayExample.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DIRelayExample.release.xcconfig"; path = "Target Support Files/Pods-DIRelayExample/Pods-DIRelayExample.release.xcconfig"; sourceTree = "<group>"; };
+		DB906E826D707FD8AFACA846 /* Pods-DIRelayExample.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DIRelayExample.debug.xcconfig"; path = "Target Support Files/Pods-DIRelayExample/Pods-DIRelayExample.debug.xcconfig"; sourceTree = "<group>"; };
+		ED00FD9D26F8453300311702 /* DIRelayExampleTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DIRelayExampleTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		ED00FDA926F8454000311702 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		ED00FDAD26F8456500311702 /* XCTestCase+Utility.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "XCTestCase+Utility.swift"; sourceTree = "<group>"; };
+		ED00FDAF26F8456500311702 /* UIStoryboard+Convenience.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIStoryboard+Convenience.swift"; sourceTree = "<group>"; };
+		ED00FDB026F8456500311702 /* XCTestCaseExpectation+Convenience.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "XCTestCaseExpectation+Convenience.swift"; sourceTree = "<group>"; };
+		ED00FDB126F8456500311702 /* XCTestCase+CustomAssertions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "XCTestCase+CustomAssertions.swift"; sourceTree = "<group>"; };
+		ED00FDB926F8457700311702 /* SudoDIRelayClientMock.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SudoDIRelayClientMock.swift; sourceTree = "<group>"; };
+		ED00FDBA26F8457700311702 /* MockAWSNetworkTransport.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockAWSNetworkTransport.swift; sourceTree = "<group>"; };
+		ED00FDBB26F8457700311702 /* MockAppSyncClientHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockAppSyncClientHelper.swift; sourceTree = "<group>"; };
+		ED00FDBD26F8457700311702 /* SudoDlRelayClientSpy.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SudoDlRelayClientSpy.swift; sourceTree = "<group>"; };
+		ED00FDBE26F8457700311702 /* AnyError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnyError.swift; sourceTree = "<group>"; };
+		ED00FDC026F8457700311702 /* DataFactoryNamespace.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataFactoryNamespace.swift; sourceTree = "<group>"; };
+		ED00FDC126F8457700311702 /* DataFactory+RelaySDK.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "DataFactory+RelaySDK.swift"; sourceTree = "<group>"; };
+		ED00FDC326F8457700311702 /* ComplexBase64Email.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ComplexBase64Email.txt; sourceTree = "<group>"; };
+		ED00FDC426F8457700311702 /* Base64EncodedBody.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Base64EncodedBody.txt; sourceTree = "<group>"; };
+		ED00FDC526F8457700311702 /* ComplexDataEmail.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ComplexDataEmail.txt; sourceTree = "<group>"; };
+		ED00FDC626F8457700311702 /* DataFactory+TestData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "DataFactory+TestData.swift"; sourceTree = "<group>"; };
+		ED00FDC726F8457700311702 /* DIRelayTestUtility.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DIRelayTestUtility.swift; sourceTree = "<group>"; };
+		ED00FDD626F845B700311702 /* UIViewController+ExtensionsTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIViewController+ExtensionsTests.swift"; sourceTree = "<group>"; };
+		ED00FDDA26F845D100311702 /* ConnectionViewControllerTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConnectionViewControllerTests.swift; sourceTree = "<group>"; };
+		ED00FDDD26F845DC00311702 /* CreateConnectionViewControllerTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CreateConnectionViewControllerTests.swift; sourceTree = "<group>"; };
+		ED00FDE026F845EB00311702 /* CreateInvitationCodeViewControllerTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CreateInvitationCodeViewControllerTests.swift; sourceTree = "<group>"; };
+		ED00FDE326F845F100311702 /* PostboxViewControllerTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PostboxViewControllerTests.swift; sourceTree = "<group>"; };
+		ED00FDE626F845FB00311702 /* ScanInvitationViewControllerTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScanInvitationViewControllerTests.swift; sourceTree = "<group>"; };
+		ED61B621A8A205DD5BDFDFF7 /* Pods-DIRelayExample.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DIRelayExample.release.xcconfig"; path = "Target Support Files/Pods-DIRelayExample/Pods-DIRelayExample.release.xcconfig"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		CFD59902245A47BF00230C6F /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4A7D7AD4652C9056C6543271 /* Pods_DIRelayExample.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		ED00FD9A26F8453300311702 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1293274A5F2F70F37B2A59AC /* Pods_DIRelayExampleTests.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		3DCE7EC395A25A2AF9F7B37C /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				907BB649FC6345AD10D66CB2 /* Pods_DIRelayExample.framework */,
+				28533FCACA7B74F31081AE43 /* Pods_DIRelayExampleTests.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		461E2D4626A646D9000A887B /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				46981E1E26F1B56D00E67FF8 /* AppDelegate+IsUnitTestRunning.swift */,
+				CF9B40D1246A183B003136B4 /* Data+Base64URL.swift */,
+				CFD59920245A7C8000230C6F /* UIViewController+Extensions.swift */,
+			);
+			name = Extensions;
+			sourceTree = "<group>";
+		};
+		464A50A4269E406B0062D9CA /* Crypto */ = {
+			isa = PBXGroup;
+			children = (
+				464A50A5269E408A0062D9CA /* KeyManagement.swift */,
+			);
+			name = Crypto;
+			sourceTree = "<group>";
+		};
+		98F881170680D02B7D57DD4A /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				DB906E826D707FD8AFACA846 /* Pods-DIRelayExample.debug.xcconfig */,
+				D63CA33F9B4069387E1D2FFF /* Pods-DIRelayExample.debug.xcconfig */,
+				D9DA29EC4AED3245ECF09445 /* Pods-DIRelayExample.release.xcconfig */,
+				ED61B621A8A205DD5BDFDFF7 /* Pods-DIRelayExample.release.xcconfig */,
+				334ADB3D43533097A70CD13F /* Pods-DIRelayExampleTests.debug.xcconfig */,
+				9577457D65F50497B6E0378C /* Pods-DIRelayExampleTests.debug.xcconfig */,
+				4C695A525D051217FF089051 /* Pods-DIRelayExampleTests.release.xcconfig */,
+				795962014CB32B90A5280898 /* Pods-DIRelayExampleTests.release.xcconfig */,
+			);
+			path = Pods;
+			sourceTree = "<group>";
+		};
+		CF51068D2465C90C00B69629 /* Storage */ = {
+			isa = PBXGroup;
+			children = (
+				464A513C269E603A0062D9CA /* Connection.swift */,
+				461E2D4926A7AD97000A887B /* Invitation.swift */,
+				CF51068E2465C92700B69629 /* KeychainStorage.swift */,
+				464A509C269D22FD0062D9CA /* PostBoxIdStorage.swift */,
+			);
+			name = Storage;
+			sourceTree = "<group>";
+		};
+		CFD598FC245A47BF00230C6F = {
+			isa = PBXGroup;
+			children = (
+				CFD59922245A7F5900230C6F /* Podfile */,
+				CFD59907245A47BF00230C6F /* DIRelayExample */,
+				ED00FDA726F8454000311702 /* DIRelayExampleTests */,
+				CFD59906245A47BF00230C6F /* Products */,
+				98F881170680D02B7D57DD4A /* Pods */,
+				3DCE7EC395A25A2AF9F7B37C /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		CFD59906245A47BF00230C6F /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				CFD59905245A47BF00230C6F /* DIRelayExample.app */,
+				ED00FD9D26F8453300311702 /* DIRelayExampleTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		CFD59907245A47BF00230C6F /* DIRelayExample */ = {
+			isa = PBXGroup;
+			children = (
+				464A50A4269E406B0062D9CA /* Crypto */,
+				461E2D4626A646D9000A887B /* Extensions */,
+				CF51068D2465C90C00B69629 /* Storage */,
+				CFD59939245B777700230C6F /* Transports */,
+				CFD59908245A47BF00230C6F /* AppDelegate.swift */,
+				46B01AAE26F1AC6600099BAF /* AppDependencies.swift */,
+				CFD59911245A47C100230C6F /* Assets.xcassets */,
+				CF784DEC245B9F7700185CF2 /* ConnectionDetailsViewController.swift */,
+				CFD59925245B4DC200230C6F /* ConnectionViewController.swift */,
+				CFD59927245B4DCC00230C6F /* CreateConnectionViewController.swift */,
+				CFD5992B245B52CE00230C6F /* CreateInvitationCodeViewController.swift */,
+				CFD59916245A47C100230C6F /* Info.plist */,
+				CFD59913245A47C100230C6F /* LaunchScreen.storyboard */,
+				CFD5990E245A47BF00230C6F /* Main.storyboard */,
+				CFD5991C245A4E7800230C6F /* PostboxViewController.swift */,
+				CFD5992D245B5A6D00230C6F /* ScanInvitationViewController.swift */,
+				CFD5990A245A47BF00230C6F /* SceneDelegate.swift */,
+				46CD49F126FB650E00B06649 /* sudoplatformconfig.json */,
+				CFD5990C245A47BF00230C6F /* WelcomeViewController.swift */,
+			);
+			path = DIRelayExample;
+			sourceTree = "<group>";
+		};
+		CFD59939245B777700230C6F /* Transports */ = {
+			isa = PBXGroup;
+			children = (
+				CF4E6EBD246244C400A672B2 /* HTTPTransports.swift */,
+			);
+			name = Transports;
+			sourceTree = "<group>";
+		};
+		ED00FDA726F8454000311702 /* DIRelayExampleTests */ = {
+			isa = PBXGroup;
+			children = (
+				ED00FDD426F845B000311702 /* Sources */,
+				ED00FDAB26F8455E00311702 /* Testing Utilities */,
+				ED00FDA926F8454000311702 /* Info.plist */,
+			);
+			path = DIRelayExampleTests;
+			sourceTree = "<group>";
+		};
+		ED00FDAB26F8455E00311702 /* Testing Utilities */ = {
+			isa = PBXGroup;
+			children = (
+				ED00FDAC26F8456500311702 /* Extensions */,
+				ED00FDB726F8457700311702 /* Utilities */,
+			);
+			path = "Testing Utilities";
+			sourceTree = "<group>";
+		};
+		ED00FDAC26F8456500311702 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				ED00FDAF26F8456500311702 /* UIStoryboard+Convenience.swift */,
+				ED00FDB126F8456500311702 /* XCTestCase+CustomAssertions.swift */,
+				ED00FDAD26F8456500311702 /* XCTestCase+Utility.swift */,
+				ED00FDB026F8456500311702 /* XCTestCaseExpectation+Convenience.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
+		ED00FDB726F8457700311702 /* Utilities */ = {
+			isa = PBXGroup;
+			children = (
+				ED00FDBF26F8457700311702 /* Data */,
+				ED00FDB826F8457700311702 /* Mocks */,
+				ED00FDBC26F8457700311702 /* Spies */,
+				ED00FDBE26F8457700311702 /* AnyError.swift */,
+				ED00FDC726F8457700311702 /* DIRelayTestUtility.swift */,
+			);
+			path = Utilities;
+			sourceTree = "<group>";
+		};
+		ED00FDB826F8457700311702 /* Mocks */ = {
+			isa = PBXGroup;
+			children = (
+				ED00FDBB26F8457700311702 /* MockAppSyncClientHelper.swift */,
+				ED00FDBA26F8457700311702 /* MockAWSNetworkTransport.swift */,
+				ED00FDB926F8457700311702 /* SudoDIRelayClientMock.swift */,
+			);
+			path = Mocks;
+			sourceTree = "<group>";
+		};
+		ED00FDBC26F8457700311702 /* Spies */ = {
+			isa = PBXGroup;
+			children = (
+				ED00FDBD26F8457700311702 /* SudoDlRelayClientSpy.swift */,
+			);
+			path = Spies;
+			sourceTree = "<group>";
+		};
+		ED00FDBF26F8457700311702 /* Data */ = {
+			isa = PBXGroup;
+			children = (
+				ED00FDC226F8457700311702 /* Files */,
+				ED00FDC126F8457700311702 /* DataFactory+RelaySDK.swift */,
+				ED00FDC626F8457700311702 /* DataFactory+TestData.swift */,
+				ED00FDC026F8457700311702 /* DataFactoryNamespace.swift */,
+			);
+			path = Data;
+			sourceTree = "<group>";
+		};
+		ED00FDC226F8457700311702 /* Files */ = {
+			isa = PBXGroup;
+			children = (
+				ED00FDC426F8457700311702 /* Base64EncodedBody.txt */,
+				ED00FDC326F8457700311702 /* ComplexBase64Email.txt */,
+				ED00FDC526F8457700311702 /* ComplexDataEmail.txt */,
+			);
+			path = Files;
+			sourceTree = "<group>";
+		};
+		ED00FDD426F845B000311702 /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				ED00FDD526F845B700311702 /* Extensions */,
+				ED00FDD826F845C800311702 /* Views */,
+			);
+			path = Sources;
+			sourceTree = "<group>";
+		};
+		ED00FDD526F845B700311702 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				ED00FDD626F845B700311702 /* UIViewController+ExtensionsTests.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
+		ED00FDD826F845C800311702 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				ED00FDD926F845D100311702 /* Connection */,
+				ED00FDDC26F845DC00311702 /* Create Connection */,
+				ED00FDDF26F845EB00311702 /* Create Intivation Code */,
+				ED00FDE226F845F100311702 /* Create Postbox */,
+				ED00FDE526F845FB00311702 /* Scan Invitation */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		ED00FDD926F845D100311702 /* Connection */ = {
+			isa = PBXGroup;
+			children = (
+				ED00FDDA26F845D100311702 /* ConnectionViewControllerTests.swift */,
+			);
+			path = Connection;
+			sourceTree = "<group>";
+		};
+		ED00FDDC26F845DC00311702 /* Create Connection */ = {
+			isa = PBXGroup;
+			children = (
+				ED00FDDD26F845DC00311702 /* CreateConnectionViewControllerTests.swift */,
+			);
+			path = "Create Connection";
+			sourceTree = "<group>";
+		};
+		ED00FDDF26F845EB00311702 /* Create Intivation Code */ = {
+			isa = PBXGroup;
+			children = (
+				ED00FDE026F845EB00311702 /* CreateInvitationCodeViewControllerTests.swift */,
+			);
+			path = "Create Intivation Code";
+			sourceTree = "<group>";
+		};
+		ED00FDE226F845F100311702 /* Create Postbox */ = {
+			isa = PBXGroup;
+			children = (
+				ED00FDE326F845F100311702 /* PostboxViewControllerTests.swift */,
+			);
+			path = "Create Postbox";
+			sourceTree = "<group>";
+		};
+		ED00FDE526F845FB00311702 /* Scan Invitation */ = {
+			isa = PBXGroup;
+			children = (
+				ED00FDE626F845FB00311702 /* ScanInvitationViewControllerTests.swift */,
+			);
+			path = "Scan Invitation";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		CFD59904245A47BF00230C6F /* DIRelayExample */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CFD59919245A47C100230C6F /* Build configuration list for PBXNativeTarget "DIRelayExample" */;
+			buildPhases = (
+				56D654CF615B2D91C0696B1C /* [CP] Check Pods Manifest.lock */,
+				CFD59901245A47BF00230C6F /* Sources */,
+				CFD59902245A47BF00230C6F /* Frameworks */,
+				CFD59903245A47BF00230C6F /* Resources */,
+				46A8B34026A14A9100807237 /* Copy Test Keys (Debug) */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = DIRelayExample;
+			productName = DIExample;
+			productReference = CFD59905245A47BF00230C6F /* DIRelayExample.app */;
+			productType = "com.apple.product-type.application";
+		};
+		ED00FD9C26F8453300311702 /* DIRelayExampleTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = ED00FDA426F8453300311702 /* Build configuration list for PBXNativeTarget "DIRelayExampleTests" */;
+			buildPhases = (
+				256292BA186BBC04B1F7ABDC /* [CP] Check Pods Manifest.lock */,
+				ED00FD9926F8453300311702 /* Sources */,
+				ED00FD9A26F8453300311702 /* Frameworks */,
+				ED00FD9B26F8453300311702 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				ED00FDA326F8453300311702 /* PBXTargetDependency */,
+			);
+			name = DIRelayExampleTests;
+			productName = DIRelayExampleTests;
+			productReference = ED00FD9D26F8453300311702 /* DIRelayExampleTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		CFD598FD245A47BF00230C6F /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 1250;
+				LastUpgradeCheck = 1250;
+				ORGANIZATIONNAME = "Sudo Platform";
+				TargetAttributes = {
+					CFD59904245A47BF00230C6F = {
+						CreatedOnToolsVersion = 11.3.1;
+					};
+					ED00FD9C26F8453300311702 = {
+						CreatedOnToolsVersion = 12.5.1;
+						TestTargetID = CFD59904245A47BF00230C6F;
+					};
+				};
+			};
+			buildConfigurationList = CFD59900245A47BF00230C6F /* Build configuration list for PBXProject "DIRelayExample" */;
+			compatibilityVersion = "Xcode 9.3";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = CFD598FC245A47BF00230C6F;
+			productRefGroup = CFD59906245A47BF00230C6F /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				CFD59904245A47BF00230C6F /* DIRelayExample */,
+				ED00FD9C26F8453300311702 /* DIRelayExampleTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		CFD59903245A47BF00230C6F /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CFD59912245A47C100230C6F /* Assets.xcassets in Resources */,
+				CFD59915245A47C100230C6F /* LaunchScreen.storyboard in Resources */,
+				464A509E269D4E1C0062D9CA /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		ED00FD9B26F8453300311702 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				ED00FDD026F8457800311702 /* Base64EncodedBody.txt in Resources */,
+				ED00FDCF26F8457800311702 /* ComplexBase64Email.txt in Resources */,
+				ED00FDD126F8457800311702 /* ComplexDataEmail.txt in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		256292BA186BBC04B1F7ABDC /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-DIRelayExampleTests-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		46A8B34026A14A9100807237 /* Copy Test Keys (Debug) */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Copy Test Keys (Debug)";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "returncode=0\n\necho \"Copy test key to bundle\"\nSOURCE=${PROJECT_DIR}/config/register_key.private\ncp -f ${SOURCE} \"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/\"\nif [ $? -ne 0 ]\nthen\n    echo \"error: Failed to copy test registration key. Make sure the file config/register_key.private exists in the project directory (see README.md).\"\nfi\n\necho \"Copy test key ID to bundle\"\nSOURCE=${PROJECT_DIR}/config/register_key.id \ncp -f ${SOURCE} \"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/\"\nif [ $? -ne 0 ]\nthen\n    echo \"error: Failed to copy test registration key ID. Make sure the file config/register_key.id exists in the project directory (see README.md).\"\nfi\n\necho \"Copy Sudo Platform config to bundle\"\nSOURCE=${PROJECT_DIR}/config/sudoplatformconfig.json\ncp -f ${SOURCE} \"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/\"\nif [ $? -ne 0 ]\nthen\n    echo \"error: Failed to copy sudoplatformconfig.json. Make sure the file config/sudoplatformconfig.json exists in the project directory (see README.md).\"\nfi\n\nexit ${returncode}\n";
+		};
+		56D654CF615B2D91C0696B1C /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-DIRelayExample-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		CFD59901245A47BF00230C6F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				46981E1F26F1B56D00E67FF8 /* AppDelegate+IsUnitTestRunning.swift in Sources */,
+				CFD59909245A47BF00230C6F /* AppDelegate.swift in Sources */,
+				46B01AAF26F1AC6600099BAF /* AppDependencies.swift in Sources */,
+				464A513D269E603A0062D9CA /* Connection.swift in Sources */,
+				CF784DED245B9F7700185CF2 /* ConnectionDetailsViewController.swift in Sources */,
+				CFD59926245B4DC200230C6F /* ConnectionViewController.swift in Sources */,
+				CFD59928245B4DCC00230C6F /* CreateConnectionViewController.swift in Sources */,
+				CFD5992C245B52CE00230C6F /* CreateInvitationCodeViewController.swift in Sources */,
+				CF9B40D2246A183B003136B4 /* Data+Base64URL.swift in Sources */,
+				CF4E6EBE246244C400A672B2 /* HTTPTransports.swift in Sources */,
+				461E2D4A26A7AD97000A887B /* Invitation.swift in Sources */,
+				CF51068F2465C92700B69629 /* KeychainStorage.swift in Sources */,
+				464A50A6269E408A0062D9CA /* KeyManagement.swift in Sources */,
+				464A509D269D22FD0062D9CA /* PostBoxIdStorage.swift in Sources */,
+				CFD5991D245A4E7800230C6F /* PostboxViewController.swift in Sources */,
+				CFD5992E245B5A6D00230C6F /* ScanInvitationViewController.swift in Sources */,
+				CFD5990B245A47BF00230C6F /* SceneDelegate.swift in Sources */,
+				CFD59921245A7C8000230C6F /* UIViewController+Extensions.swift in Sources */,
+				CFD5990D245A47BF00230C6F /* WelcomeViewController.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		ED00FD9926F8453300311702 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				ED00FDCC26F8457800311702 /* AnyError.swift in Sources */,
+				ED00FDDB26F845D100311702 /* ConnectionViewControllerTests.swift in Sources */,
+				ED00FDDE26F845DC00311702 /* CreateConnectionViewControllerTests.swift in Sources */,
+				ED00FDE126F845EB00311702 /* CreateInvitationCodeViewControllerTests.swift in Sources */,
+				ED00FDCE26F8457800311702 /* DataFactory+RelaySDK.swift in Sources */,
+				ED00FDD226F8457800311702 /* DataFactory+TestData.swift in Sources */,
+				ED00FDCD26F8457800311702 /* DataFactoryNamespace.swift in Sources */,
+				ED00FDD326F8457800311702 /* DIRelayTestUtility.swift in Sources */,
+				ED00FDCA26F8457800311702 /* MockAppSyncClientHelper.swift in Sources */,
+				ED00FDC926F8457800311702 /* MockAWSNetworkTransport.swift in Sources */,
+				ED00FDE426F845F100311702 /* PostboxViewControllerTests.swift in Sources */,
+				ED00FDE726F845FB00311702 /* ScanInvitationViewControllerTests.swift in Sources */,
+				ED00FDC826F8457800311702 /* SudoDIRelayClientMock.swift in Sources */,
+				ED00FDCB26F8457800311702 /* SudoDlRelayClientSpy.swift in Sources */,
+				ED00FDB426F8456500311702 /* UIStoryboard+Convenience.swift in Sources */,
+				ED00FDD726F845B700311702 /* UIViewController+ExtensionsTests.swift in Sources */,
+				ED00FDB626F8456500311702 /* XCTestCase+CustomAssertions.swift in Sources */,
+				ED00FDB226F8456500311702 /* XCTestCase+Utility.swift in Sources */,
+				ED00FDB526F8456500311702 /* XCTestCaseExpectation+Convenience.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		ED00FDA326F8453300311702 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = CFD59904245A47BF00230C6F /* DIRelayExample */;
+			targetProxy = ED00FDA226F8453300311702 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		CFD5990E245A47BF00230C6F /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				CFD5990F245A47BF00230C6F /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		CFD59913245A47C100230C6F /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				CFD59914245A47C100230C6F /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		CFD59917245A47C100230C6F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		CFD59918245A47C100230C6F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		CFD5991A245A47C100230C6F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = D63CA33F9B4069387E1D2FFF /* Pods-DIRelayExample.debug.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = UU2W43R8JA;
+				ENABLE_BITCODE = NO;
+				INFOPLIST_FILE = DIRelayExample/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.sudoplatform.DIRelayApp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		CFD5991B245A47C100230C6F /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = ED61B621A8A205DD5BDFDFF7 /* Pods-DIRelayExample.release.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = UU2W43R8JA;
+				ENABLE_BITCODE = NO;
+				INFOPLIST_FILE = DIRelayExample/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.sudoplatform.DIRelayApp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		ED00FDA526F8453300311702 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 9577457D65F50497B6E0378C /* Pods-DIRelayExampleTests.debug.xcconfig */;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = UU2W43R8JA;
+				INFOPLIST_FILE = DIRelayExampleTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.anonyome.DIRelayExampleTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/DIRelayExample.app/DIRelayExample";
+			};
+			name = Debug;
+		};
+		ED00FDA626F8453300311702 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 795962014CB32B90A5280898 /* Pods-DIRelayExampleTests.release.xcconfig */;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = UU2W43R8JA;
+				INFOPLIST_FILE = DIRelayExampleTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.anonyome.DIRelayExampleTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/DIRelayExample.app/DIRelayExample";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		CFD59900245A47BF00230C6F /* Build configuration list for PBXProject "DIRelayExample" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CFD59917245A47C100230C6F /* Debug */,
+				CFD59918245A47C100230C6F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CFD59919245A47C100230C6F /* Build configuration list for PBXNativeTarget "DIRelayExample" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CFD5991A245A47C100230C6F /* Debug */,
+				CFD5991B245A47C100230C6F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		ED00FDA426F8453300311702 /* Build configuration list for PBXNativeTarget "DIRelayExampleTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				ED00FDA526F8453300311702 /* Debug */,
+				ED00FDA626F8453300311702 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = CFD598FD245A47BF00230C6F /* Project object */;
+}

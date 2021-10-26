@@ -1,0 +1,6 @@
+framework module SudoConfigManager {
+  umbrella header "SudoConfigManager-umbrella.h"
+
+  export *
+  module * { export * }
+}

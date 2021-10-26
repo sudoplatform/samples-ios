@@ -1,0 +1,6 @@
+framework module KeyManager {
+  umbrella header "KeyManager-umbrella.h"
+
+  export *
+  module * { export * }
+}

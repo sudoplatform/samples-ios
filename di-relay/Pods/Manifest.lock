@@ -33,7 +33,7 @@ PODS:
     - SudoUser (~> 11.0)
   - SudoConfigManager (1.4.0):
     - SudoLogging (~> 0.2)
-  - SudoDIRelay (0.0.1):
+  - SudoDIRelay (0.1.1):
     - AWSAppSync (~> 3.1)
     - SudoApiClient (~> 4.0)
     - SudoConfigManager (~> 1.4)
@@ -58,7 +58,7 @@ PODS:
 
 DEPENDENCIES:
   - KeyManager (~> 5.0.0)
-  - "SudoDIRelay (from `git@gitlab.tools.anonyome.com:platform/decentralized-identity/sudo-decentralized-identity-relay-ios.git`, branch `dev`)"
+  - SudoDIRelay (~> 0.1.1)
   - SudoLogging (~> 0.3)
 
 SPEC REPOS:
@@ -78,20 +78,11 @@ SPEC REPOS:
     - Starscream
     - SudoApiClient
     - SudoConfigManager
+    - SudoDIRelay
     - SudoKeyManager
     - SudoLogging
     - SudoOperations
     - SudoUser
-
-EXTERNAL SOURCES:
-  SudoDIRelay:
-    :branch: dev
-    :git: "git@gitlab.tools.anonyome.com:platform/decentralized-identity/sudo-decentralized-identity-relay-ios.git"
-
-CHECKOUT OPTIONS:
-  SudoDIRelay:
-    :commit: 382f92dd2a4c8710213477f8039fe6f2c3c130ea
-    :git: "git@gitlab.tools.anonyome.com:platform/decentralized-identity/sudo-decentralized-identity-relay-ios.git"
 
 SPEC CHECKSUMS:
   AppSyncRealTimeClient: 2b4482b1770a3e5cf64f9714a6d198550017b5a2
@@ -108,12 +99,12 @@ SPEC CHECKSUMS:
   Starscream: 4bb2f9942274833f7b4d296a55504dcfc7edb7b0
   SudoApiClient: 919ee8c3b53324dc77dd5029ad5bdb0415377403
   SudoConfigManager: 41c6f94df155ff920096c08f1d6250fc3812a9ff
-  SudoDIRelay: 3ed3cade1d545f6e23759f7b070d2486a86d2e7e
+  SudoDIRelay: 382426db0c68f0cbb9605adc386df1956dcf060e
   SudoKeyManager: 14159babc8ad32c5ebc41e075fe0164b82e730b1
   SudoLogging: 3a469c7db097b4813d967597d7a62cfd1b580966
   SudoOperations: 30b9eb3444549b5eab0be9d57da31fd0ae84e691
   SudoUser: 292340496577da85b99112efbb54d16a04f9b97a
 
-PODFILE CHECKSUM: 69841b68a1fad72a57ede3c6c696125d48fdd596
+PODFILE CHECKSUM: 97afba6c8ac43c564a4786ffe0fda96dad4a19b5
 
 COCOAPODS: 1.10.1

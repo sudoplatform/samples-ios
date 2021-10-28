@@ -1,20 +1,22 @@
-# Sudo Decentralized Identity Relay iOS
+# Sudo Decentralized Identity Relay iOS SDK
 
-SDK for interfacing with Sudo Platform Decentralized Identity Relay Service in iOS applications.
+## Overview
+Your users will be able to easily create postboxes to receive and store messages in a Decentralized Identity Relay.
 
-### Pod install
+Please see the [Sudo Platform Developer Docs](https://sudoplatform.com/docs) for an overview of Decentralized Identity Relay in the Sudo Platform.
 
-``` bash
-$ bundle exec pod install
-```
+## Version Support
+| Technology             | Supported version |
+| ---------------------- | ----------------- |
+| iOS Deployment Target  | 13.0+             |
+| Swift language version | 5.0               |
+| Xcode version          | 12.0+             |
 
-### Update GraphQL
-To get the latest GraphQL schema from AWS, run the following command:
-``` bash
-$ ./get-latest-graphql-from-aws.sh -a <API_ID> [-r <REGION>]
-```
+## Integration Instructions
+Visit the [Decentralized Identity Relay section](https://docs.sudoplatform.com/sudo-labs/decentralized-identity) of the Sudo Platform Developer Docs for SDK integration instructions.
 
-Where API_ID is the AppSync API_ID. Then run:
-``` bash
-$ ./generate-client-graphql.sh
-```
+## Questions and Support
+File any issues you find on the project's GitHub repository. Be careful not to share any Personally Identifiable Information (PII) or sensitive account information (API keys, credentials, etc.) when reporting an issue.
+
+For general inquiries related to the Sudo Platform, please contact [partners@sudoplatform.com](mailto:partners@sudoplatform.com)
+

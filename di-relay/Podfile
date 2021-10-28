@@ -11,7 +11,7 @@ target 'DIRelayExample' do
   inhibit_all_warnings!
 
   # Pods for DIRelayExample
-  pod 'SudoDIRelay', :git=>'git@gitlab.tools.anonyome.com:platform/decentralized-identity/sudo-decentralized-identity-relay-ios.git', :branch=>'dev'
+  pod 'SudoDIRelay', '~> 0.1.1'
   pod 'KeyManager', '~> 5.0.0'
   pod 'SudoLogging', '~> 0.3'
 

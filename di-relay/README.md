@@ -46,4 +46,4 @@ Refer to the following documents for more information:
 
 File issues you find with this sample app in this Github repository. Ensure that you do not include any Personally Identifiable Information (PII), API keys, custom endpoints, etc. when reporting an issue.
 
-For general questions about the Sudo Platform please contact [partners@sudoplatform.com](mailto:partners@sudoplatform.com)
+For general questions about the Sudo Platform please contact [partners@sudoplatform.com](mailto:partners@sudoplatform.com).

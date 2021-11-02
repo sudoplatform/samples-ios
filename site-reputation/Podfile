@@ -11,7 +11,7 @@ target 'SiteReputationExample' do
     # Comment the next line if you don't want to use dynamic frameworks
     use_frameworks!
 
-    pod 'SudoSiteReputation', '~> 1.0'
+    pod 'SudoSiteReputation', '~> 2.0'
 
     # supress warnings for pods
     post_install do |installer|

@@ -98,7 +98,7 @@ class Authenticator {
             let client = Clients.userClient!
 
             // Present the federated sign out screen.  This will likely trigger a "do you want to allow access" alert.
-            try Clients.userClient!.presentFederatedSignOutUI(navigationController: nav) { (result) in
+            try Clients.userClient!.presentFederatedSignOutUI(presentationAnchor: nav.view.window!) { (result) in
                 switch result {
                 case .success:
 
@@ -169,7 +169,7 @@ class Authenticator {
         switch signInMethod {
         case .fsso:
             do {
-                try userClient.presentFederatedSignInUI(navigationController: nav) { signInResult in
+                try userClient.presentFederatedSignInUI(presentationAnchor: nav.view.window!) { signInResult in
                     switch signInResult {
                     case .failure(let error):
                         completion(.failure(error))

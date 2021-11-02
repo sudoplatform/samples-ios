@@ -1,47 +1,49 @@
 PODS:
-  - AppSyncRealTimeClient (1.4.2):
-    - Starscream (~> 3.1.0)
-  - AWSAppSync (3.1.5):
+  - AppSyncRealTimeClient (1.5.0):
+    - Starscream (~> 3.1.1)
+  - AWSAppSync (3.3.0):
     - AppSyncRealTimeClient (~> 1.4)
-    - AWSCore (~> 2.15.0)
-    - ReachabilitySwift (~> 5.0.0)
+    - AWSCore (~> 2.24.0)
+    - ReachabilitySwift (= 5.0.0)
     - SQLite.swift (~> 0.12.2)
-  - AWSAuthCore (2.15.3):
-    - AWSCore (= 2.15.3)
-  - AWSCognitoIdentityProvider (2.15.3):
-    - AWSCognitoIdentityProviderASF (= 1.0.2)
-    - AWSCore (= 2.15.3)
-  - AWSCognitoIdentityProviderASF (1.0.2)
-  - AWSCore (2.15.3)
-  - AWSMobileClient (2.15.3):
-    - AWSAuthCore (= 2.15.3)
-    - AWSCognitoIdentityProvider (= 2.15.3)
-  - AWSS3 (2.15.3):
-    - AWSCore (= 2.15.3)
+  - AWSAuthCore (2.24.5):
+    - AWSCore (= 2.24.5)
+  - AWSCognitoIdentityProvider (2.24.5):
+    - AWSCognitoIdentityProviderASF (= 2.24.5)
+    - AWSCore (= 2.24.5)
+  - AWSCognitoIdentityProviderASF (2.24.5)
+  - AWSCore (2.24.5)
+  - AWSMobileClient (2.24.5):
+    - AWSAuthCore (= 2.24.5)
+    - AWSCognitoIdentityProvider (= 2.24.5)
+    - AWSCognitoIdentityProviderASF (= 2.24.5)
+    - AWSCore (= 2.24.5)
+  - AWSS3 (2.24.5):
+    - AWSCore (= 2.24.5)
   - ReachabilitySwift (5.0.0)
   - SQLite.swift (0.12.2):
     - SQLite.swift/standard (= 0.12.2)
   - SQLite.swift/standard (0.12.2)
   - Starscream (3.1.1)
-  - SudoConfigManager (1.3.0):
+  - SudoConfigManager (1.4.0):
     - SudoLogging (~> 0.2)
   - SudoKeyManager (1.2.0)
   - SudoLogging (0.3.1)
-  - SudoSiteReputation (1.0.0):
+  - SudoSiteReputation (2.3.0):
     - SudoLogging (~> 0.3)
-    - SudoUser (~> 8.0)
-  - SudoUser (8.0.1):
-    - AWSAppSync (~> 3.1.5)
-    - AWSCognitoIdentityProvider (~> 2.15.3)
-    - AWSCore (~> 2.15.3)
-    - AWSMobileClient (~> 2.15.3)
-    - AWSS3 (~> 2.15.3)
+    - SudoUser (< 13.0, >= 10.0)
+  - SudoUser (12.1.2):
+    - AWSAppSync (~> 3.2)
+    - AWSCognitoIdentityProvider (~> 2.24.2)
+    - AWSCore (~> 2.24.2)
+    - AWSMobileClient (~> 2.24.2)
+    - AWSS3 (~> 2.24.2)
     - SudoConfigManager (~> 1.3)
     - SudoKeyManager (~> 1.2)
     - SudoLogging (~> 0.3)
 
 DEPENDENCIES:
-  - SudoSiteReputation (~> 1.0)
+  - SudoSiteReputation (~> 2.0)
 
 SPEC REPOS:
   trunk:
@@ -63,23 +65,23 @@ SPEC REPOS:
     - SudoUser
 
 SPEC CHECKSUMS:
-  AppSyncRealTimeClient: 7fb160294d067b6c0c4b3c4ab91e953fd4cfba30
-  AWSAppSync: dcaa833096bd226e6df445f91da8429adc88f89c
-  AWSAuthCore: 598e8eb56e12799877414d10b04598de12a15992
-  AWSCognitoIdentityProvider: 4a721292eda37a8c3ef451e8fec28abe14aff18e
-  AWSCognitoIdentityProviderASF: 0fb6ea671c05a63276e320726f680cd880522442
-  AWSCore: 5a8f9d7461dbe5ea6a5473c41cf113b687e19136
-  AWSMobileClient: 5c29678413764ee3bcd528421331deb0a35b72fb
-  AWSS3: 04a7e689791b382d2d1e29cda6852048e0555635
+  AppSyncRealTimeClient: 2b4482b1770a3e5cf64f9714a6d198550017b5a2
+  AWSAppSync: 211fec19be6c19d19250001259404311c2d7cc1d
+  AWSAuthCore: 73f2e518d32f094b656fea905651bc3288ef05c0
+  AWSCognitoIdentityProvider: d32ff306a4d3aafcdc42ce40bd36e44d3f274201
+  AWSCognitoIdentityProviderASF: 1ccfe4092b617de54f203c1b728e7be6f49716c1
+  AWSCore: 2d4b06b24e2f882deec23567438195818b16a3f2
+  AWSMobileClient: 72e55c9c7162516feab354aa67f4d38dcecdcfc7
+  AWSS3: 44a55115c5767e945049395584b747144e82d423
   ReachabilitySwift: 985039c6f7b23a1da463388634119492ff86c825
   SQLite.swift: d2b4642190917051ce6bd1d49aab565fe794eea3
   Starscream: 4bb2f9942274833f7b4d296a55504dcfc7edb7b0
-  SudoConfigManager: 7b38c594df2233ae69508d78123b1c628baef153
+  SudoConfigManager: 41c6f94df155ff920096c08f1d6250fc3812a9ff
   SudoKeyManager: 14159babc8ad32c5ebc41e075fe0164b82e730b1
   SudoLogging: 3a469c7db097b4813d967597d7a62cfd1b580966
-  SudoSiteReputation: 866d6a6f3bc77b71b70eea907e08774e391fef3e
-  SudoUser: d1ace0e264a906663fc7110e46a8d3408211509c
+  SudoSiteReputation: fd1c00485c892a9055c2772aec7234bebdd365ad
+  SudoUser: eeee5ba26cb59cbf3628f54eedc549266fff0758
 
-PODFILE CHECKSUM: 3a29747774848fcb5b7b1cf5ba4f96f8158a2a90
+PODFILE CHECKSUM: 3fcda225faeb812f041a1525b42ea36469a77cd3
 
 COCOAPODS: 1.10.1

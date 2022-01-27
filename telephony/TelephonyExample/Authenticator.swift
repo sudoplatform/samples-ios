@@ -54,7 +54,8 @@ class Authenticator {
                 name: "testRegisterAudience",
                 key: testKey,
                 keyId: testKeyId,
-                keyMananger: keyManager
+                keyManager: keyManager,
+                customAttributes: [:]
             )
             try userClient.registerWithAuthenticationProvider(
                 authenticationProvider: provider,

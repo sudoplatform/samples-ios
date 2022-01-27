@@ -192,7 +192,7 @@ class CreatePhoneNumberViewController: UIViewController, UITableViewDelegate, UI
                     // dismiss activity alert
                     self.dismiss(animated: true) {
                         switch result {
-                        case .success(let phoneNumber):
+                        case .success:
                             let success = UIAlertController(title: "Success", message: nil, preferredStyle: .alert)
                             success.addAction(UIAlertAction(title: "OK", style: .default) { _ in
                                 self.performSegue(withIdentifier: "returnToPhoneNumberList", sender: self)

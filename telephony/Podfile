@@ -16,6 +16,8 @@ pre_install do |installer|
 end
 
 target 'TelephonyExample' do
-    pod 'SudoTelephony', '~> 4.0.0'
-    pod 'SudoUser', '~> 7.9'
+    #pod 'SudoTelephony', '~> 4.0.0'
+    pod 'SudoTelephony' 
+    pod 'SudoUser', '~> 12.0'
+    pod 'SudoEntitlements'
 end

@@ -97,33 +97,26 @@ class ConversationDetailsViewController: UIViewController, UITableViewDelegate, 
     
     private func subscribeToMessages() {
         let telephonyClient = (UIApplication.shared.delegate as! AppDelegate).telephonyClient!
-
         do {
-            self.messageSubscriptionToken = try telephonyClient.subscribeToMessages { [weak self] result in
-                guard let self = self else { return }
-                
-                switch result {
-                case .success(let message):
-                    // Ignore updates to messages we aren't displaying.
-                    guard message.localPhoneNumber == self.localNumber?.phoneNumber,
-                        message.remotePhoneNumber == self.remoteNumber else {
-                            return
-                    }
-                    
-                    self.listMessages { messages in
-                        DispatchQueue.main.async {
-                            self.messages = messages.sorted(by: { $0.created > $1.created })
-                            self.tableView.reloadData()
-                        }
-                    }
-                case .failure(let error):
-                    DispatchQueue.main.async {
-                        self.presentErrorAlert(message: "Failed to subscribe to messages", error: error)
-                    }
-                }
-            }
-        } catch let error {
+            messageSubscriptionToken = try telephonyClient.subscribeToMessages(statusObserver: nil,
+                                                                                    resultHandler: newMessageSubscriptionHandler(message:))
+        } catch {
             self.presentErrorAlert(message: "Failed to subscribe to messages", error: error)
+        }
+    }
+
+    private func newMessageSubscriptionHandler(message: PhoneMessage) -> Void {
+        // Ignore updates to messages we aren't displaying.
+        guard message.localPhoneNumber == self.localNumber?.phoneNumber,
+              message.remotePhoneNumber == self.remoteNumber else {
+                  return
+              }
+
+        self.listMessages { messages in
+            DispatchQueue.main.async {
+                self.messages = messages.sorted(by: { $0.created > $1.created })
+                self.tableView.reloadData()
+            }
         }
     }
 

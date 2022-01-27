@@ -6,10 +6,19 @@
 
 import UIKit
 import SudoUser
+import SudoEntitlements
 
 class RegistrationViewController: UIViewController {
     @IBOutlet weak var registerButton: UIButton!
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
+
+    lazy var userClient: SudoUserClient = {
+        return (UIApplication.shared.delegate as! AppDelegate).userClient
+    }()
+
+    lazy var authenticator: Authenticator = {
+        return (UIApplication.shared.delegate as! AppDelegate).authenticator
+    }()
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
@@ -45,23 +54,33 @@ class RegistrationViewController: UIViewController {
         registerButton.isEnabled = false
 
         registerAndSignIn { registered in
-            DispatchQueue.main.async {
-                self.activityIndicator.stopAnimating()
-                self.registerButton.isEnabled = true
+            do {
+                let entitlementsClient = try DefaultSudoEntitlementsClient(userClient: self.userClient)
+                entitlementsClient.redeemEntitlements { result in
+                    if case .failure(let error) = result {
+                        self.showSignInFailureAlert(error: error)
+                    } else {
+                        DispatchQueue.main.async {
+                            self.activityIndicator.stopAnimating()
+                            self.registerButton.isEnabled = true
 
-                if registered {
-                    self.navigateToSudoList()
+                            if registered {
+                                self.navigateToSudoList()
+                            }
+
+                            //register for incoming calls after sign in complete
+                            (UIApplication.shared.delegate as! AppDelegate).registerForIncomingCalls()
+                        }
+                    }
                 }
-
-                //register for incoming calls after sign in complete
-                (UIApplication.shared.delegate as! AppDelegate).registerForIncomingCalls()
+            } catch {
+                self.showSignInFailureAlert(error: error)
             }
         }
     }
 
     private func registerAndSignIn(completion: @escaping (Bool) -> Void) {
-        let userClient: SudoUserClient = (UIApplication.shared.delegate as! AppDelegate).userClient
-        let authenticator: Authenticator = (UIApplication.shared.delegate as! AppDelegate).authenticator
+
 
         func signIn() {
             do {
@@ -91,7 +110,7 @@ class RegistrationViewController: UIViewController {
             }
 
             do {
-                try userClient.presentFederatedSignInUI(navigationController: navigationController) { signInResult in
+                try userClient.presentFederatedSignInUI(presentationAnchor: navigationController.view.window!) { signInResult in
                     switch signInResult {
                     case .failure(let error):
                         self.showSignInFailureAlert(error: error)

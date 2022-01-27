@@ -50,8 +50,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             self.authenticator = Authenticator(userClient: userClient, keyManager: keyManager)
 
             self.telephonyClient = try DefaultSudoTelephonyClient(
-                sudoUserClient: self.userClient,
-                sudoProfilesClient: self.sudoProfilesClient,
+                userClient: self.userClient,
+                profilesClient: self.sudoProfilesClient,
                 callProviderConfiguration: CallProviderConfiguration(
                     localizedName: "TelephonyExample",
                     iconTemplate: nil,

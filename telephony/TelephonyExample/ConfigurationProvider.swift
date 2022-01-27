@@ -8,6 +8,7 @@
 import Foundation
 import SudoTelephony
 import AWSAppSync
+import AWSCore
 import SudoUser
 
 struct ConfigurationProvider: AWSAppSync.AWSAppSyncServiceConfigProvider {
@@ -24,6 +25,11 @@ struct ConfigurationProvider: AWSAppSync.AWSAppSyncServiceConfigProvider {
 }
 
 class KeyAuthenticationInfo: AuthenticationInfo {
+
+    func getUsername() -> String {
+        return ""
+    }
+    
     
     static var type: String = "TEST"
     
@@ -36,10 +42,14 @@ class KeyAuthenticationInfo: AuthenticationInfo {
     func toString() -> String {
         return jwt
     }
-    
 }
 
 class KeyAuthenticationProvider: AuthenticationProvider {
+
+    func getAuthenticationInfo(completion: @escaping (Swift.Result<AuthenticationInfo, Error>) -> Void) {
+        completion(.success(authInfo))
+    }
+
     
     var authInfo = KeyAuthenticationInfo()
     

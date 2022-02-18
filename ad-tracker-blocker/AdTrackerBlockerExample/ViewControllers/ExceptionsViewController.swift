@@ -8,6 +8,7 @@ import UIKit
 import SudoAdTrackerBlocker
 import SafariServices
 
+@MainActor
 class ExceptionsViewController: UITableViewController {
 
     var exceptionList: [BlockingException] = []
@@ -21,7 +22,9 @@ class ExceptionsViewController: UITableViewController {
         self.parent?.navigationItem.title = "Exceptions"
         let removeAllButton = UIBarButtonItem(title: "Remove All", style: .plain, target: self, action: #selector(removeAllExceptions))
         self.parent?.navigationItem.rightBarButtonItem = removeAllButton
-        listExceptions()
+        Task {
+            await listExceptions()
+        }
     }
 
     override func viewWillDisappear(_ animated: Bool) {
@@ -29,8 +32,8 @@ class ExceptionsViewController: UITableViewController {
         self.parent?.navigationItem.rightBarButtonItem = nil
     }
 
-    func listExceptions() {
-        exceptionList = Clients.adTrackerBlockerClient.getExceptions()
+    func listExceptions() async {
+        self.exceptionList = await Clients.adTrackerBlockerClient.getExceptions()
         tableView.reloadData()
     }
 
@@ -43,9 +46,11 @@ class ExceptionsViewController: UITableViewController {
         alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { [weak self] _ in
             if let url = alert.textFields?[0].text {
                 if !url.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                    Clients.adTrackerBlockerClient.addExceptions([BlockingException(url)])
-                    self?.listExceptions()
-                    self?.notifyExtensions()
+                    Task { [weak self] in
+                        await Clients.adTrackerBlockerClient.addExceptions([BlockingException(url)])
+                        await self?.listExceptions()
+                        await self?.notifyExtensions()
+                    }
                 }
             }
         }))
@@ -54,24 +59,24 @@ class ExceptionsViewController: UITableViewController {
     }
 
     @objc func removeAllExceptions() {
-        Clients.adTrackerBlockerClient.removeAllExceptions()
-        listExceptions()
-        notifyExtensions()
+        Task {
+            await Clients.adTrackerBlockerClient.removeAllExceptions()
+            await listExceptions()
+            await notifyExtensions()
+        }
     }
 
     // notify all extensions to update
-    private func notifyExtensions() {
-        Clients.adTrackerBlockerClient.listRulesets { (result) in
-            switch result {
-            case .success(let rulesets):
-                for ruleset in rulesets {
-                    if UserDefaults.standard.bool(forKey: ruleset.type.rawValue) {
-                        ContentBlockerHelper.toggleContentBlockerFor(ruleset: ruleset, enable: true)
-                    }
+    private func notifyExtensions() async {
+        do {
+            let rulesets = try await Clients.adTrackerBlockerClient.listRulesets()
+            for ruleset in rulesets {
+                if UserDefaults.standard.bool(forKey: ruleset.type.rawValue) {
+                    try await ContentBlockerHelper.toggleContentBlockerFor(ruleset: ruleset, enable: true)
                 }
-            case .failure(let error):
-                print("Failed to list rulesets: \(error)")
             }
+        } catch {
+            print("Failed to list rulesets: \(error)")
         }
     }
 
@@ -111,10 +116,13 @@ class ExceptionsViewController: UITableViewController {
 
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete && indexPath.row > 0 {
-            Clients.adTrackerBlockerClient.removeExceptions([exceptionList[indexPath.row - 1]])
-            exceptionList.remove(at: indexPath.row - 1)
-            tableView.deleteRows(at: [indexPath], with: .fade)
-            notifyExtensions()
+            Task {
+                let exceptionsList = [exceptionList[indexPath.row - 1]]
+                await Clients.adTrackerBlockerClient.removeExceptions(exceptionsList)
+                exceptionList.remove(at: indexPath.row - 1)
+                tableView.deleteRows(at: [indexPath], with: .fade)
+                await notifyExtensions()
+            }
         }
     }
 }

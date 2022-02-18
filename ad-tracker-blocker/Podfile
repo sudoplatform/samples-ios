@@ -1,6 +1,6 @@
 source 'https://cdn.cocoapods.org/'
 
-platform :ios, '13.2'
+platform :ios, '14'
 
 acknowledgementsFields = ['name', 'version', 'licenseType', 'licenseText', 'homepage']
 acknowledgementsExclude = ['SudoUser', 'SudoTelephony', 'SudoApiClient', 'SudoConfigManager', 'SudoKeyManager', 'SudoLogging', 'SudoOperations', 'SudoProfiles']
@@ -13,7 +13,7 @@ target 'AdTrackerBlockerExample' do
   # Comment the next line if you don't want to use dynamic frameworks
   use_frameworks!
 
-  pod 'SudoAdTrackerBlocker', '~> 1.0'
+  pod 'SudoAdTrackerBlocker', '~> 3.0.1'
 
 # # supress warnings for pods
 post_install do |installer|

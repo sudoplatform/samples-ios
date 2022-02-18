@@ -8,6 +8,7 @@ import UIKit
 import SudoAdTrackerBlocker
 import SafariServices
 
+@MainActor
 class RulesetsViewController: UITableViewController {
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     var rulesetList: [Ruleset] = []
@@ -26,7 +27,9 @@ class RulesetsViewController: UITableViewController {
         let helpImage = UIImage(systemName: "questionmark.circle")
         self.parent?.navigationItem.rightBarButtonItem = UIBarButtonItem(image: helpImage, style: .plain, target: self, action: #selector(self.showHelpScreen))
 
-        listRulesets()
+        Task {
+            try await listRulesets()
+        }
         handleFirstTimeLaunch()
     }
 
@@ -43,29 +46,17 @@ class RulesetsViewController: UITableViewController {
         }
     }
 
-    private func listRulesets() {
+    private func listRulesets() async throws {
         activityIndicator.startAnimating()
-        Clients.adTrackerBlockerClient.listRulesets { [weak self] result in
-            switch result {
-            case .success(let rulesets):
-                self?.rulesetList.removeAll()
-                for ruleset in rulesets {
-                    self?.rulesetList.append(ruleset)
-                }
-                DispatchQueue.main.async {
-                    self?.tableView.reloadData()
-                }
-            case .failure(let error):
-                DispatchQueue.main.async {
-                    self?.presentErrorAlert(message: "Failed to list Rulesets", error: error)
-                }
-            }
-            DispatchQueue.main.async {
-                self?.activityIndicator.stopAnimating()
-                // set activity indicator frame to zero in order to slide the tableview up
-                self?.activityIndicator.frame = CGRect.zero
-            }
+        let rulesets = try await Clients.adTrackerBlockerClient.listRulesets()
+        self.rulesetList.removeAll()
+        for ruleset in rulesets {
+            self.rulesetList.append(ruleset)
         }
+        self.tableView.reloadData()
+        self.activityIndicator.stopAnimating()
+        // set activity indicator frame to zero in order to slide the tableview up
+        self.activityIndicator.frame = CGRect.zero
     }
 
     override func numberOfSections(in tableView: UITableView) -> Int {
@@ -98,9 +89,13 @@ class RulesetsViewController: UITableViewController {
         tableView.deselectRow(at: indexPath, animated: true)
         let ruleset = rulesetList[indexPath.row]
         let enabled = UserDefaults.standard.bool(forKey: ruleset.type.rawValue)
-        ContentBlockerHelper.toggleContentBlockerFor(ruleset: ruleset, enable: !enabled)
-        if let cell = tableView.cellForRow(at: indexPath) {
-            cell.accessoryType = enabled ? .none : .checkmark
+        Task {
+            do {
+                try await ContentBlockerHelper.toggleContentBlockerFor(ruleset: ruleset, enable: !enabled)
+                if let cell = tableView.cellForRow(at: indexPath) {
+                    cell.accessoryType = enabled ? .none : .checkmark
+                }
+            }
         }
     }
 }

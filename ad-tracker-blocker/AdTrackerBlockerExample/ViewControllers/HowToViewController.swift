@@ -6,6 +6,7 @@
 
 import UIKit
 
+@MainActor
 class HowToViewController: UIViewController {
 
     override func viewDidLoad() {

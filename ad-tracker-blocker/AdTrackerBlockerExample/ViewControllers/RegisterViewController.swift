@@ -7,6 +7,7 @@
 import UIKit
 import SudoUser
 
+@MainActor
 class RegisterViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDelegate {
 
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
@@ -53,10 +54,14 @@ class RegisterViewController: UIViewController, UIPickerViewDataSource, UIPicker
     }
 
     @objc func signOutTapped() {
-        guard let nav = self.navigationController else { return }
-        Clients.authenticator.doFSSOSignOut(from: nav) { (maybeError) in
-            Clients.resetClients()
-            print("Failed to sign out: \(String(describing: maybeError))")
+        guard let window = self.view.window else { return }
+        Task {
+            do {
+                try await Clients.authenticator.doFSSOSignOut(from: window)
+                await Clients.resetClients()
+            } catch {
+                print("Failed to sign out: \(String(describing: error))")
+            }
         }
     }
 
@@ -77,19 +82,22 @@ class RegisterViewController: UIViewController, UIPickerViewDataSource, UIPicker
     }
 
     @IBAction func registerButtonTapped() {
+        guard let window = self.view.window else { return }
+
         activityIndicator.startAnimating()
         registerButton.isEnabled = false
 
         let selectedRow = registrationMethodPicker.selectedRow(inComponent: 0)
         let signInMethod = registrationMethods[selectedRow]
-        Clients.authenticator.registerAndSignIn(from: self.navigationController!, signInMethod: signInMethod) { (result) in
-            DispatchQueue.main.async {
+        Task {
+            do {
+                try await Clients.authenticator.registerAndSignIn(from: window,
+                                                                  signInMethod: signInMethod)
                 self.activityIndicator.stopAnimating()
                 self.registerButton.isEnabled = true
-                switch result {
-                case .success: self.navigatePostSignIn()
-                case .failure(let error): self.showRegistrationFailureAlert(error: error)
-                }
+                self.navigatePostSignIn()
+            } catch {
+                self.showRegistrationFailureAlert(error: error)
             }
         }
     }

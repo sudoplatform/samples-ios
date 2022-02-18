@@ -20,7 +20,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey: Any] = [:]) -> Bool {
-        try? Clients.userClient!.processFederatedSignInTokens(url: url)
+        Task {
+            try await Clients.userClient!.processFederatedSignInTokens(url: url)
+        }
         return true
     }
 

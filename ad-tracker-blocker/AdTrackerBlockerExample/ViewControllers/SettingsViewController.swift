@@ -6,6 +6,7 @@
 
 import UIKit
 
+@MainActor
 class SettingsViewController: UITableViewController {
 
     override func viewDidLoad() {
@@ -28,7 +29,9 @@ class SettingsViewController: UITableViewController {
         tableView.deselectRow(at: indexPath, animated: true)
         switch indexPath.row {
         case 0:
-            signOut()
+            Task {
+                try await signOut()
+            }
         case 1:
             clearData()
         default:
@@ -36,7 +39,7 @@ class SettingsViewController: UITableViewController {
         }
     }
 
-    func signOut() {
+    func signOut() async throws {
         if Clients.authenticator.lastSignInMethod == .fsso {
             signOutFSSOWithAlert()
         } else {
@@ -48,10 +51,8 @@ class SettingsViewController: UITableViewController {
         let alert = UIAlertController(title: "Clear Stored Data?", message: "This will clear all stored data", preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
         alert.addAction(UIAlertAction(title: "Clear Storage", style: .default, handler: { _ in
-            do {
-                try Clients.adTrackerBlockerClient.reset()
-            } catch {
-                print("Failed to clear data: \(error)")
+            Task {
+                try await Clients.adTrackerBlockerClient.reset()
             }
         }))
         present(alert, animated: true, completion: nil)
@@ -61,12 +62,12 @@ class SettingsViewController: UITableViewController {
         let alert = UIAlertController(title: "Are you sure?", message: "This will sign out of your account and will clear all stored data.", preferredStyle: .alert)
 
         alert.addAction(UIAlertAction(title: "Sign Out", style: .destructive, handler: { (_) in
+            guard let window = self.view.window else { return }
             UIApplication.shared.topController?.presentActivityAlert(message: "Signing out")
-            Clients.authenticator.doFSSOSignOut(from: self.navigationController!) { _ in
-                DispatchQueue.main.async {
-                    Clients.resetClients()
-                    UIApplication.shared.rootController?.dismiss(animated: true, completion: nil)
-                }
+            Task {
+                try await Clients.authenticator.doFSSOSignOut(from: window)
+                await Clients.resetClients()
+                UIApplication.shared.rootController?.dismiss(animated: true, completion: nil)
             }
         }))
 

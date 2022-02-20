@@ -14,11 +14,11 @@ import SudoVirtualCards
 /// - Links To:
 ///     - `FundingSourceListViewController`: If a user successfully creates a funding source, they will be returned to this form.
 class CreateFundingSourceViewController: UIViewController,
-    UITableViewDelegate,
-    UITableViewDataSource,
-    InputFormCellDelegate,
-    FundingSourceAuthorizationDelegate,
-    LearnMoreViewDelegate {
+                                         UITableViewDelegate,
+                                         UITableViewDataSource,
+                                         InputFormCellDelegate,
+                                         FundingSourceAuthorizationDelegate,
+                                         LearnMoreViewDelegate {
 
     // MARK: - Outlets
 
@@ -194,20 +194,24 @@ class CreateFundingSourceViewController: UIViewController,
     ///
     /// This action will initiate the sequence of validating inputs and creating a funding source via the `virtualCardsClient`.
     @objc func didTapCreateFundingSourceButton() {
-        createFundingSource()
+        Task.detached(priority: .medium) {
+            await self.createFundingSource()
+        }
     }
 
     // MARK: - Operations
 
     /// Validates and creates a funding source based on the view's form inputs.
-    func createFundingSource() {
-        view.endEditing(true)
+    func createFundingSource() async {
+        Task { @MainActor in
+            view.endEditing(true)
+        }
         guard validateFormData() else {
-            presentErrorAlert(message: "Please ensure all fields are filled out")
+            await presentErrorAlert(message: "Please ensure all fields are filled out")
             return
         }
-        setCreateButtonEnabled(false)
-        presentActivityAlert(message: "Creating funding source")
+        await setCreateButtonEnabled(false)
+        await presentActivityAlert(message: "Creating funding source")
         let input = CreditCardFundingSourceInput(
             cardNumber: formData[.cardNumber] ?? "",
             expirationMonth: Int(formData[.expirationMonth] ?? "0") ?? 0,
@@ -220,21 +224,18 @@ class CreateFundingSourceViewController: UIViewController,
             postalCode: formData[.zip] ?? "",
             country: formData[.country] ?? ""
         )
-        virtualCardsClient.createFundingSource(
-            withCreditCardInput: input,
-            authorizationDelegate: self
-        ) { [weak self] result in
-            DispatchQueue.main.async {
-                self?.setCreateButtonEnabled(true)
-                switch result {
-                case .success:
-                    self?.dismissActivityAlert {
-                        self?.performSegue(withIdentifier: Segue.returnToFundingSourceList.rawValue, sender: self)
-                    }
-                case let .failure(error):
-                    self?.dismissActivityAlert {
-                        self?.presentErrorAlert(message: "Failed to create funding source", error: error)
-                    }
+        do {
+            _ = try await virtualCardsClient.createFundingSource(
+                withCreditCardInput: input,
+                authorizationDelegate: self
+            )
+            await self.dismissActivityAlert {
+                self.performSegue(withIdentifier: Segue.returnToFundingSourceList.rawValue, sender: self)
+            }
+        } catch {
+            await self.dismissActivityAlert {
+                Task { @MainActor in
+                    await self.presentErrorAlert(message: "Failed to create funding source", error: error)
                 }
             }
         }
@@ -268,7 +269,7 @@ class CreateFundingSourceViewController: UIViewController,
     func configureLearnMoreView() {
         learnMoreView.delegate = self
         learnMoreView.label.text = "A Funding source is required to link a real credit or debit card to a virtual card. This funding source is used to fund a"
-            + " transaction performed on the virtual card."
+        + " transaction performed on the virtual card."
     }
 
     // MARK: - Helpers
@@ -276,7 +277,7 @@ class CreateFundingSourceViewController: UIViewController,
     /// Sets the create button in the navigation bar to enabled/disabled.
     ///
     /// - Parameter isEnabled: If true, the navigation Create button will be enabled.
-    func setCreateButtonEnabled(_ isEnabled: Bool) {
+    @MainActor func setCreateButtonEnabled(_ isEnabled: Bool) async {
         navigationItem.rightBarButtonItem?.isEnabled = isEnabled
     }
 

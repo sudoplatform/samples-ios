@@ -29,12 +29,6 @@ class CardDetailViewController: UIViewController, UITableViewDataSource, UITable
 
     // MARK: - Supplementary
 
-    /// Typealias for a successful response call to `VirtualCardsClient.getTransactionsWithFilter(_:limit:nextToken:cachePolicy:completion:)`
-    typealias TransactionListSuccessCompletion = ([Transaction]) -> Void
-
-    /// Typealias for a error response call to `VirtualCardsClient.getTransactionsWithFilter(_:limit:nextToken:cachePolicy:completion:)`.
-    typealias TransactionListErrorCompletion = (Error) -> Void
-
     enum Segue: String {
         case navigateToTransactionDetail
     }
@@ -84,7 +78,10 @@ class CardDetailViewController: UIViewController, UITableViewDataSource, UITable
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        loadCacheTransactionsAndFetchRemote()
+
+        Task.detached(priority: .medium) {
+            await self.loadCacheTransactionsAndFetchRemote()
+        }
     }
 
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -101,30 +98,6 @@ class CardDetailViewController: UIViewController, UITableViewDataSource, UITable
             transactionDetail.inputCard = card
         case .none:
             break
-        }
-    }
-
-    // MARK: - Operations
-
-    /// List transactions from the virtual cards client.
-    ///
-    /// - Parameters:
-    ///   - cachePolicy: Cache policy used to retrieve the transactions.
-    ///   - success: Closure that executes on a successful retrieval of transactions.
-    ///   - failure: Closure that executes on an error during the retrieval of transactions.
-    func listTransactions(
-        cachePolicy: SudoVirtualCards.CachePolicy,
-        success: @escaping TransactionListSuccessCompletion,
-        failure: @escaping TransactionListErrorCompletion
-    ) {
-        let filter = GetTransactionsFilterInput(cardId: .equals(card.id))
-        virtualCardsClient.listTransactionsWithFilter(filter, limit: Defaults.transactionLimit, nextToken: nil, cachePolicy: cachePolicy) { result in
-            switch result {
-            case let .success(output):
-                success(output.items)
-            case let .failure(error):
-                failure(error)
-            }
         }
     }
 
@@ -172,32 +145,37 @@ class CardDetailViewController: UIViewController, UITableViewDataSource, UITable
     ///
     /// All transactions will be filted and sorted based on the `type` of transaction to ensure that transactions are displayed as either "Pending"
     /// or "Complete".
-    func loadCacheTransactionsAndFetchRemote() {
-        let failureCompletion: TransactionListErrorCompletion = { [weak self] error in
-            self?.presentErrorAlert(message: "Failed to list transactions", error: error)
-        }
-        listTransactions(
-            cachePolicy: .cacheOnly,
-            success: { [weak self] transactions in
-                guard let weakSelf = self else { return }
-                DispatchQueue.main.async {
-                    weakSelf.tableData = weakSelf.splitAndOrderTransactions(transactions)
-                    weakSelf.tableView.reloadData()
+    func loadCacheTransactionsAndFetchRemote() async {
+        do {
+            let filter = GetTransactionsFilterInput(cardId: .equals(self.card.id))
+            let localTransactions = try await self.virtualCardsClient.listTransactionsWithFilter(
+                filter,
+                limit: Defaults.transactionLimit,
+                nextToken: nil,
+                cachePolicy: .cacheOnly
+            ).items
+            Task {
+                await MainActor.run {
+                    self.tableData = self.splitAndOrderTransactions(localTransactions)
+                    self.tableView.reloadData()
                 }
-                weakSelf.listTransactions(
-                    cachePolicy: .remoteOnly,
-                    success: { [weak self] transactions in
-                        guard let weakSelf = self else { return }
-                        DispatchQueue.main.async {
-                            weakSelf.tableData = weakSelf.splitAndOrderTransactions(transactions)
-                            weakSelf.tableView.reloadData()
-                        }
-                    },
-                    failure: failureCompletion
-                )
-            },
-            failure: failureCompletion
-        )
+            }
+
+            let remoteTransactions = try await self.virtualCardsClient.listTransactionsWithFilter(
+                filter,
+                limit: Defaults.transactionLimit,
+                nextToken: nil,
+                cachePolicy: .remoteOnly
+            ).items
+            Task { @MainActor in
+                self.tableData = self.splitAndOrderTransactions(remoteTransactions)
+                self.tableView.reloadData()
+            }
+        } catch {
+            Task {
+                await self.presentErrorAlert(message: "Failed to list transactions", error: error)
+            }
+        }
     }
 
     /// Filters and sorts transactions based on `type` and returns as a map containing "Pending" and "Complete" transactions.

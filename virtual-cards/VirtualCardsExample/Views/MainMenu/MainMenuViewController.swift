@@ -128,38 +128,28 @@ class MainMenuViewController: UIViewController, UITableViewDelegate, UITableView
 
     // MARK: - Operations
 
-     /// Perform de-registration from the Sudo user client and clear all local data.
-    func deregister() {
-        presentActivityAlert(message: "Deregistering")
+    /// Perform de-registration from the Sudo user client and clear all local data.
+    func deregister() async {
+        await self.presentActivityAlert(message: "Deregistering")
+
         do {
-            try authenticator.userClient.deregister { result in
-                DispatchQueue.main.async {
-                    // dismiss activity alert
-                    self.dismissActivityAlert()
+            _ = try await authenticator.userClient.deregister()
+            try await self.authenticator.userClient.reset()
+            try self.profilesClient.reset()
+            try self.profilesClient.generateEncryptionKey()
+            try self.virtualCardsClient.reset()
 
-                    switch result {
-                    case .success:
-                        // after deregistering, clear all local data
-                        do {
-                            try self.authenticator.userClient.reset()
-                            try self.profilesClient.reset()
-                            try self.virtualCardsClient.reset()
-                        } catch let error {
-                            self.presentErrorAlert(message: "Failed to deregister", error: error)
-                        }
+            await self.dismissActivityAlert()
 
-                        // unwind back to registration view controller
-                        self.performSegue(withIdentifier: "returnToRegistration", sender: self)
-                    case .failure(let error):
-                        self.presentErrorAlert(message: "Failed to deregister", error: error)
-                    }
-                }
+            // unwind back to registration view controller
+            Task { @MainActor in
+                self.performSegue(withIdentifier: "returnToRegistration", sender: self)
             }
-        } catch let error {
-            self.dismissActivityAlert {
-                self.presentErrorAlert(message: "Failed to deregister", error: error)
-            }
+        } catch {
+            await self.presentErrorAlert(message: "Failed to deregister", error: error)
         }
+
+        await self.dismissActivityAlert()
     }
 
     // MARK: - Helpers: Configuration
@@ -190,7 +180,7 @@ class MainMenuViewController: UIViewController, UITableViewDelegate, UITableView
         let alert = UIAlertController(
             title: "What is a Virtual Card?",
             message: "Virtual cards must belong to a Sudo. Before a virtual card can be created, a user's identity needs "
-                + "to be verified and a funding source needs to be created.",
+            + "to be verified and a funding source needs to be created.",
             preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Learn More", style: .default) { _ in
             let docURL = URL(string: "https://docs.sudoplatform.com/guides/virtual-cards")!
@@ -208,7 +198,9 @@ class MainMenuViewController: UIViewController, UITableViewDelegate, UITableView
             preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
         alert.addAction(UIAlertAction(title: "Deregister", style: .default) { _ in
-            self.deregister()
+            Task.detached(priority: .medium) {
+                await self.deregister()
+            }
         })
         present(alert, animated: true, completion: nil)
     }

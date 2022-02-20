@@ -9,7 +9,7 @@ import UIKit
 /// Protocol to assign for a delegate of `LearnMoreView`.
 ///
 /// This is used to receive learn more button tap events.
-protocol LearnMoreViewDelegate: class {
+protocol LearnMoreViewDelegate: AnyObject {
 
     /// Called when the learn more button is tapped.
     func didTapLearnMoreButton()

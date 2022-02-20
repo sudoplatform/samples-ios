@@ -59,7 +59,9 @@ class SudoListViewController: UIViewController, UITableViewDelegate, UITableView
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        loadCacheSudosAndFetchRemote()
+        Task.detached(priority: .medium) {
+            await self.loadCacheSudosAndFetchRemote()
+        }
     }
 
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -81,56 +83,27 @@ class SudoListViewController: UIViewController, UITableViewDelegate, UITableView
     ///
     /// This action will ensure that the Sudo list is up to date when returning from views - e.g. `CreateSudoViewController`.
     @IBAction func returnToSudoList(segue: UIStoryboardSegue) {
-        loadCacheSudosAndFetchRemote()
+        Task.detached(priority: .medium) {
+            await self.loadCacheSudosAndFetchRemote()
+        }
     }
 
     // MARK: - Operations
 
-    /// List Sudos from the Sudo profiles client.
-    ///
-    /// - Parameters:
-    ///   - option: Option of either cache only or remote only when retrieving Sudos.
-    ///   - success: Closure that executes on a successful retrieval of Sudos.
-    func listSudos(option: SudoProfiles.ListOption, success: @escaping ([Sudo]) -> Void) {
-        do {
-            try profilesClient.listSudos(option: option) { result in
-                switch result {
-                case .success(let sudos):
-                    success(sudos)
-                case .failure(let error):
-                    DispatchQueue.main.async {
-                        self.presentErrorAlert(message: "Failed to list Sudos", error: error)
-                    }
-                }
-            }
-        } catch {
-            presentErrorAlert(message: "Failed to list Sudos", error: error)
-        }
-    }
-
     /// Delete a selected Sudo.
     ///
     /// - Parameter sudo: The selected Sudo to delete.
-    func deleteSudo(sudo: Sudo, _ completion: @escaping (Bool) -> Void) {
+    func deleteSudo(sudo: Sudo) async -> Bool {
+        await self.presentActivityAlert(message: "Deleting Sudo")
+        var status = false
         do {
-            presentActivityAlert(message: "Deleting Sudo")
-            try profilesClient.deleteSudo(sudo: sudo) { [weak self] result in
-                DispatchQueue.main.async {
-                    switch result {
-                    case .success:
-                        completion(true)
-                        self?.dismissActivityAlert()
-                    case let .failure(error):
-                        completion(false)
-                        self?.dismissActivityAlert {
-                            self?.presentErrorAlert(message: "Failed to delete Sudo", error: error)
-                        }
-                    }
-                }
-            }
+            _ = try await profilesClient.deleteSudo(sudo: sudo)
+            status = true
         } catch {
-            presentErrorAlert(message: "Failed to delete Sudo", error: error)
+            await presentErrorAlert(message: "Failed to delete Sudo", error: error)
         }
+        await self.dismissActivityAlert()
+        return status
     }
 
     // MARK: - Helpers: Configuration
@@ -145,19 +118,21 @@ class SudoListViewController: UIViewController, UITableViewDelegate, UITableView
     // MARK: - Helpers
 
     /// Attempts to load all Sudos from the device's cache first and then update via a remote call.
-    func loadCacheSudosAndFetchRemote() {
-        listSudos(option: .cacheOnly) { localSudos in
-            DispatchQueue.main.async {
+    func loadCacheSudosAndFetchRemote() async {
+        do {
+            let localSudos = try await self.profilesClient.listSudos(option: .cacheOnly)
+            Task { @MainActor in
                 self.sudos = localSudos
                 self.tableView.reloadData()
             }
 
-            self.listSudos(option: .remoteOnly) { remoteSudos in
-                DispatchQueue.main.async {
-                    self.sudos = remoteSudos
-                    self.tableView.reloadData()
-                }
+            let remoteSudos = try await self.profilesClient.listSudos(option: .remoteOnly)
+            Task { @MainActor in
+                self.sudos = remoteSudos
+                self.tableView.reloadData()
             }
+        } catch {
+            await presentErrorAlert(message: "Failed to list Sudos", error: error)
         }
     }
 
@@ -208,12 +183,21 @@ class SudoListViewController: UIViewController, UITableViewDelegate, UITableView
         if indexPath.row != sudos.count {
             let delete = UIContextualAction(style: .destructive, title: "Delete") { _, _, completion in
                 let sudo = self.sudos[indexPath.row]
-                self.deleteSudo(sudo: sudo) { success in
-                    if success {
-                        self.sudos.remove(at: indexPath.row)
-                        self.tableView.deleteRows(at: [indexPath], with: .automatic)
+                Task.detached(priority: .medium) {
+                    do {
+                        await self.presentActivityAlert(message: "Deleting Sudo")
+                        try await self.profilesClient.deleteSudo(sudo: sudo)
+                        await self.dismissActivityAlert()
+                        Task { @MainActor in
+                            self.sudos.remove(at: indexPath.row)
+                            self.tableView.deleteRows(at: [indexPath], with: .automatic)
+                        }
+                        completion(true)
+                    } catch {
+                        await self.dismissActivityAlert()
+                        await self.presentErrorAlert(message: "Failed to delete Sudo", error: error)
+                        completion(false)
                     }
-                    completion(success)
                 }
             }
             delete.backgroundColor = .red

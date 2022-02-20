@@ -59,13 +59,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         open url: URL,
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
     ) -> Bool {
-        do {
-            let urlProcessed = try AppDelegate.dependencies.userClient.processFederatedSignInTokens(url: url)
-            if !urlProcessed {
-                fatalError("Unable to process federated sign in tokens. Check federated sign in configuration")
+        Task.detached(priority: .medium) {
+            do {
+                let urlProcessed = try await AppDelegate.dependencies.userClient.processFederatedSignInTokens(url: url)
+                if !urlProcessed {
+                    fatalError("Unable to process federated sign in tokens. Check federated sign in configuration")
+                }
+            } catch {
+                fatalError(error.localizedDescription)
             }
-        } catch {
-            fatalError(error.localizedDescription)
         }
 
         return true

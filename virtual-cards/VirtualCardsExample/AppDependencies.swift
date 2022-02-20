@@ -61,8 +61,7 @@ struct AppDependencies {
         // Setup VirtualCardsClient
         virtualCardsClient = try DefaultSudoVirtualCardsClient(
             keyNamespace: "vcs",
-            userClient: userClient,
-            profilesClient: profilesClient
+            userClient: userClient
         )
     }
 }

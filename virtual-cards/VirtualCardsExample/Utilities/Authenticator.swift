@@ -39,46 +39,34 @@ class Authenticator {
         self.fileReadable = fileReadable
     }
 
-    func register(completion: @escaping (Swift.Result<Void, Error>) -> Void) {
-        do {
-            if userClient.isRegistered() { throw AuthenticatorError.alreadyRegistered }
-            guard let testKeyPath = fileReadable.path(forResource: "register_key", ofType: "private") else {
-                throw AuthenticatorError.missingTestKey
-            }
-            guard let testKeyIdPath = fileReadable.path(forResource: "register_key", ofType: "id") else {
-                throw AuthenticatorError.missingTestKeyId
-            }
-            let testKey = try fileReadable.contentsOfFile(forPath: testKeyPath)
-            let testKeyId = try fileReadable.contentsOfFile(forPath: testKeyIdPath).trimmingCharacters(in: .whitespacesAndNewlines)
-            let provider = try TESTAuthenticationProvider(
-                name: "testRegisterAudience",
-                key: testKey,
-                keyId: testKeyId,
-                keyManager: keyManager
-            )
-            try userClient.registerWithAuthenticationProvider(
-                authenticationProvider: provider,
-                registrationId: UUID().uuidString) { result in
-                    switch result {
-                    case .failure(let error):
-                        NSLog("Registration Failure: \(error)")
-                        completion(.failure(error))
-                    case .success:
-                        completion(.success(()))
-                    }
-            }
-        } catch let error {
-            NSLog("Pre-registration Failure: \(error)")
-            completion(.failure(error))
+    func register() async throws {
+        if try await userClient.isRegistered() { throw AuthenticatorError.alreadyRegistered }
+        guard let testKeyPath = fileReadable.path(forResource: "register_key", ofType: "private") else {
+            throw AuthenticatorError.missingTestKey
         }
+        guard let testKeyIdPath = fileReadable.path(forResource: "register_key", ofType: "id") else {
+            throw AuthenticatorError.missingTestKeyId
+        }
+        let testKey = try fileReadable.contentsOfFile(forPath: testKeyPath)
+        let testKeyId = try fileReadable.contentsOfFile(forPath: testKeyIdPath).trimmingCharacters(in: .whitespacesAndNewlines)
+        let provider = try TESTAuthenticationProvider(
+            name: "testRegisterAudience",
+            key: testKey,
+            keyId: testKeyId,
+            keyManager: keyManager
+        )
+        _ = try await userClient.registerWithAuthenticationProvider(
+            authenticationProvider: provider,
+            registrationId: UUID().uuidString
+        )
     }
 
-    func deregister(completion: @escaping (Result<String, Error>) -> Void) throws {
-        try userClient.deregister(completion: completion)
+    func deregister() async throws -> String {
+        try await userClient.deregister()
     }
 
-    func reset() throws {
-        try userClient.reset()
+    func reset() async throws {
+        try await userClient.reset()
     }
 
 }

@@ -93,80 +93,52 @@ class TransactionDetailViewController: UIViewController, UITableViewDataSource, 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         guard inputTransaction != nil else {
-            presentAlert(title: "Malformed transaction", message: "The transaction could not be loaded") { _ in
-                self.navigationController?.popViewController(animated: true)
+            Task {
+                await presentAlert(title: "Malformed transaction", message: "The transaction could not be loaded") { _ in
+                    self.navigationController?.popViewController(animated: true)
+                }
             }
             return
         }
         presentCancellableActivityAlert(message: "Loading Transaction", delegate: self) {
-            var transactionResult: Swift.Result<[Transaction], Error>?
-            var fundingSourceResult: Swift.Result<FundingSource, Error>?
-            var sudoResult: Swift.Result<Sudo, Error>?
-            let group = DispatchGroup()
-            group.enter()
-            self.listTransactions(withSequenceId: self.inputTransaction.sequenceId, cachePolicy: .remoteOnly) { result in
-                transactionResult = result
-                group.leave()
-            }
-            group.enter()
-            self.virtualCardsClient.getFundingSourceWithId(self.inputCard.fundingSourceId, cachePolicy: .remoteOnly) { result in
-                defer { group.leave() }
-                switch result {
-                case let .success(optionalFundingSource):
-                    guard let fundingSource = optionalFundingSource else {
-                        fundingSourceResult = .failure(TransactionDetailError.fundingSourceNotFound)
-                        return
-                    }
-                    fundingSourceResult = .success(fundingSource)
-                case let .failure(error):
-                    fundingSourceResult = .failure(error)
-                }
-            }
-            group.enter()
-            do {
-                try self.profilesClient.listSudos(option: .remoteOnly) { result in
-                    defer { group.leave() }
-                    switch result {
-                    case let .success(sudos):
-                        guard let sudo = sudos.first(where: { sudo in
-                            return self.inputCard.owners.contains { $0.id == sudo.id }
-                        }) else {
-                            sudoResult = .failure(TransactionDetailError.sudoNotFound)
-                            return
-                        }
-                        sudoResult = .success(sudo)
-                    case let .failure(cause):
-                        sudoResult = .failure(cause)
-                    }
-                }
-            } catch {
-                sudoResult = .failure(error)
-                group.leave()
-            }
-            group.notify(queue: .main) {
-                let transactions: [Transaction]
-                let fundingSource: FundingSource
-                let sudo: Sudo
+            let owners = self.inputCard.owners
+            Task.detached(priority: .medium) {
                 do {
-                    guard
-                        let transactionResult = transactionResult,
-                        let fundingSourceResult = fundingSourceResult,
-                        let sudoResult = sudoResult
-                    else {
-                        throw TransactionDetailError.failedToLoadData
+                    let transactions = try await self.listTransactions(withSequenceId: self.inputTransaction.sequenceId, cachePolicy: .remoteOnly)
+                    guard let fundingSource = try await self.virtualCardsClient.getFundingSourceWithId(
+                        self.inputCard.fundingSourceId,
+                        cachePolicy: .remoteOnly
+                    ) else {
+                        throw TransactionDetailError.fundingSourceNotFound
                     }
-                    transactions = try transactionResult.get()
-                    fundingSource = try fundingSourceResult.get()
-                    sudo = try sudoResult.get()
-                    guard let tableData = self.tableDataFromTransactions(transactions, sudo: sudo, fundingSource: fundingSource, card: self.inputCard) else {
-                        throw TransactionDetailError.failedToLoadData
+
+                    let sudos = try await self.profilesClient.listSudos(option: .remoteOnly)
+                    guard let sudo = sudos.first(where: { sudo in
+                        return owners.contains { $0.id == sudo.id }
+                    }) else {
+                        throw TransactionDetailError.sudoNotFound
                     }
-                    self.tableData = tableData
-                    self.tableView.reloadData()
-                    self.dismissActivityAlert()
+
+                    Task { @MainActor in
+                            guard let tableData = self.tableDataFromTransactions(
+                                transactions,
+                                sudo: sudo,
+                                fundingSource: fundingSource,
+                                card: self.inputCard
+                            ) else {
+                                await self.presentErrorAlert(message: "The transaction could not be loaded") { _ in
+                                    self.navigationController?.popViewController(animated: true)
+                                }
+                                return
+                            }
+                            self.tableData = tableData
+                            self.tableView.reloadData()
+                    }
+
+                    await self.dismissActivityAlert()
                 } catch {
-                    self.dismissActivityAlert {
-                        self.presentErrorAlert(message: "The transaction could not be loaded", error: error) { _ in
+                    await self.presentErrorAlert(message: "The transaction could not be loaded", error: error) { _ in
+                        Task { @MainActor in
                             self.navigationController?.popViewController(animated: true)
                         }
                     }
@@ -186,25 +158,13 @@ class TransactionDetailViewController: UIViewController, UITableViewDataSource, 
     ///   - failure: Closure that executes on an error during the retrieval of transactions.
     func listTransactions(
         withSequenceId sequenceId: String?,
-        cachePolicy: SudoVirtualCards.CachePolicy,
-        completion: @escaping TransactionListCompletion
-    ) {
+        cachePolicy: SudoVirtualCards.CachePolicy
+    ) async throws -> [Transaction] {
         var filter: GetTransactionsFilterInput?
         if let sequenceId = sequenceId {
             filter = GetTransactionsFilterInput(sequenceId: .equals(sequenceId))
         }
-        virtualCardsClient.listTransactionsWithFilter(filter, limit: Defaults.transactionLimit, nextToken: nil, cachePolicy: cachePolicy) { result in
-            let items = result.map { $0.items }
-            completion(items)
-        }
-    }
-
-    func loadTransactionCacheAndFetchRemote(
-        onCacheLoad cacheCompletion: @escaping TransactionListCompletion,
-        onRemoteLoad remoteCompletion: @escaping TransactionListCompletion
-    ) {
-        listTransactions(withSequenceId: inputTransaction.sequenceId, cachePolicy: .cacheOnly, completion: cacheCompletion)
-        listTransactions(withSequenceId: inputTransaction.sequenceId, cachePolicy: .cacheOnly, completion: remoteCompletion)
+        return try await virtualCardsClient.listTransactionsWithFilter(filter, limit: Defaults.transactionLimit, nextToken: nil, cachePolicy: cachePolicy).items
     }
 
     // MARK: - Helpers: Configuration
@@ -357,8 +317,10 @@ class TransactionDetailViewController: UIViewController, UITableViewDataSource, 
     // MARK: - Conformance: ActivityAlertViewControllerDelegate
 
     func didTapAlertCancelButton() {
-        dismissActivityAlert {
-            self.navigationController?.popViewController(animated: true)
+        Task {
+            await dismissActivityAlert {
+                self.navigationController?.popViewController(animated: true)
+            }
         }
     }
 }

@@ -59,8 +59,10 @@ class RegistrationViewController: UIViewController {
         super.viewDidAppear(animated)
 
         // Sign in automatically if the user is registered.
-        if userClient.isRegistered() {
-            self.registerButtonTapped()
+        Task.detached(priority: .medium) {
+            if try await self.userClient.isRegistered() {
+                await self.registerButtonTapped()
+            }
         }
     }
 
@@ -77,14 +79,16 @@ class RegistrationViewController: UIViewController {
         activityIndicator.startAnimating()
         registerButton.isEnabled = false
 
-        registerAndSignIn { registered in
-            DispatchQueue.main.async {
-                self.activityIndicator.stopAnimating()
-                self.registerButton.isEnabled = true
-
-                if registered {
+        Task.detached(priority: .medium) {
+            do {
+                try await self.registerAndSignIn()
+                Task { @MainActor in
+                    self.activityIndicator.stopAnimating()
+                    self.registerButton.isEnabled = true
                     self.navigateToMainMenu()
                 }
+            } catch {
+                await self.showSignInFailureAlert(error: error)
             }
         }
     }
@@ -92,85 +96,32 @@ class RegistrationViewController: UIViewController {
     // MARK: - Operations
 
     /// Perform registration and sign in from the Sudo user client.
-    ///
-    /// - Parameters:
-    ///     - completion: Closure that indicates the success or failure of the registration process.
-    func registerAndSignIn(completion: @escaping (Bool) -> Void) {
+    func registerAndSignIn() async throws {
 
-        func redeem() {
-            self.entitlementsClient.redeemEntitlements { [weak self] result in
-                switch result {
-                case .success:
-                    completion(true)
-                case .failure(let error):
-                    DispatchQueue.main.async {
-                        self?.showSignInFailureAlert(error: error)
-                    }
-                    completion(false)
-                }
-            }
+        func redeem() async throws {
+            _ = try await self.entitlementsClient.redeemEntitlements()
         }
 
-        func signIn() {
-            do {
-                if try userClient.isSignedIn() {
-                    completion(true)
-                    return
-                }
-
-                try userClient.signInWithKey { [weak self] signInResult in
-                    switch signInResult {
-                    case .failure(let error):
-                        DispatchQueue.main.async {
-                            self?.showSignInFailureAlert(error: error)
-                        }
-                        completion(false)
-                    case .success:
-                        redeem()
-                    }
-                }
-            } catch let signInError {
-                self.showSignInFailureAlert(error: signInError)
-                completion(false)
+        func signIn() async throws {
+            if !(try await self.userClient.isSignedIn()) {
+                _ = try await self.userClient.signInWithKey()
+                _ = try await redeem()
             }
         }
 
         if userClient.getSupportedRegistrationChallengeType().contains(.fsso) {
             guard let viewControllerWindow = self.view.window else {
-                return completion(false)
+                return
             }
 
-            do {
-                try userClient.presentFederatedSignInUI(presentationAnchor: viewControllerWindow) { [weak self] signInResult in
-                    switch signInResult {
-                    case .failure(let error):
-                        DispatchQueue.main.async {
-                            self?.showSignInFailureAlert(error: error)
-                        }
-                        completion(false)
-                    case .success:
-                        redeem()
-                    }
-                }
-            } catch let signInError {
-                self.showSignInFailureAlert(error: signInError)
-                completion(false)
-            }
+            _ = try await userClient.presentFederatedSignInUI(presentationAnchor: viewControllerWindow)
+            _ = try await redeem()
         } else {
-            if userClient.isRegistered() {
-                signIn()
+            if try await userClient.isRegistered() {
+                _ = try await signIn()
             } else {
-                authenticator.register { [weak self] registerResult in
-                    switch registerResult {
-                    case .failure(let error):
-                        DispatchQueue.main.async {
-                            self?.showRegistrationFailureAlert(error: error)
-                        }
-                        completion(false)
-                    case .success:
-                        signIn()
-                    }
-                }
+                try await authenticator.register()
+                _ = try await signIn()
             }
         }
     }
@@ -191,10 +142,10 @@ class RegistrationViewController: UIViewController {
     ///
     /// - Parameters:
     ///     - error: Contains the given `Error`.
-    private func showSignInFailureAlert(error: Error) {
+    @MainActor private func showSignInFailureAlert(error: Error) async {
         let alert = UIAlertController(title: "Error", message: "Failed to sign in:\n\(error.localizedDescription)", preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
-        present(alert, animated: true, completion: nil)
+        self.present(alert, animated: true, completion: nil)
     }
 
     /// Navigates to the `MainMenuViewController` via a segue.

@@ -29,12 +29,6 @@ class FundingSourceListViewController: UIViewController, UITableViewDelegate, UI
 
     // MARK: - Supplementary
 
-    /// Typealias for a successful response call to `VirtualCardsClient.getFundingSourcesWithFilter(_:limit:nextToken:cachePolicy:completion:)`
-    typealias FundingSourceListSuccessCompletion = ([FundingSource]) -> Void
-
-    /// Typealias for a error response call to `VirtualCardsClient.getFundingSourcesWithFilter(_:limit:nextToken:cachePolicy:completion:)`.
-    typealias FundingSourceListErrorCompletion = (Error) -> Void
-
     /// Defaults used in `FundingSourceListViewController`.
     enum Defaults {
         /// Limit used when querying funding sources from `VirtualCardsClient`.
@@ -68,7 +62,10 @@ class FundingSourceListViewController: UIViewController, UITableViewDelegate, UI
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        loadCacheFundingSourcesAndFetchRemote()
+
+        Task.detached(priority: .medium) {
+            await self.loadCacheFundingSourcesAndFetchRemote()
+        }
     }
 
     // MARK: - Actions
@@ -77,7 +74,9 @@ class FundingSourceListViewController: UIViewController, UITableViewDelegate, UI
     ///
     /// This action will ensure that the funding source list is up to date when returning from views - e.g. `CreateFundingSourceViewController`.
     @IBAction func returnToFundingSourceList(segue: UIStoryboardSegue) {
-        loadCacheFundingSourcesAndFetchRemote()
+        Task.detached(priority: .medium) {
+            await self.loadCacheFundingSourcesAndFetchRemote()
+        }
     }
 
     // MARK: - Operations
@@ -89,37 +88,31 @@ class FundingSourceListViewController: UIViewController, UITableViewDelegate, UI
     ///   - success: Closure that executes on a successful retrieval of funding sources.
     ///   - failure: Closure that executes on an error during the retrieval of funding sources.
     func listFundingSources(
-        cachePolicy: SudoVirtualCards.CachePolicy,
-        success: @escaping FundingSourceListSuccessCompletion,
-        failure: @escaping FundingSourceListErrorCompletion
-    ) {
-        virtualCardsClient.listFundingSourcesWithLimit(Defaults.fundingSourceLimit, nextToken: nil, cachePolicy: cachePolicy) { result in
-            switch result {
-            case let .success(output):
-                success(output.items)
-            case let .failure(error):
-                failure(error)
-            }
-        }
+        cachePolicy: SudoVirtualCards.CachePolicy
+    ) async throws -> [FundingSource] {
+        return try await virtualCardsClient.listFundingSourcesWithLimit(
+            Defaults.fundingSourceLimit,
+            nextToken: nil,
+            cachePolicy: cachePolicy
+        ).items
     }
 
     /// Cancel a funding source based on the input id.
     ///
     /// - Parameter id: The id of the funding source to cancel.
-    func cancelFundingSource(id: String, _ completion: @escaping (Result<FundingSource, Error>) -> Void) {
-        presentActivityAlert(message: "Cancelling funding source")
-        virtualCardsClient.cancelFundingSourceWithId(id) { [weak self] result in
-            DispatchQueue.main.async {
-                switch result {
-                case .success:
-                    self?.dismissActivityAlert()
-                case let .failure(error):
-                    self?.dismissActivityAlert {
-                        self?.presentErrorAlert(message: "Failed to cancel funding source", error: error)
-                    }
-                }
-                completion(result)
-            }
+    func cancelFundingSource(id: String) async throws -> FundingSource {
+        await self.presentActivityAlert(message: "Cancelling funding source")
+
+        do {
+            let fundingSource = try await virtualCardsClient.cancelFundingSourceWithId(id)
+
+            await self.dismissActivityAlert()
+
+            return fundingSource
+        } catch {
+            await self.dismissActivityAlert()
+            await self.presentErrorAlert(message: "Failed to cancel funding source", error: error)
+            throw error
         }
     }
 
@@ -137,32 +130,28 @@ class FundingSourceListViewController: UIViewController, UITableViewDelegate, UI
     /// Attempts to load all funding sources from the device's cache first and then update via a remote call.
     ///
     /// On any failure, either by cache or remote call,  a "Failed to list funding sources" UIAlert message will be presented to the user.
-    func loadCacheFundingSourcesAndFetchRemote() {
-        let failureCompletion: FundingSourceListErrorCompletion = { [weak self] error in
-             self?.presentErrorAlert(message: "Failed to list Funding Sources", error: error)
-         }
-        listFundingSources(
-            cachePolicy: .cacheOnly,
-            success: { [weak self] fundingSources in
-                guard let weakSelf = self else { return }
-                DispatchQueue.main.async {
-                    weakSelf.fundingSources = fundingSources
-                    weakSelf.tableView.reloadData()
-                }
-                weakSelf.listFundingSources(
-                    cachePolicy: .remoteOnly,
-                    success: { [weak self] fundingSources in
-                        DispatchQueue.main.async {
-                            guard let weakSelf = self else { return }
-                            weakSelf.fundingSources = fundingSources
-                            weakSelf.tableView.reloadData()
-                        }
-                    },
-                    failure: failureCompletion
-                )
-            },
-            failure: failureCompletion
-        )
+    func loadCacheFundingSourcesAndFetchRemote() async {
+        do {
+            let localFundingSource = try await listFundingSources(
+                cachePolicy: .cacheOnly
+            )
+
+            Task { @MainActor in
+                self.fundingSources = localFundingSource
+                self.tableView.reloadData()
+            }
+
+            let remoteFundingSource = try await listFundingSources(
+                cachePolicy: .remoteOnly
+            )
+
+            Task { @MainActor in
+                self.fundingSources = remoteFundingSource
+                self.tableView.reloadData()
+            }
+        } catch {
+            await self.presentErrorAlert(message: "Failed to list Funding Sources", error: error)
+        }
     }
 
     /// Formats the title which represents a funding source and is displayed on the table view cell.
@@ -215,15 +204,18 @@ class FundingSourceListViewController: UIViewController, UITableViewDelegate, UI
         if indexPath.row != fundingSources.count {
             let cancel = UIContextualAction(style: .destructive, title: "Cancel") { _, _, completion in
                 let fundingSource = self.fundingSources[indexPath.row]
-                self.cancelFundingSource(id: fundingSource.id) { result in
-                    switch result {
-                    case .success(let result):
-                        self.fundingSources.remove(at: indexPath.row)
-                        self.fundingSources.insert(result, at: indexPath.row)
-                        let cell = self.tableView.cellForRow(at: indexPath)
-                        cell?.textLabel?.text = self.getDisplayTitleForFundingSource(result)
-                        completion(true)
-                    case .failure:
+
+                Task.detached(priority: .medium) {
+                    do {
+                        let canceledFundingSource = try await self.cancelFundingSource(id: fundingSource.id)
+                        Task { @MainActor in
+                            self.fundingSources.remove(at: indexPath.row)
+                            self.fundingSources.insert(canceledFundingSource, at: indexPath.row)
+                            let cell = self.tableView.cellForRow(at: indexPath)
+                            cell?.textLabel?.text = self.getDisplayTitleForFundingSource(canceledFundingSource)
+                            completion(true)
+                        }
+                    } catch {
                         completion(false)
                     }
                 }

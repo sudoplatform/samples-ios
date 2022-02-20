@@ -26,7 +26,7 @@ struct ConfigurationProvider: AWSAppSync.AWSAppSyncServiceConfigProvider {
 
 class KeyAuthenticationInfo: AuthenticationInfo {
 
-    static var type: String = "TEST"
+    let type: String = "TEST"
 
     var jwt: String = ""
 
@@ -47,8 +47,8 @@ class KeyAuthenticationProvider: AuthenticationProvider {
 
     var authInfo = KeyAuthenticationInfo()
 
-    func getAuthenticationInfo(completion: @escaping (Swift.Result<AuthenticationInfo, Error>) -> Void) {
-        completion(.success(authInfo))
+    func getAuthenticationInfo() async throws -> AuthenticationInfo {
+        return authInfo
     }
 
     func reset() {}

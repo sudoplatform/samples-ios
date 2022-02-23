@@ -30,7 +30,7 @@ struct RelayTransformer {
             connectionId: result.connectionId,
             cipherText: result.cipherText,
             direction: try transform(result.direction),
-            timestamp: try transform(timestamp: result.utcTimestamp)
+            timestamp: transform(timestamp: result.utcTimestamp)
         )
     }
 
@@ -54,16 +54,9 @@ struct RelayTransformer {
 
     /// Transform a `timestamp` formatted as E, d MMM yyyy HH:mm:ss zzz into a `Date` object.
     /// - Parameter timestamp: A timestamp from the relay.
-    /// - Throws: `SudoDIRelayError.InternalError`
     /// - Returns: `Date` representation of the timestamp
-    static func transform(timestamp: String) throws -> Date {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "E, d MMM yyyy HH:mm:ss zzz"
-        if let returnValue =  dateFormatter.date(from: timestamp) {
-            return returnValue
-        } else {
-            throw SudoDIRelayError.internalError("Unsupported date format: \(timestamp)")
-        }
+    static func transform(timestamp: Double) -> Date {
+        return Date(millisecondsSince1970: timestamp)
     }
 
     // MARK: - Helpers
@@ -76,7 +69,7 @@ struct RelayTransformer {
                 connectionId: $0.connectionId,
                 cipherText: $0.cipherText,
                 direction: try transform($0.direction),
-                timestamp: try transform(timestamp: $0.utcTimestamp)
+                timestamp: transform(timestamp: $0.utcTimestamp)
             )
         }
     }
@@ -88,7 +81,7 @@ struct RelayTransformer {
             connectionId: items.connectionId,
             cipherText: items.cipherText,
             direction: try transform(items.direction),
-            timestamp: try transform(timestamp: items.utcTimestamp)
+            timestamp: transform(timestamp: items.utcTimestamp)
         )
     }
 }

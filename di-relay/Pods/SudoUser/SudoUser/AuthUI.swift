@@ -105,7 +105,7 @@ public class CognitoAuthUI: AuthUI {
 
         let cognitoAuthConfig: AWSCognitoAuthConfiguration = AWSCognitoAuthConfiguration.init(appClientId: appClientId,
                                                                                               appClientSecret: nil,
-                                                                                              scopes: ["openid", "aws.cognito.signin.user.admin"],
+                                                                                              scopes: ["openid"],
                                                                                               signInRedirectUri: signInRedirectUri,
                                                                                               signOutRedirectUri: signOutRedirectUri,
                                                                                               webDomain: "https://\(webDomain)",

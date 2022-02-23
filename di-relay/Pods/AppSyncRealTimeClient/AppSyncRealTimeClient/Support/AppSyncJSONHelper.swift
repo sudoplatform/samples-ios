@@ -1,13 +1,13 @@
 //
-// Copyright 2018-2021 Amazon.com,
-// Inc. or its affiliates. All Rights Reserved.
+// Copyright Amazon.com Inc. or its affiliates.
+// All Rights Reserved.
 //
 // SPDX-License-Identifier: Apache-2.0
 //
 
 import Foundation
 
-public struct AppSyncJSONHelper {
+public enum AppSyncJSONHelper {
 
     public static func base64AuthenticationBlob(_ header: AuthenticationHeader ) -> String {
         let jsonEncoder = JSONEncoder()

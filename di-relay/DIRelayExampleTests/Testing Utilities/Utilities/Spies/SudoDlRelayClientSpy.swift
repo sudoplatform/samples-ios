@@ -16,6 +16,16 @@ class MockSubscriptionToken: SubscriptionToken {
 
 class SudoDIRelayClientSpy: SudoDIRelayClient {
 
+    var getPostboxEndpointCalled: Bool = false
+    var getPostboxEndpointParameters: (String)?
+    var getPostboxEndpointResult: URL? = nil
+
+    func getPostboxEndpoint(withConnectionId connectionId: String) -> URL? {
+        getPostboxEndpointCalled = true
+        getPostboxEndpointParameters = (connectionId)
+        return getPostboxEndpointResult
+    }
+
     var getMessagesCalled: Bool = false
     var getMessagesParameters: (withConnectionId: String, completion: ClientCompletion<[RelayMessage]>)?
     var getMessagesResult: Result<[RelayMessage], Error> = .failure(

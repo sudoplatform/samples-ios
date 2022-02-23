@@ -6,16 +6,25 @@
 
 import UIKit
 import SudoDIRelay
+import SudoUser
 
 class PostboxViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
     
-    // MARK: - Supplementary
+    // MARK: - Properties
 
     var postboxIds: [String] = []
+    var currentRegistrationMethod: ChallengeType = .unknown
+    private var presentedActivityAlert: UIAlertController?
+
+    // MARK: - Properties: Computed
+
     var relayClient: SudoDIRelayClient {
         return AppDelegate.dependencies.sudoDIRelayClient
     }
-    private var presentedActivityAlert: UIAlertController?
+
+    var sudoUserClient: SudoUserClient {
+        return AppDelegate.dependencies.sudoUserClient
+    }
 
     // MARK: - Outlets
 
@@ -67,7 +76,7 @@ class PostboxViewController: UIViewController, UITableViewDelegate, UITableViewD
             createPostBoxAndSaveToCache()
             
         } else {
-            // Clicked on an existing Postbox ID.=
+            // Clicked on an existing Postbox ID
             let postboxId = postboxIds[indexPath.row - 1]
 
             if let _ = try? KeyManagement().getPublicKeyForConnection(connectionId: postboxId) {
@@ -83,7 +92,7 @@ class PostboxViewController: UIViewController, UITableViewDelegate, UITableViewD
     /// Swipe on an existing postbox ID to delete postbox.
     /// If swiping on the `Create Postbox` button, do nothing.
     func tableView(_ tableView: UITableView,
-                   leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+                   trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         if indexPath.row > 0 {
             let postBoxId = postboxIds[indexPath.row - 1]
             let action = UIContextualAction(
@@ -109,21 +118,49 @@ class PostboxViewController: UIViewController, UITableViewDelegate, UITableViewD
         case "navigateToCreateConnection":
             let destination = segue.destination as! CreateConnectionViewController
             destination.postboxId = sender as? String
-        default: break
+        case "unwindToWelcome":
+            let destination = segue.destination as! WelcomeViewController
+            // Propagate previous registration method to next registration/ sign in
+            destination.previousRegistrationMethod = self.currentRegistrationMethod
+        default:
+            break
         }
     }
 
     // MARK: - Actions
 
-    @IBAction func returnToWallet(unwindSegue: UIStoryboardSegue) {}
-    
-    /// Show a description when tapping on the info button.
-    @IBAction func infoTapped(_ sender: UIBarButtonItem) {
-        let alert = UIAlertController(title: "What is a Postbox?", message: "A Postbox is a store for DIDComm messages that uses a relay defined in Aries RFC 0046.", preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
-        present(alert, animated: true, completion: nil)
+    /// Create an alert allowing the user to choose whether to sign out, deregister, or cancel.
+    ///
+    /// Unknown registration method does not require deregistration.
+    /// DeviceCheck, TEST and FSSO registration methods permit both deregistration and sign out.
+    /// 
+    /// Note that for FSSO deregistration, the user MUST still be signed in.
+    ///
+    /// - Parameter sender: Exit button.
+    @IBAction func didTapExitButton(_ sender: Any) {
+        let alert = UIAlertController(
+            title: "Sign out or deregister",
+            message: "Choose to sign out or deregister. Certain registration types may not require deregistration. \n The current registration method is \(currentRegistrationMethod).",
+            preferredStyle: .actionSheet
+        )
+        let signOutOption = UIAlertAction(title: "Sign out", style: .default, handler: doSignOutAlertAction.self)
+        let deregisterOption = UIAlertAction(title: "Deregister", style: .default, handler: doDeregisterAlertAction.self)
+
+        // Disable for unknown registration
+        switch currentRegistrationMethod {
+        case .unknown:
+            deregisterOption.isEnabled = false
+        default:
+            break
+        }
+
+        alert.addAction(signOutOption)
+        alert.addAction(deregisterOption)
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+
+        self.present(alert, animated: true, completion: nil)
     }
-    
+
     // MARK: - Helpers
     
     /// Attempt to create a postbox via the `SudoDIRelayClient`, using a UUID4 generated `connectionId`.
@@ -142,7 +179,7 @@ class PostboxViewController: UIViewController, UITableViewDelegate, UITableViewD
                         self?.dismiss(animated: true) {
                             self?.updatePostboxView()
                         }
-                    } catch let error {
+                    } catch {
                         self?.dismiss(animated: true) {
                             self?.presentErrorAlert(message: "Failed to store postbox id in cache", error: error)
                         }
@@ -167,7 +204,8 @@ class PostboxViewController: UIViewController, UITableViewDelegate, UITableViewD
     
     /// Attempt to retrieve the list of postboxes from the postbox ID storage.
     /// If unsuccessful, display an error alert on the UI.
-    /// - Returns: List of postbox IDs or  nil
+    ///
+    /// - Returns: List of postbox IDs or  nil.
     func retrievePostboxIdsOrAlert() -> [String]? {
         switch Result(catching: {
             try KeychainPostboxIdStorage().retrieve()
@@ -189,6 +227,7 @@ class PostboxViewController: UIViewController, UITableViewDelegate, UITableViewD
     
     /// Delete postbox in the relay via the `SudoDIRelayClient` and resent an activity alert on the UI.
     /// If unsuccessful, present an error alert.
+    ///
     /// - Parameter postBoxId: postbox ID to delete.
     func deletePostboxFromRelayAndCache(postBoxId: String) {
         presentActivityAlert(message: "Deleting postbox...")
@@ -206,6 +245,153 @@ class PostboxViewController: UIViewController, UITableViewDelegate, UITableViewD
                     }
                 }
             }
+        }
+    }
+
+    // MARK: - Deregistration and Sign Out
+
+    /// Proceed to sign out the user depending on registration method.
+    ///
+    /// - Parameter sender: Sign out option.
+    func doSignOutAlertAction(sender: UIAlertAction) {
+        switch currentRegistrationMethod {
+        case .fsso:
+            // Federated users should be signed out using the Federated UI
+            fssoSignOut { fssoSignOutResult in
+                switch fssoSignOutResult {
+                case .success:
+                    DispatchQueue.main.async {
+                        self.performSegue(withIdentifier: "unwindToWelcome", sender: self)
+                    }
+                case .failure(let error):
+                    DispatchQueue.main.async {
+                        self.presentErrorAlert(message: "Could not sign out using federated account.", error: error)
+                    }
+                }
+            }
+        case .test:
+            // Invalidate TEST registration keys to sign out
+            self.signOutIfSignedIn { result in
+                switch result {
+                case .success:
+                    DispatchQueue.main.async {
+                        self.performSegue(withIdentifier: "unwindToWelcome", sender: self)
+                    }
+                case .failure(let error):
+                    DispatchQueue.main.async {
+                        self.presentErrorAlert(message: "Could not sign out.", error: error)
+                    }
+                }
+            }
+        case .unknown, .deviceCheck:
+            // Should not be able to sign out with DeviceCheck, but unwind to start
+            DispatchQueue.main.async {
+                self.performSegue(withIdentifier: "unwindToWelcome", sender: self)
+            }
+        }
+    }
+
+    /// Proceed to deregister the user depending on reigstration method.
+    /// Delete postboxes from cache and backend upon deregistration.
+    ///
+    /// - Parameter sender: Deregister option.
+    /// 
+    func doDeregisterAlertAction(sender: UIAlertAction) {
+        switch currentRegistrationMethod {
+        case .deviceCheck, .fsso, .test:
+
+            // Delete postboxes concurrently and only show error alert once done
+            let dispatchGroup = DispatchGroup()
+            var deleteErrors: [Error] = []
+            postboxIds.forEach { postboxId in
+                dispatchGroup.enter()
+                relayClient.deletePostbox(withConnectionId: postboxId) { result in
+                    if case .failure(let error) = result {
+                        deleteErrors.append(error)
+                    }
+                    dispatchGroup.leave()
+                }
+            }
+            dispatchGroup.notify(queue: .main) { [weak self] in
+                if let error = deleteErrors.first {
+                    self?.presentErrorAlert(message: "Could not delete all postboxes from backend.", error: error)
+                }
+            }
+
+            KeychainPostboxIdStorage().deleteAllPostboxes()
+
+            // Note: federated users should not ideally be deregistered in the Sudo Platform
+            do {
+                try self.sudoUserClient.deregister { deregisterResult in
+                    switch deregisterResult {
+                    case .success:
+                        DispatchQueue.main.async {
+                            self.performSegue(withIdentifier: "unwindToWelcome", sender: self)
+                        }
+                    case .failure(let error):
+                        DispatchQueue.main.async {
+                            self.presentErrorAlert(message: "Could not deregister.", error: error)
+                        }
+                    }
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    self.presentErrorAlert(message: "Could not deregister.", error: error)
+                }
+            }
+        case .unknown:
+            DispatchQueue.main.async {
+                self.performSegue(withIdentifier: "unwindToWelcome", sender: self)
+            }
+        }
+    }
+
+    /// Present FSSO sign out window.
+    ///
+    /// - Parameter completion: `Void` upon success to sign out, `Error` upon failure.
+    private func fssoSignOut(completion: @escaping (Result<Void, Error>) -> Void) {
+        do {
+            guard let presentationAnchor = self.view?.window else {
+                fatalError("No window for \(String(describing: self))")
+            }
+            try sudoUserClient.presentFederatedSignOutUI(presentationAnchor: presentationAnchor) { result in
+                switch result {
+                case .success:
+                    completion(.success(()))
+                case .failure(let error):
+                    completion(.failure(error))
+                }
+            }
+        } catch {
+            // An error may be thrown if the backend is unable to perform
+            // requested operation due to availability or security issues.
+            // An error might be also be thrown for unrecoverable circumstances arising
+            // from programmatic error or configuration error.
+            completion(.failure(error))
+        }
+    }
+
+    /// Check whether user is signed in. If signed in, sign out of all devices.
+    ///
+    /// - Parameter completion: `Void` upon successful sign out, `Error` upon failure.
+    private func signOutIfSignedIn(completion: @escaping (Result<Void, Error>) -> Void) {
+        do {
+            guard try sudoUserClient.isSignedIn() else {
+                // Was already signed out
+                completion(.success(()))
+                return
+            }
+            try sudoUserClient.globalSignOut { result in
+                switch result {
+                case .success:
+                    completion(.success(()))
+                case .failure(let error):
+                    completion(.failure(error))
+                }
+            }
+        } catch {
+            // Could not query whether signed in
+            completion(.failure(error))
         }
     }
 }

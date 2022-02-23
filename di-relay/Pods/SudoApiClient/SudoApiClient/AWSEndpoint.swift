@@ -41,4 +41,3 @@ public extension AWSEndpoint {
     }
 
 }
-

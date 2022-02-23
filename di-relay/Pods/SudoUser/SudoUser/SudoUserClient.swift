@@ -173,6 +173,15 @@ public protocol SudoUserClient: AnyObject {
     ///   - completion: The completion handler to invoke to pass the authentication tokens or error.
     func refreshTokens(refreshToken: String, completion: @escaping (Result<AuthenticationTokens, Error>) -> Void) throws
 
+    /// Refreshes the access and ID tokens using the cached refresh token. The refresh token expires after 30 days
+    /// so sign in again to obtain a new refresh token before its expiry. The tokens will also be refreshed automatically
+    /// when you call platform APIs requiring authentication but there will be added delay in the API response.
+    /// For more consistent response time for each API call, call this API to proactively keep the tokens fresh.
+    ///
+    /// - Parameters:
+    ///   - completion: The completion handler to invoke to pass the authentication tokens or error.
+    func refreshTokens(completion: @escaping (Result<AuthenticationTokens, Error>) -> Void) throws
+
     /// Returns the user name associated with this client. The username maybe needed to contact
     /// the support team when diagnosing an issue related to a specific user.
     ///

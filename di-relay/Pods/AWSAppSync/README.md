@@ -18,12 +18,24 @@ The AWS AppSync SDK for iOS enables you to access your AWS AppSync backend and p
 
 ### Installing the SDK
 
+#### Via Swift Package Manager
+
+1. Swift Package Manager is distributed with Xcode. To start adding the AWS SDK to your iOS project, open your project in Xcode and select **File > Swift Packages > Add Package Dependency**.
+
+1. Enter the URL for the AWS AppSync SDK for iOS GitHub repo (`https://github.com/awslabs/aws-mobile-appsync-sdk-ios`) into the search bar and click **Next**.
+
+1. You'll see the repository rules for which version of the SDK you want Swift Package Manager to install. Choose the first rule, **Version**, and select **Up to Next Major** as it will use the latest compatible version of the dependency that can be detected from the `main` branch, then click **Next**.
+
+1. Choose the **AWSAppSync** package product and click **Finish**.
+
+1. In your source file, import the SDK using `import AWSAppSync`.
+
 #### Via CocoaPods
 
 1. Add the following line to your Podfile:
 
     ```ruby
-    pod 'AWSAppSync', '~> 3.1.17'
+    pod 'AWSAppSync', '~> 3.3.0'
     ```
 
     Example:
@@ -37,7 +49,7 @@ The AWS AppSync SDK for iOS enables you to access your AWS AppSync backend and p
       use_frameworks!
 
       # Pods for EventsApp
-      pod 'AWSAppSync', '~> 3.1.17'
+      pod 'AWSAppSync', '~> 3.3.0'
     end
     ```
 
@@ -181,6 +193,16 @@ You can get the backend setup by following the steps below:
         - `BucketName`
         - `BucketRegion`
         - `AppSyncMultiAuthAPIKey`
+1. Create another CloudFormation Stack following step 1-6 above with `API Key` as the Auth type (we'll change that later)
+   1. Create a Lambda function using the template provided in this project at `AWSAppSyncIntegrationTests/ConsoleResources/appsync-lambda-authorize
+r.js` 
+   1. Once the stack is complete click on the __Outputs__ tab
+   1. Copy the appropriate values to the test configuration file `AppSyncIntegrationTests/appsync_test_credentials.json`:
+        - `AppSyncEndpointAPIKeyLambda`
+        - `AppSyncEndpointAPIKeyLambdaRegion`
+
+   1. Go to the [AWS AppSync console](https://console.aws.amazon.com/appsync/home), select the newly created AppSync instance
+   1. In the `Settings` section, change the default authentication type to `AWS Lambda` and select the Lambda function created at the previous step
 
 > Note: You must either provide all values in the `AppSyncIntegrationTests/appsync_test_credentials.json` or in code. There is no mechanism to handle partial overrides of one source with the other. All values must be specified before running the integration tests.
 

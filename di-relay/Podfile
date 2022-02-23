@@ -1,5 +1,4 @@
-source 'https://cdn.cocoapods.org/'
-source 'git@gitlab.tools.anonyome.com:anonyome/pod-repository.git'
+source 'https://github.com/CocoaPods/Specs.git'
 
 platform :ios, '13.2'
 
@@ -11,9 +10,10 @@ target 'DIRelayExample' do
   inhibit_all_warnings!
 
   # Pods for DIRelayExample
-  pod 'SudoDIRelay', '~> 0.1.1'
+  pod 'SudoDIRelay', '~> 1.0.1'
   pod 'KeyManager', '~> 5.0.0'
   pod 'SudoLogging', '~> 0.3'
+  pod 'SudoUser', '~> 12.1.3'
 
   target 'DIRelayExampleTests' do
      inherit! :search_paths

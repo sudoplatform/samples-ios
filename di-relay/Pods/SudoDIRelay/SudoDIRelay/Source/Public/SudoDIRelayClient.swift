@@ -62,4 +62,10 @@ public protocol SudoDIRelayClient: AnyObject {
     ///   - Success:  nil
     ///   - Failure: `SudoDIRelayError`
     func subscribeToPostboxDeleted(withConnectionId connectionId: String, resultHandler: @escaping ClientCompletion<Status>) -> SubscriptionToken?
+
+    // MARK: - Helpers
+
+    /// Get HTTP endpoint of the provided postbox.
+    /// - Returns: Postbox HTTP endpoint on success, or nil on failure
+    func getPostboxEndpoint(withConnectionId connectionId: String) -> URL?
 }

@@ -97,7 +97,7 @@ class CreateInvitationCodeViewController: UIViewController {
                 return
             }
             completion(invitation, invitationAsData, invitationAsString)
-        } catch let error {
+        } catch {
             self.onFailure("Unable to generate invitation to send", error: error)
         }
     }
@@ -165,7 +165,7 @@ class CreateInvitationCodeViewController: UIViewController {
     private func storePeerConnectionIdToCache(peerConnectionId: String) {
         do {
             try KeychainConnectionStorage().store(peerConnectionId: peerConnectionId, for: myPostboxId)
-        } catch let error {
+        } catch {
             onFailure("Failed to store peer key pair to cache", error: error)
         }
     }
@@ -176,8 +176,11 @@ class CreateInvitationCodeViewController: UIViewController {
     private func storePeerPublicKeyToVault(invitation: Invitation) {
         do {
             // peer connection id is wrong
-            try KeyManagement().storePublicKeyOfPeer(peerConnectionId: invitation.connectionId, base64PublicKey: invitation.publicKey)
-        } catch let error {
+            try KeyManagement().storePublicKeyOfPeer(
+                peerConnectionId: invitation.connectionId,
+                base64PublicKey: invitation.publicKey
+            )
+        } catch {
             onFailure("Failed to store peer key pair to vault", error: error)
         }
     }
@@ -189,8 +192,11 @@ class CreateInvitationCodeViewController: UIViewController {
     func decryptReceivedMessageOrPresentError(packedMessage: String) -> String? {
         do {
             // The message was sent as a string representation of the data
-            return try KeyManagement().unpackEncryptedMessageForConnection(connectionId: myPostboxId, encryptedPayloadString: packedMessage)
-        } catch let error {
+            return try KeyManagement().unpackEncryptedMessageForConnection(
+                connectionId: myPostboxId,
+                encryptedPayloadString: packedMessage
+            )
+        } catch {
             DispatchQueue.main.async {
                 self.presentErrorAlert(message: "Unable to decrypt received message", error: error)
             }
@@ -226,7 +232,8 @@ class CreateInvitationCodeViewController: UIViewController {
             destination.myPostboxId = myPostboxId
             destination.messageLog = messageLog
             destination.invitationMessageId = invitationMessageId
-        default: break
+        default:
+            break
         }
     }
 }

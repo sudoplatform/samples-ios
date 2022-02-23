@@ -5,15 +5,20 @@
 //
 
 import UIKit
+import SudoDIRelay
 
 class ConnectionDetailsViewController: UITableViewController {
 
-    // MARK: - Supplementary
+    // MARK: - Properties
 
     var myPostboxId: String!
     var peerPostboxId: String!
     var myPublicKey: String!
     var peerPublicKey: String!
+
+    // MARK: - Properties: Computed
+
+    let relayClient: SudoDIRelayClient = AppDelegate.dependencies.sudoDIRelayClient
 
     // MARK: - Outlets
 
@@ -31,14 +36,11 @@ class ConnectionDetailsViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        let endpoint = AppDelegate.dependencies.appSyncClientHelper.getHttpEndpoint()
-        
         peerPostboxIdLabel.text = peerPostboxId
         myPostboxIdLabel.text = myPostboxId
         
-        myEndpointLabel.text = "\(endpoint)/\(myPostboxId ?? "")"
-        peerEndpointLabel.text = "\(endpoint)/\(peerPostboxId ?? "")"
-
+        myEndpointLabel.text = relayClient.getPostboxEndpoint(withConnectionId: myPostboxId)?.absoluteString ?? ""
+        peerEndpointLabel.text = relayClient.getPostboxEndpoint(withConnectionId: peerPostboxId)?.absoluteString ?? ""
 
         myPublicKeyLabel.text = myPublicKey
         peerPublicKeyLabel.text = peerPublicKey

@@ -32,6 +32,7 @@ internal enum L10n {
         internal static let relayServiceConfigNotFound = L10n.tr("Localizable", "relay.errors.relayServiceConfigNotFound")
         internal static let serviceError = L10n.tr("Localizable", "relay.errors.serviceError")
         internal static let unknownTimezone = L10n.tr("Localizable", "relay.errors.unknownTimezone")
+        internal static let unauthorizedPostboxAccess = L10n.tr("Localizable", "relay.errors.unauthorizedPostboxAccess")
       }
     }
 }

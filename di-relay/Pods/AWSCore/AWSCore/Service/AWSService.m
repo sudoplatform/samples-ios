@@ -21,7 +21,7 @@
 #import "AWSCocoaLumberjack.h"
 #import "AWSCategory.h"
 
-NSString *const AWSiOSSDKVersion = @"2.23.5";
+NSString *const AWSiOSSDKVersion = @"2.24.5";
 NSString *const AWSServiceErrorDomain = @"com.amazonaws.AWSServiceErrorDomain";
 
 static NSString *const AWSServiceConfigurationUnknown = @"Unknown";
@@ -122,36 +122,45 @@ static NSString *const AWSServiceConfigurationUnknown = @"Unknown";
                    serviceType:(AWSServiceType)serviceType
            credentialsProvider:(id<AWSCredentialsProvider>)credentialsProvider
            localTestingEnabled:(BOOL)localTestingEnabled {
-    if(self = [self initWithRegion:regionType credentialsProvider:credentialsProvider]){
-        _localTestingEnabled = localTestingEnabled;
-        if(localTestingEnabled) {
-            _endpoint = [[AWSEndpoint alloc] initLocalEndpointWithRegion:regionType
-                                                                 service:serviceType
-                                                            useUnsafeURL:YES];
-        }
+    AWSEndpoint *endpoint;
+    if (localTestingEnabled) {
+        endpoint = [[AWSEndpoint alloc] initLocalEndpointWithRegion:regionType
+                                                            service:serviceType
+                                                       useUnsafeURL:YES];
     }
-    
-    return self;
+    return [self initWithRegion:regionType
+                       endpoint:endpoint
+            credentialsProvider:credentialsProvider
+            localTestingEnabled:localTestingEnabled];
 }
 
 - (instancetype)initWithRegion:(AWSRegionType)regionType
            credentialsProvider:(id<AWSCredentialsProvider>)credentialsProvider {
-    if (self = [super init]) {
-        _regionType = regionType;
-        _credentialsProvider = credentialsProvider;
-        _localTestingEnabled = NO;
-    }
-
-    return self;
+    return [self initWithRegion:regionType
+                       endpoint:nil
+            credentialsProvider:credentialsProvider
+            localTestingEnabled:NO];
 }
 
 - (instancetype)initWithRegion:(AWSRegionType)regionType
                       endpoint:(AWSEndpoint *)endpoint
            credentialsProvider:(id<AWSCredentialsProvider>)credentialsProvider {
-    if(self = [self initWithRegion:regionType credentialsProvider:credentialsProvider]){
+    return [self initWithRegion:regionType
+                       endpoint:endpoint
+            credentialsProvider:credentialsProvider
+            localTestingEnabled:NO];
+}
+
+- (instancetype)initWithRegion:(AWSRegionType)regionType
+                      endpoint:(AWSEndpoint *)endpoint
+           credentialsProvider:(id<AWSCredentialsProvider>)credentialsProvider
+           localTestingEnabled:(BOOL)localTestingEnabled {
+    if (self = [super init]) {
+        _regionType = regionType;
         _endpoint = endpoint;
+        _credentialsProvider = credentialsProvider;
+        _localTestingEnabled = localTestingEnabled;
     }
-    
     return self;
 }
 
@@ -299,6 +308,8 @@ static NSString *const AWSServiceNameTranscribe = @"transcribe";
 static NSString *const AWSServiceNameTranscribeStreaming = @"transcribe";
 static NSString *const AWSServiceNameTranslate = @"translate";
 static NSString *const AWSServiceNameLocation = @"location";
+static NSString *const AWSServiceNameChimeSDKMessaging = @"chime";
+static NSString *const AWSServiceNameChimeSDKIdentity = @"chime";
 
 @interface AWSEndpoint()
 
@@ -567,6 +578,10 @@ static NSString *const AWSServiceNameLocation = @"location";
             return AWSServiceNameTranslate;
         case AWSServiceLocation:
             return AWSServiceNameLocation;
+        case AWSServiceChimeSDKMessaging:
+            return AWSServiceNameChimeSDKMessaging;
+        case AWSServiceChimeSDKIdentity:
+            return AWSServiceNameChimeSDKIdentity;
         default:
             return nil;
     }
@@ -639,6 +654,10 @@ static NSString *const AWSServiceNameLocation = @"location";
         URL = [NSURL URLWithString:[NSString stringWithFormat:@"%@://participant.connect.%@.amazonaws.com", HTTPType, regionName]];
     } else if (serviceType == AWSServiceLocation) {
         URL = [NSURL URLWithString:[NSString stringWithFormat:@"%@://geo.%@.amazonaws.com", HTTPType, regionName]];
+    } else if (serviceType == AWSServiceChimeSDKMessaging) {
+        URL = [NSURL URLWithString:[NSString stringWithFormat:@"%@://messaging-chime.%@.amazonaws.com", HTTPType, regionName]];
+    } else if (serviceType == AWSServiceChimeSDKIdentity) {
+        URL = [NSURL URLWithString:[NSString stringWithFormat:@"%@://identity-chime.%@.amazonaws.com", HTTPType, regionName]];
     } else {
         URL = [NSURL URLWithString:[NSString stringWithFormat:@"%@://%@.%@.amazonaws.com", HTTPType, serviceName, regionName]];
     }

@@ -9,6 +9,7 @@ import AWSAppSync
 import SudoLogging
 import AWSCore
 import SudoConfigManager
+import SudoUser
 
 public class DefaultAppSyncClientHelper: AppSyncClientHelper {
 
@@ -41,14 +42,11 @@ public class DefaultAppSyncClientHelper: AppSyncClientHelper {
     /// HTTP endpoint for peers to post messages to.
     private var relayServiceEndpoint: String
 
-    /// Provides an AWS API key.
-    private let awsApiKeyProvider: APIKeyAuthProvider
-
     // MARK: - Lifecycle
 
     /// Intializes a new `DefaultAppSyncClientHelper` instance. It uses configuration parameters defined in
     /// `sudoplatformconfig.json` file located in the app bundle.
-    public init() throws {
+    public init(userClient: SudoUserClient) throws {
         /// Programatically get SDK config via SudoConfigManager
         guard
             let configManager = DefaultSudoConfigManager(),
@@ -58,24 +56,19 @@ public class DefaultAppSyncClientHelper: AppSyncClientHelper {
 
         /// GraphQL url
         guard
-            let urlAsString = relayServiceConfig[RelayService.apiUrl] as? String,
-            let url = URL(string: urlAsString) else {
+            let graphqlUrlAsString = relayServiceConfig[RelayService.apiUrl] as? String,
+            let graphQlUrl = URL(string: graphqlUrlAsString) else {
             throw SudoDIRelayError.invalidConfig
         }
-
-        /// API key and auth provider
-        guard
-            let apiKey = relayServiceConfig[RelayService.apiKey] as? String else {
-            throw SudoDIRelayError.invalidConfig
-        }
-        self.awsApiKeyProvider = APIKeyAuthProvider(apiKey)
 
         /// AppSync client
+        let config: SudoDIRelayConfig = SudoDIRelayConfig(endpoint: graphQlUrl, region: AWSRegionType.USEast1)
+        let authProvider = GraphQLAuthProvider(client: userClient)
+        let cacheConfiguration = try AWSAppSyncCacheConfiguration()
         let appSyncConfig = try AWSAppSyncClientConfiguration(
-            url: url,
-            serviceRegion: AWSRegionType.USEast1,
-            apiKeyAuthProvider: self.awsApiKeyProvider
-        )
+            appSyncServiceConfig: config,
+            userPoolsAuthProvider: authProvider,
+            cacheConfiguration: cacheConfiguration)
         self.appSyncClient = try AWSAppSyncClient(appSyncConfig: appSyncConfig)
         self.appSyncClient?.apolloClient?.cacheKeyForObject = { $0["id"] }
 
@@ -94,24 +87,5 @@ public class DefaultAppSyncClientHelper: AppSyncClientHelper {
 
     public func getHttpEndpoint() -> String {
         return self.relayServiceEndpoint
-    }
-}
-
-// MARK: - APIKeyAuthProvider
-
-private class APIKeyAuthProvider: AWSAPIKeyAuthProvider {
-
-    // MARK: - Properties
-
-    let apiKey: String
-
-    // MARK: - Lifecycle
-
-    public init(_ apiKey: String) {
-        self.apiKey = apiKey
-    }
-
-    func getAPIKey() -> String {
-        return apiKey
     }
 }

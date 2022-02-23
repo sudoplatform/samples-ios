@@ -1,6 +1,6 @@
 //
-// Copyright 2018-2021 Amazon.com,
-// Inc. or its affiliates. All Rights Reserved.
+// Copyright Amazon.com Inc. or its affiliates.
+// All Rights Reserved.
 //
 // SPDX-License-Identifier: Apache-2.0
 //
@@ -81,7 +81,7 @@ public class AppSyncSubscriptionConnection: SubscriptionConnection, RetryableCon
 
         connectionProvider.addListener(identifier: subscriptionItem.identifier) { [weak self] event in
             guard let self = self else {
-                AppSyncLogger.debug("[AppSyncSubscriptionConnection] \(#function): Self is nil, listener is not called.")
+                AppSyncLogger.debug("[AppSyncSubscriptionConnection]: Subscription (Self) is nil, connection event is not handled.")
                 return
             }
             switch event {

@@ -5,6 +5,7 @@
 //
 
 import AWSAppSync
+import AWSCore
 
 /// `AWSAppSyncServiceConfigProvider` implementation that converts Sudo platform
 /// configuration to AWS AppSync configuration.

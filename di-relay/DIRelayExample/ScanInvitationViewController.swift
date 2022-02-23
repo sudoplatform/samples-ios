@@ -7,12 +7,14 @@
 import UIKit
 import AVFoundation
 import MobileCoreServices
+import SudoDIRelay
 
 class ScanInvitationViewController: UIViewController, AVCaptureMetadataOutputObjectsDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     
-    // MARK: - Supplementary
+    // MARK: - Properties
     
     var postboxId: String!
+    let relayClient: SudoDIRelayClient = AppDelegate.dependencies.sudoDIRelayClient
 
     // MARK: - Outlets
 
@@ -54,7 +56,6 @@ class ScanInvitationViewController: UIViewController, AVCaptureMetadataOutputObj
                     case .failure(let error):
                         let title = "Unable to send details"
                         self.onFailure(title, error: error)
-
                     }
                 }
             case .failure(let error):
@@ -75,7 +76,7 @@ class ScanInvitationViewController: UIViewController, AVCaptureMetadataOutputObj
         // Generate and store public key pair
         do {
             try KeyManagement().createKeyPairForConnection(connectionId: postboxId)
-        } catch let error {
+        } catch {
             onFailure("Failed to generate public key pair", error: error)
             return nil
         }
@@ -100,7 +101,11 @@ class ScanInvitationViewController: UIViewController, AVCaptureMetadataOutputObj
     ///   - detailsToPost: An Invitation containing our connection ID and public key.
     ///   - peerConnectionId: The peer's connection ID contained in the endpoint to POST to.
     ///   - completion: Resolves to a `Result`containing `Void` on .success and an `Error` on failure.
-    private func postToPeerEndpoint(detailsToPost: Invitation, peerConnectionId: String, completion: @escaping (Result<Void, Error>) -> Void) {
+    private func postToPeerEndpoint(
+        detailsToPost: Invitation,
+        peerConnectionId: String,
+        completion: @escaping (Result<Void, Error>) -> Void
+    ) {
         guard let invitationAsJson = try? JSONEncoder().encode(detailsToPost) else {
             onFailure("Failed to encode details to send to peer", error: nil)
             return
@@ -109,16 +114,24 @@ class ScanInvitationViewController: UIViewController, AVCaptureMetadataOutputObj
             return
         }
         
-        guard let encryptedPayload = try? KeyManagement().packEncryptedMessageForPeer(peerConnectionId: peerConnectionId, message: jsonString) else {
+        guard let encryptedPayload = try? KeyManagement().packEncryptedMessageForPeer(
+            peerConnectionId: peerConnectionId,
+            message: jsonString
+        ) else {
             onFailure("Failed to encrypt details to send to peer", error: nil)
             return
         }
         let encryptedMessageAsData = encryptedPayload.data(using: .utf8)
 
+        guard let url = relayClient.getPostboxEndpoint(withConnectionId: peerConnectionId) else {
+            onFailure("Unable to fetch peer's postbox endpoint", error: nil)
+            return
+        }
+
         // Post to endpoint
         HTTPTransports.transmit(
             data:  encryptedMessageAsData ?? invitationAsJson,
-            to: AppDelegate.dependencies.appSyncClientHelper.getHttpEndpoint() + "/" + peerConnectionId
+            to: url
         ) { result in
             switch result {
             case .success:
@@ -144,7 +157,7 @@ class ScanInvitationViewController: UIViewController, AVCaptureMetadataOutputObj
             }
             let invitation = try JSONDecoder().decode(Invitation.self, from: invitationAsData)
             completion(.success(invitation))
-        } catch let error {
+        } catch {
             completion(.failure(.failedToDecodeInvitation(error)))
         }
     }
@@ -185,7 +198,11 @@ class ScanInvitationViewController: UIViewController, AVCaptureMetadataOutputObj
         return true
     }
 
-    func metadataOutput(_ output: AVCaptureMetadataOutput, didOutput metadataObjects: [AVMetadataObject], from connection: AVCaptureConnection) {
+    func metadataOutput(
+        _ output: AVCaptureMetadataOutput,
+        didOutput metadataObjects: [AVMetadataObject],
+        from connection: AVCaptureConnection
+    ) {
         guard let readableObject = metadataObjects.first as? AVMetadataMachineReadableCodeObject,
             let string = readableObject.stringValue else {
                 NSLog("Warning: Received capture metadata output but could not read string value.")
@@ -227,7 +244,10 @@ class ScanInvitationViewController: UIViewController, AVCaptureMetadataOutputObj
         present(pickerController, animated: true, completion: nil)
     }
 
-    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+    func imagePickerController(
+        _ picker: UIImagePickerController,
+        didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]
+    ) {
         dismiss(animated: true, completion: nil)
 
         guard let pickedImage = info[.editedImage] as? UIImage ?? info[.originalImage] as? UIImage else {
@@ -335,7 +355,8 @@ class ScanInvitationViewController: UIViewController, AVCaptureMetadataOutputObj
         case "navigateToConnection":
             let destination = segue.destination as! ConnectionViewController
             destination.myPostboxId = postboxId
-        default: break
+        default:
+            break
         }
     }
     
@@ -348,7 +369,7 @@ class ScanInvitationViewController: UIViewController, AVCaptureMetadataOutputObj
     private func storePeerConnectionIdToCache(peerConnectionId: String) {
         do {
             try KeychainConnectionStorage().store(peerConnectionId: peerConnectionId, for: postboxId)
-        } catch let error {
+        } catch {
             onFailure("Failed to store peer key pair to cache", error: error)
         }
     }
@@ -360,8 +381,11 @@ class ScanInvitationViewController: UIViewController, AVCaptureMetadataOutputObj
     private func storePeerPublicKeyToVault(invitation: Invitation) {
         do {
             // peer connection id is wrong
-            try KeyManagement().storePublicKeyOfPeer(peerConnectionId: invitation.connectionId, base64PublicKey: invitation.publicKey)
-        } catch let error {
+            try KeyManagement().storePublicKeyOfPeer(
+                peerConnectionId: invitation.connectionId,
+                base64PublicKey: invitation.publicKey
+            )
+        } catch {
             onFailure("Failed to store peer key pair to vault", error: error)
         }
     }

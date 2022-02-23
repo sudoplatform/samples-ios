@@ -146,6 +146,12 @@ open class MockSudoUserClient: SudoUserClient {
         completion(self.refreshTokensResult)
     }
 
+    public var refreshToken: String = ""
+
+    open func refreshTokens(completion: @escaping (Result<AuthenticationTokens, Error>) -> Void) throws {
+        try self.refreshTokens(refreshToken: self.refreshToken, completion: completion)
+    }
+
     public var getUserNameCalled: Bool = false
     public var getUserNameReturn: String?
     public var getUserNameError: Error?

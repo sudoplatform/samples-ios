@@ -8,7 +8,7 @@ import Foundation
 import AWSAppSync
 import SudoLogging
 import AWSCore
-import SudoConfigManager
+
 
 /*
  A simple AppSync user client without Identity or Entitlements.

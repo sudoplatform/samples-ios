@@ -38,7 +38,7 @@ class CodableKeychainStorage<T: Codable> {
         let json: Data
         do {
             json = try JSONEncoder().encode(value)
-        } catch let error {
+        } catch {
             throw Errors.failedToEncodeValue(error)
         }
 
@@ -63,7 +63,7 @@ class CodableKeychainStorage<T: Codable> {
 
         do {
             return try JSONDecoder().decode(T.self, from: data)
-        } catch let error {
+        } catch {
             throw Errors.failedToDecodeValue(error)
         }
     }

@@ -37,16 +37,10 @@ struct HTTPTransports {
     ///   - completion: Resolves to `Void ` on success or a `TransmissionError` upon failure.
     static func transmit(
         data: Data,
-        to endpoint: String,
+        to endpoint: URL,
         completion: @escaping (Result<Void, TransmissionError>) -> Void
     ) {
-        guard let endpointUrl = URL(string: endpoint),
-            ["https", "http"].contains(endpointUrl.scheme) else {
-                // TODO: handle websocket and XMPP endpoints
-                return completion(.failure(.unsupportedEndpoint))
-        }
-
-        var request = URLRequest(url: endpointUrl)
+        var request = URLRequest(url: endpoint)
         request.httpMethod = "POST"
         request.httpBody = data
         

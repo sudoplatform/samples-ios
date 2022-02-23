@@ -7,7 +7,7 @@
 import Foundation
 import SudoLogging
 
-extension Logger {
+public extension Logger {
 
     static let sudoApiClientLogger = Logger(identifier: "SudoApiClient", driver: NSLogDriver(level: .debug))
 

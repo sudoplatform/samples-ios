@@ -42,6 +42,7 @@ public enum SudoDIRelayError: Error, Equatable, LocalizedError {
     case policyFailed
     case serviceError
     case unknownTimezone
+    case unauthorizedPostboxAccess
 
     // MARK: - Lifecycle
 
@@ -57,6 +58,8 @@ public enum SudoDIRelayError: Error, Equatable, LocalizedError {
             self = .ambiguousRelay
         case "sudoplatform.relay.InvalidInitMessage":
             self = .invalidInitMessage
+        case "sudoplatform.relay.UnauthorizedPostboxAccess":
+            self = .unauthorizedPostboxAccess
         default:
             return nil
         }
@@ -137,6 +140,8 @@ public enum SudoDIRelayError: Error, Equatable, LocalizedError {
             return L10n.Relay.Errors.invalidInitMessage
         case .noEntitlementsError:
             return L10n.Relay.Errors.noEntitlementsError
+        case .unauthorizedPostboxAccess:
+            return L10n.Relay.Errors.unauthorizedPostboxAccess
         }
     }
 }

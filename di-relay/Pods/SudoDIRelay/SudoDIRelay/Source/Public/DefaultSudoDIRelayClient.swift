@@ -9,6 +9,7 @@
 import AWSAppSync
 import SudoLogging
 import SudoConfigManager
+import SudoUser
 
 /// Default Client API Endpoint for interacting with the Relay Service.
 public class DefaultSudoDIRelayClient: SudoDIRelayClient {
@@ -37,10 +38,14 @@ public class DefaultSudoDIRelayClient: SudoDIRelayClient {
     /// Utility factory class to generate use cases.
     let useCaseFactory: UseCaseFactory
 
+    /// Client used to authenticate to Sudo Platform.
+    let sudoUserClient: SudoUserClient
+
+    /// Helper class to create AWS AppSyncClient
+    let appSyncClientHelper: AppSyncClientHelper
+
     /// Relay service that does the work of interacting with the service via GraphQL.
     let relayService: RelayService
-
-    let appSyncClientHelper: AppSyncClientHelper
 
     var allResetables: [Resetable] {
         return [
@@ -53,10 +58,10 @@ public class DefaultSudoDIRelayClient: SudoDIRelayClient {
     /// Initialize an instance of `DefaultSudoDIRelayClient`. It uses configuration parameters defined in
     /// `sudoplatformconfig.json` file located in the app bundle.
     /// - Parameters:
-    ///   - appSyncClientHelper: DefaultAppSyncClientHelper instance used for authentication.
+    ///   - sudoUserClient: SudoUserClient instance used for authenticating to the backend..
     /// Throws:
     ///     - `SudoDIRelayError` if invalid config.
-    public convenience init(appSyncClientHelper: AppSyncClientHelper) throws {
+    public convenience init(sudoUserClient: SudoUserClient) throws {
         guard let configManager = SudoConfigManagerFactory.instance.getConfigManager(name: SudoConfigManagerFactory.Constants.defaultConfigManagerName) else {
             throw SudoDIRelayError.invalidConfig
         }
@@ -67,14 +72,17 @@ public class DefaultSudoDIRelayClient: SudoDIRelayClient {
             throw SudoDIRelayError.relayServiceConfigNotFound
         }
 
-        guard let appSyncClient = appSyncClientHelper.getAppSyncClient() else {
+        let appSyncHelper = try DefaultAppSyncClientHelper(userClient: sudoUserClient)
+
+        guard let appSyncClient = appSyncHelper.getAppSyncClient() else {
             throw SudoDIRelayError.invalidConfig
         }
 
-        let relayService = DefaultRelayService(appSyncClient: appSyncClient)
+        let relayService = DefaultRelayService(appSyncClient: appSyncClient, appSyncClientHelper: appSyncHelper)
         self.init(
             appSyncClient: appSyncClient,
-            appSyncClientHelper: appSyncClientHelper,
+            appSyncClientHelper: appSyncHelper,
+            sudoUserClient: sudoUserClient,
             useCaseFactory: UseCaseFactory(relayService: relayService),
             relayService: relayService
         )
@@ -86,15 +94,17 @@ public class DefaultSudoDIRelayClient: SudoDIRelayClient {
     init(
         appSyncClient: AWSAppSyncClient,
         appSyncClientHelper: AppSyncClientHelper,
+        sudoUserClient: SudoUserClient,
         useCaseFactory: UseCaseFactory,
         relayService: RelayService,
         logger: Logger = .relaySDKLogger
     ) {
         self.appSyncClient = appSyncClient
-        self.logger = logger
+        self.appSyncClientHelper = appSyncClientHelper
+        self.sudoUserClient = sudoUserClient
         self.useCaseFactory = useCaseFactory
         self.relayService = relayService
-        self.appSyncClientHelper = appSyncClientHelper
+        self.logger = logger
     }
     // MARK: - Methods
 
@@ -145,5 +155,11 @@ public class DefaultSudoDIRelayClient: SudoDIRelayClient {
         let useCase = useCaseFactory.generateSubscribeToPostboxDeleted()
         let token = useCase.execute(withConnectionId: connectionId, completion: resultHandler)
         return token
+    }
+
+    public func getPostboxEndpoint(withConnectionId connectionId: String) -> URL? {
+        let useCase = useCaseFactory.generateGetPostboxEndpoint()
+        let endpoint = useCase.execute(withConnectionId: connectionId)
+        return endpoint
     }
 }

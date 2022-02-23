@@ -13,8 +13,11 @@ class DefaultRelayService: RelayService {
 
     // MARK: - Properties
 
-    /// App sync client for peforming operations against the relay service.
+    /// AppSync client for peforming operations against the relay service.
     var appSyncClient: AWSAppSyncClient
+
+    /// Helper for the AppSync client.
+    var appSyncClientHelper: AppSyncClientHelper
 
     /// Used to log diagnostic and error information.
     var logger: Logger
@@ -30,8 +33,9 @@ class DefaultRelayService: RelayService {
 
     // MARK: - Lifecycle
 
-    init(appSyncClient: AWSAppSyncClient, logger: Logger = .relaySDKLogger) {
+    init(appSyncClient: AWSAppSyncClient, appSyncClientHelper: AppSyncClientHelper, logger: Logger = .relaySDKLogger) {
         self.appSyncClient = appSyncClient
+        self.appSyncClientHelper = appSyncClientHelper
         self.logger = logger
     }
 
@@ -44,7 +48,7 @@ class DefaultRelayService: RelayService {
     // MARK: - Conformance: RelayService
 
     func getMessages(withConnectionId connectionId: String, completion: @escaping ClientCompletion<[RelayMessage]>) {
-        let input = IdAsInput(id: connectionId)
+        let input = IdAsInput(connectionId: connectionId)
         let query = GetMessagesQuery(input: input)
         let operation = operationFactory.generateQueryOperation(query: query, appSyncClient: appSyncClient, logger: logger)
         let completionObserver = PlatformBlockObserver(finishHandler: { [weak self, unowned operation] _, errors in
@@ -71,12 +75,7 @@ class DefaultRelayService: RelayService {
     }
 
     func createPostbox(withConnectionId connectionId: String, completion: @escaping ClientCompletion<Void>) {
-        let input = createWriteToRelayInput(
-            messageId: "init",
-            connectionId: connectionId,
-            cipherText: "",
-            direction: Direction.inbound
-        )
+        let input = IdAsInput(connectionId: connectionId)
         let mutation = SendInitMutation(input: input)
         let operation = operationFactory.generateMutationOperation(mutation: mutation, appSyncClient: appSyncClient, logger: logger)
         let completionObserver = PlatformBlockObserver(finishHandler: { [weak self, unowned operation] _, errors in
@@ -102,8 +101,7 @@ class DefaultRelayService: RelayService {
             connectionId: connectionId,
             cipherText: message,
             direction: Direction.outbound)
-        let mutation = StoreMessageMutation(input: input
-        )
+        let mutation = StoreMessageMutation(input: input)
         let operation = operationFactory.generateMutationOperation(mutation: mutation, appSyncClient: appSyncClient, logger: logger)
         let completionObserver = PlatformBlockObserver(finishHandler: { [weak self, unowned operation] _, errors in
             if let error = errors.first {
@@ -127,7 +125,7 @@ class DefaultRelayService: RelayService {
     }
 
     func deletePostbox(withConnectionId connectionId: String, completion: @escaping ClientCompletion<Void>) {
-        let input = IdAsInput(id: connectionId)
+        let input = IdAsInput(connectionId: connectionId)
         let mutation = DeletePostBoxMutation(input: input)
         let operation = operationFactory.generateMutationOperation(mutation: mutation, appSyncClient: appSyncClient, logger: logger)
         let completionObserver = PlatformBlockObserver(finishHandler: { _, errors in
@@ -202,6 +200,10 @@ class DefaultRelayService: RelayService {
             statusChangeHandler: subscriptionStatusChangeHandler,
             resultHandler: subscriptionResultHandler
         )
+    }
+
+    func getPostboxEndpoint(withConnectionId connectionId: String) -> URL? {
+        return URL(string: appSyncClientHelper.getHttpEndpoint() + "/" + connectionId)
     }
 
     // MARK: - Helpers
@@ -290,9 +292,7 @@ class DefaultRelayService: RelayService {
 
     /// Construct a WriteToRelayInput
     func createWriteToRelayInput(messageId: String, connectionId: String, cipherText: String, direction: Direction) -> WriteToRelayInput {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "E, d MMM yyyy HH:mm:ss zzz"
-        let timestamp = dateFormatter.string(from: Date())
+        let timestamp = Date().millisecondsSince1970.rounded()
         return WriteToRelayInput(
             messageId: messageId,
             connectionId: connectionId,

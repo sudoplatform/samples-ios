@@ -44,4 +44,8 @@ class UseCaseFactory {
     func generateSubscribeToPostboxDeleted() -> SubscribeToPostboxDeletedUseCase {
         return SubscribeToPostboxDeletedUseCase(relayService: relayService)
     }
+
+    func generateGetPostboxEndpoint() -> GetPostboxEndpointUseCase {
+        return GetPostboxEndpointUseCase(relayService: relayService)
+    }
 }

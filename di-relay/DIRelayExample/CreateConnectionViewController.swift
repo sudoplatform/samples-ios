@@ -27,7 +27,8 @@ class CreateConnectionViewController: UITableViewController {
         case "navigateToScanInvitation":
             let destination = segue.destination as! ScanInvitationViewController
             destination.postboxId = postboxId
-        default: break
+        default:
+            break
         }
     }
 

@@ -25,12 +25,15 @@ struct PresentableMessage: Comparable {
 
 class ConnectionViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
     
-    // MARK: - Supplementary
+    // MARK: - Properties
 
     let dateFormatter: DateFormatter = DateFormatter()
+    let relayClient: SudoDIRelayClient = AppDelegate.dependencies.sudoDIRelayClient
+
     var messageLog: [PresentableMessage] = []
     var onMessagesReceivedToken: SubscriptionToken?
     var myPostboxId: String = ""
+    var peerPostboxId: String?
 
     /// The peer posted an invitation message containing metadata we don't want to display in the connection view.
     /// Make note of this message and do not display it.
@@ -38,7 +41,6 @@ class ConnectionViewController: UIViewController, UITableViewDelegate, UITableVi
 
     private var myPublicKey: String?
     private var peerPublicKey: String?
-    private var peerPostboxId: String?
 
     // MARK: - Outlets
 
@@ -76,10 +78,7 @@ class ConnectionViewController: UIViewController, UITableViewDelegate, UITableVi
             return
         }
         
-        onMessagesReceivedToken = AppDelegate
-            .dependencies
-            .sudoDIRelayClient
-            .subscribeToMessagesReceived(withConnectionId: myPostboxId) { [weak self] result in
+        onMessagesReceivedToken = relayClient.subscribeToMessagesReceived(withConnectionId: myPostboxId) { [weak self] result in
             guard let weakSelf = self else { return }
             switch result {
             case .success(let message):
@@ -106,25 +105,18 @@ class ConnectionViewController: UIViewController, UITableViewDelegate, UITableVi
             messageCopy.cipherText = decryptedText
         }
         DispatchQueue.main.async {
-            /// Must keep a strong reference to keep subscription connection open
+            // Must keep a strong reference to keep subscription connection open
             self.messageLog.append(PresentableMessage(message: messageCopy, encrypted: false))
             self.messageLog.sort(by: >)
             self.tableView.reloadData()
         }
     }
-    
-    
+
     /// Attempt to decrypt the given `relayMessage` or display an error alert if unsuccessful.
-    /// At the moment, init messages are not encrypted.
     ///
     /// - Parameter relayMessage: A message returned from the postbox.
     /// - Returns: Decrypted string or nil.
     func decryptReceivedMessageOrPresentError(relayMessage: RelayMessage) -> String? {
-        
-        // Don't attempt to decrypt an init message
-        if relayMessage.messageId == "init" {
-            return relayMessage.cipherText
-        }
         
         do {
             // The message was sent as a string representation of the data
@@ -132,24 +124,23 @@ class ConnectionViewController: UIViewController, UITableViewDelegate, UITableVi
                 connectionId: myPostboxId,
                 encryptedPayloadString: relayMessage.cipherText
             )
-        } catch let error {
+        } catch {
             DispatchQueue.main.async {
                 self.presentErrorAlert(message: "Unable to decrypt received message", error: error)
             }
             return nil
         }
     }
-    
-    
+
     /// Attempt to encrypt `message` and store in the relay via the `SudoDIRelayClient`.
-    /// Appends the unencrypted RelayMessage in the current list of messages.
+    /// Appends the unencrypted `RelayMessage` in the current list of messages.
     ///
     /// Displays an error alert if encryption or storage were unsuccesful.
     ///
     /// - Parameter message: The plaintext message to store inside the relay and the cache.
     func encryptAndStoreInRelayAndCache(message: String) {
-        /// Encrypt using our public key
         do {
+            // Encrypt using our public key
             guard let encryptedMessage = try KeyManagement().packEncryptedMessageForPeer(
                     peerConnectionId: myPostboxId,
                     message: message
@@ -159,10 +150,7 @@ class ConnectionViewController: UIViewController, UITableViewDelegate, UITableVi
             }
             
             // Store encrypted message in our own postbox for persistence
-            AppDelegate.dependencies.sudoDIRelayClient.storeMessage(
-                withConnectionId: myPostboxId,
-                message: encryptedMessage
-            ) { result in
+            relayClient.storeMessage(withConnectionId: myPostboxId, message: encryptedMessage) { result in
                 switch result {
                 case .success(let storedMessage):
                     if var storedMessage = storedMessage {
@@ -189,16 +177,16 @@ class ConnectionViewController: UIViewController, UITableViewDelegate, UITableVi
 
     // MARK: - Table View
 
-    /// Return number of table rows
+    /// Return number of table rows.
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return messageLog.count
+        return messageLog.count + 1
     }
 
     /// Construct table view cells.
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
 
-        if indexPath.row == messageLog.count - 1 {
-            /// Add a summary label before the conversation messages
+        if indexPath.row == messageLog.count {
+            // Add a summary label before the conversation messages
             let cell: ConnectionSummaryTableViewCell
             cell = tableView.dequeueReusableCell(withIdentifier: "connectionSummaryMessageCell", for: indexPath) as! ConnectionSummaryTableViewCell
             if peerPostboxId != nil {
@@ -253,9 +241,9 @@ class ConnectionViewController: UIViewController, UITableViewDelegate, UITableVi
             destination.peerPostboxId = peerPostboxId
             destination.myPublicKey = myPublicKey
             destination.peerPublicKey = peerPublicKey
-
             view.endEditing(true)
-        default: break
+        default:
+            break
         }
     }
 
@@ -267,7 +255,7 @@ class ConnectionViewController: UIViewController, UITableViewDelegate, UITableVi
 
         let messageToSend = messageBodyTextField.text ?? ""
         do {
-            /// Clear the body text field.
+            // Clear the body text field
             DispatchQueue.main.async {
                 self.messageBodyTextField.text = ""
             }
@@ -285,18 +273,22 @@ class ConnectionViewController: UIViewController, UITableViewDelegate, UITableVi
 
             print("What should be stored in the postbox. \(encryptedMessageAsData.base64URLEncodedString())")
 
-            /// POST to peer's postbox
+            guard let url = relayClient.getPostboxEndpoint(withConnectionId: peerPostboxId ?? "") else {
+                onFailure("Unable to fetch peer's postbox endpoint", error: nil)
+                return
+            }
+
+            // POST to peer's postbox
             HTTPTransports.transmit(
                 data: encryptedMessageAsData,
-                to: "\(AppDelegate.dependencies.appSyncClientHelper.getHttpEndpoint())/\(peerPostboxId ?? "")"
+                to: url
             ) { result in
                 switch result {
                 case .success:
-                    /// Store in our own postbox for persistence
+                    // Store in our own postbox for persistence
                     self.encryptAndStoreInRelayAndCache(message: messageToSend)
                 case .failure(let error):
                     self.onFailure("Failed to send message", error: error)
-                    break
                 }
             }
         } catch {
@@ -343,7 +335,6 @@ class ConnectionViewController: UIViewController, UITableViewDelegate, UITableVi
 
         do {
             try getMetadata()
-
         } catch {
             presentErrorAlert(message: "Unable to fetch metadata", error: error)
         }
@@ -372,7 +363,7 @@ class ConnectionViewController: UIViewController, UITableViewDelegate, UITableVi
                 }
                 self.myPublicKey = myPublicKey
             }
-        } catch let error {
+        } catch {
             self.onFailure("Unable to retrieve metadata for conversation", error: error)
             throw error
         }
@@ -387,11 +378,13 @@ class ConnectionViewController: UIViewController, UITableViewDelegate, UITableVi
     ///
     /// - Parameter completion: a `Result` that on `.success`resolves to the list of fetched messages, or  on `.failure` resolves to an error.
     private func fetchMessages(completion: @escaping(Result<[RelayMessage], Error>) -> Void) {
-        AppDelegate.dependencies.sudoDIRelayClient.getMessages(withConnectionId: myPostboxId) { result in
+        relayClient.getMessages(withConnectionId: myPostboxId) { result in
             switch result {
             case .success(let messages):
                 for message in messages {
-                    //=// If the current list doesn't contain this message, and if this message also isn't the invitation message
+                    // If the current list doesn't contain this message, and
+                    // if this message also isn't the invitation message
+
                     /// TODO: get invitationMessageId when segued from postbox list view
                     if !self.messageLog.contains(where: { $0.message.messageId == message.messageId}) &&
                                                     message.messageId != self.invitationMessageId {
@@ -407,21 +400,6 @@ class ConnectionViewController: UIViewController, UITableViewDelegate, UITableVi
             case .failure(let error):
                 completion(.failure(error))
             }
-        }
-    }
-    
-    
-    /// Convert the a timestamp in the format 'E, d MMM yyyy HH:mm:ss Z' to a Date object.
-    ///
-    /// - Parameter timestamp: a timestamp in the format 'E, d MMM yyyy HH:mm:ss Z'.
-    /// - Throws: `SudoDIRelayError.InternalError`.
-    /// - Returns: A Date representing the time in the timestamp.
-    func transformDateFromRelay(timestamp: String) throws -> Date {
-        dateFormatter.dateFormat = "E, d MMM yyyy HH:mm:ss Z"
-        if let returnValue =  dateFormatter.date(from: timestamp) {
-            return returnValue
-        } else {
-            throw SudoDIRelayError.internalError("Unsupported date format: \(timestamp)")
         }
     }
     

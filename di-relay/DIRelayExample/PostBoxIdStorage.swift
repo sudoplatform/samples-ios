@@ -20,6 +20,9 @@ protocol PostboxIdStorage {
     /// Delete `postboxId` from the storage
     /// - Parameter postBoxId: Postbox ID to delete from storage
     func delete(postBoxId: String)
+
+    /// Deletes all postboxes in Keychain
+    func deleteAllPostboxes()
 }
 
 class KeychainPostboxIdStorage: PostboxIdStorage {
@@ -45,5 +48,9 @@ class KeychainPostboxIdStorage: PostboxIdStorage {
             existingIds = existingIds.filter(){$0 != postBoxId}
             try? keychain.setValue(existingIds, forKey: keychainEntryId)
         }
+    }
+
+    func deleteAllPostboxes() {
+        try? keychain.setValue([], forKey: keychainEntryId)
     }
 }

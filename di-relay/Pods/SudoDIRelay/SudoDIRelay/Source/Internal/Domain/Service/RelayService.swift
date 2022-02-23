@@ -45,6 +45,11 @@ protocol RelayService: AnyObject, Resetable {
     /// - Parameters:
     ///   - connectionId: Identifier of the postbox to retrieve messages from.
     ///   - resultHandler: Returns `Status` on success, or `Error` on failure.
+    /// - Returns: Token to manage subscription.
     func subscribeToPostboxDeleted(withConnectionId connectionId: String, resultHandler: @escaping ClientCompletion<Status>) throws -> SubscriptionToken
+
+    /// Get HTTP endpoint of the postbox given the postbox identifier.
+    /// - Returns: The postbox HTTP endpoint on success, or nil on failure.
+    func getPostboxEndpoint(withConnectionId connectionId: String) -> URL?
 
 }

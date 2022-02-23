@@ -6,6 +6,7 @@
 
 import Foundation
 import AppSyncRealTimeClient
+import AWSCore
 
 class BasicSubscriptionConnectionFactory: SubscriptionConnectionFactory {
 
@@ -13,6 +14,7 @@ class BasicSubscriptionConnectionFactory: SubscriptionConnectionFactory {
     var userpoolsBasedPool: UserPoolsBasedConnectionPool?
     var iamBasedPool: IAMBasedConnectionPool?
     var oidcBasedPool: OIDCBasedConnectionPool?
+    var lambdaBasedPool: LambdaBasedConnectionPool?
 
     let url: URL
     let retryStrategy: AWSAppSyncRetryStrategy
@@ -24,6 +26,7 @@ class BasicSubscriptionConnectionFactory: SubscriptionConnectionFactory {
           region: AWSRegionType?,
           apiKeyProvider: AWSAPIKeyAuthProvider?,
           cognitoUserPoolProvider: AWSCognitoUserPoolsAuthProvider?,
+          awsLambdaAuthProvider: AWSLambdaAuthProvider?,
           oidcAuthProvider: AWSOIDCAuthProvider?,
           iamAuthProvider: AWSCredentialsProvider?) {
 
@@ -43,6 +46,10 @@ class BasicSubscriptionConnectionFactory: SubscriptionConnectionFactory {
         if let oidcAuthProvider = oidcAuthProvider {
             self.oidcBasedPool = OIDCBasedConnectionPool(oidcAuthProvider)
         }
+        if let awsLambdaAuthProvider = awsLambdaAuthProvider {
+            self.lambdaBasedPool = LambdaBasedConnectionPool(awsLambdaAuthProvider)
+        }
+        
     }
 
     func connection(connectionType: SubscriptionConnectionType) -> SubscriptionConnection? {
@@ -69,6 +76,8 @@ class BasicSubscriptionConnectionFactory: SubscriptionConnectionFactory {
             return userpoolsBasedPool
         case .oidcToken:
             return oidcBasedPool
+        case .awsLambda:
+            return lambdaBasedPool
         }
     }
 }

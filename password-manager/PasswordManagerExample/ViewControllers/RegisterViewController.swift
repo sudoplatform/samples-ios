@@ -7,6 +7,7 @@
 import UIKit
 import SudoUser
 
+@MainActor
 class RegisterViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDelegate {
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     @IBOutlet weak var registerButton: UIButton!
@@ -50,9 +51,11 @@ class RegisterViewController: UIViewController, UIPickerViewDataSource, UIPicker
     }
 
     @objc func signOutTapped() {
-        Clients.authenticator.doFSSOSignOut(from: self.view.window!) { (maybeError) in
-            Clients.resetClients()
-            if let error = maybeError {
+        Task {
+            do {
+                try await Clients.authenticator.doFSSOSignOut(from: self.view.window!)
+                Clients.resetClients()
+            } catch {
                 print("Failed to sign out: \(error)")
             }
         }
@@ -85,14 +88,20 @@ class RegisterViewController: UIViewController, UIPickerViewDataSource, UIPicker
 
         let selectedRow = registrationMethodPicker.selectedRow(inComponent: 0)
         let signInMethod = registrationMethods[selectedRow]
-        Clients.authenticator.registerAndSignIn(from: self.view.window!, signInMethod: signInMethod) { (result) in
-            DispatchQueue.main.async {
+        Task {
+            do {
+                try await Clients.authenticator.registerAndSignIn(from: self.view.window!, signInMethod: signInMethod)
                 self.activityIndicator.stopAnimating()
                 self.registerButton.isEnabled = true
-                switch result {
-                case .success: self.navigatePostSignIn()
-                case .failure(SudoUserClientError.signInCanceled): break
-                case .failure(let error): self.showRegistrationFailureAlert(error: error)
+                self.navigatePostSignIn()
+            } catch {
+                self.activityIndicator.stopAnimating()
+                self.registerButton.isEnabled = true
+                switch error {
+                case SudoUserClientError.signInCanceled:
+                    break
+                default:
+                    self.showRegistrationFailureAlert(error: error)
                 }
             }
         }

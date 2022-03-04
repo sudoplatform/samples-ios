@@ -7,6 +7,7 @@
 import UIKit
 import SudoProfiles
 
+@MainActor
 class CreateSudoViewController: UIViewController {
     @IBOutlet weak var createButton: UIBarButtonItem!
     @IBOutlet weak var labelTextField: UITextField!
@@ -27,24 +28,18 @@ class CreateSudoViewController: UIViewController {
         let sudo = Sudo(title: nil, firstName: nil, lastName: nil, label: labelTextField.text, notes: nil, avatar: nil)
         presentActivityAlert(message: "Creating sudo")
 
-        do {
-            try sudoProfilesClient.createSudo(sudo: sudo) { result in
-                DispatchQueue.main.async {
-                    // dismiss activity alert
-                    self.dismiss(animated: true) {
-                        switch result {
-                        case .success:
-                            self.performSegue(withIdentifier: "returnToSudoList", sender: self)
-                        case .failure(let error):
-                            self.presentErrorAlert(message: "Failed to create sudo", error: error)
-                        }
-                    }
+        Task {
+            do {
+                _ = try await sudoProfilesClient.createSudo(sudo: sudo)
+                await self.dismiss(animated: true)
+                self.performSegue(withIdentifier: "returnToSudoList", sender: self)
+            } catch let error {
+                dismiss(animated: true) {
+                    self.presentErrorAlert(message: "Failed to create sudo", error: error)
                 }
-            }
-        } catch let error {
-            dismiss(animated: true) {
-                self.presentErrorAlert(message: "Failed to create sudo", error: error)
             }
         }
     }
 }
+
+

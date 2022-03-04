@@ -34,12 +34,14 @@ class Clients {
     }
 
     static func resetClients() {
-        do {
-            _ = try? passwordManagerClient.reset()
-            try profilesClient.reset()
-            try userClient.reset()
-        } catch let error {
-            NSLog("Failed to reset clients: \(error)")
+        Task {
+            do {
+                _ = try? await passwordManagerClient.reset()
+                try profilesClient.reset()
+                try await userClient.reset()
+            } catch let error {
+                NSLog("Failed to reset clients: \(error)")
+            }
         }
     }
 
@@ -48,24 +50,16 @@ class Clients {
 
         alert.addAction(UIAlertAction(title: "Reset", style: .destructive, handler: { (_) in
             UIApplication.shared.topController?.presentActivityAlert(message: "Deregistering")
-
-            do {
-                try authenticator.deregister(completion: { (result) in
-                    if case .failure(let error) = result {
-                        NSLog("Failed to deregister: \(error)")
-                    }
-
-                    DispatchQueue.main.async {
-                        self.resetClients()
-                        UIApplication.shared.rootController?.dismiss(animated: true, completion: nil)
-                    }
-                })
-            }
-            catch {
-                NSLog("Failed to deregister: \(error)")
-                self.resetClients()
-                DispatchQueue.main.async {
-                    UIApplication.shared.topController?.dismiss(animated: true, completion: nil)
+            Task {
+                do {
+                    _ = try await authenticator.deregister()
+                    self.resetClients()
+                    await UIApplication.shared.rootController?.dismiss(animated: true)
+                }
+                catch {
+                    NSLog("Failed to deregister: \(error)")
+                    self.resetClients()
+                    await UIApplication.shared.topController?.dismiss(animated: true)
                 }
             }
         }))

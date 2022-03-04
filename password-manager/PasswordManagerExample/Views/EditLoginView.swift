@@ -71,26 +71,28 @@ class EditLoginView: UIView {
 
     func setLogin(login: VaultLogin) {
         self.login = login
-        do {
-            webAddressField.text = login.url
-            loginNameField.text = login.name
-            usernameField.text = login.user
-            passwordField.text = try login.password?.getValue()
-            notesField.text = try login.notes?.getValue()
-            let formatter = DateFormatter()
-            formatter.dateFormat = "yyyy-MM-dd hh:mm:ss"
-            createdLabel.text = "Created: \(formatter.string(from: login.createdAt))"
-            updatedLabel.text = "Updated: \(formatter.string(from: login.updatedAt))"
-            createdLabel.isHidden = false
-            updatedLabel.isHidden = false
-        } catch {
-            print(error)
+        Task {
+            do {
+                webAddressField.text = login.url
+                loginNameField.text = login.name
+                usernameField.text = login.user
+                passwordField.text = try await login.password?.getValue()
+                notesField.text = try await login.notes?.getValue()
+                let formatter = DateFormatter()
+                formatter.dateFormat = "yyyy-MM-dd hh:mm:ss"
+                createdLabel.text = "Created: \(formatter.string(from: login.createdAt))"
+                updatedLabel.text = "Updated: \(formatter.string(from: login.updatedAt))"
+                createdLabel.isHidden = false
+                updatedLabel.isHidden = false
+            } catch {
+                print(error)
+            }
         }
     }
 
     func getLogin() -> VaultLogin {
         // return updated existing login
-        if let login = login {
+        if var login = login {
             login.user = usernameField.text
             login.url = webAddressField.text
             login.name = (loginNameField.text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? "").isEmpty ? "Create Login" : loginNameField.text!

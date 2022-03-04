@@ -7,6 +7,7 @@
 import UIKit
 import SudoPasswordManager
 
+@MainActor
 class BankAccountViewController: UITableViewController {
 
     // Input for the vault the item belongs to
@@ -57,12 +58,14 @@ class BankAccountViewController: UITableViewController {
     }
 
     func loadDataFrom(bankAccount: VaultBankAccount?) {
-        nameField.text = bankAccount?.name
-        bankNameField.text =  bankAccount?.bankName
-        accountNumberField.text = try? bankAccount?.accountNumber?.getValue()
-        routingNumberField.text = bankAccount?.routingNumber
-        notesField.text = try? bankAccount?.notes?.getValue()
-        accountTypeField.text = bankAccount?.accountType
+        Task {
+            nameField.text = bankAccount?.name
+            bankNameField.text =  bankAccount?.bankName
+            accountNumberField.text = try? await bankAccount?.accountNumber?.getValue()
+            routingNumberField.text = bankAccount?.routingNumber
+            notesField.text = try? await bankAccount?.notes?.getValue()
+            accountTypeField.text = bankAccount?.accountType
+        }
 
         let formatter = DateFormatter()
         formatter.dateStyle = .short
@@ -74,8 +77,9 @@ class BankAccountViewController: UITableViewController {
     }
 
     func updateModelWithInputs() -> VaultBankAccount {
+
         // Get the passed in bank account so it can be updated, or create a new one and update that.
-        let bankAccount = self.bankAccountInput ?? VaultBankAccount(name: "", notes: nil, accountType: nil, bankName: nil, branchAddress: nil, branchPhone: nil, ibanNumber: nil, routingNumber: nil, swiftCode: nil, accountNumber: nil, accountPin: nil)
+        var bankAccount = self.bankAccountInput ?? VaultBankAccount(name: "", notes: nil, accountType: nil, bankName: nil, branchAddress: nil, branchPhone: nil, ibanNumber: nil, routingNumber: nil, swiftCode: nil, accountNumber: nil, accountPin: nil)
 
         if let name = nameField.text {
             bankAccount.name = name
@@ -119,30 +123,28 @@ class BankAccountViewController: UITableViewController {
 
         /// The add/update functions take different parameters to their closures.
         if self.bankAccountInput == nil {
-            Clients.passwordManagerClient.add(item: item, toVault: vault) { [weak self] (result) in
-                runOnMain {
-                    switch result {
-                    case .success(_):
-                        (self?.presentingViewController ?? self)?.dismiss(animated: true, completion: nil)
-                    case .failure(let error):
-                        self?.dismiss(animated: false, completion: {
-                            self?.presentErrorAlert(message: "Failed to add vault item", error: error)
-                        })
-                    }
+            Task {
+                do {
+                    _ = try await Clients.passwordManagerClient.add(item: item, toVault: vault)
+                    (self.presentingViewController ?? self).dismiss(animated: true, completion: nil)
+                }
+                catch {
+                    self.dismiss(animated: false, completion: {
+                        self.presentErrorAlert(message: "Failed to add vault item", error: error)
+                    })
                 }
             }
         }
         else {
-            Clients.passwordManagerClient.update(item: item, in: vault) { [weak self] (result) in
-                runOnMain {
-                    switch result {
-                    case .success(_):
-                        (self?.presentingViewController ?? self)?.dismiss(animated: true, completion: nil)
-                    case .failure(let error):
-                        self?.dismiss(animated: false, completion: {
-                            self?.presentErrorAlert(message: "Failed to update vault item", error: error)
-                        })
-                    }
+            Task {
+                do {
+                    try await Clients.passwordManagerClient.update(item: item, in: vault)
+                    (self.presentingViewController ?? self).dismiss(animated: true, completion: nil)
+                }
+                catch {
+                    self.dismiss(animated: false, completion: {
+                        self.presentErrorAlert(message: "Failed to update vault item", error: error)
+                    })
                 }
             }
         }

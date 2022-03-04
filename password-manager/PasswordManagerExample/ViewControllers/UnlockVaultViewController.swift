@@ -8,6 +8,7 @@ import UIKit
 import SudoPasswordManager
 import enum SudoUser.SudoUserClientError
 
+@MainActor
 class UnlockVaultViewController: UIViewController {
     @IBOutlet weak var instructionsLabel: UILabel!
     @IBOutlet weak var passwordField: UITextField!
@@ -31,16 +32,16 @@ class UnlockVaultViewController: UIViewController {
 
     @objc func back() {
         if Clients.authenticator.lastSignInMethod == .fsso {
-            Clients.authenticator.doFSSOSignOut(from: UIApplication.shared.rootWindow!) { (maybeError) in
-                runOnMain {
-                    switch maybeError {
-                    case .some(SudoUserClientError.signInCanceled):
-                        break
-                    case .some(let error):
+            Task {
+                do {
+                    try await Clients.authenticator.doFSSOSignOut(from: UIApplication.shared.rootWindow!)
+                    Clients.resetClients()
+                    UIApplication.shared.rootController?.dismiss(animated: true, completion: nil)
+                } catch {
+                    switch error {
+                    case SudoUserClientError.signInCanceled: break
+                    default:
                         self.presentErrorAlert(message: "Failed to sign out: \(error)")
-                    case .none:
-                        Clients.resetClients()
-                        UIApplication.shared.rootController?.dismiss(animated: true, completion: nil)
                     }
                 }
             }
@@ -54,11 +55,9 @@ class UnlockVaultViewController: UIViewController {
         super.viewWillAppear(animated)
         passwordField.text = ""
         confirmPasswordField.text = ""
-        passwordManagerClient.getRegistrationStatus { [weak self] (result) in
-            guard let self = self else { return }
-            self.registrationStatusLoadingView.isHidden = true
-            switch result {
-            case .success(let status):
+        Task {
+            do {
+                let status = try await passwordManagerClient.registrationStatus()
                 self.registrationStatus = status
                 switch self.registrationStatus {
                 case .registered:
@@ -68,7 +67,7 @@ class UnlockVaultViewController: UIViewController {
                     let unlockButton = UIBarButtonItem(title: "Unlock", style: .plain, target: self, action: #selector(self.unlockOrRegister))
                     self.navigationItem.rightBarButtonItems = [unlockButton]
                     // check if client is unlocked
-                    if !self.passwordManagerClient.isLocked() {
+                    if await !self.passwordManagerClient.isLocked() {
                         self.proceedToVaults()
                     }
                 case .notRegistered:
@@ -86,8 +85,10 @@ class UnlockVaultViewController: UIViewController {
                     let unlockButton = UIBarButtonItem(title: "Unlock", style: .plain, target: self, action: #selector(self.unlockOrRegister))
                     self.navigationItem.rightBarButtonItems = [unlockButton]
                 }
-            default:
-                break
+                self.registrationStatusLoadingView.isHidden = true
+            }
+            catch {
+
             }
         }
     }
@@ -100,17 +101,16 @@ class UnlockVaultViewController: UIViewController {
                 self.presentErrorAlert(message: "You must enter a password")
             } else {
                 self.presentActivityAlert(message: "Unlocking Vault")
-                self.passwordManagerClient.unlock(masterPassword: passwordField.text ?? "", secretCode: nil) { [weak self] (result) in
-                    runOnMain {
-                        switch result {
-                        case .success:
-                            self?.dismiss(animated: false, completion: nil)
-                            self?.proceedToVaults()
-                        case .failure(let error):
-                            self?.dismiss(animated: false, completion: {
-                                self?.presentErrorAlert(message: "Failed to unlock client", error: error)
-                            })
-                        }
+                Task {
+                    do {
+                        try await self.passwordManagerClient.unlock(masterPassword: passwordField.text ?? "", secretCode: nil)
+                        self.dismiss(animated: false, completion: nil)
+                        self.proceedToVaults()
+                    }
+                    catch {
+                        self.dismiss(animated: false, completion: {
+                            self.presentErrorAlert(message: "Failed to unlock client", error: error)
+                        })
                     }
                 }
             }
@@ -119,31 +119,18 @@ class UnlockVaultViewController: UIViewController {
             let password = passwordField.text ?? ""
             if !password.isEmpty && confirmPasswordField.text == password {
                 self.presentActivityAlert(message: "Creating Vault")
-                self.passwordManagerClient.register(masterPassword: password) { (result) in
-                    runOnMain {
-                        switch result {
-                        case .success:
-                            self.registrationStatus = .registered
-                                self.passwordManagerClient.unlock(masterPassword: password, secretCode: nil) { (result) in
-                                    DispatchQueue.main.async {
-                                    switch result {
-                                    case .success:
-                                        self.dismiss(animated: false) {
-                                            self.postRegistration()
-                                        }
-                                    case .failure(let error):
-                                        self.dismiss(animated: false) {
-                                            self.presentErrorAlert(message: "Failed to unlock client", error: error)
-                                        }
-                                        break
-                                    }
-                                }
-                            }
-                        case .failure(let error):
-                            self.dismiss(animated: false) {
-                                self.presentErrorAlert(message: "Failed to register client", error: error)
-                            }
-                            break
+                Task {
+                    do {
+                        try await self.passwordManagerClient.register(masterPassword: password)
+                        self.registrationStatus = .registered
+                        try await self.passwordManagerClient.unlock(masterPassword: password, secretCode: nil)
+                        self.dismiss(animated: false) {
+                            self.postRegistration()
+                        }
+                    }
+                    catch {
+                        self.dismiss(animated: false) {
+                            self.presentErrorAlert(message: "Failed to register client", error: error)
                         }
                     }
                 }
@@ -154,17 +141,15 @@ class UnlockVaultViewController: UIViewController {
             self.presentActivityAlert(message: "Unlocking Vault")
             let password = confirmPasswordField.text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
             let secretCode = passwordField.text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-            self.passwordManagerClient.unlock(masterPassword: password, secretCode: secretCode) { [weak self] (result) in
-                runOnMain {
-                    switch result {
-                    case .success:
-                        self?.dismiss(animated: false, completion: nil)
-                        self?.proceedToVaults()
-                    case .failure(let error):
-                        self?.dismiss(animated: false, completion: {
-                            self?.presentErrorAlert(message: "Failed to unlock client", error: error)
-                        })
-                    }
+            Task {
+                do {
+                    try await passwordManagerClient.unlock(masterPassword: password, secretCode: secretCode)
+                    self.dismiss(animated: false, completion: nil)
+                    self.proceedToVaults()
+                } catch {
+                    self.dismiss(animated: false, completion: {
+                        self.presentErrorAlert(message: "Failed to unlock client", error: error)
+                    })
                 }
             }
         }
@@ -218,7 +203,9 @@ class UnlockVaultViewController: UIViewController {
     }
 
     @objc func lockVault() {
-        Clients.passwordManagerClient.lock()
+        Task {
+            await Clients.passwordManagerClient.lock()
+        }
         self.navigationController?.popToViewController(self, animated: true)
     }
 

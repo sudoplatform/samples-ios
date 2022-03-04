@@ -7,6 +7,7 @@
 import UIKit
 import SudoPasswordManager
 
+@MainActor
 class CreditCardViewController: UITableViewController {
 
     @IBOutlet weak var itemTitle: UITextField!
@@ -46,7 +47,9 @@ class CreditCardViewController: UITableViewController {
         // Setup navigation bar, nav buttons, and initial data to display
         if let card = self.creditCardInput {
             self.title = "Edit Credit Card"
-            self.loadDataFrom(card: card)
+            Task {
+                await self.loadDataFrom(card: card)
+            }
         }
         else {
             self.title = "Create Credit Card"
@@ -66,11 +69,11 @@ class CreditCardViewController: UITableViewController {
     }()
 
     /// Loads data from the model into the textfields, making any conversions needed. Best effort
-    func loadDataFrom(card: VaultCreditCard) {
+    func loadDataFrom(card: VaultCreditCard) async {
         itemTitle.text = card.name
         cardholderName.text = card.cardName
 
-        if let cardNumber = try? card.cardNumber?.getValue() {
+        if let cardNumber = try? await card.cardNumber?.getValue() {
             number.text = cardNumber
         }
 
@@ -78,11 +81,11 @@ class CreditCardViewController: UITableViewController {
             self.expiration.text = self.dateFormatter.string(from: expiration)
         }
 
-        if let securityCode = try? card.cardSecurityCode?.getValue() {
+        if let securityCode = try? await card.cardSecurityCode?.getValue() {
             self.securityCode.text = securityCode
         }
         cardType.text = card.cardType
-        notes.text = (try? card.notes?.getValue()) ?? ""
+        notes.text = (try? await card.notes?.getValue()) ?? ""
 
         let formatter = DateFormatter()
         formatter.dateStyle = .short
@@ -94,7 +97,7 @@ class CreditCardViewController: UITableViewController {
     /// Writes the data from the text fields to the model.  Best effort.
     func updateModelWithInputs() -> VaultCreditCard {
 
-        let card = self.creditCardInput ?? VaultCreditCard(name: "", notes: nil, cardType: nil, cardName: nil, cardExpiration: nil, cardNumber: nil, cardSecurityCode: nil)
+        var card = self.creditCardInput ?? VaultCreditCard(name: "", notes: nil, cardType: nil, cardName: nil, cardExpiration: nil, cardNumber: nil, cardSecurityCode: nil)
 
         if let text = itemTitle.text {
             card.name = text
@@ -147,32 +150,32 @@ class CreditCardViewController: UITableViewController {
 
         /// The add/update functions take different parameters to their closures.
         if self.creditCardInput == nil {
-            Clients.passwordManagerClient.add(item: dataToSave, toVault: self.vault, completion: {  [weak self] (result) in
-                runOnMain {
-                    switch result {
-                    case .success(_):
-                        (self?.presentingViewController ?? self)?.dismiss(animated: true, completion: nil)
-                    case .failure(let error):
-                        self?.dismiss(animated: false, completion: {
-                            self?.presentErrorAlert(message: "Failed to add vault item", error: error)
-                        })
-                    }
+
+            Task {
+                do {
+                    _ = try await Clients.passwordManagerClient.add(item: dataToSave, toVault: self.vault)
+                    (self.presentingViewController ?? self)?.dismiss(animated: true, completion: nil)
                 }
-            })
+                catch {
+                    self.dismiss(animated: false, completion: {
+                        self.presentErrorAlert(message: "Failed to add vault item", error: error)
+                    })
+                }
+            }
         }
         else {
-            Clients.passwordManagerClient.update(item: dataToSave, in: self.vault, completion: {  [weak self] (result) in
-                runOnMain {
-                    switch result {
-                    case .success(_):
-                        (self?.presentingViewController ?? self)?.dismiss(animated: true, completion: nil)
-                    case .failure(let error):
-                        self?.dismiss(animated: false, completion: {
-                            self?.presentErrorAlert(message: "Failed to update vault item", error: error)
-                        })
-                    }
+            Task {
+                do {
+                    try await Clients.passwordManagerClient.update(item: dataToSave, in: self.vault)
+                    (self.presentingViewController ?? self)?.dismiss(animated: true, completion: nil)
                 }
-            })
+                catch {
+                    self.dismiss(animated: false, completion: {
+                        self.presentErrorAlert(message: "Failed to update vault item", error: error)
+                    })
+                }
+            }
+
         }
     }
 }

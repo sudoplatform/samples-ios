@@ -8,6 +8,7 @@ import UIKit
 import SudoPasswordManager
 import SudoProfiles
 
+@MainActor
 class VaultListViewController: UITableViewController {
     var vaults: [Vault] = []
 
@@ -25,6 +26,20 @@ class VaultListViewController: UITableViewController {
         self.tableView.dataSource = self
 
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Settings", style: .plain, target: self, action: #selector(self.showSettings))
+
+        // Add pull to refresh for vault list
+        self.tableView.refreshControl = UIRefreshControl()
+        self.tableView.refreshControl?.addTarget(self, action: #selector(self.pullToRefreshTriggered(control:)), for: .allEvents)
+    }
+
+    @objc func pullToRefreshTriggered(control: UIRefreshControl) {
+        if control.isRefreshing {
+            Task {
+                try? await self.passwordManagerClient.updateLocalDataStore()
+                control.endRefreshing()
+                await self.loadData()
+            }
+        }
     }
 
     @objc func showSettings() {
@@ -35,52 +50,53 @@ class VaultListViewController: UITableViewController {
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        guard !self.passwordManagerClient.isLocked() else {
-            self.dismiss(animated: true, completion: nil)
-            return
+        Task {
+            guard await !self.passwordManagerClient.isLocked() else {
+                self.dismiss(animated: true, completion: nil)
+                return
+            }
+            await self.loadData()
         }
-        self.loadData()
     }
 
-    func addNewVault() {
+    func addNewVault() async {
         self.presentActivityAlert(message: "Creating Vault")
-        passwordManagerClient.createVault(sudoId: self.sudoID) { [weak self] result in
-            runOnMain {
-                switch result {
-                case .success(let vault):
-                    self?.dismiss(animated: false, completion: nil)
-                    self?.vaults.append(vault)
-                    self?.tableView.reloadData()
-                case .failure(let error):
-                    self?.dismiss(animated: false, completion: {
-                        self?.presentErrorAlert(message: "Failed to create vault", error: error)
-                    })
-                }
+        Task {
+            do {
+                let vault = try await passwordManagerClient.createVault(sudoId: self.sudoID)
+                self.dismiss(animated: false, completion: nil)
+                self.vaults.append(vault)
+                self.tableView.reloadData()
+            }
+            catch {
+                self.dismiss(animated: false, completion: {
+                    self.presentErrorAlert(message: "Failed to create vault", error: error)
+                })
             }
         }
     }
 
-    func loadData() {
-        passwordManagerClient.listVaults { [weak self] result in
-            DispatchQueue.main.async {
-                guard let self = self else { return }
-                switch result {
-                case .success(let vaults):
-                    self.vaults = vaults.filter({ $0.belongsToSudo(id: self.sudoID) }).sorted(by: { (lhs, rhs) -> Bool in
-                        return lhs.createdAt <= rhs.createdAt
-                    })
-                    self.tableView.reloadData()
-                case .failure(let error):
-                    self.presentErrorAlert(message: "Failed to list vaults", error: error)
-                }
+    func loadData() async {
+        Task {
+            do {
+                let vaults = try await passwordManagerClient.listVaults()
+                self.tableView.refreshControl?.endRefreshing()
+                self.vaults = vaults.filter({ $0.belongsToSudo(id: self.sudoID) }).sorted(by: { (lhs, rhs) -> Bool in
+                    return lhs.createdAt <= rhs.createdAt
+                })
+                self.tableView.reloadData()
+            }
+            catch {
+                self.presentErrorAlert(message: "Failed to list vaults", error: error)
             }
         }
     }
 
     @objc func lockPasswordManager() {
-        passwordManagerClient.lock()
-        // unwind back to unlock view controller
-        self.dismiss(animated: true, completion: nil)
+        Task {
+            await passwordManagerClient.lock()
+            self.dismiss(animated: true, completion: nil)
+        }
     }
 
     @objc func showSecretCode() {
@@ -128,7 +144,9 @@ class VaultListViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         if indexPath.row == vaults.count {
-            addNewVault()
+            Task {
+                await addNewVault()
+            }
         } else {
             let vault = self.vaults[indexPath.row]
             let vc = UIStoryboard(name: "Main", bundle: Bundle.main).instantiateViewController(identifier: "LoginListViewController") as! VaultItemListViewController
@@ -144,18 +162,18 @@ class VaultListViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if indexPath.row < vaults.count && editingStyle == .delete {
             self.presentActivityAlert(message: "Deleting Vault")
-            passwordManagerClient.deleteVault(withId: vaults[indexPath.row].id) { [weak self] result in
-                runOnMain {
-                    switch result {
-                    case .success():
-                        self?.dismiss(animated: false, completion: nil)
-                        self?.vaults.remove(at: indexPath.row)
-                        tableView.deleteRows(at: [indexPath], with: .fade)
-                    case .failure(let error):
-                        self?.dismiss(animated: false, completion: {
-                            self?.presentErrorAlert(message: "Failed to delete vault", error: error)
-                        })
-                    }
+            Task {
+                do {
+                    let id = vaults[indexPath.row].id
+                    _ = try await passwordManagerClient.deleteVault(withId: id)
+                    self.dismiss(animated: false, completion: nil)
+                    self.vaults.remove(at: indexPath.row)
+                    tableView.deleteRows(at: [indexPath], with: .fade)
+                }
+                catch {
+                    self.dismiss(animated: false, completion: {
+                        self.presentErrorAlert(message: "Failed to delete vault", error: error)
+                    })
                 }
             }
         }

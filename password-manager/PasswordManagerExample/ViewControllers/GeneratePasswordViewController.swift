@@ -7,6 +7,7 @@
 import UIKit
 import SudoPasswordManager
 
+@MainActor
 class GeneratePasswordViewController: UIViewController {
     @IBOutlet weak var passwordTextField: UITextField!
     @IBOutlet weak var generatePasswordView: GeneratePasswordView!

@@ -7,6 +7,7 @@
 import UIKit
 import SudoUser
 
+@MainActor
 class SettingsViewController: UITableViewController {
 
     @IBOutlet weak var deregisterLabel: UILabel!
@@ -39,24 +40,14 @@ class SettingsViewController: UITableViewController {
             break
         case 2:
             // lock vaults
-            Clients.passwordManagerClient.lock()
-            self.dismissToUnlockScreen()
+            Task {
+                await Clients.passwordManagerClient.lock()
+                self.dismissToUnlockScreen()
+            }
         case 3:
             // deregister / sign out
             if Clients.authenticator.lastSignInMethod == .fsso {
-                Clients.authenticator.doFSSOSignOut(from: self.view.window!) { (maybeError) in
-                    runOnMain {
-                        switch maybeError {
-                        case .some(SudoUserClientError.signInCanceled):
-                            break
-                        case .some(let error):
-                            self.presentErrorAlert(message: "Failed to sign out: \(error)")
-                        case .none:
-                            Clients.resetClients()
-                            UIApplication.shared.rootController?.dismiss(animated: true, completion: nil)
-                        }
-                    }
-                }
+                self.performDeregister()
             }
             else {
                 Clients.deregisterWithAlert()
@@ -73,6 +64,22 @@ class SettingsViewController: UITableViewController {
         }
     }
 
+    func performDeregister() {
+        Task {
+            do {
+                try await Clients.authenticator.doFSSOSignOut(from: self.view.window!)
+                Clients.resetClients()
+                await UIApplication.shared.rootController?.dismiss(animated: true)
+            } catch {
+                if case SudoUserClientError.signInCanceled = error {
+                    return
+                } else {
+                    self.presentErrorAlert(message: "Failed to sign out: \(error)")
+                }
+            }
+        }
+    }
+
     func deregisterPasswordManagerWithAlert() {
         let alert = UIAlertController(title: "All vaults will be lost", message: "This will reset your account with the vault service and all vaults will be lost.  Your secret code/rescue kit will be reset and you will be asked to create a new master password.", cancelActionTitle: "Not now")
 
@@ -85,16 +92,12 @@ class SettingsViewController: UITableViewController {
 
     func deregisterPasswordManager() {
         self.presentActivityAlert(message: "Resetting Vaults")
-        Clients.passwordManagerClient.deregister { (result) in
-            switch result {
-            case .success:
-                DispatchQueue.main.async {
-                    self.dismissToUnlockScreen()
-                }
-            case .failure(let error):
-                DispatchQueue.main.async {
-                    self.presentErrorAlert(message: "Something went wrong", error: error)
-                }
+        Task {
+            do {
+                _ = try await Clients.passwordManagerClient.deregister()
+                self.dismissToUnlockScreen()
+            } catch {
+                self.presentErrorAlert(message: "Something went wrong", error: error)
             }
         }
     }
@@ -117,8 +120,10 @@ class SettingsViewController: UITableViewController {
             } catch {
                 self.presentErrorAlert(message: "Failed to remove keys", error: error)
             }
-            client.lock()
-            self.dismissToUnlockScreen()
+            Task {
+                await client.lock()
+                self.dismissToUnlockScreen()
+            }
         }))
         present(alert, animated: true, completion: nil)
     }

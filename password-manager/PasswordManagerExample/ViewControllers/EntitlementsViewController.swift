@@ -7,6 +7,7 @@
 import UIKit
 import SudoPasswordManager
 
+@MainActor
 class EntitlementsViewController: UITableViewController {
     
     private let client = Clients.passwordManagerClient!
@@ -25,15 +26,14 @@ class EntitlementsViewController: UITableViewController {
     }
     
     private func loadData() {
-        client.getEntitlementState { [weak self] (result) in
-            runOnMain {
-                switch result {
-                case .success(let entitlements):
-                    self?.entitlements = entitlements
-                    self?.tableView.reloadData()
-                case .failure(let error):
-                    self?.presentErrorAlert(message: "Failed to list entitlements", error: error)
-                }
+        Task {
+            do {
+                let entitlements = try await client.getEntitlementState()
+                self.entitlements = entitlements
+                self.tableView.reloadData()
+            }
+            catch {
+                self.presentErrorAlert(message: "Failed to list entitlements", error: error)
             }
         }
     }

@@ -54,135 +54,80 @@ class Authenticator {
         self.entitlementsClient = entitlementsClient
     }
 
-    private func register(completion: @escaping (Swift.Result<Void, Error>) -> Void) {
-        do {
-            if userClient.isRegistered() { throw AuthenticatorError.alreadyRegistered }
-            guard let testKeyPath = Bundle.main.path(forResource: "register_key", ofType: "private") else {
-                throw AuthenticatorError.missingTestKey
-            }
-
-            guard let testKeyIdPath = Bundle.main.path(forResource: "register_key", ofType: "id") else {
-                throw AuthenticatorError.missingTestKeyId
-            }
-
-            let testKey = try String(contentsOfFile: testKeyPath)
-            let testKeyId = try String(contentsOfFile: testKeyIdPath).trimmingCharacters(in: .whitespacesAndNewlines)
-            let provider = try TESTAuthenticationProvider(
-                name: "testRegisterAudience",
-                key: testKey,
-                keyId: testKeyId,
-                keyManager: keyManager
-            )
-            try userClient.registerWithAuthenticationProvider(
-                authenticationProvider: provider,
-                registrationId: UUID().uuidString
-            ) { result in
-                switch result {
-                case .failure(let error):
-                    NSLog("Registration Failure: \(error)")
-                    completion(.failure(error))
-                case .success:
-                    completion(.success(()))
-                }
-            }
+    private func register() async throws {
+        if try await userClient.isRegistered() {
+            throw AuthenticatorError.alreadyRegistered
         }
-        catch let error {
-            NSLog("Pre-registration Failure: \(error)")
-            completion(.failure(error))
+
+        guard let testKeyPath = Bundle.main.path(forResource: "register_key", ofType: "private") else {
+            throw AuthenticatorError.missingTestKey
         }
+
+        guard let testKeyIdPath = Bundle.main.path(forResource: "register_key", ofType: "id") else {
+            throw AuthenticatorError.missingTestKeyId
+        }
+
+        let testKey = try String(contentsOfFile: testKeyPath)
+        let testKeyId = try String(contentsOfFile: testKeyIdPath).trimmingCharacters(in: .whitespacesAndNewlines)
+        let provider = try TESTAuthenticationProvider(
+            name: "testRegisterAudience",
+            key: testKey,
+            keyId: testKeyId,
+            keyManager: keyManager
+        )
+        _ = try await userClient.registerWithAuthenticationProvider(
+            authenticationProvider: provider,
+            registrationId: UUID().uuidString)
     }
 
-    func doFSSOSignOut(from anchor: UIWindow, completion: ((Error?) -> Void)?) {
-        do {
-            // Present the federated sign out screen.  This will likely trigger a "do you want to allow access" alert.
-            try Clients.userClient!.presentFederatedSignOutUI(presentationAnchor: anchor) { (result) in
-                // There is no way to tap into the authentication session's UI dismissal, so we have issues
-                // dismissing view controllers after sign out.  As a general fix we can delay the completion handler
-                // for one second to let things settle.
-                //
-                //https://developer.apple.com/forums/thread/123667
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                    switch result {
-                    case .success:
-                        print("Successly signed out.")
-                        self.lastSignInMethod = .unknown
-                        completion?(nil)
-                    case .failure(let cause):
-                        completion?(cause)
-                    }
-                }
-            }
-        } catch let error {
-            completion?(error)
-        }
+
+    func doFSSOSignOut(from anchor: UIWindow) async throws {
+        // Present the federated sign out screen.  This will likely trigger a "do you want to allow access" alert.
+        try await Clients.userClient!.presentFederatedSignOutUI(presentationAnchor: anchor)
+        self.lastSignInMethod = .unknown
+        // There is no way to tap into the authentication session's UI dismissal, so we have issues
+        // dismissing view controllers after sign out.  As a general fix we can delay the completion handler
+        // for one second to let things settle.
+        //
+        //https://developer.apple.com/forums/thread/123667
+        try await Task.sleep(nanoseconds: 1)
     }
 
-    func registerAndSignIn(from anchor: UIWindow, signInMethod: ChallengeType, completion: @escaping (Result<Void, Error>) -> Void) {
+    func registerAndSignIn(from anchor: UIWindow, signInMethod: ChallengeType) async throws {
         let userClient: SudoUserClient = Clients.userClient
 
-        func signInWithTestKey() {
-            do {
-                if try userClient.isSignedIn() {
-                    self.entitlementsClient.redeemEntitlements() { result in }
-                    completion(.success(()))
+        func signInWithTestKey() async throws {
+                if try await userClient.isSignedIn() {
+                    _ = try await self.entitlementsClient.redeemEntitlements()
                     return
                 }
 
-                try userClient.signInWithKey { signInResult in
-                    switch signInResult {
-                    case .failure(let error):
-                        completion(.failure(error))
-                    case .success:
-                        self.lastSignInMethod = .test
-                        self.entitlementsClient.redeemEntitlements() { result in }
-                        completion(.success(()))
-                    }
-                }
-            } catch let signInError {
-                completion(.failure(signInError))
-            }
+                _ = try await userClient.signInWithKey()
+                self.lastSignInMethod = .test
+                _ = try await self.entitlementsClient.redeemEntitlements()
         }
 
         switch signInMethod {
         case .fsso:
-            do {
-                try userClient.presentFederatedSignInUI(presentationAnchor: anchor) { signInResult in
-                    switch signInResult {
-                    case .failure(let error):
-                        completion(.failure(error))
-                    case .success:
-                        self.lastSignInMethod = .fsso
-                        self.entitlementsClient.redeemEntitlements() { result in }
-                        completion(.success(()))
-                    }
-                }
-            } catch let signInError {
-                completion(.failure(signInError))
-            }
+            _ = try await userClient.presentFederatedSignInUI(presentationAnchor: anchor)
+            self.lastSignInMethod = .fsso
+            _ = try await self.entitlementsClient.redeemEntitlements()
         case .test:
-            if userClient.isRegistered() {
-                signInWithTestKey()
+            if try await userClient.isRegistered() {
+                try await signInWithTestKey()
             } else {
-                self.register { registerResult in
-                    switch registerResult {
-                    case .failure(let error):
-                        completion(.failure(error))
-                    case .success:
-                        signInWithTestKey()
-                    }
-                }
+                try await self.register()
+                try await signInWithTestKey()
             }
         default:
             break
         }
     }
 
-    func deregister(completion: @escaping (Result<String, Error>) -> Void) throws {
-        try self.userClient.deregister { (result) in
-            if case .success(_) = result {
-                self.lastSignInMethod = .unknown
-            }
-            completion(result)
+    func deregister() async throws -> String {
+        defer {
+            self.lastSignInMethod = .unknown
         }
+        return try await self.userClient.deregister()
     }
 }

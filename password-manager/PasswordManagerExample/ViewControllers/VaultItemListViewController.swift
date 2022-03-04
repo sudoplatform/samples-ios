@@ -8,6 +8,7 @@ import UIKit
 import AuthenticationServices
 import SudoPasswordManager
 
+@MainActor
 class VaultItemListViewController: UITableViewController {
 
     var passwordManagerClient: SudoPasswordManagerClient!
@@ -27,6 +28,23 @@ class VaultItemListViewController: UITableViewController {
 
         let newPasswordButton = UIBarButtonItem(title: "Gen Password", style: .plain, target: self, action: #selector(self.newPassword))
         self.navigationItem.rightBarButtonItems = [newPasswordButton]
+
+        // Add pull to refresh
+        self.tableView.refreshControl = UIRefreshControl()
+        self.tableView.refreshControl?.addTarget(self, action: #selector(self.pullToRefreshTriggered(control:)), for: .allEvents)
+    }
+
+    @objc func pullToRefreshTriggered(control: UIRefreshControl) {
+        if control.isRefreshing {
+            Task {
+                try await self.passwordManagerClient.updateLocalDataStore()
+                control.endRefreshing()
+
+                // force a reload/fetch of vault data
+                // load data will end refreshing
+                self.loadData()
+            }
+        }
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -35,16 +53,18 @@ class VaultItemListViewController: UITableViewController {
     }
 
     func loadData() {
-        passwordManagerClient.listVaultItems(inVault: vault) { [weak self] result in
-            switch result {
-            case .success(let items):
-                self?.vaultItems = items.compactMap({ return $0 as? VaultItemListViewModel }).sorted(by: { (lhs, rhs) -> Bool in
+        Task {
+            do {
+                let items = try await passwordManagerClient.listVaultItems(inVault: vault)
+                self.vaultItems = items.compactMap({ return $0 as? VaultItemListViewModel }).sorted(by: { (lhs, rhs) -> Bool in
                     return lhs.displayTitle <= rhs.displayTitle
                 })
-                self?.tableView.reloadData()
-            case .failure(let error):
-                self?.presentErrorAlert(message: "Failed to list vault items", error: error)
+                self.tableView.reloadData()
             }
+            catch {
+                self.presentErrorAlert(message: "Failed to list vault items", error: error)
+            }
+            self.tableView?.refreshControl?.endRefreshing()
         }
     }
 
@@ -134,7 +154,9 @@ class VaultItemListViewController: UITableViewController {
             let item = self.vaultItems[indexPath.row]
 
             cell.textLabel?.text = item.displayTitle
-            cell.detailTextLabel?.text = item.displaySubtitle
+            Task {
+                cell.detailTextLabel?.text = await item.displaySubtitle
+            }
             cell.typeImage = item.displayTypeImage
             return cell
         }
@@ -177,16 +199,14 @@ class VaultItemListViewController: UITableViewController {
         if indexPath.row < vaultItems.count && editingStyle == .delete {
             // remove vault item
             let item = vaultItems[indexPath.row]
-            passwordManagerClient.removeVaultItem(id: item.id, from: vault) { [weak self] removeResult in
-                runOnMain {
-                    switch removeResult {
-                    case .success():
-                        guard let self = self else { return }
-                        self.vaultItems.remove(at: indexPath.row)
-                        tableView.deleteRows(at: [indexPath], with: .fade)
-                    case .failure(let error):
-                        self?.presentErrorAlert(message: "Failed to remove vault item", error: error)
-                    }
+            Task {
+                do {
+                    _ = try await passwordManagerClient.removeVaultItem(id: item.id, from: vault)
+                    self.vaultItems.remove(at: indexPath.row)
+                    tableView.deleteRows(at: [indexPath], with: .fade)
+                }
+                catch {
+                    self.presentErrorAlert(message: "Failed to remove vault item", error: error)
                 }
             }
         }
@@ -218,7 +238,7 @@ class VaultItemCell: UITableViewCell {
 
 protocol VaultItemListViewModel {
     var displayTitle: String { get }
-    var displaySubtitle: String { get }
+    var displaySubtitle: String { get async }
     var displayTypeImage: UIImage? { get }
     var id: String { get }
 }
@@ -233,7 +253,11 @@ extension VaultLogin: VaultItemListViewModel {
 
 extension VaultCreditCard: VaultItemListViewModel {
     var displayTitle: String  { return self.name }
-    var displaySubtitle: String { return (try? self.cardNumber?.getValue()) ?? "" }
+    var displaySubtitle: String {
+        get async {
+            return (try? await self.cardNumber?.getValue()) ?? ""
+        }
+    }
     var displayTypeImage: UIImage? { return UIImage(systemName: "creditcard") }
 }
 

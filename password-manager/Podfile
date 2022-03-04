@@ -1,4 +1,4 @@
-platform :ios, '13.0'
+platform :ios, '14.0'
 use_frameworks!
 use_modular_headers!
 
@@ -16,7 +16,7 @@ pre_install do |installer|
 end
 
 target 'PasswordManagerExample' do
-  pod 'SudoPasswordManager', '~> 2.0'
+  pod 'SudoPasswordManager', '~> 6.0'
 end
 
 # supress warnings for pods
@@ -25,7 +25,7 @@ post_install do |installer|
         target.build_configurations.each do |config|
             config.build_settings['GCC_WARN_INHIBIT_ALL_WARNINGS'] = "YES"
             config.build_settings['SWIFT_SUPPRESS_WARNINGS'] = "YES"
-            config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '13.0'
+            config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '14.0'
         end
     end
 end

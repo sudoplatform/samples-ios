@@ -57,6 +57,7 @@
 		CE6BD2872530ED4E00E2E4DA /* EntitlementCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE6BD2862530ED4E00E2E4DA /* EntitlementCell.swift */; };
 		CEA886F7251BF47300E72008 /* SecretCodeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEA886F6251BF47300E72008 /* SecretCodeViewController.swift */; };
 		D4142AEC8758986833076364 /* Pods_PasswordManagerExample.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 25998C7EEDA088D3386C7668 /* Pods_PasswordManagerExample.framework */; };
+		E25AC8BD27D26A1E0023B4E0 /* Viewcontroller+async.swift in Sources */ = {isa = PBXBuildFile; fileRef = E25AC8BC27D26A1E0023B4E0 /* Viewcontroller+async.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -147,6 +148,7 @@
 		CE65DAE8252CDFD500C35EA4 /* EntitlementsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntitlementsViewController.swift; sourceTree = "<group>"; };
 		CE6BD2862530ED4E00E2E4DA /* EntitlementCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntitlementCell.swift; sourceTree = "<group>"; };
 		CEA886F6251BF47300E72008 /* SecretCodeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecretCodeViewController.swift; sourceTree = "<group>"; };
+		E25AC8BC27D26A1E0023B4E0 /* Viewcontroller+async.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Viewcontroller+async.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -254,6 +256,7 @@
 				CE65DAE8252CDFD500C35EA4 /* EntitlementsViewController.swift */,
 				CABE3F3025BB801D008C1AB9 /* CreditCardViewController.swift */,
 				CABE3F5525BF7407008C1AB9 /* BankAccountViewController.swift */,
+				E25AC8BC27D26A1E0023B4E0 /* Viewcontroller+async.swift */,
 			);
 			path = ViewControllers;
 			sourceTree = "<group>";
@@ -559,6 +562,7 @@
 				C30DB7192507FD64002CBCAC /* UnlockVaultViewController.swift in Sources */,
 				C311E4B524E5AAE5006293D5 /* GeneratePasswordViewController.swift in Sources */,
 				C33E12802501915000D1294E /* UIViewController+Extensions.swift in Sources */,
+				E25AC8BD27D26A1E0023B4E0 /* Viewcontroller+async.swift in Sources */,
 				C33E127C2501913B00D1294E /* RegisterViewController.swift in Sources */,
 				32CA71B1252CE8CC00BED941 /* CreateSudoViewController.swift in Sources */,
 				C33E127B2501913B00D1294E /* VaultListViewController.swift in Sources */,
@@ -725,7 +729,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.5;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -780,7 +784,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.5;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
@@ -800,7 +804,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = PasswordManagerExample/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -822,7 +826,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = PasswordManagerExample/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -841,6 +845,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = AutofillExtension/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -861,6 +866,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = AutofillExtension/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

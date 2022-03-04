@@ -6,6 +6,7 @@
 
 import UIKit
 
+@MainActor
 class ChangePasswordViewController: UIViewController {
 
     @IBOutlet weak var currentPasswordField: UITextField!
@@ -21,16 +22,14 @@ class ChangePasswordViewController: UIViewController {
         guard let client = Clients.passwordManagerClient else { return }
 
         self.presentActivityAlert(message: "Changing master password")
-        client.changeMasterPassword(currentPassword: currentPassword, newPassword: newPassword) { (result) in
-            runOnMain {
-                switch result {
-                case .success:
-                    self.dismiss(animated: true, completion: nil)
-                    self.navigationController?.popViewController(animated: true)
-                case .failure(let error):
-                    self.dismiss(animated: true) {
-                        self.presentErrorAlert(message: "Change master password failed", error: error)
-                    }
+        Task {
+            do {
+                try await client.changeMasterPassword(currentPassword: currentPassword, newPassword: newPassword)
+                self.dismiss(animated: true, completion: nil)
+                self.navigationController?.popViewController(animated: true)
+            } catch {
+                self.dismiss(animated: true) {
+                    self.presentErrorAlert(message: "Change master password failed", error: error)
                 }
             }
         }

@@ -8,6 +8,7 @@ import UIKit
 import AuthenticationServices
 import SudoPasswordManager
 
+@MainActor
 class NewLoginViewController: UIViewController {
     var vault: Vault!
 
@@ -40,16 +41,15 @@ class NewLoginViewController: UIViewController {
         let passwordManagerClient = Clients.passwordManagerClient!
         // add login
         self.presentActivityAlert(message: "Saving Vault Item")
-        passwordManagerClient.add(item: self.editLoginView.getLogin(), toVault: vault) { [weak self] addResult in
-            runOnMain {
-                switch addResult {
-                case .success(_):
-                    (self?.presentingViewController ?? self)?.dismiss(animated: true, completion: nil)
-                case .failure(let error):
-                    self?.dismiss(animated: false, completion: {
-                        self?.presentErrorAlert(message: "Failed to add vault item", error: error)
-                    })
-                }
+        Task {
+            do {
+                _ = try await passwordManagerClient.add(item: self.editLoginView.getLogin(), toVault: vault)
+                (self.presentingViewController ?? self)?.dismiss(animated: true, completion: nil)
+            }
+            catch {
+                self.dismiss(animated: false, completion: {
+                    self.presentErrorAlert(message: "Failed to add vault item", error: error)
+                })
             }
         }
     }

@@ -7,6 +7,7 @@
 import UIKit
 import SudoPasswordManager
 
+@MainActor
 class EditLoginViewController: UIViewController {
     @IBOutlet weak var editLoginView: EditLoginView!
     var login: VaultLogin!
@@ -32,18 +33,18 @@ class EditLoginViewController: UIViewController {
         let passwordManagerClient = Clients.passwordManagerClient!
         // update login
         self.presentActivityAlert(message: "Saving Vault Item")
-        passwordManagerClient.update(item: editLoginView.getLogin(), in: vault) { [weak self] updateItemResult in
-            runOnMain {
-                switch updateItemResult {
-                case .success():
-                    self?.dismiss(animated: false, completion: nil)
-                    self?.navigationController?.popViewController(animated: true)
-                case .failure(let error):
-                    self?.dismiss(animated: false, completion: {
-                        self?.presentErrorAlert(message: "Failed to update vault item", error: error)
-                    })
-                }
+        Task {
+            do {
+                let _ = try await passwordManagerClient.update(item: editLoginView.getLogin(), in: vault)
+                self.dismiss(animated: false, completion: nil)
+                self.navigationController?.popViewController(animated: true)
+            }
+            catch {
+                self.dismiss(animated: false, completion: {
+                    self.presentErrorAlert(message: "Failed to update vault item", error: error)
+                })
             }
         }
+
     }
 }

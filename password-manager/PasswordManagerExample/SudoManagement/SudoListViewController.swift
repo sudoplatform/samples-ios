@@ -10,6 +10,7 @@ import SudoProfiles
 import UIKit
 import SudoProfiles
 
+@MainActor
 class SudoListViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
     @IBOutlet weak var tableView: UITableView!
     private var sudos: [Sudo] = []
@@ -38,51 +39,30 @@ class SudoListViewController: UIViewController, UITableViewDelegate, UITableView
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-
-        listSudos(option: .cacheOnly) { localSudos in
-            DispatchQueue.main.async {
-                self.sudos = localSudos
-                self.tableView.reloadData()
-            }
-
-            self.listSudos(option: .remoteOnly) { remoteSudos in
-                DispatchQueue.main.async {
-                    self.sudos = remoteSudos
-                    self.tableView.reloadData()
-                }
-            }
+        Task {
+            self.sudos = try await self.listSudos(option: .cacheOnly)
+            self.tableView.reloadData()
+            self.sudos = try await self.listSudos(option: .remoteOnly)
+            self.tableView.reloadData()
         }
     }
 
-    private func listSudos(option: SudoProfiles.ListOption, onSuccess: @escaping ([Sudo]) -> Void) {
-        do {
-            try sudoProfilesClient.listSudos(option: option) { result in
-                switch result {
-                case .success(let sudos):
-
-                    // This example creates sudos without claims (i.e. all attributes nil except id).  an id is an ugly display name
-                    // so this assigns a number to each sudo based on their creation date.
-                    // The general approach is to sort by createdAt, then create a copy of each sudo with label of "Sudo X".
-                    // Since these claims are assigned locally they aren't encrypted and can be read.
-                    var count = 0
-                    let sudosWithSelfAssignedTitle: [Sudo] = sudos.sorted { (lhs, rhs) -> Bool in
-                        return lhs.createdAt < rhs.createdAt
-                    }
-                    .map {
-                        let copy = Sudo(id: $0.id ?? "", version: $0.version, createdAt: $0.createdAt, updatedAt: $0.updatedAt, title: $0.title, firstName: $0.firstName, lastName: $0.lastName, label: "Sudo \(count)", notes: $0.notes, avatar: $0.avatar)
-                        count += 1
-                        return copy
-                    }
-                    onSuccess(sudosWithSelfAssignedTitle)
-                case .failure(let error):
-                    DispatchQueue.main.async {
-                        self.presentErrorAlert(message: "Failed to list Sudos", error: error)
-                    }
-                }
-            }
-        } catch {
-            presentErrorAlert(message: "Failed to list Sudos", error: error)
+    private func listSudos(option: SudoProfiles.ListOption) async throws -> [Sudo] {
+        let sudos = try await sudoProfilesClient.listSudos(option: option)
+        // This example creates sudos without claims (i.e. all attributes nil except id).  an id is an ugly display name
+        // so this assigns a number to each sudo based on their creation date.
+        // The general approach is to sort by createdAt, then create a copy of each sudo with label of "Sudo X".
+        // Since these claims are assigned locally they aren't encrypted and can be read.
+        var count = 0
+        let sudosWithSelfAssignedTitle: [Sudo] = sudos.sorted { (lhs, rhs) -> Bool in
+            return lhs.createdAt < rhs.createdAt
         }
+            .map {
+                let copy = Sudo(id: $0.id ?? "", version: $0.version, createdAt: $0.createdAt, updatedAt: $0.updatedAt, title: $0.title, firstName: $0.firstName, lastName: $0.lastName, label: "Sudo \(count)", notes: $0.notes, avatar: $0.avatar)
+                count += 1
+                return copy
+            }
+        return sudosWithSelfAssignedTitle
     }
 
     private func navigateToLoginScreen() {
@@ -157,28 +137,15 @@ class SudoListViewController: UIViewController, UITableViewDelegate, UITableView
         // This allows testing across multiple devices without transferring keys belonging to the `SudoProfiles` SDK.
         let sudo = Sudo(title: nil, firstName: nil, lastName: nil, label: nil, notes: nil, avatar: nil)
         presentActivityAlert(message: "Creating sudo")
-        do {
-            try sudoProfilesClient.createSudo(sudo: sudo) { result in
-
-                DispatchQueue.main.async {
-                    // dismiss activity alert
-                    self.dismiss(animated: true) {
-                        switch result {
-                        case .success:
-                            self.listSudos(option: .remoteOnly) { remoteSudos in
-                                DispatchQueue.main.async {
-                                    self.sudos = remoteSudos
-                                    self.tableView.reloadData()
-                                }
-                            }
-                        case .failure(let error):
-                            self.presentErrorAlert(message: "Failed to create sudo", error: error)
-                        }
-                    }
-                }
-            }
-        } catch let error {
-            dismiss(animated: true) {
+        Task {
+            do {
+                _ = try await sudoProfilesClient.createSudo(sudo: sudo)
+                await self.dismiss(animated: true)
+                let sudos = try await self.listSudos(option: .remoteOnly)
+                self.sudos = sudos
+                self.tableView.reloadData()
+            } catch let error {
+                await dismiss(animated: true)
                 self.presentErrorAlert(message: "Failed to create sudo", error: error)
             }
         }

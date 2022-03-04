@@ -6,6 +6,7 @@
 
 import UIKit
 
+@MainActor
 class SecretCodeViewController: UIViewController {
     
     @IBOutlet weak var secretCode: UILabel!

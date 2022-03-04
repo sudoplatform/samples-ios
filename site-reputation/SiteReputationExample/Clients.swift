@@ -23,22 +23,22 @@ class Clients {
         self.siteReputationClient = try DefaultSudoSiteReputationClient(userClient: userClient)
     }
 
-    static func resetClients() {
+    static func resetClients() async {
         do {
-            try userClient.reset()
-            try siteReputationClient.clearStorage()
+            try await userClient.reset()
+            try await siteReputationClient.clearStorage()
         } catch let error {
             NSLog("Failed to reset clients: \(error)")
         }
 
     }
 
-    static func deregisterClients() throws {
-        try authenticator.deregister(completion: { (result) in
-            if case .failure(let error) = result {
-                NSLog("Failed to deregister: \(error)")
-            }
-        })
+    static func deregisterClients() async throws {
+        do {
+            _ = try await authenticator.deregister()
+        } catch {
+            NSLog("Failed to deregister: \(error)")
+        }
     }
 }
 
@@ -49,18 +49,14 @@ extension Clients {
         alert.addAction(UIAlertAction(title: "Reset", style: .destructive, handler: { (_) in
             UIApplication.shared.topController?.presentActivityAlert(message: "Deregistering")
 
-            do {
-                try self.deregisterClients()
-
-                DispatchQueue.main.async {
-                    self.resetClients()
-                    UIApplication.shared.rootController?.dismiss(animated: true, completion: nil)
-                }
-            } catch {
-                NSLog("Failed to deregister: \(error)")
-                self.resetClients()
-                DispatchQueue.main.async {
-                    UIApplication.shared.topController?.dismiss(animated: true, completion: nil)
+            Task {
+                await self.resetClients()
+                do {
+                    try await self.deregisterClients()
+                    await UIApplication.shared.rootController?.dismiss(animated: true, completion: nil)
+                } catch {
+                    NSLog("Failed to deregister: \(error)")
+                    await UIApplication.shared.topController?.dismiss(animated: true, completion: nil)
                 }
             }
         }))

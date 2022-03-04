@@ -48,10 +48,12 @@ class SettingsViewController: UITableViewController {
         let alert = UIAlertController(title: "Clear Stored Data?", message: "This will clear all cached site reputation data.", preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
         alert.addAction(UIAlertAction(title: "Clear Storage", style: .default, handler: { _ in
-            do {
-                try Clients.siteReputationClient.clearStorage()
-            } catch {
-                print("Failed to clear data: \(error)")
+            Task {
+                do {
+                    try await Clients.siteReputationClient.clearStorage()
+                } catch {
+                    print("Failed to clear data: \(error)")
+                }
             }
         }))
         present(alert, animated: true, completion: nil)
@@ -62,11 +64,12 @@ class SettingsViewController: UITableViewController {
 
         alert.addAction(UIAlertAction(title: "Sign Out", style: .destructive, handler: { (_) in
             UIApplication.shared.topController?.presentActivityAlert(message: "Signing out")
-            Clients.authenticator.doFSSOSignOut(from: self.navigationController!) { _ in
-                DispatchQueue.main.async {
-                    Clients.resetClients()
-                    UIApplication.shared.rootController?.dismiss(animated: true, completion: nil)
-                }
+
+            guard let navController = self.navigationController else { return }
+            Task {
+                try await Clients.authenticator.doFSSOSignOut(from: navController)
+                await Clients.resetClients()
+                UIApplication.shared.rootController?.dismiss(animated: true, completion: nil)
             }
         }))
 

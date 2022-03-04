@@ -9,6 +9,7 @@ import SudoUser
 import SudoKeyManager
 import UIKit
 import SafariServices
+import AuthenticationServices
 
 enum AuthenticatorError: LocalizedError {
     case registerFailed
@@ -72,140 +73,77 @@ class Authenticator {
         }
     }
 
-    func register(completion: @escaping (Swift.Result<Void, Error>) -> Void) {
+    func register() async throws {
         do {
-            if userClient.isRegistered() { throw AuthenticatorError.alreadyRegistered }
+            if try await userClient.isRegistered() { throw AuthenticatorError.alreadyRegistered }
             let provider = try authenticationProvider()
-            try userClient.registerWithAuthenticationProvider(
-                authenticationProvider: provider,
-                registrationId: UUID().uuidString) { result in
-                switch result {
-                case .failure(let error):
-                    NSLog("Registration Failure: \(error)")
-                    completion(.failure(error))
-                case .success:
-                    completion(.success(()))
-                }
-            }
-        } catch let error {
+            _ = try await userClient.registerWithAuthenticationProvider(authenticationProvider: provider,
+                                                                        registrationId: UUID().uuidString)
+        } catch {
             NSLog("Pre-registration Failure: \(error)")
-            completion(.failure(error))
         }
     }
 
-    func doFSSOSignOut(from nav: UINavigationController, completion: ((Error?) -> Void)?) {
+    func doFSSOSignOut(from nav: UINavigationController) async throws {
         do {
             let client = Clients.userClient!
 
             // Present the federated sign out screen.  This will likely trigger a "do you want to allow access" alert.
-            try Clients.userClient!.presentFederatedSignOutUI(presentationAnchor: nav.view.window!) { (result) in
-                switch result {
-                case .success:
-
-                    // After federated sign out succeeds, perform global sign out.
-                    do {
-                        try client.globalSignOut { (result) in
-                            switch result {
-                            case .success:
-                                // If global sign out succeeds, we still have to launch this `SFAuthenticationSession` to really
-                                // clear the auth cookies.  This will trigger another alert, and the user will have to close the blank
-                                // page that shows up when the logout page loads.
-                                self.clearSFAuthCookies(completion: completion)
-                            case .failure(let cause):
-                                completion?(cause)
-                            }
-                        }
-                    } catch {
-                        // If global sign out fails we still want to complete the sign out locally, otherwise we can be left in a bad
-                        // state where the auth cookies cannot be cleared.
-                        self.clearSFAuthCookies(completion: completion)
-                        completion?(error)
-                    }
-                case .failure(let cause):
-                    completion?(cause)
-                }
-            }
+            try await Clients.userClient!.presentFederatedSignOutUI(presentationAnchor: nav.view.window!)
+            // After federated sign out succeeds, perform global sign out.
+            try await client.globalSignOut()
+            // If global sign out succeeds, we still have to launch this `SFAuthenticationSession` to really
+            // clear the auth cookies.  This will trigger another alert, and the user will have to close the blank
+            // page that shows up when the logout page loads.
+            // If global sign out fails we still want to complete the sign out locally, otherwise we can be left in a bad
+            // state where the auth cookies cannot be cleared.
+            try await self.clearASWebAuthCookies()
         } catch let error {
-            completion?(error)
+            throw error
         }
     }
 
-    private func clearSFAuthCookies(completion: ((Error?) -> Void)?) {
-        self.authSession = SFAuthenticationSession(url: URL(string: "https://dev-98hbdgse.auth0.com/v2/logout")!, callbackURLScheme: nil, completionHandler: { (_, _) in
+    private func clearASWebAuthCookies() async throws {
+        self.authSession?.start()
+        self.authSession = ASWebAuthenticationSession(url: URL(string: "https://dev-98hbdgse.auth0.com/v2/logout")!,
+                                                      callbackURLScheme: nil,
+                                                      completionHandler: { (_, _) in
             // The only option for the user is to cancel to dismiss the webpage, so there will be an error.
             // that we need to ignore.
             self.lastSignInMethod = .unknown
-            completion?(nil)
         })
-        self.authSession?.start()
     }
 
-    var authSession: SFAuthenticationSession?
+    var authSession: ASWebAuthenticationSession?
 
-    func registerAndSignIn(from nav: UINavigationController, signInMethod: ChallengeType, completion: @escaping (Result<Void, Error>) -> Void) {
+    func registerAndSignIn(from nav: UINavigationController,
+                           signInMethod: ChallengeType) async throws {
         let userClient: SudoUserClient = Clients.userClient
 
-        func signIn() {
-            do {
-                if try userClient.isSignedIn() {
-                    completion(.success(()))
-                    return
-                }
-
-                try userClient.signInWithKey { signInResult in
-                    switch signInResult {
-                    case .failure(let error):
-                        completion(.failure(error))
-                    case .success:
-                        self.lastSignInMethod = .test
-                        completion(.success(()))
-                    }
-                }
-            } catch let signInError {
-                completion(.failure(signInError))
+        func signIn() async throws {
+            if try await !userClient.isSignedIn() {
+                _ = try await userClient.signInWithKey()
+                self.lastSignInMethod = .test
             }
         }
 
         switch signInMethod {
         case .fsso:
-            do {
-                try userClient.presentFederatedSignInUI(presentationAnchor: nav.view.window!) { signInResult in
-                    switch signInResult {
-                    case .failure(let error):
-                        completion(.failure(error))
-                    case .success:
-                        self.lastSignInMethod = .fsso
-
-                        completion(.success(()))
-                    }
-                }
-            } catch let signInError {
-                completion(.failure(signInError))
-            }
+            _ = try await userClient.presentFederatedSignInUI(presentationAnchor: nav.view.window!)
+            self.lastSignInMethod = .fsso
         case .test:
-            if userClient.isRegistered() {
-                signIn()
-            } else {
-                self.register { registerResult in
-                    switch registerResult {
-                    case .failure(let error):
-                        completion(.failure(error))
-                    case .success:
-                        signIn()
-                    }
-                }
+            if try await !userClient.isRegistered() {
+                try await self.register()
             }
+            try await signIn()
         default:
             break
         }
     }
 
-    func deregister(completion: @escaping (Result<String, Error>) -> Void) throws {
-        try self.userClient.deregister { (result) in
-            if case .success(_) = result {
-                self.lastSignInMethod = .unknown
-            }
-            completion(result)
-        }
+    func deregister() async throws -> String {
+        let deregisteredUserId = try await self.userClient.deregister()
+        self.lastSignInMethod = .unknown
+        return deregisteredUserId
     }
 }

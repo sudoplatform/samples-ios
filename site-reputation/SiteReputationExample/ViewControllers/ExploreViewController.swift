@@ -56,16 +56,16 @@ class ExploreViewController: UIViewController, UIPickerViewDataSource, UIPickerV
     @IBAction func updateTapped(_ sender: Any) {
         showLoading(text: "Updating")
 
-        Clients.siteReputationClient.update { [weak self] result in
-            switch result {
-            case .success:
-                self?.setUpdatedText()
-            case .failure(let error):
+        Task {
+            do {
+                try await Clients.siteReputationClient.update()
+                self.setUpdatedText()
+            } catch {
                 let alert = UIAlertController(title: "Update Failed", message: error.localizedDescription, preferredStyle: .alert)
                 alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
-                self?.present(alert, animated: true, completion: nil)
+                self.present(alert, animated: true, completion: nil)
             }
-            self?.hideLoading()
+            self.hideLoading()
         }
     }
 
@@ -82,20 +82,21 @@ class ExploreViewController: UIViewController, UIPickerViewDataSource, UIPickerV
         }
 
         // get SiteReputation result for URL to determine if Malicious or Safe
-        let result = Clients.siteReputationClient.getSiteReputation(url: urlTextField.text ?? "")
-        switch result {
-        case .success(let siteReputation):
-            if siteReputation.isMalicious {
-                resultLabel.text = "Malicious"
-                resultLabel.textColor = .red
-            } else {
-                resultLabel.text = "Safe"
-                resultLabel.textColor = .green
+        Task {
+            do {
+                let siteReputation = try await Clients.siteReputationClient.getSiteReputation(url: urlTextField.text ?? "")
+                if siteReputation.isMalicious {
+                    resultLabel.text = "Malicious"
+                    resultLabel.textColor = .red
+                } else {
+                    resultLabel.text = "Safe"
+                    resultLabel.textColor = .green
+                }
+            } catch {
+                let alert = UIAlertController(title: "Check Failed", message: "Unable to get site reputation: \(error.localizedDescription)", preferredStyle: .alert)
+                alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+                present(alert, animated: true, completion: nil)
             }
-        case .failure(let error):
-            let alert = UIAlertController(title: "Check Failed", message: "Unable to get site reputation: \(error.localizedDescription)", preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
-            present(alert, animated: true, completion: nil)
         }
     }
 
@@ -104,13 +105,15 @@ class ExploreViewController: UIViewController, UIPickerViewDataSource, UIPickerV
     }
 
     private func setUpdatedText() {
-        let date = Clients.siteReputationClient.lastUpdatePerformedAt
-        if let date = date {
-            let formatter = DateFormatter()
-            formatter.dateFormat = "yyyy-MM-dd hh:mm:ss"
-            lastUpdatedLabel.text = "Last updated at: \(formatter.string(from: date))"
-        } else {
-            lastUpdatedLabel.text = "Update Required"
+        Task {
+            let date = await Clients.siteReputationClient.lastUpdatePerformedAt()
+            if let date = date {
+                let formatter = DateFormatter()
+                formatter.dateFormat = "yyyy-MM-dd hh:mm:ss"
+                lastUpdatedLabel.text = "Last updated at: \(formatter.string(from: date))"
+            } else {
+                lastUpdatedLabel.text = "Update Required"
+            }
         }
     }
 

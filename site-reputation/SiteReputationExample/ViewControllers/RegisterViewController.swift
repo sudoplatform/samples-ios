@@ -54,9 +54,13 @@ class RegisterViewController: UIViewController, UIPickerViewDataSource, UIPicker
 
     @objc func signOutTapped() {
         guard let nav = self.navigationController else { return }
-        Clients.authenticator.doFSSOSignOut(from: nav) { (maybeError) in
-            Clients.resetClients()
-            print("Failed to sign out: \(String(describing: maybeError))")
+        Task {
+            do {
+                try await Clients.authenticator.doFSSOSignOut(from: nav)
+                await Clients.resetClients()
+            } catch {
+                print("Failed to sign out: \(String(describing: error))")
+            }
         }
     }
 
@@ -82,14 +86,14 @@ class RegisterViewController: UIViewController, UIPickerViewDataSource, UIPicker
 
         let selectedRow = registrationMethodPicker.selectedRow(inComponent: 0)
         let signInMethod = registrationMethods[selectedRow]
-        Clients.authenticator.registerAndSignIn(from: self.navigationController!, signInMethod: signInMethod) { (result) in
-            DispatchQueue.main.async {
+        Task {
+            do {
+                try await Clients.authenticator.registerAndSignIn(from: self.navigationController!, signInMethod: signInMethod)
                 self.activityIndicator.stopAnimating()
                 self.registerButton.isEnabled = true
-                switch result {
-                case .success: self.navigatePostSignIn()
-                case .failure(let error): self.showRegistrationFailureAlert(error: error)
-                }
+                self.navigatePostSignIn()
+            } catch {
+                self.showRegistrationFailureAlert(error: error)
             }
         }
     }

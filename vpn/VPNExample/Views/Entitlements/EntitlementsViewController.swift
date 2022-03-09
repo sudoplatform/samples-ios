@@ -49,38 +49,36 @@ class EntitlementsViewController: UIViewController,
 
     override func viewWillAppear(_ animated: Bool) {
         presentActivityAlert(message: "Loading Entitlements") { [weak self] in
-            self?.loadEntitlementsList()
+            Task { [weak self] in
+                await self?.loadEntitlementsList()
+            }
         }
         super.viewWillAppear(animated)
     }
 
     // MARK: - Operations
 
-    func loadEntitlementsList() {
-        entitlementsClient.getEntitlementsConsumption { [weak self] result in
-            guard let self = self else { return }
-            switch result {
-            case let .success(entitlementsConsumption):
-                let models: [EntitlementConsumptionModel] = entitlementsConsumption.entitlements.entitlements.map { entitlement in
-                    let consumed = entitlementsConsumption.consumption.first(where: { $0.name == entitlement.name })?.consumed
-                    return EntitlementConsumptionModel(
-                        name: entitlement.name,
-                        value: entitlement.value,
-                        consumed: consumed ?? 0,
-                        available: entitlement.value
-                    )
-                }
-                self.entitlementsList = self.filterVpnEntitlementConsumptionModels(models)
-                DispatchQueue.main.async {
-                    self.tableView.reloadData()
-                    self.dismissActivityAlert()
-                }
-            case let .failure(error):
-                DispatchQueue.main.async {
-                    self.dismissActivityAlert()
-                    self.presentErrorAlert(message: "Failure", error: error)
-                }
-                return
+    func loadEntitlementsList() async {
+        do {
+            let entitlementsConsumption = try await entitlementsClient.getEntitlementsConsumption()
+            let models: [EntitlementConsumptionModel] = entitlementsConsumption.entitlements.entitlements.map { entitlement in
+                let consumed = entitlementsConsumption.consumption.first(where: { $0.name == entitlement.name })?.consumed
+                return EntitlementConsumptionModel(
+                    name: entitlement.name,
+                    value: entitlement.value,
+                    consumed: consumed ?? 0,
+                    available: entitlement.value
+                )
+            }
+            self.entitlementsList = self.filterVpnEntitlementConsumptionModels(models)
+            DispatchQueue.main.async { [weak self] in
+                self?.tableView.reloadData()
+                self?.dismissActivityAlert()
+            }
+        } catch {
+            DispatchQueue.main.async { [weak self] in
+                self?.dismissActivityAlert()
+                self?.presentErrorAlert(message: "Failure", error: error)
             }
         }
     }

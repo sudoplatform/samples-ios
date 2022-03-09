@@ -35,7 +35,9 @@ class ServerListViewController: UIViewController, UITableViewDelegate, UITableVi
 
     override func viewWillAppear(_ animated: Bool) {
         presentActivityAlert(message: "Loading Servers") { [weak self] in
-            self?.loadServerList()
+            Task.detached(.medium) { [weak self] in
+                await self?.loadServerList()
+            }
         }
         super.viewWillAppear(animated)
     }
@@ -50,7 +52,11 @@ class ServerListViewController: UIViewController, UITableViewDelegate, UITableVi
             else {
                 break
             }
-            serverSelected.setServer(serverList[row])
+            Task.detached(.medium) { [weak self] in
+                guard let self = self else { return }
+                let server = self.serverList[row]
+                await serverSelected.setServer(server)
+            }
         default:
             break
         }
@@ -63,20 +69,19 @@ class ServerListViewController: UIViewController, UITableViewDelegate, UITableVi
 
     // MARK: - Operations
 
-    func loadServerList() {
-        vpnClient.listServers(cachePolicy: .remoteOnly) { [weak self] result in
-            DispatchQueue.main.async {
-                guard let self = self else { return }
-                switch result {
-                case let .success(servers):
-                    self.updateServerList(servers)
-                    self.tableView.reloadData()
-                    self.dismissActivityAlert()
-                case let .failure(error):
-                    self.dismissActivityAlert()
-                    self.presentErrorAlert(message: "Failure", error: error) { _ in
-                        self.performSegue(withSegue: Segue.returnToMainMenu, sender: self)
-                    }
+    func loadServerList() async {
+        do {
+            let servers = try await vpnClient.listServers(cachePolicy: .remoteOnly)
+            updateServerList(servers)
+            DispatchQueue.main.async { [weak self] in
+                self?.tableView.reloadData()
+                self?.dismissActivityAlert()
+            }
+        } catch {
+            DispatchQueue.main.async { [weak self] in
+                self?.dismissActivityAlert()
+                self?.presentErrorAlert(message: "Failure", error: error) { _ in
+                    self?.performSegue(withSegue: Segue.returnToMainMenu, sender: self)
                 }
             }
         }

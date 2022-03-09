@@ -39,9 +39,9 @@ struct AppDependencies {
         entitlementsClient = try DefaultSudoEntitlementsClient(userClient: userClient)
     }
 
-    func reset() throws {
+    func reset() async throws {
         try vpnClient.reset()
         try entitlementsClient.reset()
-        try userClient.reset()
+        try await userClient.reset()
     }
 }

@@ -72,24 +72,22 @@ class ServerSelectedViewController: UIViewController, SudoVPNObserving {
     @IBAction func connectButtonTapped() {
         switch vpnClient.state {
         case .error, .disconnecting, .disconnected:
-            updateConnectionState(.connecting)
-            let configuration = SudoVPNConfiguration(server: server, protocolType: currentProtocol)
-            vpnClient.connect(withConfiguration: configuration) { [weak self] result in
-                DispatchQueue.main.async {
-                    guard let self = self else { return }
-                    if case .failure(let error) = result {
-                        self.presentErrorAlert(message: "Failed to connect", error: error)
-                    }
+            Task.detached(.medium) {
+                updateConnectionState(.connecting)
+                let configuration = SudoVPNConfiguration(server: server, protocolType: currentProtocol)
+                do {
+                    try await vpnClient.connect(withConfiguration: configuration)
+                } catch {
+                    presentErrorAlert(message: "Failed to connect", error: error)
                 }
             }
         case .connected, .connecting, .reconnecting:
-            updateConnectionState(.disconnecting)
-            vpnClient.disconnect(isUserInitiated: true) { [weak self] result in
-                DispatchQueue.main.async {
-                    guard let self = self else { return }
-                    if case .failure(let error) = result {
-                        self.presentErrorAlert(message: "Failed to disconnect", error: error)
-                    }
+            Task.detached(.medium) {
+                updateConnectionState(.disconnecting)
+                do {
+                    try await vpnClient.disconnect(isUserInitiated: true)
+                } catch {
+                    presentErrorAlert(message: "Failed to disconnect", error: error)
                 }
             }
         }
@@ -108,11 +106,14 @@ class ServerSelectedViewController: UIViewController, SudoVPNObserving {
 
     // MARK: - Setters
 
-    func setServer(_ server: SudoVPNServer) {
+    func setServer(_ server: SudoVPNServer) async {
         switch vpnClient.state {
         case .connecting, .connected, .reconnecting:
-            vpnClient.disconnect(isUserInitiated: false) { [weak self] _ in
-                self?.server = server
+            do {
+                try await vpnClient.disconnect(isUserInitiated: false)
+                self.server = server
+            } catch {
+                // Do nothing.
             }
         default:
             self.server = server

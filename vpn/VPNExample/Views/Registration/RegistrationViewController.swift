@@ -47,8 +47,15 @@ class RegistrationViewController: UIViewController {
         super.viewDidAppear(animated)
 
         // Sign in automatically if the user is registered.
-        if userClient.isRegistered() {
-            self.registerButtonTapped()
+        Task.detached(.medium) {
+            guard let isRegistered = try? await userClient.isRegistered() else {
+                return
+            }
+            if isRegistered {
+                DispatchQueue.main.async {
+                    self.registerButtonTapped()
+                }
+            }
         }
     }
 
@@ -64,121 +71,59 @@ class RegistrationViewController: UIViewController {
     @IBAction func registerButtonTapped() {
         activityIndicator.startAnimating()
         registerButton.isEnabled = false
-        let completion: (Error?) -> Void = { [weak self] error in
-            DispatchQueue.main.async {
-                self?.activityIndicator.stopAnimating()
-                self?.registerButton.isEnabled = true
-                if let error = error {
-                    self?.showRegistrationFailureAlert(error: error)
-                } else {
+        Task.detached(priority: .medium) {
+            do {
+                try await self.register()
+                try await self.signIn()
+                try await self.redeemEntitlements()
+                try await self.vpnClient.prepare()
+                Task { @MainActor [weak self] in
+                    self?.activityIndicator.stopAnimating()
+                    self?.registerButton.isEnabled = true
                     self?.navigateToMainMenu()
                 }
-            }
-        }
-        register { [weak self] result in
-            guard let self = self else { return }
-            if case .failure(let error) = result {
-                return completion(error)
-            }
-            self.signIn { [weak self] result in
-                guard let self = self else { return }
-                if case .failure(let error) = result {
-                    return completion(error)
-                }
-                self.redeemEntitlements { [weak self] result in
-                    if case .failure(let error) = result {
-                        return completion(error)
-                    }
-
-                    self?.vpnClient.prepare { result in
-                        if case .failure(let error) = result {
-                            return completion(error)
-                        } else {
-                            completion(nil)
-                        }
-                    }
-                }
+            } catch {
+                await self.showRegistrationFailureAlert(error: error)
             }
         }
     }
 
     // MARK: - Operations
 
-    func register(completion: @escaping (Result<Void, Error>) -> Void) {
+    @MainActor
+    func register() async throws {
         if userClient.getSupportedRegistrationChallengeType().contains(.fsso) {
             guard let presentationAnchor = self.view?.window else {
                 fatalError("No window for \(String(describing: self))")
             }
-            do {
-                try userClient.presentFederatedSignInUI(presentationAnchor: presentationAnchor) { result in
-                    switch result {
-                    case .failure(let error):
-                        return completion(.failure(error))
-                    default:
-                        return completion(.success(()))
-                    }
-                }
-            } catch {
-                completion(.failure(error))
-            }
+            _ = try await userClient.presentFederatedSignInUI(presentationAnchor: presentationAnchor)
         } else {
-            if userClient.isRegistered() {
-                return completion(.success(()))
-            }
-            authenticator.register { result in
-                switch result {
-                case .failure(let error):
-                    return completion(.failure(error))
-                default:
-                    return completion(.success(()))
-                }
-            }
-        }
-    }
-
-    func signIn(completion: @escaping (Result<Void, Error>) -> Void) {
-        do {
-            if try userClient.isSignedIn() {
-                guard let refreshToken = try? userClient.getRefreshToken() else {
-                    return completion(.failure(AuthenticatorError.unableToRefreshTokens))
-                }
-                try userClient.refreshTokens(refreshToken: refreshToken) { result in
-                    switch result {
-                    case .failure(let error):
-                        return completion(.failure(error))
-                    default:
-                        return completion(.success(()))
-                    }
-                }
+            if try await userClient.isRegistered() {
                 return
             }
-            try userClient.signInWithKey { result in
-                switch result {
-                case .failure(let error):
-                    return completion(.failure(error))
-                default:
-                    return completion(.success(()))
-                }
-            }
-        } catch {
-            completion(.failure(error))
+            try await authenticator.register()
         }
     }
 
-    func redeemEntitlements(completion: @escaping (Result<Void, Error>) -> Void) {
-        entitlementsClient.redeemEntitlements { result in
-            switch result {
-            case .success(let entitlements):
-                guard
-                    let entitlement = entitlements.entitlements.first(where: { $0.name == "sudoplatform.vpn.vpnUserEntitled"}),
-                    entitlement.value >= 1
-                else {
-                    return completion(.failure(RegistrationError.invalidEntitlements))
-                }
-                completion(.success(()))
-            case .failure(let error):
-                return completion(.failure(error))
+    func signIn() async throws {
+        if try await userClient.isSignedIn() {
+            guard let refreshToken = try? userClient.getRefreshToken() else {
+                throw AuthenticatorError.unableToRefreshTokens
             }
+            _ = try await userClient.refreshTokens(refreshToken: refreshToken)
+            return
+        }
+        _ = try await userClient.signInWithKey()
+        return
+    }
+
+    func redeemEntitlements() async throws {
+        let entitlements = try await entitlementsClient.redeemEntitlements()
+        guard
+            let entitlement = entitlements.entitlements.first(where: { $0.name == "sudoplatform.vpn.vpnUserEntitled"}),
+            entitlement.value >= 1
+        else {
+            throw RegistrationError.invalidEntitlements
         }
     }
 
@@ -188,6 +133,7 @@ class RegistrationViewController: UIViewController {
     ///
     /// - Parameters:
     ///     - error: Contains the given `Error`.
+    @MainActor
     private func showRegistrationFailureAlert(error: Error) {
         let alert = UIAlertController(title: "Error", message: "Failed to register:\n\(error.localizedDescription)", preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))

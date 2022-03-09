@@ -87,34 +87,17 @@ class MainMenuViewController: UIViewController, UITableViewDelegate, UITableView
     // MARK: - Operations
 
      /// Perform de-registration from the Sudo user client and clear all local data.
-    func deregister() {
+    func deregister() async {
         presentActivityAlert(message: "Deregistering")
         do {
-            try authenticator.deregister { [weak self] result in
-                DispatchQueue.main.async {
-                    guard let self = self else { return }
-                    // dismiss activity alert
-                    self.dismissActivityAlert()
-                    switch result {
-                    case .success:
-                        // after deregistering, clear all local data
-                        do {
-                            try AppDelegate.dependencies.reset()
-                        } catch {
-                            self.presentErrorAlert(message: "Failed to reset", error: error)
-                        }
-
-                        // unwind back to registration view controller
-                        self.performSegue(withIdentifier: "returnToRegistration", sender: self)
-                    case .failure(let error):
-                        self.presentErrorAlert(message: "Failed to deregister", error: error)
-                    }
-                }
-            }
-        } catch let error {
-            self.dismissActivityAlert {
-                self.presentErrorAlert(message: "Failed to deregister", error: error)
-            }
+            _ = try await authenticator.deregister()
+            try await AppDelegate.dependencies.reset()
+            dismissActivityAlert()
+            // unwind back to registration view controller
+            performSegue(withIdentifier: "returnToRegistration", sender: self)
+        } catch {
+            self.dismissActivityAlert()
+            self.presentErrorAlert(message: "Failed to deregister", error: error)
         }
     }
 
@@ -145,7 +128,9 @@ class MainMenuViewController: UIViewController, UITableViewDelegate, UITableView
             preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
         alert.addAction(UIAlertAction(title: "Deregister", style: .default) { _ in
-            self.deregister()
+            Task.detached(.medium) { [weak self] in
+                await self?.deregister()
+            }
         })
         present(alert, animated: true, completion: nil)
     }

@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Anonyome Labs, Inc. All rights reserved.
+// Copyright © 2022 Anonyome Labs, Inc. All rights reserved.
 //
 // SPDX-License-Identifier: Apache-2.0
 //
@@ -19,13 +19,23 @@ class CreditCardViewController: UITableViewController {
     @IBOutlet weak var notes: UITextView!
     @IBOutlet weak var createdLabel: UILabel!
     @IBOutlet weak var updatedLabel: UILabel!
+    @IBOutlet weak var favoriteButton: UIButton!
 
+    @IBOutlet var colorButtons: [UIButton]!
 
     // Input for the vault the item belongs to
     var vault: Vault!
 
     // Input card data, used for editing.  Otherwise a new card will be created.
-    var creditCardInput: VaultCreditCard?
+    var creditCardInput: CreditCard?
+
+    var isFavorite: Bool = false
+    var favoriteButtonImage: UIImage?
+
+    // If nil, all buttons should be deselected and background should be set to system white.
+    var hexColor: String?
+    // Arbitrarily chosen colors values. Actual colors come from themes?
+    var hexColors = ["EBC7CA", "EBE9C7", "BBEBBC", "A0EBE6", "DEBAEB"]
 
     // Reference to the save button so we can manage its state.
 
@@ -41,6 +51,7 @@ class CreditCardViewController: UITableViewController {
         notes.text = ""
         createdLabel.text = ""
         updatedLabel.text = ""
+        favoriteButton.setTitle("", for: .normal)
 
         tableView.separatorStyle = .none
 
@@ -61,6 +72,16 @@ class CreditCardViewController: UITableViewController {
         self.tableView.tableFooterView = UIView()
     }
 
+    override func viewDidLayoutSubviews() {
+        colorButtons.forEach { button in
+            let buttonHexString = hexColors[button.tag]
+            button.backgroundColor = UIColor(hexString: buttonHexString)
+            button.setTitle("", for: .normal)
+            button.layer.cornerRadius = button.frame.height/2
+            button.layer.borderColor = UIColor.black.cgColor
+        }
+    }
+
     // Date formatter for use with expiry.
     lazy var dateFormatter: DateFormatter = {
         let f = DateFormatter()
@@ -69,7 +90,7 @@ class CreditCardViewController: UITableViewController {
     }()
 
     /// Loads data from the model into the textfields, making any conversions needed. Best effort
-    func loadDataFrom(card: VaultCreditCard) async {
+    func loadDataFrom(card: CreditCard) async {
         itemTitle.text = card.name
         cardholderName.text = card.cardName
 
@@ -87,6 +108,26 @@ class CreditCardViewController: UITableViewController {
         cardType.text = card.cardType
         notes.text = (try? await card.notes?.getValue()) ?? ""
 
+        isFavorite = card.favorite
+
+        favoriteButtonImage = isFavorite ? UIImage(systemName: "star.fill") : UIImage(systemName: "star")
+        favoriteButton.setImage(favoriteButtonImage, for: .normal)
+
+        if let hexColor = card.hexColor {
+            self.hexColor = hexColor
+
+            // Find the button associated with the hex color and update it's border.
+            colorButtons.forEach { button in
+                if self.hexColor == hexColors[button.tag] {
+                    button.layer.borderWidth = 2
+                }
+            }
+
+            navigationController?.navigationBar.backgroundColor = UIColor(hexString: hexColor)
+        } else {
+            navigationController?.navigationBar.backgroundColor = .systemBackground
+        }
+
         let formatter = DateFormatter()
         formatter.dateStyle = .short
         formatter.timeStyle = .medium
@@ -95,9 +136,17 @@ class CreditCardViewController: UITableViewController {
     }
 
     /// Writes the data from the text fields to the model.  Best effort.
-    func updateModelWithInputs() -> VaultCreditCard {
+    func updateModelWithInputs() -> CreditCard {
 
-        var card = self.creditCardInput ?? VaultCreditCard(name: "", notes: nil, cardType: nil, cardName: nil, cardExpiration: nil, cardNumber: nil, cardSecurityCode: nil)
+        var card = self.creditCardInput ?? CreditCard(name: "",
+                                                      notes: nil,
+                                                      cardType: nil,
+                                                      cardName: nil,
+                                                      cardExpiration: nil,
+                                                      cardNumber: nil,
+                                                      cardSecurityCode: nil,
+                                                      hexColor: nil,
+                                                      favorite: false)
 
         if let text = itemTitle.text {
             card.name = text
@@ -126,6 +175,8 @@ class CreditCardViewController: UITableViewController {
         if let notes = notes.text {
             card.notes = VaultItemNote(value: notes)
         }
+        card.favorite = isFavorite
+        card.hexColor = hexColor
 
         return card
     }
@@ -134,7 +185,7 @@ class CreditCardViewController: UITableViewController {
         self.presentingViewController?.dismiss(animated: true, completion: nil)
     }
 
-    func isModelValidForSave(model: VaultCreditCard) -> Bool {
+    func isModelValidForSave(model: CreditCard) -> Bool {
         return model.name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false
     }
 
@@ -175,7 +226,33 @@ class CreditCardViewController: UITableViewController {
                     })
                 }
             }
+        }
+    }
 
+    // MARK: - Favorite and HexColor
+    @IBAction func favoriteButtonTapped(_ sender: Any) {
+        isFavorite = !isFavorite
+        let image = isFavorite ? UIImage(systemName: "star.fill") : UIImage(systemName: "star")
+        favoriteButton.setImage( image, for: .normal)
+    }
+
+    @IBAction func colorButtonTapped(_ sender: UIButton) {
+        // Clear all the buttons' borders
+        colorButtons.forEach { button in
+            button.layer.borderWidth = 0
+        }
+
+        // Set the class hexColor and update the border and navBar color as needed.
+        let index = sender.tag
+        if self.hexColor == hexColors[index] {
+            self.hexColor = nil
+            navigationController?.navigationBar.backgroundColor = .systemBackground
+        } else {
+            // Otherwise, set the class property and outline the button
+            sender.layer.borderWidth = 2
+            self.hexColor = hexColors[index]
+            guard let colorString = self.hexColor else {return}
+            navigationController?.navigationBar.backgroundColor = UIColor(hexString: colorString)
         }
     }
 }

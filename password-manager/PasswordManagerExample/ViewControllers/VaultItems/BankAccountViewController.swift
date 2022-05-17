@@ -7,14 +7,13 @@
 import UIKit
 import SudoPasswordManager
 
-@MainActor
 class BankAccountViewController: UITableViewController {
 
     // Input for the vault the item belongs to
     var vault: Vault!
 
     // Bank account to be updated, otherwise a new item will be created upon save.
-    var bankAccountInput: VaultBankAccount?
+    var bankAccountInput: BankAccount?
 
     @IBOutlet weak var nameField: UITextField!
     @IBOutlet weak var bankNameField: UITextField!
@@ -24,9 +23,20 @@ class BankAccountViewController: UITableViewController {
     @IBOutlet weak var notesField: UITextView!
     @IBOutlet weak var createdLabel: UILabel!
     @IBOutlet weak var updatedLabel: UILabel!
+    @IBOutlet weak var favoriteButton: UIButton!
+
+    @IBOutlet var colorButtons: [UIButton]!
 
     // Reference to the save button so we can manage its state.
     var saveButton = UIBarButtonItem(title: "Save", style: .done, target: nil, action: nil)
+
+    var isFavorite: Bool = false
+    var favoriteButtonImage: UIImage?
+
+    // If nil, all buttons should be deselected and background should be set to system white.
+    var hexColor: String?
+    // Arbitrarily chosen colors values. Actual colors come from themes?
+    var hexColors = ["EBC7CA", "EBE9C7", "BBEBBC", "A0EBE6", "DEBAEB"]
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -39,6 +49,7 @@ class BankAccountViewController: UITableViewController {
         notesField.text = "" // no placeholder on textview, clear whatever is there.
         createdLabel.text = ""
         updatedLabel.text = ""
+        favoriteButton.setTitle("", for: .normal)
 
         tableView.separatorStyle = .none
 
@@ -57,7 +68,17 @@ class BankAccountViewController: UITableViewController {
         self.tableView.tableFooterView = UIView()
     }
 
-    func loadDataFrom(bankAccount: VaultBankAccount?) {
+    override func viewDidLayoutSubviews() {
+        colorButtons.forEach { button in
+            let buttonHexString = hexColors[button.tag]
+            button.backgroundColor = UIColor(hexString: buttonHexString)
+            button.setTitle("", for: .normal)
+            button.layer.cornerRadius = button.frame.height/2
+            button.layer.borderColor = UIColor.black.cgColor
+        }
+    }
+
+    func loadDataFrom(bankAccount: BankAccount?) {
         Task {
             nameField.text = bankAccount?.name
             bankNameField.text =  bankAccount?.bankName
@@ -65,6 +86,28 @@ class BankAccountViewController: UITableViewController {
             routingNumberField.text = bankAccount?.routingNumber
             notesField.text = try? await bankAccount?.notes?.getValue()
             accountTypeField.text = bankAccount?.accountType
+
+            if let favorite = bankAccount?.favorite {
+                isFavorite = favorite
+            }
+
+            favoriteButtonImage = isFavorite ? UIImage(systemName: "star.fill") : UIImage(systemName: "star")
+            favoriteButton.setImage(favoriteButtonImage, for: .normal)
+
+            if let hexColor = bankAccount?.hexColor {
+                self.hexColor = hexColor
+
+                // Find the button associated with the hex color and update it's border.
+                colorButtons.forEach { button in
+                    if self.hexColor == hexColors[button.tag] {
+                        button.layer.borderWidth = 2
+                    }
+                }
+
+                navigationController?.navigationBar.backgroundColor = UIColor(hexString: hexColor)
+            } else {
+                navigationController?.navigationBar.backgroundColor = .systemBackground
+            }
         }
 
         let formatter = DateFormatter()
@@ -76,10 +119,22 @@ class BankAccountViewController: UITableViewController {
         }
     }
 
-    func updateModelWithInputs() -> VaultBankAccount {
+    func updateModelWithInputs() -> BankAccount {
 
         // Get the passed in bank account so it can be updated, or create a new one and update that.
-        var bankAccount = self.bankAccountInput ?? VaultBankAccount(name: "", notes: nil, accountType: nil, bankName: nil, branchAddress: nil, branchPhone: nil, ibanNumber: nil, routingNumber: nil, swiftCode: nil, accountNumber: nil, accountPin: nil)
+        var bankAccount = self.bankAccountInput ?? BankAccount(name: "",
+                                                               notes: nil,
+                                                               accountType: nil,
+                                                               bankName: nil,
+                                                               branchAddress: nil,
+                                                               branchPhone: nil,
+                                                               ibanNumber: nil,
+                                                               routingNumber: nil,
+                                                               swiftCode: nil,
+                                                               accountNumber: nil,
+                                                               accountPin: nil,
+                                                               hexColor: nil,
+                                                               favorite: false)
 
         if let name = nameField.text {
             bankAccount.name = name
@@ -99,6 +154,8 @@ class BankAccountViewController: UITableViewController {
         if let notes = notesField.text {
             bankAccount.notes = VaultItemValue(value: notes)
         }
+        bankAccount.favorite = isFavorite
+        bankAccount.hexColor = hexColor
 
         return bankAccount
     }
@@ -107,7 +164,7 @@ class BankAccountViewController: UITableViewController {
         self.presentingViewController?.dismiss(animated: true, completion: nil)
     }
 
-    func isModelValidForSave(model: VaultBankAccount) -> Bool {
+    func isModelValidForSave(model: BankAccount) -> Bool {
         return model.name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false
     }
 
@@ -147,6 +204,34 @@ class BankAccountViewController: UITableViewController {
                     })
                 }
             }
+        }
+    }
+
+    // MARK: - Favorite and HexColor
+    @IBAction func favoriteButtonTapped(_ sender: Any) {
+        // Set the class property, saves when the save button is tapped
+        isFavorite = !isFavorite
+        let image = isFavorite ? UIImage(systemName: "star.fill") : UIImage(systemName: "star")
+        favoriteButton.setImage( image, for: .normal)
+    }
+
+    @IBAction func colorButtonTapped(_ sender: UIButton) {
+        // Clear all the buttons' borders
+        colorButtons.forEach { button in
+            button.layer.borderWidth = 0
+        }
+
+        // Set the class hexColor and update the border and navBar color as needed.
+        let index = sender.tag
+        if self.hexColor == hexColors[index] {
+            self.hexColor = nil
+            navigationController?.navigationBar.backgroundColor = .systemBackground
+        } else {
+            // Otherwise, set the class property and outline the button
+            sender.layer.borderWidth = 2
+            self.hexColor = hexColors[index]
+            guard let colorString = self.hexColor else {return}
+            navigationController?.navigationBar.backgroundColor = UIColor(hexString: colorString)
         }
     }
 }

@@ -42,10 +42,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             case .invalidConfig:
                 fatalError("Make sure the file config/sudoplatformconfig.json exists in the project directory (see README.md).")
             default:
-                fatalError(error.localizedDescription)
+                fatalError("\(error)")
             }
         } catch {
-            fatalError(error.localizedDescription)
+            fatalError("\(error)")
         }
 
         window = UIWindow(frame: UIScreen.main.bounds)
@@ -59,14 +59,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         open url: URL,
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
     ) -> Bool {
-        Task.detached(priority: .medium) {
+        Task(priority: .medium) {
             do {
                 let urlProcessed = try await AppDelegate.dependencies.userClient.processFederatedSignInTokens(url: url)
                 if !urlProcessed {
                     fatalError("Unable to process federated sign in tokens. Check federated sign in configuration")
                 }
             } catch {
-                fatalError(error.localizedDescription)
+                fatalError("\(error)")
             }
         }
 

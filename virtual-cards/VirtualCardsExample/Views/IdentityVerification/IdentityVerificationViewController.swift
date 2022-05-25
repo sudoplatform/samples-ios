@@ -167,7 +167,7 @@ class IdentityVerificationViewController: UIViewController,
 
         // Once we know we're verified we don't have to check again
         if self.statusLabel?.text != VerificationStatus.verified.rawValue {
-            Task.detached(priority: .medium) {
+            Task(priority: .medium) {
                 await self.fetchVerificationStatus()
             }
         }
@@ -190,7 +190,7 @@ class IdentityVerificationViewController: UIViewController,
     ///
     /// This action will initiate the sequence of validating inputs and verify identity via the `virtualCardsClient`.
     @objc func didTapVerify() {
-        Task.detached(priority: .medium) {
+        Task(priority: .medium) {
             await self.verifyUser()
         }
     }
@@ -199,16 +199,18 @@ class IdentityVerificationViewController: UIViewController,
 
     /// Validates and verifies identity based on the view's form inputs.
     func verifyUser() async {
-        Task { @MainActor in
+        Task {
             view.endEditing(true)
         }
         guard validateFormData() else {
-            await presentErrorAlert(message: "Please ensure all fields are filled out")
+            Task {
+                presentErrorAlert(message: "Please ensure all fields are filled out")
+            }
             return
         }
 
         await self.setVerifyButtonEnabled(false)
-        await self.presentActivityAlert(message: "Verifying identity")
+        self.presentActivityAlert(message: "Verifying identity")
 
         var address: String = formData[.address] ?? ""
         if let unitNumber = formData[.unitNumber], !unitNumber.isEmpty {
@@ -225,21 +227,25 @@ class IdentityVerificationViewController: UIViewController,
                 country: formData[.country] ?? "",
                 dateOfBirth: formData[.dateOfBirth] ?? ""
             )
-            await self.dismissActivityAlert {
-                Task { @MainActor in
-                    if verifiedIdentity.verified {
-                        await self.presentAlert(title: "Verification complete", message: "Identity verified")
-                        self.statusLabel.text = VerificationStatus.verified.rawValue
-                    } else {
-                        await self.presentAlert(title: "Verification complete", message: "Identity not verified")
-                        self.statusLabel.text = VerificationStatus.unverified.rawValue
+            Task {
+                self.dismissActivityAlert {
+                    Task {
+                        if verifiedIdentity.verified {
+                            await self.presentAlert(title: "Verification complete", message: "Identity verified")
+                            self.statusLabel.text = VerificationStatus.verified.rawValue
+                        } else {
+                            await self.presentAlert(title: "Verification complete", message: "Identity not verified")
+                            self.statusLabel.text = VerificationStatus.unverified.rawValue
+                        }
                     }
                 }
             }
         } catch {
-            await self.dismissActivityAlert {
-                Task { @MainActor in
-                    await self.presentErrorAlert(message: "Failed to verify identity", error: error)
+            Task {
+                self.dismissActivityAlert {
+                    Task {
+                        self.presentErrorAlert(message: "Failed to verify identity", error: error)
+                    }
                 }
             }
         }
@@ -250,11 +256,11 @@ class IdentityVerificationViewController: UIViewController,
     /// Lookup the verification status of the registered user
     func fetchVerificationStatus() async {
         await self.setVerifyButtonEnabled(false)
-        await presentActivityAlert(message: "Checking status")
+        presentActivityAlert(message: "Checking status")
         do {
             let verifiedIdentity = try await verificationClient.checkIdentityVerification(option: QueryOption.remoteOnly)
             // dismiss activity alert
-            Task { @MainActor in
+            Task {
                 if verifiedIdentity.verified {
                     self.statusLabel.text = VerificationStatus.verified.rawValue
                 } else {
@@ -262,13 +268,15 @@ class IdentityVerificationViewController: UIViewController,
                 }
             }
 
-            await self.dismissActivityAlert()
-        } catch {
-            Task { @MainActor in
-                self.statusLabel.text = VerificationStatus.unknown.rawValue
+            Task {
+                self.dismissActivityAlert()
             }
-            await self.dismissActivityAlert()
-            await presentErrorAlert(message: "Please ensure all fields are filled out")
+        } catch {
+            Task {
+                self.statusLabel.text = VerificationStatus.unknown.rawValue
+                self.dismissActivityAlert()
+                self.presentErrorAlert(message: "Please ensure all fields are filled out", error: error)
+            }
         }
 
         await self.setVerifyButtonEnabled(true)
@@ -312,7 +320,7 @@ class IdentityVerificationViewController: UIViewController,
     /// Sets the verify button in the navigation bar to enabled/disabled.
     ///
     /// - Parameter isEnabled: If true, the navigation verify button will be enabled.
-    @MainActor func setVerifyButtonEnabled(_ isEnabled: Bool) async {
+    func setVerifyButtonEnabled(_ isEnabled: Bool) async {
         self.navigationItem.rightBarButtonItem?.isEnabled = isEnabled
     }
 

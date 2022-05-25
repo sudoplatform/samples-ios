@@ -8,6 +8,7 @@
 import Foundation
 import SudoUser
 import SudoKeyManager
+import AWSAppSync
 @testable import SudoVirtualCards
 
 enum AuthenticatorError: LocalizedError {
@@ -62,7 +63,38 @@ class Authenticator {
     }
 
     func deregister() async throws -> String {
-        try await userClient.deregister()
+        do {
+            return try await userClient.deregister()
+        } catch SudoUserClientError.graphQLError(let cause) {
+            guard let err = cause.first else {
+                fatalError("No Error in cause")
+            }
+            guard let appSyncError = err as? AWSAppSyncClientError else {
+                throw err
+            }
+            let error: GraphQLAuthProviderError
+            switch appSyncError {
+            case .authenticationError(let authError):
+                guard let gqlError = authError as? GraphQLAuthProviderError else {
+                    fallthrough
+                }
+                error = gqlError
+            default:
+                throw appSyncError
+            }
+            switch error {
+            case .notAuthorized:
+                // refresh tokens and try again
+                do {
+                    _ = try await userClient.refreshTokens()
+                } catch {
+                    _ = try await userClient.signInWithKey()
+                }
+                return try await userClient.deregister()
+            default:
+                throw error
+            }
+        }
     }
 
     func reset() async throws {

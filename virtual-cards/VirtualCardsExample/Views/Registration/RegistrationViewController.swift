@@ -59,9 +59,9 @@ class RegistrationViewController: UIViewController {
         super.viewDidAppear(animated)
 
         // Sign in automatically if the user is registered.
-        Task.detached(priority: .medium) {
+        Task(priority: .medium) {
             if try await self.userClient.isRegistered() {
-                await self.registerButtonTapped()
+                self.registerButtonTapped()
             }
         }
     }
@@ -79,16 +79,21 @@ class RegistrationViewController: UIViewController {
         activityIndicator.startAnimating()
         registerButton.isEnabled = false
 
-        Task.detached(priority: .medium) {
+        Task(priority: .medium) {
             do {
                 try await self.registerAndSignIn()
-                Task { @MainActor in
+                Task {
                     self.activityIndicator.stopAnimating()
                     self.registerButton.isEnabled = true
                     self.navigateToMainMenu()
                 }
             } catch {
-                await self.showSignInFailureAlert(error: error)
+                Task {
+                    await self.showSignInFailureAlert(error: error) {
+                        self.activityIndicator.stopAnimating()
+                        self.registerButton.isEnabled = true
+                    }
+                }
             }
         }
     }
@@ -133,7 +138,7 @@ class RegistrationViewController: UIViewController {
     /// - Parameters:
     ///     - error: Contains the given `Error`.
     private func showRegistrationFailureAlert(error: Error) {
-        let alert = UIAlertController(title: "Error", message: "Failed to register:\n\(error.localizedDescription)", preferredStyle: .alert)
+        let alert = UIAlertController(title: "Error", message: "Failed to register:\n\(error)", preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
         present(alert, animated: true, completion: nil)
     }
@@ -142,10 +147,10 @@ class RegistrationViewController: UIViewController {
     ///
     /// - Parameters:
     ///     - error: Contains the given `Error`.
-    @MainActor private func showSignInFailureAlert(error: Error) async {
-        let alert = UIAlertController(title: "Error", message: "Failed to sign in:\n\(error.localizedDescription)", preferredStyle: .alert)
+    private func showSignInFailureAlert(error: Error, completion: (() -> Void)? = nil) async {
+        let alert = UIAlertController(title: "Error", message: "Failed to sign in:\n\(error)", preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
-        self.present(alert, animated: true, completion: nil)
+        self.present(alert, animated: true, completion: completion)
     }
 
     /// Navigates to the `MainMenuViewController` via a segue.

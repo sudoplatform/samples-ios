@@ -53,7 +53,7 @@ class CardDetailViewController: UIViewController, UITableViewDataSource, UITable
     var tableData: [(title: String, items: [Transaction])] = []
 
     /// The selected card.
-    var card: Card!
+    var card: VirtualCard!
 
     // MARK: - Properties: Computed
 
@@ -79,7 +79,7 @@ class CardDetailViewController: UIViewController, UITableViewDataSource, UITable
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 
-        Task.detached(priority: .medium) {
+        Task(priority: .medium) {
             await self.loadCacheTransactionsAndFetchRemote()
         }
     }
@@ -121,7 +121,7 @@ class CardDetailViewController: UIViewController, UITableViewDataSource, UITable
             status = .unknown
         }
         let cardModel = CardViewModel(
-            cardName: card.alias,
+            cardName: card.metadataAlias ?? card.alias ?? "",
             cardStatus: status,
             cardholderName: card.cardHolder,
             cardNumber: card.pan.inserting(separator: " ", every: 4),
@@ -147,33 +147,49 @@ class CardDetailViewController: UIViewController, UITableViewDataSource, UITable
     /// or "Complete".
     func loadCacheTransactionsAndFetchRemote() async {
         do {
-            let filter = GetTransactionsFilterInput(cardId: .equals(self.card.id))
-            let localTransactions = try await self.virtualCardsClient.listTransactionsWithFilter(
-                filter,
+            var localTransactions: [Transaction] = []
+            let localResult = try await self.virtualCardsClient.listTransactions(
+                withCardId: self.card.id,
                 limit: Defaults.transactionLimit,
                 nextToken: nil,
+                dateRange: nil,
+                sortOrder: nil,
                 cachePolicy: .cacheOnly
-            ).items
+            )
+            switch localResult {
+            case .success(let success):
+                localTransactions = success.items
+            case .partial(let partial):
+                throw AnyError("Failure: \(partial)")
+            }
             Task {
-                await MainActor.run {
-                    self.tableData = self.splitAndOrderTransactions(localTransactions)
-                    self.tableView.reloadData()
-                }
+                self.tableData = self.splitAndOrderTransactions(localTransactions)
+                self.tableView.reloadData()
             }
 
-            let remoteTransactions = try await self.virtualCardsClient.listTransactionsWithFilter(
-                filter,
+            var remoteTransactions: [Transaction] = []
+            let remoteResult = try await self.virtualCardsClient.listTransactions(
+                withCardId: self.card.id,
                 limit: Defaults.transactionLimit,
                 nextToken: nil,
+                dateRange: nil,
+                sortOrder: nil,
                 cachePolicy: .remoteOnly
-            ).items
-            Task { @MainActor in
+            )
+            switch remoteResult {
+            case .success(let success):
+                remoteTransactions = success.items
+            case .partial(let partial):
+                throw AnyError("Failure: \(partial)")
+            }
+            Task {
                 self.tableData = self.splitAndOrderTransactions(remoteTransactions)
                 self.tableView.reloadData()
             }
         } catch {
+            NSLog("error: \(error)")
             Task {
-                await self.presentErrorAlert(message: "Failed to list transactions", error: error)
+                self.presentErrorAlert(message: "Failed to list transactions", error: error)
             }
         }
     }

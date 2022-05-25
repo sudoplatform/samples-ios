@@ -19,7 +19,7 @@ class CreateCardViewController: UIViewController,
     UITableViewDelegate,
     UITableViewDataSource,
     InputFormCellDelegate,
-    ProvisionCardObservable,
+    ProvisionVirtualCardObservable,
     LearnMoreViewDelegate {
 
     // MARK: - Outlets
@@ -164,7 +164,7 @@ class CreateCardViewController: UIViewController,
     var fundingSource: FundingSource?
 
     /// The created card.
-    var card: Card?
+    var card: VirtualCard?
 
     /// The frame of the visible keyboard. This will be updated alongside show/hide notifications.
     var keyboardFrame: CGRect = .zero
@@ -202,8 +202,8 @@ class CreateCardViewController: UIViewController,
         configureFooterValues()
         configureLearnMoreView()
         Task {
-            await setErrorLabelHidden(true)
-            await setCreateButtonEnabled(true)
+            setErrorLabelHidden(true)
+            setCreateButtonEnabled(true)
         }
     }
 
@@ -211,7 +211,7 @@ class CreateCardViewController: UIViewController,
         super.viewWillAppear(animated)
         startListeningForKeyboardNotifications()
 
-        Task.detached(priority: .medium) {
+        Task(priority: .medium) {
             await self.loadFirstActiveFundingSource()
         }
     }
@@ -246,7 +246,7 @@ class CreateCardViewController: UIViewController,
     ///
     /// This action will initiate the sequence of validating inputs and adding a card via the `virtualCardsClient`.
     @objc func didTapCreateCardButton() {
-        Task.detached(priority: .medium) {
+        Task(priority: .medium) {
             await self.createCard()
         }
     }
@@ -255,24 +255,32 @@ class CreateCardViewController: UIViewController,
 
     /// Validates and creates a card based on the view's form inputs.
     func createCard() async {
-        Task { @MainActor in
+        Task {
             view.endEditing(true)
         }
         guard validateFormData() else {
-            await presentErrorAlert(message: "Please ensure all fields are filled out")
+            Task {
+                presentErrorAlert(message: "Please ensure all fields are filled out")
+            }
             return
         }
         guard let fundingSource = fundingSource else {
-            await presentErrorAlert(message: "Internal error has occurred")
+            Task {
+                presentErrorAlert(message: "Internal error has occurred")
+            }
             return
         }
         guard let sudoId = sudo.id else {
-            await presentErrorAlert(message: "Sudo Id cannot be found")
+            Task {
+                presentErrorAlert(message: "Sudo Id cannot be found")
+            }
             return
         }
 
-        await self.setCreateButtonEnabled(false)
-        await self.presentActivityAlert(message: "Creating card")
+        Task {
+            self.setCreateButtonEnabled(false)
+            self.presentActivityAlert(message: "Creating card")
+        }
 
         do {
             let ownershipProof = try await self.profilesClient.getOwnershipProof(sudo: Sudo(id: sudoId), audience: "sudoplatform.virtual-cards.virtual-card")
@@ -285,24 +293,28 @@ class CreateCardViewController: UIViewController,
                 postalCode: formData[.zip] ?? "",
                 country: formData[.country] ?? ""
             )
-            let input = ProvisionCardInput(
+            let metadata: JSONValue = .dictionary([
+                "alias": .string(formData[.cardLabel] ?? "")
+            ])
+            let input = ProvisionVirtualCardInput(
                 fundingSourceId: fundingSource.id,
                 cardHolder: formData[.cardHolder] ?? "",
-                alias: formData[.cardLabel] ?? "",
                 billingAddress: billingAddressInput,
                 currency: Defaults.provisionCurrency,
-                ownershipProof: ownershipProof
+                ownershipProof: ownershipProof,
+                metadata: metadata
             )
-            _ = try await self.virtualCardsClient.provisionCardWithInput(
-                input,
-                observer: self
-            )
+            _ = try await virtualCardsClient.provisionVirtualCard(withInput: input, observer: self)
         } catch {
-            await self.presentErrorAlert(message: "Failed to create card", error: error)
+            Task {
+                self.presentErrorAlert(message: "Failed to create card", error: error)
+            }
         }
 
-        await self.dismissActivityAlert()
-        await self.setCreateButtonEnabled(true)
+        Task {
+            self.dismissActivityAlert()
+            self.setCreateButtonEnabled(true)
+        }
     }
 
     // MARK: - Helpers: Configuration
@@ -332,7 +344,7 @@ class CreateCardViewController: UIViewController,
     func configureFooterValues() {
         guard let sudoLabelText = sudo.label, !sudoLabelText.isEmpty else {
             Task {
-                await presentErrorAlert(
+                presentErrorAlert(
                     message: "An error has occurred: no sudo label found",
                     okHandler: { _ in
                         self.performSegue(withIdentifier: Segue.navigateToCardDetail.rawValue, sender: self)
@@ -343,7 +355,7 @@ class CreateCardViewController: UIViewController,
         }
         guard let sudoId = sudo.id, !sudoId.isEmpty else {
             Task {
-                await presentErrorAlert(
+                presentErrorAlert(
                     message: "An error has occurred: no sudo id found",
                     okHandler: { _ in
                         self.performSegue(withIdentifier: Segue.returnToCardList.rawValue, sender: self)
@@ -366,34 +378,38 @@ class CreateCardViewController: UIViewController,
     /// Load the first active funding source associated with the user's account.
     func loadFirstActiveFundingSource() async {
         do {
-            let fundingSources = try await self.virtualCardsClient.listFundingSourcesWithLimit(
-                Defaults.fundingSourceLimit,
+            let fundingSources = try await self.virtualCardsClient.listFundingSources(
+                withLimit: Defaults.fundingSourceLimit,
                 nextToken: nil,
                 cachePolicy: .remoteOnly
             ).items
             if let fundingSource = fundingSources.first(where: { $0.state == .active }) {
-                Task { @MainActor in
+                Task {
                     self.fundingSource = fundingSource
                     let fundingSourceText = "\(fundingSource.network.string) ••••\(fundingSource.last4)"
                     self.fundingSourceLabel.text = fundingSourceText
                 }
             } else {
-                await self.setErrorLabelHidden(false)
-                await self.setCreateButtonEnabled(false)
+                Task {
+                    self.setErrorLabelHidden(false)
+                    self.setCreateButtonEnabled(false)
+                }
             }
         } catch {
-            await self.presentErrorAlert(message: "Failed to list funding sources", error: error)
+            Task {
+                self.presentErrorAlert(message: "Failed to list funding sources", error: error)
+            }
         }
     }
 
     /// Sets the Create Button in the navigation bar to enabled/disabled.
     ///
     /// - Parameter isEnabled: If true, the navigation Create button will be enabled.
-    @MainActor func setCreateButtonEnabled(_ isEnabled: Bool) async {
+    func setCreateButtonEnabled(_ isEnabled: Bool) {
         self.navigationItem.rightBarButtonItem?.isEnabled = isEnabled
     }
 
-    @MainActor func setErrorLabelHidden(_ isHidden: Bool) async {
+    func setErrorLabelHidden(_ isHidden: Bool) {
         errorLabel.isHidden = isHidden
         tableFooterView.layoutIfNeeded()
     }
@@ -509,8 +525,8 @@ class CreateCardViewController: UIViewController,
 
     // MARK: - Conformance: ProvisionCardObservable
 
-    func provisioningStateDidChange(_ state: ProvisionalCard.State, card: Card?) {
-        Task { @MainActor in
+    func provisioningStateDidChange(_ state: ProvisionalCardState, card: VirtualCard?) {
+        Task {
             switch state {
             case .completed:
                 self.card = card
@@ -518,21 +534,25 @@ class CreateCardViewController: UIViewController,
                     withIdentifier: Segue.navigateToCardDetail.rawValue,
                     sender: self)
             case .failed:
-                await self.presentErrorAlert(message: "Failed to create card")
+                Task {
+                    self.presentErrorAlert(message: "Failed to create card")
+                }
             default:
                 break
             }
 
-            await self.setCreateButtonEnabled(true)
-            await self.dismissActivityAlert()
+            Task {
+                self.setCreateButtonEnabled(true)
+                self.dismissActivityAlert()
+            }
         }
     }
 
     func errorOccurred(_ error: Error) {
         Task {
-            await self.setCreateButtonEnabled(true)
-            await self.dismissActivityAlert()
-            await self.presentErrorAlert(message: "Failed to create card", error: error)
+            self.setCreateButtonEnabled(true)
+            self.dismissActivityAlert()
+            self.presentErrorAlert(message: "Failed to create card", error: error)
         }
     }
 

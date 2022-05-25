@@ -7,7 +7,7 @@
 import Foundation
 import SudoVirtualCards
 
-extension Transaction.DeclineReason: CustomStringConvertible {
+extension TransactionDeclineReason: CustomStringConvertible {
     // MARK: - Conformance: CustomStringConvertible
 
     public var description: String {

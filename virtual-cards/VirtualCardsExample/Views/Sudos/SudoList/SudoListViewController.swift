@@ -59,7 +59,7 @@ class SudoListViewController: UIViewController, UITableViewDelegate, UITableView
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        Task.detached(priority: .medium) {
+        Task(priority: .medium) {
             await self.loadCacheSudosAndFetchRemote()
         }
     }
@@ -83,7 +83,7 @@ class SudoListViewController: UIViewController, UITableViewDelegate, UITableView
     ///
     /// This action will ensure that the Sudo list is up to date when returning from views - e.g. `CreateSudoViewController`.
     @IBAction func returnToSudoList(segue: UIStoryboardSegue) {
-        Task.detached(priority: .medium) {
+        Task(priority: .medium) {
             await self.loadCacheSudosAndFetchRemote()
         }
     }
@@ -94,15 +94,22 @@ class SudoListViewController: UIViewController, UITableViewDelegate, UITableView
     ///
     /// - Parameter sudo: The selected Sudo to delete.
     func deleteSudo(sudo: Sudo) async -> Bool {
-        await self.presentActivityAlert(message: "Deleting Sudo")
+        Task {
+            self.presentActivityAlert(message: "Deleting Sudo")
+        }
         var status = false
         do {
             _ = try await profilesClient.deleteSudo(sudo: sudo)
             status = true
+            Task {
+                self.dismissActivityAlert()
+            }
         } catch {
-            await presentErrorAlert(message: "Failed to delete Sudo", error: error)
+            Task {
+                self.dismissActivityAlert()
+                self.presentErrorAlert(message: "Failed to delete Sudo", error: error)
+            }
         }
-        await self.dismissActivityAlert()
         return status
     }
 
@@ -121,18 +128,20 @@ class SudoListViewController: UIViewController, UITableViewDelegate, UITableView
     func loadCacheSudosAndFetchRemote() async {
         do {
             let localSudos = try await self.profilesClient.listSudos(option: .cacheOnly)
-            Task { @MainActor in
+            Task {
                 self.sudos = localSudos
                 self.tableView.reloadData()
             }
 
             let remoteSudos = try await self.profilesClient.listSudos(option: .remoteOnly)
-            Task { @MainActor in
+            Task {
                 self.sudos = remoteSudos
                 self.tableView.reloadData()
             }
         } catch {
-            await presentErrorAlert(message: "Failed to list Sudos", error: error)
+            Task {
+                presentErrorAlert(message: "Failed to list Sudos", error: error)
+            }
         }
     }
 
@@ -183,19 +192,19 @@ class SudoListViewController: UIViewController, UITableViewDelegate, UITableView
         if indexPath.row != sudos.count {
             let delete = UIContextualAction(style: .destructive, title: "Delete") { _, _, completion in
                 let sudo = self.sudos[indexPath.row]
-                Task.detached(priority: .medium) {
+                Task(priority: .medium) {
                     do {
-                        await self.presentActivityAlert(message: "Deleting Sudo")
+                        self.presentActivityAlert(message: "Deleting Sudo")
                         try await self.profilesClient.deleteSudo(sudo: sudo)
-                        await self.dismissActivityAlert()
-                        Task { @MainActor in
+                        self.dismissActivityAlert()
+                        Task {
                             self.sudos.remove(at: indexPath.row)
                             self.tableView.deleteRows(at: [indexPath], with: .automatic)
                         }
                         completion(true)
                     } catch {
-                        await self.dismissActivityAlert()
-                        await self.presentErrorAlert(message: "Failed to delete Sudo", error: error)
+                        self.dismissActivityAlert()
+                        self.presentErrorAlert(message: "Failed to delete Sudo", error: error)
                         completion(false)
                     }
                 }

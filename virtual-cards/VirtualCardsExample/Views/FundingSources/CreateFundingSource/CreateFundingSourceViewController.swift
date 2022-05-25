@@ -6,6 +6,7 @@
 
 import UIKit
 import SudoVirtualCards
+import Stripe
 
 /// This View Controller presents a form so that a user can create a `FundingSource`.
 ///
@@ -17,7 +18,6 @@ class CreateFundingSourceViewController: UIViewController,
                                          UITableViewDelegate,
                                          UITableViewDataSource,
                                          InputFormCellDelegate,
-                                         FundingSourceAuthorizationDelegate,
                                          LearnMoreViewDelegate {
 
     // MARK: - Outlets
@@ -141,6 +141,8 @@ class CreateFundingSourceViewController: UIViewController,
 
     // MARK: - Properties
 
+    var configResult: Task<[FundingSourceClientConfiguration], Error>!
+
     /// Array of input fields used on the view.
     let inputFields: [InputField] = InputField.allCases
 
@@ -170,6 +172,9 @@ class CreateFundingSourceViewController: UIViewController,
         configureNavigationBar()
         configureTableView()
         configureLearnMoreView()
+        configResult = Task(priority: .background) {
+            return try await virtualCardsClient.getFundingSourceClientConfiguration()
+        }
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -180,6 +185,7 @@ class CreateFundingSourceViewController: UIViewController,
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         stopListeningForKeyboardNotifications()
+        configResult.cancel()
     }
 
     override func viewDidLayoutSubviews() {
@@ -194,7 +200,7 @@ class CreateFundingSourceViewController: UIViewController,
     ///
     /// This action will initiate the sequence of validating inputs and creating a funding source via the `virtualCardsClient`.
     @objc func didTapCreateFundingSourceButton() {
-        Task.detached(priority: .medium) {
+        Task(priority: .medium) {
             await self.createFundingSource()
         }
     }
@@ -203,15 +209,17 @@ class CreateFundingSourceViewController: UIViewController,
 
     /// Validates and creates a funding source based on the view's form inputs.
     func createFundingSource() async {
-        Task { @MainActor in
+        Task {
             view.endEditing(true)
         }
         guard validateFormData() else {
-            await presentErrorAlert(message: "Please ensure all fields are filled out")
+            presentErrorAlert(message: "Please ensure all fields are filled out")
             return
         }
-        await setCreateButtonEnabled(false)
-        await presentActivityAlert(message: "Creating funding source")
+        Task {
+            setCreateButtonEnabled(false)
+            presentActivityAlert(message: "Creating funding source")
+        }
         let input = CreditCardFundingSourceInput(
             cardNumber: formData[.cardNumber] ?? "",
             expirationMonth: Int(formData[.expirationMonth] ?? "0") ?? 0,
@@ -224,19 +232,41 @@ class CreateFundingSourceViewController: UIViewController,
             postalCode: formData[.zip] ?? "",
             country: formData[.country] ?? ""
         )
+        let configResult = await configResult.result
         do {
-            _ = try await virtualCardsClient.createFundingSource(
-                withCreditCardInput: input,
-                authorizationDelegate: self
-            )
-            await self.dismissActivityAlert {
-                self.performSegue(withIdentifier: Segue.returnToFundingSourceList.rawValue, sender: self)
+            switch configResult {
+            case .success(let config):
+                guard let apiKey = config.first?.apiKey else {
+                    throw AnyError("Failed to get API Key")
+                }
+                let setupResult = try await virtualCardsClient.setupFundingSource(
+                    withInput: SetupFundingSourceInput(type: .creditCard, currency: "USD")
+                )
+                let stripeClient = STPAPIClient(publishableKey: apiKey)
+                let stripeWorker = StripeIntentWorker(
+                    fromInputDetails: input,
+                    clientSecret: setupResult.provisioningData.clientSecret,
+                    stripeClient: stripeClient
+                )
+                let paymentMethodId = try await stripeWorker.confirmSetupIntent()
+                _ = try await virtualCardsClient.completeFundingSource(
+                    withInput: CompleteFundingSourceInput(
+                        id: setupResult.id,
+                        completionData: CompletionDataInput(paymentMethodId: paymentMethodId)
+                    )
+                )
+                Task {
+                    dismissActivityAlert {
+                        self.performSegue(withIdentifier: Segue.returnToFundingSourceList.rawValue, sender: self)
+                    }
+                }
+            case .failure(let error):
+                throw error
             }
         } catch {
-            await self.dismissActivityAlert {
-                Task { @MainActor in
-                    await self.presentErrorAlert(message: "Failed to create funding source", error: error)
-                }
+            Task {
+                dismissActivityAlert()
+                presentErrorAlert(message: "Failed to create funding source", error: error)
             }
         }
     }
@@ -277,7 +307,7 @@ class CreateFundingSourceViewController: UIViewController,
     /// Sets the create button in the navigation bar to enabled/disabled.
     ///
     /// - Parameter isEnabled: If true, the navigation Create button will be enabled.
-    @MainActor func setCreateButtonEnabled(_ isEnabled: Bool) async {
+    func setCreateButtonEnabled(_ isEnabled: Bool) {
         navigationItem.rightBarButtonItem?.isEnabled = isEnabled
     }
 
@@ -387,14 +417,6 @@ class CreateFundingSourceViewController: UIViewController,
             return
         }
         formData[field] = input
-    }
-
-    // MARK: - Conformance: FundingSourceServiceAuthorizationDelegate
-
-    let returnURL: String? = "virtualcardsexample://fundingsource/authorization"
-
-    func fundingSourceAuthorizationPresentingViewController() -> UIViewController {
-        return self
     }
 
     // MARK: - Conformance: LearnMoreViewDelegate

@@ -63,7 +63,7 @@ class FundingSourceListViewController: UIViewController, UITableViewDelegate, UI
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 
-        Task.detached(priority: .medium) {
+        Task(priority: .medium) {
             await self.loadCacheFundingSourcesAndFetchRemote()
         }
     }
@@ -74,7 +74,7 @@ class FundingSourceListViewController: UIViewController, UITableViewDelegate, UI
     ///
     /// This action will ensure that the funding source list is up to date when returning from views - e.g. `CreateFundingSourceViewController`.
     @IBAction func returnToFundingSourceList(segue: UIStoryboardSegue) {
-        Task.detached(priority: .medium) {
+        Task(priority: .medium) {
             await self.loadCacheFundingSourcesAndFetchRemote()
         }
     }
@@ -90,8 +90,8 @@ class FundingSourceListViewController: UIViewController, UITableViewDelegate, UI
     func listFundingSources(
         cachePolicy: SudoVirtualCards.CachePolicy
     ) async throws -> [FundingSource] {
-        return try await virtualCardsClient.listFundingSourcesWithLimit(
-            Defaults.fundingSourceLimit,
+        return try await virtualCardsClient.listFundingSources(
+            withLimit: Defaults.fundingSourceLimit,
             nextToken: nil,
             cachePolicy: cachePolicy
         ).items
@@ -101,17 +101,22 @@ class FundingSourceListViewController: UIViewController, UITableViewDelegate, UI
     ///
     /// - Parameter id: The id of the funding source to cancel.
     func cancelFundingSource(id: String) async throws -> FundingSource {
-        await self.presentActivityAlert(message: "Cancelling funding source")
+        Task {
+            self.presentActivityAlert(message: "Cancelling funding source")
+        }
 
         do {
-            let fundingSource = try await virtualCardsClient.cancelFundingSourceWithId(id)
-
-            await self.dismissActivityAlert()
+            let fundingSource = try await virtualCardsClient.cancelFundingSource(withId: id)
+            Task {
+                self.dismissActivityAlert()
+            }
 
             return fundingSource
         } catch {
-            await self.dismissActivityAlert()
-            await self.presentErrorAlert(message: "Failed to cancel funding source", error: error)
+            Task {
+                self.dismissActivityAlert()
+                self.presentErrorAlert(message: "Failed to cancel funding source", error: error)
+            }
             throw error
         }
     }
@@ -136,7 +141,7 @@ class FundingSourceListViewController: UIViewController, UITableViewDelegate, UI
                 cachePolicy: .cacheOnly
             )
 
-            Task { @MainActor in
+            Task {
                 self.fundingSources = localFundingSource
                 self.tableView.reloadData()
             }
@@ -145,12 +150,14 @@ class FundingSourceListViewController: UIViewController, UITableViewDelegate, UI
                 cachePolicy: .remoteOnly
             )
 
-            Task { @MainActor in
+            Task {
                 self.fundingSources = remoteFundingSource
                 self.tableView.reloadData()
             }
         } catch {
-            await self.presentErrorAlert(message: "Failed to list Funding Sources", error: error)
+            Task {
+                self.presentErrorAlert(message: "Failed to list Funding Sources", error: error)
+            }
         }
     }
 
@@ -205,10 +212,10 @@ class FundingSourceListViewController: UIViewController, UITableViewDelegate, UI
             let cancel = UIContextualAction(style: .destructive, title: "Cancel") { _, _, completion in
                 let fundingSource = self.fundingSources[indexPath.row]
 
-                Task.detached(priority: .medium) {
+                Task(priority: .medium) {
                     do {
                         let canceledFundingSource = try await self.cancelFundingSource(id: fundingSource.id)
-                        Task { @MainActor in
+                        Task {
                             self.fundingSources.remove(at: indexPath.row)
                             self.fundingSources.insert(canceledFundingSource, at: indexPath.row)
                             let cell = self.tableView.cellForRow(at: indexPath)

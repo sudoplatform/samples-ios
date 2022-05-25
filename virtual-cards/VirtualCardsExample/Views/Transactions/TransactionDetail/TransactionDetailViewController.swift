@@ -27,7 +27,15 @@ class TransactionDetailViewController: UIViewController, UITableViewDataSource, 
 
     typealias SudoGetCompletion = ClientCompletion<Sudo?>
 
-    typealias AccountDetails = (sudoLabel: String, fundingSource: FundingSource, card: Card)
+    struct AccountDetails {
+        var sudoLabel: String
+        var fundingSource: FundingSource
+        var card: VirtualCard
+
+        var alias: String? {
+            return card.metadataAlias ?? card.alias
+        }
+    }
 
     /// Defaults used in `TransactionDetailViewController`.
     enum Defaults {
@@ -53,7 +61,7 @@ class TransactionDetailViewController: UIViewController, UITableViewDataSource, 
     // MARK: - Properties
 
     /// Input of the card by the view that serves this view.
-    var inputCard: Card!
+    var inputCard: VirtualCard!
 
     /// Input by the view that serves this view.
     var inputTransaction: Transaction!
@@ -102,11 +110,11 @@ class TransactionDetailViewController: UIViewController, UITableViewDataSource, 
         }
         presentCancellableActivityAlert(message: "Loading Transaction", delegate: self) {
             let owners = self.inputCard.owners
-            Task.detached(priority: .medium) {
+            Task(priority: .medium) {
                 do {
                     let transactions = try await self.listTransactions(withSequenceId: self.inputTransaction.sequenceId, cachePolicy: .remoteOnly)
-                    guard let fundingSource = try await self.virtualCardsClient.getFundingSourceWithId(
-                        self.inputCard.fundingSourceId,
+                    guard let fundingSource = try await self.virtualCardsClient.getFundingSource(
+                        withId: self.inputCard.fundingSourceId,
                         cachePolicy: .remoteOnly
                     ) else {
                         throw TransactionDetailError.fundingSourceNotFound
@@ -119,15 +127,19 @@ class TransactionDetailViewController: UIViewController, UITableViewDataSource, 
                         throw TransactionDetailError.sudoNotFound
                     }
 
-                    Task { @MainActor in
+                    Task {
                             guard let tableData = self.tableDataFromTransactions(
                                 transactions,
                                 sudo: sudo,
                                 fundingSource: fundingSource,
                                 card: self.inputCard
                             ) else {
-                                await self.presentErrorAlert(message: "The transaction could not be loaded") { _ in
-                                    self.navigationController?.popViewController(animated: true)
+                                Task {
+                                    self.presentErrorAlert(message: "The transaction could not be loaded") { _ in
+                                        Task {
+                                            self.navigationController?.popViewController(animated: true)
+                                        }
+                                    }
                                 }
                                 return
                             }
@@ -135,10 +147,10 @@ class TransactionDetailViewController: UIViewController, UITableViewDataSource, 
                             self.tableView.reloadData()
                     }
 
-                    await self.dismissActivityAlert()
+                    self.dismissActivityAlert()
                 } catch {
-                    await self.presentErrorAlert(message: "The transaction could not be loaded", error: error) { _ in
-                        Task { @MainActor in
+                    self.presentErrorAlert(message: "The transaction could not be loaded", error: error) { _ in
+                        Task {
                             self.navigationController?.popViewController(animated: true)
                         }
                     }
@@ -160,11 +172,13 @@ class TransactionDetailViewController: UIViewController, UITableViewDataSource, 
         withSequenceId sequenceId: String?,
         cachePolicy: SudoVirtualCards.CachePolicy
     ) async throws -> [Transaction] {
-        var filter: GetTransactionsFilterInput?
-        if let sequenceId = sequenceId {
-            filter = GetTransactionsFilterInput(sequenceId: .equals(sequenceId))
+        let result = try await virtualCardsClient.listTransactions(withLimit: Defaults.transactionLimit, nextToken: nil, cachePolicy: cachePolicy)
+        switch result {
+        case .success(let success):
+            return success.items
+        case .partial(let partial):
+            throw AnyError("Partial receieved: \(partial)")
         }
-        return try await virtualCardsClient.listTransactionsWithFilter(filter, limit: Defaults.transactionLimit, nextToken: nil, cachePolicy: cachePolicy).items
     }
 
     // MARK: - Helpers: Configuration
@@ -183,7 +197,7 @@ class TransactionDetailViewController: UIViewController, UITableViewDataSource, 
         _ transactions: [Transaction],
         sudo: Sudo,
         fundingSource: FundingSource,
-        card: Card
+        card: VirtualCard
     ) -> TableData? {
         guard
             let selectedTransaction = transactions.first(where: { $0.id == inputTransaction.id }),
@@ -209,7 +223,7 @@ class TransactionDetailViewController: UIViewController, UITableViewDataSource, 
         default:
             break
         }
-        let accountDetails: AccountDetails = (sudoLabel: sudoLabel, fundingSource: fundingSource, card: card)
+        let accountDetails = AccountDetails(sudoLabel: sudoLabel, fundingSource: fundingSource, card: card)
         let accountSection = accountSectionFromRawAccountDetails(details: accountDetails)
         return [generalSection, amountSection, dateSection, accountSection]
     }
@@ -218,7 +232,7 @@ class TransactionDetailViewController: UIViewController, UITableViewDataSource, 
         let merchantCell = CellData(title: "Merchant", value: transaction.description)
         let statusCell = CellData(title: "Status", value: String(describing: transaction.type))
         if transaction.type == .decline {
-            let declineReason = transaction.declineReason ?? Transaction.DeclineReason.declined
+            let declineReason = transaction.declineReason ?? TransactionDeclineReason.declined
             let declineReasonCell = CellData(title: "Decline Reason", value: String(describing: declineReason))
             return [merchantCell, statusCell, declineReasonCell]
         } else {
@@ -268,7 +282,7 @@ class TransactionDetailViewController: UIViewController, UITableViewDataSource, 
 
     func accountSectionFromRawAccountDetails(details: AccountDetails) -> [CellData] {
         let sudoCell = CellData(title: "Sudo", value: details.sudoLabel)
-        let cardCell = CellData(title: "Virtual card", value: details.card.alias)
+        let cardCell = CellData(title: "Virtual card", value: details.alias ?? "")
         let fundingSourceText = "\(details.fundingSource.network.string) ••••\(details.fundingSource.last4)"
         let fundedByCell = CellData(title: "Funded by", value: fundingSourceText)
         return [sudoCell, cardCell, fundedByCell]
@@ -318,9 +332,8 @@ class TransactionDetailViewController: UIViewController, UITableViewDataSource, 
 
     func didTapAlertCancelButton() {
         Task {
-            await dismissActivityAlert {
-                self.navigationController?.popViewController(animated: true)
-            }
+            dismissActivityAlert()
+            self.navigationController?.popViewController(animated: true)
         }
     }
 }

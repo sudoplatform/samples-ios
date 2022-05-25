@@ -56,6 +56,8 @@
 		8470C8F2245AD0E200439F92 /* MainMenuViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8470C8F0245AD0E200439F92 /* MainMenuViewController.swift */; };
 		8470C8F3245AD0E200439F92 /* MainMenuViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8470C8F1245AD0E200439F92 /* MainMenuViewController.xib */; };
 		8470C8F5245AD55700439F92 /* SudoListViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8470C8F4245AD55700439F92 /* SudoListViewController.xib */; };
+		84F2FB24283C90450070077B /* VirtualCard+Metadata.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84F2FB23283C90450070077B /* VirtualCard+Metadata.swift */; };
+		84FE1BCB27F17EF700E7C5AB /* StripeIntentWorker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84FE1BCA27F17EF700E7C5AB /* StripeIntentWorker.swift */; };
 		90BAD63AECE015307CAF13FD /* Pods_VirtualCardsExample_VirtualCardsExampleTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4F82DC0DB6CDA8CF0EC891E4 /* Pods_VirtualCardsExample_VirtualCardsExampleTests.framework */; };
 		92349B9F67AA97645E3AB20D /* Pods-VirtualCardsExample-VirtualCardsExampleTests-metadata.plist in Resources */ = {isa = PBXBuildFile; fileRef = 96159C456C186D9EF6BC7028 /* Pods-VirtualCardsExample-VirtualCardsExampleTests-metadata.plist */; };
 		9545BF1D25464D74002CDE74 /* CreateSudoViewControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9545BF1C25464D74002CDE74 /* CreateSudoViewControllerTests.swift */; };
@@ -156,6 +158,8 @@
 		8470C8F0245AD0E200439F92 /* MainMenuViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainMenuViewController.swift; sourceTree = "<group>"; };
 		8470C8F1245AD0E200439F92 /* MainMenuViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = MainMenuViewController.xib; sourceTree = "<group>"; };
 		8470C8F4245AD55700439F92 /* SudoListViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SudoListViewController.xib; sourceTree = "<group>"; };
+		84F2FB23283C90450070077B /* VirtualCard+Metadata.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "VirtualCard+Metadata.swift"; sourceTree = "<group>"; };
+		84FE1BCA27F17EF700E7C5AB /* StripeIntentWorker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StripeIntentWorker.swift; sourceTree = "<group>"; };
 		88F9B8D28C1D11496229828D /* Pods_VirtualCardsExample.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_VirtualCardsExample.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		9545BF1C25464D74002CDE74 /* CreateSudoViewControllerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CreateSudoViewControllerTests.swift; path = VirtualCardsExampleTests/Tests/Views/Sudos/CreateSudo/CreateSudoViewControllerTests.swift; sourceTree = SOURCE_ROOT; };
 		9545BF3E254654AB002CDE74 /* SudoListViewControllerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SudoListViewControllerTests.swift; sourceTree = "<group>"; };
@@ -249,6 +253,7 @@
 				845A8B25246D092A00FAFB42 /* TransactionType+CustomStringConvertible.swift */,
 				84309D3E2463DC7600F48ECC /* UIView+NibLoadable.swift */,
 				CF2571D1245109BF0053334E /* UIViewController+AlertPresentation.swift */,
+				84F2FB23283C90450070077B /* VirtualCard+Metadata.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -273,6 +278,7 @@
 				AB93CAD2240EF6FB0065AF50 /* Authenticator.swift */,
 				AB93CAD1240EF6FB0065AF50 /* ConfigurationProvider.swift */,
 				957E6092253D53980019D33A /* FileReadable.swift */,
+				84FE1BCA27F17EF700E7C5AB /* StripeIntentWorker.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -990,6 +996,7 @@
 				CF2571BF2444EB7B0053334E /* RegistrationViewController.swift in Sources */,
 				845A8B3724721E1200FAFB42 /* Result+Convenience.swift in Sources */,
 				84309D5B2463F31E00F48ECC /* String+Separatable.swift in Sources */,
+				84FE1BCB27F17EF700E7C5AB /* StripeIntentWorker.swift in Sources */,
 				CF2571C12444EBB80053334E /* SudoListViewController.swift in Sources */,
 				845A8B3924736FEF00FAFB42 /* TransactionDetailError.swift in Sources */,
 				845A8B29246D184A00FAFB42 /* TransactionDetailTableViewCell.swift in Sources */,
@@ -998,6 +1005,7 @@
 				845A8B26246D092A00FAFB42 /* TransactionType+CustomStringConvertible.swift in Sources */,
 				84309D3F2463DC7600F48ECC /* UIView+NibLoadable.swift in Sources */,
 				CF2571D2245109BF0053334E /* UIViewController+AlertPresentation.swift in Sources */,
+				84F2FB24283C90450070077B /* VirtualCard+Metadata.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

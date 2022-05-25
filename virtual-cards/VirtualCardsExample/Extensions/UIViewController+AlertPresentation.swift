@@ -24,13 +24,13 @@ extension UIViewController {
     }
 
     /// Presents a `UIAlertController` containing a `UIActivityIndicatorView` and the given message.
-    @MainActor func presentActivityAlert(message: String, completion: UIAlertPresentationCompletion? = nil) async {
+    func presentActivityAlert(message: String, completion: UIAlertPresentationCompletion? = nil) {
         let alert = ActivityAlertViewController(message: message)
         alert.view.accessibilityIdentifier = self.activityIdentifier
         self.present(alert, animated: false, completion: completion)
     }
 
-    @MainActor func presentCancellableActivityAlert(
+    func presentCancellableActivityAlert(
         message: String,
         delegate: ActivityAlertViewControllerDelegate,
         completion: UIAlertPresentationCompletion? = nil
@@ -44,7 +44,7 @@ extension UIViewController {
     ///
     /// - Parameter completion: The block to execute after the view controller is dismissed. This block has no return value and takes no parameters. You may
     ///     specify nil for this parameter.
-    @MainActor func dismissActivityAlert(_ completion: (() -> Void)? = nil) async {
+    func dismissActivityAlert(_ completion: (() -> Void)? = nil) {
         guard
             let presentedAlert = self.presentedViewController as? ActivityAlertViewController,
             presentedAlert.view.accessibilityIdentifier == self.activityIdentifier
@@ -56,7 +56,7 @@ extension UIViewController {
     }
 
     /// Presents a `UIAlertController` presenting with the `title` and `message`.
-    @MainActor func presentAlert(title: String, message: String, confirm: UIAlertActionHandler? = nil) async {
+    func presentAlert(title: String, message: String, confirm: UIAlertActionHandler? = nil) async {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
         let okAction = UIAlertAction(title: "OK", style: .default, handler: confirm)
         alert.addAction(okAction)
@@ -64,10 +64,10 @@ extension UIViewController {
     }
 
     /// Presents a `UIAlertController` containing the given error message along with a detailed description from the `Error`.
-    @MainActor func presentErrorAlert(message: String, error: Error? = nil, okHandler: UIAlertActionHandler? = nil) async {
+    func presentErrorAlert(message: String, error: Error? = nil, okHandler: UIAlertActionHandler? = nil) {
         var message = message
         if let error = error {
-            message = "\(message):\n\(error.localizedDescription)"
+            message = "\(message):\n\(String(describing: error))"
         }
         let alert = UIAlertController(title: "Error", message: message, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "OK", style: .default, handler: okHandler))

@@ -1,5 +1,6 @@
 #
 source 'https://github.com/CocoaPods/Specs.git'
+source 'https://gitlab.tools.anonyome.com/anonyome/pod-repository.git'
 
 platform :ios, '14.0'
 use_frameworks!
@@ -17,11 +18,12 @@ pre_install do |installer|
 end
 
 target 'VirtualCardsExample' do
+    pod 'Stripe', '~> 21.2.1'
     pod 'SudoUser', '~> 13.0'
     pod 'SudoProfiles', '~> 15.0'
     pod 'SudoEntitlements', '~> 6.0'
     pod 'SudoIdentityVerification', '~> 10.0'
-    pod 'SudoVirtualCards', '~> 15.0'
+    pod 'SudoVirtualCards', '~> 18.0'
 
     target 'VirtualCardsExampleTests'
 end

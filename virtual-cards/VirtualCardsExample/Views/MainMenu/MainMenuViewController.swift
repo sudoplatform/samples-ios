@@ -110,6 +110,17 @@ class MainMenuViewController: UIViewController, UITableViewDelegate, UITableView
         configureNavigationBar()
     }
 
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        Task(priority: .medium) {
+            do {
+                _ = try await self.virtualCardsClient.createKeysIfAbsent()
+            } catch {
+                self.presentErrorAlert(message: "Failed to create keys", error: error)
+            }
+        }
+    }
+
     // MARK: - Actions
 
     /// Action associated with tapping the "Info" button on the navigation bar.
@@ -130,26 +141,27 @@ class MainMenuViewController: UIViewController, UITableViewDelegate, UITableView
 
     /// Perform de-registration from the Sudo user client and clear all local data.
     func deregister() async {
-        await self.presentActivityAlert(message: "Deregistering")
+        Task {
+            self.presentActivityAlert(message: "Deregistering")
+        }
 
         do {
-            _ = try await authenticator.userClient.deregister()
+            _ = try await authenticator.deregister()
             try await self.authenticator.userClient.reset()
             try self.profilesClient.reset()
             try self.profilesClient.generateEncryptionKey()
             try self.virtualCardsClient.reset()
 
-            await self.dismissActivityAlert()
-
-            // unwind back to registration view controller
-            Task { @MainActor in
+            Task {
+                self.dismissActivityAlert()
                 self.performSegue(withIdentifier: "returnToRegistration", sender: self)
             }
         } catch {
-            await self.presentErrorAlert(message: "Failed to deregister", error: error)
+            Task {
+                self.dismissActivityAlert()
+                self.presentErrorAlert(message: "Failed to deregister", error: error)
+            }
         }
-
-        await self.dismissActivityAlert()
     }
 
     // MARK: - Helpers: Configuration
@@ -198,7 +210,7 @@ class MainMenuViewController: UIViewController, UITableViewDelegate, UITableView
             preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
         alert.addAction(UIAlertAction(title: "Deregister", style: .default) { _ in
-            Task.detached(priority: .medium) {
+            Task(priority: .medium) {
                 await self.deregister()
             }
         })

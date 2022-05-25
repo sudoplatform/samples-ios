@@ -1,5 +1,5 @@
 PODS:
-  - AppSyncRealTimeClient (1.8.0):
+  - AppSyncRealTimeClient (1.9.1):
     - Starscream (~> 4.0.4)
   - AWSAppSync (3.4.2):
     - AppSyncRealTimeClient (~> 1.4)
@@ -29,12 +29,12 @@ PODS:
   - Stripe (21.2.1):
     - Stripe/Stripe3DS2 (= 21.2.1)
   - Stripe/Stripe3DS2 (21.2.1)
-  - SudoApiClient (8.0.0):
+  - SudoApiClient (8.0.1):
     - AWSAppSync (~> 3.4.2)
     - SudoConfigManager (~> 2.0)
     - SudoLogging (~> 0.3)
     - SudoUser (~> 13.0)
-  - SudoConfigManager (2.0.1):
+  - SudoConfigManager (2.0.2):
     - AWSS3 (~> 2.26.0)
     - SudoLogging (~> 0.3)
   - SudoEntitlements (6.0.0):
@@ -57,7 +57,7 @@ PODS:
     - SudoConfigManager (~> 2.0)
     - SudoLogging (~> 0.3)
     - SudoUser (~> 13.0)
-  - SudoUser (13.0.1):
+  - SudoUser (13.1.0):
     - AWSAppSync (~> 3.4.2)
     - AWSCognitoIdentityProvider (~> 2.26.0)
     - AWSCore (~> 2.26.0)
@@ -66,19 +66,19 @@ PODS:
     - SudoConfigManager (~> 2.0.1)
     - SudoKeyManager (~> 1.2)
     - SudoLogging (~> 0.3)
-  - SudoVirtualCards (15.0.0):
-    - Stripe (~> 21.2.1)
+  - SudoVirtualCards (18.0.1):
     - SudoApiClient (~> 8.0)
     - SudoKeyManager (~> 1.2)
     - SudoLogging (~> 0.3)
     - SudoUser (~> 13.0)
 
 DEPENDENCIES:
+  - Stripe (~> 21.2.1)
   - SudoEntitlements (~> 6.0)
   - SudoIdentityVerification (~> 10.0)
   - SudoProfiles (~> 15.0)
   - SudoUser (~> 13.0)
-  - SudoVirtualCards (~> 15.0)
+  - SudoVirtualCards (~> 18.0)
 
 SPEC REPOS:
   https://github.com/CocoaPods/Specs.git:
@@ -105,7 +105,7 @@ SPEC REPOS:
     - SudoVirtualCards
 
 SPEC CHECKSUMS:
-  AppSyncRealTimeClient: 463678f3a459c6e77851ca8e23dd7e0108bfb717
+  AppSyncRealTimeClient: cdee78ab78249cb87a71d975e1436e692813a606
   AWSAppSync: cd5702596a414ca58772d7cce0eee75139cb7e58
   AWSAuthCore: e987fce9ad13ef8ac7d39d82305af21a63c590cf
   AWSCognitoIdentityProvider: 94cb0197e41662e3d29ee0feeb0cfa10d2242302
@@ -117,16 +117,16 @@ SPEC CHECKSUMS:
   SQLite.swift: d2b4642190917051ce6bd1d49aab565fe794eea3
   Starscream: 5178aed56b316f13fa3bc55694e583d35dd414d9
   Stripe: ff769d6739fbb7a60592bf665fc0e0df7db0c284
-  SudoApiClient: 8bf9bb0d04a29df2d1b76ea213ac99c1fa557e4a
-  SudoConfigManager: 292edc4d08fdcd1546bf99fb051366a33ce67225
+  SudoApiClient: c1d3e47b1a03daeab4f34659920f98912e5a39ac
+  SudoConfigManager: 324a0c0c9ea73322af5c7bb5c90e82be04c27777
   SudoEntitlements: 91d84196c0b81a0418f7e0e613935e7c908371cf
   SudoIdentityVerification: c913a713862b59b0ee8a1076ef26655fb8362969
   SudoKeyManager: 14159babc8ad32c5ebc41e075fe0164b82e730b1
   SudoLogging: 3a469c7db097b4813d967597d7a62cfd1b580966
   SudoProfiles: a213245263c9eb6bf35d0ee9f527bbcfc9e5ac99
-  SudoUser: ee042ae12ee3df70fd2063c9f31fcd3325dd3cb9
-  SudoVirtualCards: e60e36feea69fbf2ee0ee1859f2e857997daac64
+  SudoUser: 2a01d00fa0a82d6f89664ab978b0caf46a94197a
+  SudoVirtualCards: dd4d571e4e4289c90e15cd159122f1987a2b736a
 
-PODFILE CHECKSUM: 39950d277df27dbb07601a3244e2af4293378760
+PODFILE CHECKSUM: 09a9bb572692b5e77b623643c150ea30585e6460
 
-COCOAPODS: 1.11.2
+COCOAPODS: 1.11.3

@@ -42,10 +42,7 @@ class OrphanCardListViewController: UIViewController, UITableViewDataSource, UIT
     // MARK: - Properties
 
     /// A list of orphan`Cards` that are associated with the `sudoId` of a deleted Sudo.
-    var orphanCards: [Card] = []
-
-    /// A list of `Sudos` to check for deleted Sudos.
-    var sudos: [Sudo] = []
+    var orphanCards: [VirtualCard] = []
 
     // MARK: - Properties: Computed
 
@@ -68,8 +65,7 @@ class OrphanCardListViewController: UIViewController, UITableViewDataSource, UIT
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        Task.detached(priority: .medium) {
-            await self.loadCacheSudosAndFetchRemote()
+        Task(priority: .medium) {
             await self.loadCacheOrphanCardsAndFetchRemote()
         }
     }
@@ -93,7 +89,7 @@ class OrphanCardListViewController: UIViewController, UITableViewDataSource, UIT
     ///
     /// This action will ensure that the orphan card list is up to date when returning from views - e.g. `CardDetailViewController`.
     @IBAction func returnToOrphanCardList(segue: UIStoryboardSegue) {
-        Task.detached(priority: .medium) {
+        Task(priority: .medium) {
             await self.loadCacheOrphanCardsAndFetchRemote()
         }
     }
@@ -106,8 +102,14 @@ class OrphanCardListViewController: UIViewController, UITableViewDataSource, UIT
     ///   - cachePolicy: Cache policy used to retrieve the orphan cards.
     func listOrphanCards(
         cachePolicy: SudoVirtualCards.CachePolicy
-    ) async throws -> [Card] {
-        return try await virtualCardsClient.listCardsWithFilter(nil, limit: Defaults.orphanCardListLimit, nextToken: nil, cachePolicy: cachePolicy).items
+    ) async throws -> [VirtualCard] {
+        let result = try await virtualCardsClient.listVirtualCards(withLimit: Defaults.orphanCardListLimit, nextToken: nil, cachePolicy: cachePolicy)
+        switch result {
+        case .success(let success):
+            return success.items
+        case .partial(let partial):
+            throw AnyError("Error occurred: \(partial)")
+        }
     }
 
     // MARK: - Helpers: Configuration
@@ -120,14 +122,16 @@ class OrphanCardListViewController: UIViewController, UITableViewDataSource, UIT
 
     // MARK: - Helpers
 
-    /// Filter a list of cards by a Sudo identifier of a deleted Sudo.
+    /// Filter a list of cards by removing all sudos that do not contain a ownership proof.
     ///
     /// - Parameters:
     ///   - cards: Cards to be filtered.
     ///   - sudoIds: Sudo Identifiers.
     /// - Returns: Filtered orphan cards.
-    func filterCards(_ cards: [Card], withSudoIds sudoIds: [String]) -> [Card] {
-        return cards.filter { $0.owners.contains { !sudoIds.contains($0.id) } }
+    func filterCards(_ cards: [VirtualCard]) -> [VirtualCard] {
+        return cards.filter { card in
+            return !card.owners.contains { $0.issuer == "sudoplatform.sudoservice" }
+        }
     }
 
     /// Attempts to load all the cards from the device's cache, and then update via a remote call.
@@ -137,47 +141,32 @@ class OrphanCardListViewController: UIViewController, UITableViewDataSource, UIT
     /// All cards will be filtered using the `sudoId`of deleted Sudos to ensure only cards associated with the deleted sudo are listed.
     func loadCacheOrphanCardsAndFetchRemote() async {
         do {
-            let sudoIds = self.sudos.map { $0.id ?? "" }
             let localCards = try await listOrphanCards(cachePolicy: .cacheOnly)
 
-            Task { @MainActor in
-                self.orphanCards = self.filterCards(localCards, withSudoIds: sudoIds)
+            Task {
+                self.orphanCards = self.filterCards(localCards)
                 self.tableView.reloadData()
             }
 
             let remoteCards = try await self.listOrphanCards(cachePolicy: .remoteOnly)
 
-            Task { @MainActor in
-                self.orphanCards = self.filterCards(remoteCards, withSudoIds: sudoIds)
+            Task {
+                self.orphanCards = self.filterCards(remoteCards)
                 self.tableView.reloadData()
             }
         } catch {
-            await self.presentErrorAlert(message: "Failed to list orphan Cards", error: error)
-        }
-    }
-
-    /// Attempts to load all Sudos from the device's cache first and then update via a remote call.
-    func loadCacheSudosAndFetchRemote() async {
-        do {
-            let localSudos = try await self.profilesClient.listSudos(option: .cacheOnly)
-            Task { @MainActor in
-                self.sudos = localSudos
+            Task {
+                self.presentErrorAlert(message: "Failed to list orphan Cards", error: error)
             }
-            let remoteSudos = try await self.profilesClient.listSudos(option: .remoteOnly)
-            Task { @MainActor in
-                self.sudos = remoteSudos
-            }
-        } catch {
-            await self.presentErrorAlert(message: "Failed to list Sudos", error: error)
         }
     }
 
     /// Formats the title which represents an orphan card and is displayed on the table view cell.
     ///
     /// - Parameter orphanCard: The orphan card to display.
-    func getDisplayTitleForOrphanCard(_ orphanCard: Card) -> String {
+    func getDisplayTitleForOrphanCard(_ orphanCard: VirtualCard) -> String {
         let suffix = (orphanCard.state == .closed) ? " - Cancelled" : ""
-        return "\(orphanCard.alias) \(suffix)"
+        return "\(orphanCard.metadataAlias ?? orphanCard.alias ?? "") \(suffix)"
     }
 
     // MARK: - Conformance: UITableViewDataSource
@@ -186,12 +175,10 @@ class OrphanCardListViewController: UIViewController, UITableViewDataSource, UIT
         return 1
     }
 
-    @MainActor
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return orphanCards.count
     }
 
-    @MainActor
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "default", for: indexPath)
         let orphanCard = orphanCards[indexPath.row]
@@ -203,7 +190,6 @@ class OrphanCardListViewController: UIViewController, UITableViewDataSource, UIT
 
     // MARK: - Conformance: UITableViewDelegate
 
-    @MainActor
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         assert(indexPath.section == 0)
         performSegue(withIdentifier: Segue.navigateToCardDetail.rawValue, sender: self)

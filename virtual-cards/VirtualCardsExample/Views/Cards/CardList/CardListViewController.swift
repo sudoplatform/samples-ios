@@ -56,7 +56,7 @@ class CardListViewController: UIViewController, UITableViewDataSource, UITableVi
     var sudo: Sudo = Sudo()
 
     /// A list of `Cards` that are associated with the `sudoId`.
-    var cards: [Card] = []
+    var cards: [VirtualCard] = []
 
     // MARK: - Properties: Computed
 
@@ -76,7 +76,7 @@ class CardListViewController: UIViewController, UITableViewDataSource, UITableVi
         super.viewWillAppear(animated)
         guard let sudoLabel = sudo.label, !sudoLabel.isEmpty else {
             Task {
-                await presentErrorAlert(
+                presentErrorAlert(
                     message: "An error has occurred: no sudo label found",
                     okHandler: { _ in
                         self.performSegue(withIdentifier: Segue.returnToSudoList.rawValue, sender: self)
@@ -87,7 +87,7 @@ class CardListViewController: UIViewController, UITableViewDataSource, UITableVi
         }
         guard let sudoId = sudo.id, !sudoId.isEmpty else {
             Task {
-                await presentErrorAlert(
+                presentErrorAlert(
                     message: "An error has occurred: no sudo id found",
                     okHandler: { _ in
                         self.performSegue(withIdentifier: Segue.returnToSudoList.rawValue, sender: self)
@@ -97,7 +97,7 @@ class CardListViewController: UIViewController, UITableViewDataSource, UITableVi
             return
         }
 
-        Task.detached(priority: .medium) {
+        Task(priority: .medium) {
             await self.loadCacheCardsAndFetchRemote()
         }
     }
@@ -126,7 +126,7 @@ class CardListViewController: UIViewController, UITableViewDataSource, UITableVi
     ///
     /// This action will ensure that the card list is up to date when returning from views - e.g. `CreateCardViewController`.
     @IBAction func returnToCardList(segue: UIStoryboardSegue) {
-        Task.detached(priority: .medium) {
+        Task(priority: .medium) {
             await self.loadCacheCardsAndFetchRemote()
         }
     }
@@ -137,23 +137,43 @@ class CardListViewController: UIViewController, UITableViewDataSource, UITableVi
     ///
     /// - Parameters:
     ///   - cachePolicy: Cache policy used to retrieve the cards.
-    func listCards(cachePolicy: SudoVirtualCards.CachePolicy) async throws -> [Card] {
-        return try await virtualCardsClient.listCardsWithFilter(nil, limit: Defaults.cardListLimit, nextToken: nil, cachePolicy: cachePolicy).items
+    func listCards(cachePolicy: SudoVirtualCards.CachePolicy) async throws -> [VirtualCard] {
+        let result = try await virtualCardsClient.listVirtualCards(withLimit: Defaults.cardListLimit, nextToken: nil, cachePolicy: cachePolicy)
+        switch result {
+        case .success(let success):
+            return success.items
+        case .partial(let partial):
+            throw AnyError("Failure: \(partial)")
+        }
     }
 
     /// Cancel a card based on the input id.
     ///
     /// - Parameter id: The id of the card to cancel.
-    func cancelCard(id: String) async throws -> Card {
-        await self.presentActivityAlert(message: "Cancelling card")
+    func cancelCard(id: String) async throws -> VirtualCard {
+        Task {
+            self.presentActivityAlert(message: "Cancelling card")
+        }
 
         do {
-            let card = try await virtualCardsClient.cancelCardWithId(id)
-            await self.dismissActivityAlert()
+            let result = try await virtualCardsClient.cancelVirtualCard(withId: id)
+            let card: VirtualCard
+            switch result {
+            case .success(let c):
+                card = c
+            case .partial(let partial):
+                throw AnyError("Failure: \(partial)")
+            }
+
+            Task {
+                self.dismissActivityAlert()
+            }
             return card
         } catch {
-            await self.dismissActivityAlert()
-            await self.presentErrorAlert(message: "Failed to cancel card", error: error)
+            Task {
+                self.dismissActivityAlert()
+                self.presentErrorAlert(message: "Failed to cancel card", error: error)
+            }
             throw error
         }
     }
@@ -180,7 +200,7 @@ class CardListViewController: UIViewController, UITableViewDataSource, UITableVi
                 cachePolicy: .cacheOnly
             )
 
-            Task { @MainActor in
+            Task {
                 self.cards = self.filterCards(localCards, withSudoId: self.sudo.id ?? "")
                 self.tableView.reloadData()
             }
@@ -189,12 +209,14 @@ class CardListViewController: UIViewController, UITableViewDataSource, UITableVi
                 cachePolicy: .remoteOnly
             )
 
-            Task { @MainActor in
+            Task {
                 self.cards = self.filterCards(remoteCards, withSudoId: self.sudo.id ?? "")
                 self.tableView.reloadData()
             }
         } catch {
-            await self.presentErrorAlert(message: "Failed to list Cards", error: error)
+            Task {
+                 self.presentErrorAlert(message: "Failed to list Cards", error: error)
+            }
         }
     }
 
@@ -204,16 +226,16 @@ class CardListViewController: UIViewController, UITableViewDataSource, UITableVi
     ///   - cards: Cards to be filtered.
     ///   - sudoId: Sudo Identifier to use to filter the cards.
     /// - Returns: Filtered cards.
-    func filterCards(_ cards: [Card], withSudoId sudoId: String) -> [Card] {
+    func filterCards(_ cards: [VirtualCard], withSudoId sudoId: String) -> [VirtualCard] {
         return cards.filter { $0.owners.contains { $0.id == sudoId } }
     }
 
     /// Formats the title which represents a card and is displayed on the table view cell.
     ///
     /// - Parameter card: The card to display.
-    func getDisplayTitleForCard(_ card: Card) -> String {
+    func getDisplayTitleForCard(_ card: VirtualCard) -> String {
         let suffix = (card.state == .closed) ? " - Cancelled" : ""
-        return "\(card.alias) \(suffix)"
+        return "\(card.metadataAlias ?? card.alias ?? "") \(suffix)"
     }
 
     // MARK: - Conformance: UITableViewDataSource
@@ -222,12 +244,10 @@ class CardListViewController: UIViewController, UITableViewDataSource, UITableVi
         return 1
     }
 
-    @MainActor
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return cards.count + 1
     }
 
-    @MainActor
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell: UITableViewCell
         if indexPath.row == cards.count {
@@ -248,7 +268,6 @@ class CardListViewController: UIViewController, UITableViewDataSource, UITableVi
 
     // MARK: - Conformance: UITableViewDelegate
 
-    @MainActor
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         assert(indexPath.section == 0)
         if indexPath.row == cards.count {
@@ -259,16 +278,15 @@ class CardListViewController: UIViewController, UITableViewDataSource, UITableVi
         tableView.deselectRow(at: indexPath, animated: true)
     }
 
-    @MainActor
     func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         if indexPath.row != cards.count {
             let cancel = UIContextualAction(style: .destructive, title: "Cancel") { _, _, completion in
                 let card = self.cards[indexPath.row]
 
-                Task.detached(priority: .medium) {
+                Task(priority: .medium) {
                     do {
                         let canceledCard = try await self.cancelCard(id: card.id)
-                        Task { @MainActor in
+                        Task {
                             self.cards.remove(at: indexPath.row)
                             self.cards.insert(canceledCard, at: indexPath.row)
                             let cell = self.tableView.cellForRow(at: indexPath)

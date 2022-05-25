@@ -89,7 +89,7 @@ class CreateSudoViewController: UIViewController, LearnMoreViewDelegate {
     ///
     /// This action will initiate the sequence of  creating a Sudo via the `profilesClient`.
     @objc func didTapCreateSudoButton() {
-        Task.detached(priority: .medium) {
+        Task(priority: .medium) {
             await self.createSudo()
         }
     }
@@ -98,23 +98,24 @@ class CreateSudoViewController: UIViewController, LearnMoreViewDelegate {
 
     /// Creates a Sudo based on the view's form inputs.
     func createSudo() async {
-        await self.presentActivityAlert(message: "Creating sudo")
+        Task {
+            self.presentActivityAlert(message: "Creating sudo")
+        }
         do {
             let sudo = Sudo(title: nil, firstName: nil, lastName: nil, label: labelTextField.text, notes: nil, avatar: nil)
             let createdSudo = try await profilesClient.createSudo(sudo: sudo)
 
-            await self.dismissActivityAlert()
-
-            Task { @MainActor in
+            Task {
                 self.sudo = createdSudo
+                self.dismissActivityAlert()
                 self.performSegue(
                     withIdentifier: Segue.navigateToCardList.rawValue,
                     sender: self)
             }
         } catch {
-            Task { @MainActor in
+            Task {
                 self.dismiss(animated: true)
-                await self.presentErrorAlert(message: "Failed to create sudo", error: error)
+                self.presentErrorAlert(message: "Failed to create sudo", error: error)
             }
         }
     }
@@ -140,7 +141,7 @@ class CreateSudoViewController: UIViewController, LearnMoreViewDelegate {
     // MARK: - Helpers
 
     /// Sets the create button in the navigation bar to enabled/disabled.
-    @MainActor func createButtonShouldBeEnabled(_ textField: UITextField) async {
+    func createButtonShouldBeEnabled(_ textField: UITextField) async {
         let isEnabled = !(textField.text?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ?? true)
         navigationItem.rightBarButtonItem?.isEnabled = isEnabled
     }

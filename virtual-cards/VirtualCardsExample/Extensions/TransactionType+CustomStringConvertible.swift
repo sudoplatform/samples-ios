@@ -7,7 +7,7 @@
 import Foundation
 import SudoVirtualCards
 
-extension Transaction.TransactionType: CustomStringConvertible {
+extension TransactionType: CustomStringConvertible {
 
     // MARK: - Conformance: CustomStringConvertible
 

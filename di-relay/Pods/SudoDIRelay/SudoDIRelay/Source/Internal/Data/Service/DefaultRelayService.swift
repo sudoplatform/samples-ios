@@ -7,14 +7,15 @@
 import Foundation
 import AWSAppSync
 import SudoLogging
-import SudoOperations
+import SudoApiClient
+import SudoUser
 
 class DefaultRelayService: RelayService {
 
     // MARK: - Properties
 
-    /// AppSync client for peforming operations against the relay service.
-    var appSyncClient: AWSAppSyncClient
+    /// Client used to interact with the GraphQL endpoint of the virtual cards service.
+    unowned var sudoApiClient: SudoApiClient
 
     /// Helper for the AppSync client.
     var appSyncClientHelper: AppSyncClientHelper
@@ -22,131 +23,68 @@ class DefaultRelayService: RelayService {
     /// Used to log diagnostic and error information.
     var logger: Logger
 
-    /// Utility factory class to generate mutation and query operations.
-    var operationFactory: OperationFactory = OperationFactory()
-
-    /// Operation queue for enqueuing asynchronous tasks.
-    var queue = PlatformOperationQueue()
-
     /// Utility class to manage subscriptions.
     var subscriptionManager: SubscriptionManager = DefaultSubscriptionManager()
 
+    // MARK: - Supplementary
+
+    struct Constants {
+        /// Cache policy when fetching  data.
+        static let cachePolicy: CachePolicy = .remoteOnly
+    }
+
     // MARK: - Lifecycle
 
-    init(appSyncClient: AWSAppSyncClient, appSyncClientHelper: AppSyncClientHelper, logger: Logger = .relaySDKLogger) {
-        self.appSyncClient = appSyncClient
+    init(
+        sudoApiClient: SudoApiClient,
+        appSyncClientHelper: AppSyncClientHelper,
+        logger: Logger = .relaySDKLogger
+    ) {
+        self.sudoApiClient = sudoApiClient
         self.appSyncClientHelper = appSyncClientHelper
         self.logger = logger
     }
 
-    // MARK: - Methods
-
-    func reset() {
-        queue.cancelAllOperations()
-    }
-
     // MARK: - Conformance: RelayService
 
-    func getMessages(withConnectionId connectionId: String, completion: @escaping ClientCompletion<[RelayMessage]>) {
+    func listMessages(withConnectionId connectionId: String) async throws -> [RelayMessage] {
         let input = IdAsInput(connectionId: connectionId)
         let query = GetMessagesQuery(input: input)
-        let operation = operationFactory.generateQueryOperation(query: query, appSyncClient: appSyncClient, logger: logger)
-        let completionObserver = PlatformBlockObserver(finishHandler: { [weak self, unowned operation] _, errors in
-            if let error = errors.first {
-                completion(.failure(error))
-                return
-            }
-            guard let graphQLResult = operation.result?.getMessages else {
-                completion(.failure(SudoDIRelayError.serviceError))
-                return
-            }
-            do {
-                var result = try RelayTransformer.transform(graphQLResult)
-                result.sort { $0.timestamp > $1.timestamp }
-                completion(.success(result))
-            } catch let error {
-                self?.logger.error(error.localizedDescription)
-                completion(.failure(error))
-                return
-            }
-        })
-        operation.addObserver(completionObserver)
-        queue.addOperation(operation)
+
+        let data = try await GraphQLHelper.performQuery(graphQLClient: sudoApiClient, query: query, cachePolicy: Constants.cachePolicy, logger: logger)
+        guard let messageList = data?.getMessages else {
+            return []
+        }
+        return try RelayTransformer.transform(messageList)
     }
 
-    func createPostbox(withConnectionId connectionId: String, completion: @escaping ClientCompletion<Void>) {
-        let input = IdAsInput(connectionId: connectionId)
+    func createPostbox(withConnectionId connectionId: String, ownershipProofToken: String) async throws {
+        let input = CreatePostboxInput(connectionId: connectionId, ownershipProofTokens: [ownershipProofToken])
         let mutation = SendInitMutation(input: input)
-        let operation = operationFactory.generateMutationOperation(mutation: mutation, appSyncClient: appSyncClient, logger: logger)
-        let completionObserver = PlatformBlockObserver(finishHandler: { [weak self, unowned operation] _, errors in
-            if let error = errors.first {
-                self?.logger.error(error.localizedDescription)
-                completion(.failure(SudoDIRelayError.invalidInitMessage))
-                return
-            }
-
-            guard operation.result?.sendInit != nil else {
-                completion(.failure(SudoDIRelayError.serviceError))
-                return
-            }
-            completion(.success(()))
-        })
-        operation.addObserver(completionObserver)
-        queue.addOperation(operation)
+        _ = try await GraphQLHelper.performMutation(graphQLClient: sudoApiClient, mutation: mutation, logger: logger)
     }
 
-    func storeMessage(withConnectionId connectionId: String, message: String, completion: @escaping ClientCompletion<RelayMessage?>) {
+    func storeMessage(withConnectionId connectionId: String, message: String) async throws -> RelayMessage? {
         let input = createWriteToRelayInput(
             messageId: UUID().uuidString,
             connectionId: connectionId,
             cipherText: message,
             direction: Direction.outbound)
         let mutation = StoreMessageMutation(input: input)
-        let operation = operationFactory.generateMutationOperation(mutation: mutation, appSyncClient: appSyncClient, logger: logger)
-        let completionObserver = PlatformBlockObserver(finishHandler: { [weak self, unowned operation] _, errors in
-            if let error = errors.first {
-                completion(.failure(error))
-                return
-            }
-            guard let graphQLResult = operation.result?.storeMessage else {
-                completion(.failure(SudoDIRelayError.serviceError))
-                return
-            }
-            do {
-                let result = try RelayTransformer.transform(graphQLResult)
-                completion(.success(result))
-            } catch let error {
-                self?.logger.error(error.localizedDescription)
-                completion(.failure(SudoDIRelayError.serviceError))
-            }
-        })
-        operation.addObserver(completionObserver)
-        queue.addOperation(operation)
+        let data = try await GraphQLHelper.performMutation(graphQLClient: sudoApiClient, mutation: mutation, logger: logger)
+        return try RelayTransformer.transform(data.storeMessage)
     }
 
-    func deletePostbox(withConnectionId connectionId: String, completion: @escaping ClientCompletion<Void>) {
+    func deletePostbox(withConnectionId connectionId: String) async throws {
         let input = IdAsInput(connectionId: connectionId)
         let mutation = DeletePostBoxMutation(input: input)
-        let operation = operationFactory.generateMutationOperation(mutation: mutation, appSyncClient: appSyncClient, logger: logger)
-        let completionObserver = PlatformBlockObserver(finishHandler: { _, errors in
-            if let error = errors.first {
-                completion(.failure(error))
-                return
-            }
-            guard operation.result?.deletePostBox != nil else {
-                completion(.failure(SudoDIRelayError.serviceError))
-                return
-            }
-            completion(.success(()))
-        })
-        operation.addObserver(completionObserver)
-        queue.addOperation(operation)
+        _ = try await GraphQLHelper.performMutation(graphQLClient: sudoApiClient, mutation: mutation, logger: logger)
     }
 
     func subscribeToMessagesReceived(
         withConnectionId connectionId: String,
         resultHandler: @escaping ClientCompletion<RelayMessage>
-    ) throws -> SubscriptionToken {
+    ) async throws -> SubscriptionToken {
         let subscriptionId = UUID().uuidString
         let onMessageCreatedGraphQlSubscription = OnMessageCreatedSubscription(
             connectionId: connectionId,
@@ -166,18 +104,23 @@ class DefaultRelayService: RelayService {
             },
             resultHandler: resultHandler
         )
-        return try subscribeWithId(
-            subscriptionId,
+        guard let subscriptionToken = await subscribe(
+            withId: subscriptionId,
             subscription: onMessageCreatedGraphQlSubscription,
-            statusChangeHandler: subscriptionStatusChangeHandler,
+            withStatusChangeHandler: subscriptionStatusChangeHandler,
             resultHandler: subscriptionResultHandler
-        )
+        ) else {
+            throw SudoDIRelayError.internalError(
+                "No SubscriptionToken object returned from subscription"
+            )
+        }
+        return subscriptionToken
     }
 
     func subscribeToPostboxDeleted(
         withConnectionId connectionId: String,
         resultHandler: @escaping ClientCompletion<Status>
-    ) throws -> SubscriptionToken {
+    ) async throws -> SubscriptionToken {
         let subscriptionId = UUID().uuidString
         let onMessageCreatedGraphQlSubscription = OnPostBoxDeletedSubscription(connectionId: connectionId)
         let subscriptionStatusChangeHandler = constructStatusChangeHandlerWithSubscriptionId(
@@ -194,41 +137,59 @@ class DefaultRelayService: RelayService {
             },
             resultHandler: resultHandler
         )
-        return try subscribeWithId(
-            subscriptionId,
+        guard let subscriptionToken = await subscribe(
+            withId: subscriptionId,
             subscription: onMessageCreatedGraphQlSubscription,
-            statusChangeHandler: subscriptionStatusChangeHandler,
+            withStatusChangeHandler: subscriptionStatusChangeHandler,
             resultHandler: subscriptionResultHandler
-        )
+        ) else {
+            throw SudoDIRelayError.internalError(
+                "No SubscriptionToken object returned from subscription"
+            )
+        }
+        return subscriptionToken
     }
 
     func getPostboxEndpoint(withConnectionId connectionId: String) -> URL? {
         return URL(string: appSyncClientHelper.getHttpEndpoint() + "/" + connectionId)
     }
 
+    func listPostboxes(withSudoId sudoId: String) async throws -> [Postbox] {
+        let input = ListPostboxesForSudoIdInput(sudoId: sudoId)
+        let query = ListPostboxesForSudoIdQuery(input: input)
+
+        let data = try await GraphQLHelper.performQuery(graphQLClient: sudoApiClient, query: query, cachePolicy: Constants.cachePolicy, logger: logger)
+        guard let postboxes = data?.listPostboxesForSudoId else {
+            throw SudoDIRelayError.serviceError
+        }
+        return RelayTransformer.transform(postboxes)
+    }
+
     // MARK: - Helpers
 
-    func subscribeWithId<S: GraphQLSubscription>(
-        _ subscriptionId: String,
+    /// Subscribe to transaction update events. This includes creation of new transactions.
+    ///
+    /// - Parameter statusChangeHandler: Connection status change.
+    /// - Parameter resultHandler: Updated transaction event.
+    /// - Returns: `Cancellable` object to cancel the subscription.
+    func subscribe<S: GraphQLSubscription>(
+        withId subscriptionId: String,
         subscription: S,
-        statusChangeHandler: @escaping SubscriptionStatusChangeHandler,
+        withStatusChangeHandler statusChangeHandler: SudoSubscriptionStatusChangeHandler?,
         resultHandler: @escaping SubscriptionResultHandler<S>
-    ) throws -> SubscriptionToken {
-        do {
-            let optionalCancellable = try appSyncClient.subscribe(
-                subscription: subscription,
-                statusChangeHandler: statusChangeHandler,
-                resultHandler: resultHandler
-            )
-            guard let cancellable = optionalCancellable else {
-                throw SudoDIRelayError.internalError(
-                    "No Cancellable object returned from subscription"
-                )
-            }
-            return RelaySubscriptionToken(id: subscriptionId, cancellable: cancellable, manager: subscriptionManager)
-        } catch {
-            throw SudoDIRelayError.internalError(error.localizedDescription)
+    ) async -> RelaySubscriptionToken? {
+        let discard = try? await sudoApiClient.subscribe(
+            subscription: subscription,
+            statusChangeHandler: { status in
+                let platformStatus = PlatformSubscriptionStatus(status: status)
+                statusChangeHandler?(platformStatus)
+            },
+            resultHandler: resultHandler
+        )
+        guard let cancellable = discard else {
+            return nil
         }
+        return RelaySubscriptionToken(id: subscriptionId, cancellable: cancellable, manager: subscriptionManager)
     }
 
     /// Construct the result handler for a subscription that returns a relay message object that can be transformed to `RelayMessage`.
@@ -276,12 +237,17 @@ class DefaultRelayService: RelayService {
     func constructStatusChangeHandlerWithSubscriptionId<T>(
         _ subscriptionId: String,
         resultHandler: @escaping ClientCompletion<T>
-    ) -> SubscriptionStatusChangeHandler {
+    ) -> SudoSubscriptionStatusChangeHandler {
         return { [weak self] status in
             switch status {
-            case .error(let cause):
-                let error = SudoDIRelayError.internalError(cause.errorDescription)
-                resultHandler(.failure(error))
+            case let .error(cause):
+                if let err = cause as? GraphQLError {
+                    let error = SudoDIRelayError(graphQLError: err)
+                    resultHandler(.failure(error))
+                    return
+                }
+                let err = SudoDIRelayError.internalError(String(reflecting: cause))
+                resultHandler(.failure(err))
             case .disconnected:
                 self?.subscriptionManager.removeSubscription(withId: subscriptionId)
             default:

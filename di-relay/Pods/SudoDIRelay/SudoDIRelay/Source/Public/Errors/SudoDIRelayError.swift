@@ -5,8 +5,8 @@
 //
 
 import Foundation
-import SudoOperations
 import AWSAppSync
+import SudoApiClient
 
 /// Errors that occur in SudoDIRelay.
 public enum SudoDIRelayError: Error, Equatable, LocalizedError {
@@ -28,7 +28,7 @@ public enum SudoDIRelayError: Error, Equatable, LocalizedError {
 
     // MARK: - SudoPlatformError
 
-    case accountLockedError
+    case accountLocked
     case ambiguousRelay
     case decodingError
     case environmentError
@@ -43,15 +43,28 @@ public enum SudoDIRelayError: Error, Equatable, LocalizedError {
     case serviceError
     case unknownTimezone
     case unauthorizedPostboxAccess
+    case invalidRequest
+    case notAuthorized
+    case limitExceeded
+    case insufficientEntitlements
+    case versionMismatch
+    case rateLimitExceeded
+    case graphQLError(description: String?)
+    case requestFailed(response: HTTPURLResponse?, cause: Error?)
+
+    /// Indicates that a fatal error occurred. This could be due to coding error, out-of-memory condition or other
+    /// conditions that is beyond control of `SudoIdentityVerificationClient` implementation.
+    case fatalError(description: String)
 
     // MARK: - Lifecycle
 
     /// Initialize a `SudoDIRelayError` from a `GraphQLError`.
     ///
     /// If the GraphQLError is unsupported, `nil` will be returned instead.
-    init?(graphQLError error: GraphQLError) {
+    init(graphQLError error: GraphQLError) {
         guard let errorType = error["errorType"] as? String else {
-            return nil
+            self = .internalError(error.message)
+            return
         }
         switch errorType {
         case "sudoplatform.relay.AmbiguousRelayError":
@@ -60,47 +73,40 @@ public enum SudoDIRelayError: Error, Equatable, LocalizedError {
             self = .invalidInitMessage
         case "sudoplatform.relay.UnauthorizedPostboxAccess":
             self = .unauthorizedPostboxAccess
-        default:
-            return nil
-        }
-    }
-
-    /// Initialize a `SudoDIRelayError` from a `SudoPlatformError`.
-    init(platformError error: SudoPlatformError) {
-        switch error {
-        case .accountLockedError:
-            self = .accountLockedError
-        case .decodingError:
+        case "sudoplatform.AccountLocked":
+            self = .accountLocked
+        case "sudoplatform.DecodingError":
             self = .decodingError
-        case .environmentError:
+        case "sudoplatform.EnvironmentError":
             self = .environmentError
-        case .identityInsufficient:
+        case "sudoplatform.IdentityVerificationInsufficientError":
             self = .identityInsufficient
-        case .identityNotVerified:
+        case "sudoplatform.IdentityVerificationNotVerifiedError":
             self = .identityNotVerified
-        case .internalError(let cause):
-            self = .internalError(cause)
-        case .insufficientEntitlementsError:
+        case "sudoplatform.InsufficientEntitlementsError":
             self = .insufficientEntitlementsError
-        case .invalidArgument(let msg):
+        case "sudoplatform.InvalidArgumentError":
+            let msg = error.message.isEmpty ? nil : error.message
             self = .invalidArgument(msg)
-        case .invalidTokenError:
+        case "sudoplatform.relay.InvalidTokenError":
             self = .invalidTokenError
-        case .noEntitlementsError:
+        case "sudoplatform.NoEntitlementsError":
             self = .noEntitlementsError
-        case .policyFailed:
+        case "sudoplatform.PolicyFailed":
             self = .policyFailed
-        case .serviceError:
+        case "sudoplatform.ServiceError":
             self = .serviceError
-        case .unknownTimezone:
+        case "sudoplatform.UnknownTimezoneError":
             self = .unknownTimezone
+        default:
+            self = .internalError("\(errorType) - \(error.message)")
         }
     }
 
     public var errorDescription: String? {
         switch self {
-        case .accountLockedError:
-            return L10n.Relay.Errors.accountLockedError
+        case .accountLocked:
+            return L10n.Relay.Errors.accountLocked
         case .ambiguousRelay:
             return L10n.Relay.Errors.ambiguousRelayError
         case .decodingError:
@@ -142,6 +148,100 @@ public enum SudoDIRelayError: Error, Equatable, LocalizedError {
             return L10n.Relay.Errors.noEntitlementsError
         case .unauthorizedPostboxAccess:
             return L10n.Relay.Errors.unauthorizedPostboxAccess
+        case .fatalError:
+            return L10n.Relay.Errors.fatalError
+        case .invalidRequest:
+            return L10n.Relay.Errors.invalidRequest
+        case .notAuthorized:
+            return L10n.Relay.Errors.notAuthorized
+        case .insufficientEntitlements:
+            return L10n.Relay.Errors.insufficientEntitlementsError
+        case .versionMismatch:
+            return L10n.Relay.Errors.versionMismatch
+        case .graphQLError:
+            return L10n.Relay.Errors.fatalError
+        case .requestFailed:
+            return L10n.Relay.Errors.requestFailed
+        case .limitExceeded:
+            return L10n.Relay.Errors.limitExceeded
+        case .rateLimitExceeded:
+            return L10n.Relay.Errors.rateLimitExceeded
+        }
+    }
+
+    // MARK: - Conformance: Equatable
+
+    public static func == (lhs: SudoDIRelayError, rhs: SudoDIRelayError) -> Bool {
+        switch (lhs, rhs) {
+        case (.requestFailed(let lhsResponse, let lhsCause), requestFailed(let rhsResponse, let rhsCause)):
+            if let lhsResponse = lhsResponse, let rhsResponse = rhsResponse {
+                return lhsResponse.statusCode == rhsResponse.statusCode
+            }
+            return type(of: lhsCause) == type(of: rhsCause)
+        case (.accountLocked, .accountLocked),
+            (.environmentError, .environmentError),
+            (.fatalError, .fatalError),
+            (.graphQLError, .graphQLError),
+            (.identityInsufficient, .identityInsufficient),
+            (.identityNotVerified, .identityNotVerified),
+            (.insufficientEntitlements, .insufficientEntitlements),
+            (.internalError, internalError),
+            (.invalidArgument, .invalidArgument),
+            (.invalidConfig, .invalidConfig),
+            (.invalidRequest, .invalidRequest),
+            (.invalidTokenError, .invalidTokenError),
+            (.limitExceeded, .limitExceeded),
+            (.notAuthorized, .notAuthorized),
+            (.notSignedIn, .notSignedIn),
+            (.rateLimitExceeded, .rateLimitExceeded),
+            (.serviceError, .serviceError),
+            (.unknownTimezone, .unknownTimezone),
+            (.versionMismatch, .versionMismatch),
+            (.ambiguousRelay, .ambiguousRelay),
+            (.decodingError, .decodingError),
+            (.insufficientEntitlementsError, .insufficientEntitlementsError),
+            (.noEntitlementsError, .noEntitlementsError),
+            (.policyFailed, .policyFailed),
+            (.unauthorizedPostboxAccess, .unauthorizedPostboxAccess):
+            return true
+        default:
+            return false
+        }
+    }
+}
+
+extension SudoDIRelayError {
+
+    struct Constants {
+        static let errorType = "errorType"
+    }
+
+    static func fromApiOperationError(error: Error) -> SudoDIRelayError {
+        switch error {
+        case ApiOperationError.accountLocked:
+            return .accountLocked
+        case ApiOperationError.invalidRequest:
+            return .invalidRequest
+        case ApiOperationError.notSignedIn:
+            return .notSignedIn
+        case ApiOperationError.notAuthorized:
+            return .notAuthorized
+        case ApiOperationError.limitExceeded:
+            return .limitExceeded
+        case ApiOperationError.insufficientEntitlements:
+            return .insufficientEntitlements
+        case ApiOperationError.serviceError:
+            return .serviceError
+        case ApiOperationError.versionMismatch:
+            return .versionMismatch
+        case ApiOperationError.rateLimitExceeded:
+            return .rateLimitExceeded
+        case ApiOperationError.graphQLError(let cause):
+            return .graphQLError(description: "Unexpected GraphQL error: \(cause)")
+        case ApiOperationError.requestFailed(let response, let cause):
+            return .requestFailed(response: response, cause: cause)
+        default:
+            return .fatalError(description: "Unexpected API operation error: \(error)")
         }
     }
 }

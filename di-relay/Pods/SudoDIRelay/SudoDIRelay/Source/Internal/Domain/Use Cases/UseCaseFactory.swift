@@ -21,8 +21,8 @@ class UseCaseFactory {
 
     // MARK: - Methods
 
-    func generateGetMessages() -> GetMessagesUseCase {
-        return GetMessagesUseCase(relayService: relayService)
+    func generateListMessages() -> ListMessagesUseCase {
+        return ListMessagesUseCase(relayService: relayService)
     }
 
     func generateCreatePostbox() -> CreatePostboxUseCase {
@@ -47,5 +47,9 @@ class UseCaseFactory {
 
     func generateGetPostboxEndpoint() -> GetPostboxEndpointUseCase {
         return GetPostboxEndpointUseCase(relayService: relayService)
+    }
+
+    func generateListPostboxes() -> ListPostboxesUseCase {
+        return ListPostboxesUseCase(relayService: relayService)
     }
 }

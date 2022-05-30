@@ -3,14 +3,14 @@
 
 import AWSAppSync
 
-public enum KeyFormat: RawRepresentable, Equatable, JSONDecodable, JSONEncodable {
-  public typealias RawValue = String
+internal enum KeyFormat: RawRepresentable, Equatable, JSONDecodable, JSONEncodable {
+  internal typealias RawValue = String
   case rsaPublicKey
   case spki
   /// Auto generated constant for unknown enum values
   case unknown(RawValue)
 
-  public init?(rawValue: RawValue) {
+  internal init?(rawValue: RawValue) {
     switch rawValue {
       case "RSA_PUBLIC_KEY": self = .rsaPublicKey
       case "SPKI": self = .spki
@@ -18,7 +18,7 @@ public enum KeyFormat: RawRepresentable, Equatable, JSONDecodable, JSONEncodable
     }
   }
 
-  public var rawValue: RawValue {
+  internal var rawValue: RawValue {
     switch self {
       case .rsaPublicKey: return "RSA_PUBLIC_KEY"
       case .spki: return "SPKI"
@@ -26,7 +26,7 @@ public enum KeyFormat: RawRepresentable, Equatable, JSONDecodable, JSONEncodable
     }
   }
 
-  public static func == (lhs: KeyFormat, rhs: KeyFormat) -> Bool {
+  internal static func == (lhs: KeyFormat, rhs: KeyFormat) -> Bool {
     switch (lhs, rhs) {
       case (.rsaPublicKey, .rsaPublicKey): return true
       case (.spki, .spki): return true
@@ -36,14 +36,14 @@ public enum KeyFormat: RawRepresentable, Equatable, JSONDecodable, JSONEncodable
   }
 }
 
-public struct IdAsInput: GraphQLMapConvertible {
-  public var graphQLMap: GraphQLMap
+internal struct IdAsInput: GraphQLMapConvertible {
+  internal var graphQLMap: GraphQLMap
 
-  public init(connectionId: GraphQLID) {
+  internal init(connectionId: GraphQLID) {
     graphQLMap = ["connectionId": connectionId]
   }
 
-  public var connectionId: GraphQLID {
+  internal var connectionId: GraphQLID {
     get {
       return graphQLMap["connectionId"] as! GraphQLID
     }
@@ -53,14 +53,14 @@ public struct IdAsInput: GraphQLMapConvertible {
   }
 }
 
-public enum Direction: RawRepresentable, Equatable, JSONDecodable, JSONEncodable {
-  public typealias RawValue = String
+internal enum Direction: RawRepresentable, Equatable, JSONDecodable, JSONEncodable {
+  internal typealias RawValue = String
   case inbound
   case outbound
   /// Auto generated constant for unknown enum values
   case unknown(RawValue)
 
-  public init?(rawValue: RawValue) {
+  internal init?(rawValue: RawValue) {
     switch rawValue {
       case "INBOUND": self = .inbound
       case "OUTBOUND": self = .outbound
@@ -68,7 +68,7 @@ public enum Direction: RawRepresentable, Equatable, JSONDecodable, JSONEncodable
     }
   }
 
-  public var rawValue: RawValue {
+  internal var rawValue: RawValue {
     switch self {
       case .inbound: return "INBOUND"
       case .outbound: return "OUTBOUND"
@@ -76,7 +76,7 @@ public enum Direction: RawRepresentable, Equatable, JSONDecodable, JSONEncodable
     }
   }
 
-  public static func == (lhs: Direction, rhs: Direction) -> Bool {
+  internal static func == (lhs: Direction, rhs: Direction) -> Bool {
     switch (lhs, rhs) {
       case (.inbound, .inbound): return true
       case (.outbound, .outbound): return true
@@ -86,14 +86,31 @@ public enum Direction: RawRepresentable, Equatable, JSONDecodable, JSONEncodable
   }
 }
 
-public struct CreatePublicKeyInput: GraphQLMapConvertible {
-  public var graphQLMap: GraphQLMap
+internal struct ListPostboxesForSudoIdInput: GraphQLMapConvertible {
+  internal var graphQLMap: GraphQLMap
 
-  public init(keyId: String, keyRingId: String, algorithm: String, keyFormat: Optional<KeyFormat?> = nil, publicKey: String) {
+  internal init(sudoId: GraphQLID) {
+    graphQLMap = ["sudoId": sudoId]
+  }
+
+  internal var sudoId: GraphQLID {
+    get {
+      return graphQLMap["sudoId"] as! GraphQLID
+    }
+    set {
+      graphQLMap.updateValue(newValue, forKey: "sudoId")
+    }
+  }
+}
+
+internal struct CreatePublicKeyInput: GraphQLMapConvertible {
+  internal var graphQLMap: GraphQLMap
+
+  internal init(keyId: String, keyRingId: String, algorithm: String, keyFormat: Optional<KeyFormat?> = nil, publicKey: String) {
     graphQLMap = ["keyId": keyId, "keyRingId": keyRingId, "algorithm": algorithm, "keyFormat": keyFormat, "publicKey": publicKey]
   }
 
-  public var keyId: String {
+  internal var keyId: String {
     get {
       return graphQLMap["keyId"] as! String
     }
@@ -102,7 +119,7 @@ public struct CreatePublicKeyInput: GraphQLMapConvertible {
     }
   }
 
-  public var keyRingId: String {
+  internal var keyRingId: String {
     get {
       return graphQLMap["keyRingId"] as! String
     }
@@ -111,7 +128,7 @@ public struct CreatePublicKeyInput: GraphQLMapConvertible {
     }
   }
 
-  public var algorithm: String {
+  internal var algorithm: String {
     get {
       return graphQLMap["algorithm"] as! String
     }
@@ -120,7 +137,7 @@ public struct CreatePublicKeyInput: GraphQLMapConvertible {
     }
   }
 
-  public var keyFormat: Optional<KeyFormat?> {
+  internal var keyFormat: Optional<KeyFormat?> {
     get {
       return graphQLMap["keyFormat"] as! Optional<KeyFormat?>
     }
@@ -129,7 +146,7 @@ public struct CreatePublicKeyInput: GraphQLMapConvertible {
     }
   }
 
-  public var publicKey: String {
+  internal var publicKey: String {
     get {
       return graphQLMap["publicKey"] as! String
     }
@@ -139,14 +156,14 @@ public struct CreatePublicKeyInput: GraphQLMapConvertible {
   }
 }
 
-public struct DeletePublicKeyInput: GraphQLMapConvertible {
-  public var graphQLMap: GraphQLMap
+internal struct DeletePublicKeyInput: GraphQLMapConvertible {
+  internal var graphQLMap: GraphQLMap
 
-  public init(keyId: String) {
+  internal init(keyId: String) {
     graphQLMap = ["keyId": keyId]
   }
 
-  public var keyId: String {
+  internal var keyId: String {
     get {
       return graphQLMap["keyId"] as! String
     }
@@ -156,23 +173,14 @@ public struct DeletePublicKeyInput: GraphQLMapConvertible {
   }
 }
 
-public struct WriteToRelayInput: GraphQLMapConvertible {
-  public var graphQLMap: GraphQLMap
+internal struct CreatePostboxInput: GraphQLMapConvertible {
+  internal var graphQLMap: GraphQLMap
 
-  public init(messageId: GraphQLID, connectionId: GraphQLID, cipherText: String, direction: Direction, utcTimestamp: Double) {
-    graphQLMap = ["messageId": messageId, "connectionId": connectionId, "cipherText": cipherText, "direction": direction, "utcTimestamp": utcTimestamp]
+  internal init(connectionId: GraphQLID, ownershipProofTokens: [String]) {
+    graphQLMap = ["connectionId": connectionId, "ownershipProofTokens": ownershipProofTokens]
   }
 
-  public var messageId: GraphQLID {
-    get {
-      return graphQLMap["messageId"] as! GraphQLID
-    }
-    set {
-      graphQLMap.updateValue(newValue, forKey: "messageId")
-    }
-  }
-
-  public var connectionId: GraphQLID {
+  internal var connectionId: GraphQLID {
     get {
       return graphQLMap["connectionId"] as! GraphQLID
     }
@@ -181,7 +189,42 @@ public struct WriteToRelayInput: GraphQLMapConvertible {
     }
   }
 
-  public var cipherText: String {
+  internal var ownershipProofTokens: [String] {
+    get {
+      return graphQLMap["ownershipProofTokens"] as! [String]
+    }
+    set {
+      graphQLMap.updateValue(newValue, forKey: "ownershipProofTokens")
+    }
+  }
+}
+
+internal struct WriteToRelayInput: GraphQLMapConvertible {
+  internal var graphQLMap: GraphQLMap
+
+  internal init(messageId: GraphQLID, connectionId: GraphQLID, cipherText: String, direction: Direction, utcTimestamp: Double) {
+    graphQLMap = ["messageId": messageId, "connectionId": connectionId, "cipherText": cipherText, "direction": direction, "utcTimestamp": utcTimestamp]
+  }
+
+  internal var messageId: GraphQLID {
+    get {
+      return graphQLMap["messageId"] as! GraphQLID
+    }
+    set {
+      graphQLMap.updateValue(newValue, forKey: "messageId")
+    }
+  }
+
+  internal var connectionId: GraphQLID {
+    get {
+      return graphQLMap["connectionId"] as! GraphQLID
+    }
+    set {
+      graphQLMap.updateValue(newValue, forKey: "connectionId")
+    }
+  }
+
+  internal var cipherText: String {
     get {
       return graphQLMap["cipherText"] as! String
     }
@@ -190,7 +233,7 @@ public struct WriteToRelayInput: GraphQLMapConvertible {
     }
   }
 
-  public var direction: Direction {
+  internal var direction: Direction {
     get {
       return graphQLMap["direction"] as! Direction
     }
@@ -199,7 +242,7 @@ public struct WriteToRelayInput: GraphQLMapConvertible {
     }
   }
 
-  public var utcTimestamp: Double {
+  internal var utcTimestamp: Double {
     get {
       return graphQLMap["utcTimestamp"] as! Double
     }
@@ -209,14 +252,14 @@ public struct WriteToRelayInput: GraphQLMapConvertible {
   }
 }
 
-public struct PostBoxDeletionInput: GraphQLMapConvertible {
-  public var graphQLMap: GraphQLMap
+internal struct PostBoxDeletionInput: GraphQLMapConvertible {
+  internal var graphQLMap: GraphQLMap
 
-  public init(connectionId: GraphQLID, remainingMessages: [TableKeyAsInput]) {
+  internal init(connectionId: GraphQLID, remainingMessages: [TableKeyAsInput]) {
     graphQLMap = ["connectionId": connectionId, "remainingMessages": remainingMessages]
   }
 
-  public var connectionId: GraphQLID {
+  internal var connectionId: GraphQLID {
     get {
       return graphQLMap["connectionId"] as! GraphQLID
     }
@@ -225,7 +268,7 @@ public struct PostBoxDeletionInput: GraphQLMapConvertible {
     }
   }
 
-  public var remainingMessages: [TableKeyAsInput] {
+  internal var remainingMessages: [TableKeyAsInput] {
     get {
       return graphQLMap["remainingMessages"] as! [TableKeyAsInput]
     }
@@ -235,14 +278,14 @@ public struct PostBoxDeletionInput: GraphQLMapConvertible {
   }
 }
 
-public struct TableKeyAsInput: GraphQLMapConvertible {
-  public var graphQLMap: GraphQLMap
+internal struct TableKeyAsInput: GraphQLMapConvertible {
+  internal var graphQLMap: GraphQLMap
 
-  public init(connectionId: GraphQLID, messageId: GraphQLID) {
+  internal init(connectionId: GraphQLID, messageId: GraphQLID) {
     graphQLMap = ["connectionId": connectionId, "messageId": messageId]
   }
 
-  public var connectionId: GraphQLID {
+  internal var connectionId: GraphQLID {
     get {
       return graphQLMap["connectionId"] as! GraphQLID
     }
@@ -251,7 +294,7 @@ public struct TableKeyAsInput: GraphQLMapConvertible {
     }
   }
 
-  public var messageId: GraphQLID {
+  internal var messageId: GraphQLID {
     get {
       return graphQLMap["messageId"] as! GraphQLID
     }
@@ -261,40 +304,40 @@ public struct TableKeyAsInput: GraphQLMapConvertible {
   }
 }
 
-public final class GetPublicKeyForRelayQuery: GraphQLQuery {
-  public static let operationString =
+internal final class GetPublicKeyForRelayQuery: GraphQLQuery {
+  internal static let operationString =
     "query GetPublicKeyForRelay($keyId: String!, $keyFormats: [KeyFormat!]) {\n  getPublicKeyForRelay(keyId: $keyId, keyFormats: $keyFormats) {\n    __typename\n    id\n    keyId\n    keyRingId\n    algorithm\n    keyFormat\n    publicKey\n    owner\n    version\n    createdAtEpochMs\n    updatedAtEpochMs\n  }\n}"
 
-  public var keyId: String
-  public var keyFormats: [KeyFormat]?
+  internal var keyId: String
+  internal var keyFormats: [KeyFormat]?
 
-  public init(keyId: String, keyFormats: [KeyFormat]?) {
+  internal init(keyId: String, keyFormats: [KeyFormat]?) {
     self.keyId = keyId
     self.keyFormats = keyFormats
   }
 
-  public var variables: GraphQLMap? {
+  internal var variables: GraphQLMap? {
     return ["keyId": keyId, "keyFormats": keyFormats]
   }
 
-  public struct Data: GraphQLSelectionSet {
-    public static let possibleTypes = ["Query"]
+  internal struct Data: GraphQLSelectionSet {
+    internal static let possibleTypes = ["Query"]
 
-    public static let selections: [GraphQLSelection] = [
+    internal static let selections: [GraphQLSelection] = [
       GraphQLField("getPublicKeyForRelay", arguments: ["keyId": GraphQLVariable("keyId"), "keyFormats": GraphQLVariable("keyFormats")], type: .object(GetPublicKeyForRelay.selections)),
     ]
 
-    public var snapshot: Snapshot
+    internal var snapshot: Snapshot
 
-    public init(snapshot: Snapshot) {
+    internal init(snapshot: Snapshot) {
       self.snapshot = snapshot
     }
 
-    public init(getPublicKeyForRelay: GetPublicKeyForRelay? = nil) {
+    internal init(getPublicKeyForRelay: GetPublicKeyForRelay? = nil) {
       self.init(snapshot: ["__typename": "Query", "getPublicKeyForRelay": getPublicKeyForRelay.flatMap { $0.snapshot }])
     }
 
-    public var getPublicKeyForRelay: GetPublicKeyForRelay? {
+    internal var getPublicKeyForRelay: GetPublicKeyForRelay? {
       get {
         return (snapshot["getPublicKeyForRelay"] as? Snapshot).flatMap { GetPublicKeyForRelay(snapshot: $0) }
       }
@@ -303,10 +346,10 @@ public final class GetPublicKeyForRelayQuery: GraphQLQuery {
       }
     }
 
-    public struct GetPublicKeyForRelay: GraphQLSelectionSet {
-      public static let possibleTypes = ["PublicKey"]
+    internal struct GetPublicKeyForRelay: GraphQLSelectionSet {
+      internal static let possibleTypes = ["PublicKey"]
 
-      public static let selections: [GraphQLSelection] = [
+      internal static let selections: [GraphQLSelection] = [
         GraphQLField("__typename", type: .nonNull(.scalar(String.self))),
         GraphQLField("id", type: .nonNull(.scalar(GraphQLID.self))),
         GraphQLField("keyId", type: .nonNull(.scalar(String.self))),
@@ -320,17 +363,17 @@ public final class GetPublicKeyForRelayQuery: GraphQLQuery {
         GraphQLField("updatedAtEpochMs", type: .nonNull(.scalar(Double.self))),
       ]
 
-      public var snapshot: Snapshot
+      internal var snapshot: Snapshot
 
-      public init(snapshot: Snapshot) {
+      internal init(snapshot: Snapshot) {
         self.snapshot = snapshot
       }
 
-      public init(id: GraphQLID, keyId: String, keyRingId: String, algorithm: String, keyFormat: KeyFormat? = nil, publicKey: String, owner: GraphQLID, version: Int, createdAtEpochMs: Double, updatedAtEpochMs: Double) {
+      internal init(id: GraphQLID, keyId: String, keyRingId: String, algorithm: String, keyFormat: KeyFormat? = nil, publicKey: String, owner: GraphQLID, version: Int, createdAtEpochMs: Double, updatedAtEpochMs: Double) {
         self.init(snapshot: ["__typename": "PublicKey", "id": id, "keyId": keyId, "keyRingId": keyRingId, "algorithm": algorithm, "keyFormat": keyFormat, "publicKey": publicKey, "owner": owner, "version": version, "createdAtEpochMs": createdAtEpochMs, "updatedAtEpochMs": updatedAtEpochMs])
       }
 
-      public var __typename: String {
+      internal var __typename: String {
         get {
           return snapshot["__typename"]! as! String
         }
@@ -339,7 +382,7 @@ public final class GetPublicKeyForRelayQuery: GraphQLQuery {
         }
       }
 
-      public var id: GraphQLID {
+      internal var id: GraphQLID {
         get {
           return snapshot["id"]! as! GraphQLID
         }
@@ -348,7 +391,7 @@ public final class GetPublicKeyForRelayQuery: GraphQLQuery {
         }
       }
 
-      public var keyId: String {
+      internal var keyId: String {
         get {
           return snapshot["keyId"]! as! String
         }
@@ -357,7 +400,7 @@ public final class GetPublicKeyForRelayQuery: GraphQLQuery {
         }
       }
 
-      public var keyRingId: String {
+      internal var keyRingId: String {
         get {
           return snapshot["keyRingId"]! as! String
         }
@@ -366,7 +409,7 @@ public final class GetPublicKeyForRelayQuery: GraphQLQuery {
         }
       }
 
-      public var algorithm: String {
+      internal var algorithm: String {
         get {
           return snapshot["algorithm"]! as! String
         }
@@ -375,7 +418,7 @@ public final class GetPublicKeyForRelayQuery: GraphQLQuery {
         }
       }
 
-      public var keyFormat: KeyFormat? {
+      internal var keyFormat: KeyFormat? {
         get {
           return snapshot["keyFormat"] as? KeyFormat
         }
@@ -384,7 +427,7 @@ public final class GetPublicKeyForRelayQuery: GraphQLQuery {
         }
       }
 
-      public var publicKey: String {
+      internal var publicKey: String {
         get {
           return snapshot["publicKey"]! as! String
         }
@@ -393,7 +436,7 @@ public final class GetPublicKeyForRelayQuery: GraphQLQuery {
         }
       }
 
-      public var owner: GraphQLID {
+      internal var owner: GraphQLID {
         get {
           return snapshot["owner"]! as! GraphQLID
         }
@@ -402,7 +445,7 @@ public final class GetPublicKeyForRelayQuery: GraphQLQuery {
         }
       }
 
-      public var version: Int {
+      internal var version: Int {
         get {
           return snapshot["version"]! as! Int
         }
@@ -411,7 +454,7 @@ public final class GetPublicKeyForRelayQuery: GraphQLQuery {
         }
       }
 
-      public var createdAtEpochMs: Double {
+      internal var createdAtEpochMs: Double {
         get {
           return snapshot["createdAtEpochMs"]! as! Double
         }
@@ -420,7 +463,7 @@ public final class GetPublicKeyForRelayQuery: GraphQLQuery {
         }
       }
 
-      public var updatedAtEpochMs: Double {
+      internal var updatedAtEpochMs: Double {
         get {
           return snapshot["updatedAtEpochMs"]! as! Double
         }
@@ -432,42 +475,42 @@ public final class GetPublicKeyForRelayQuery: GraphQLQuery {
   }
 }
 
-public final class GetPublicKeysForRelayQuery: GraphQLQuery {
-  public static let operationString =
+internal final class GetPublicKeysForRelayQuery: GraphQLQuery {
+  internal static let operationString =
     "query GetPublicKeysForRelay($limit: Int, $nextToken: String, $keyFormats: [KeyFormat!]) {\n  getPublicKeysForRelay(limit: $limit, nextToken: $nextToken, keyFormats: $keyFormats) {\n    __typename\n    items {\n      __typename\n      id\n      keyId\n      keyRingId\n      algorithm\n      keyFormat\n      publicKey\n      owner\n      version\n      createdAtEpochMs\n      updatedAtEpochMs\n    }\n    nextToken\n  }\n}"
 
-  public var limit: Int?
-  public var nextToken: String?
-  public var keyFormats: [KeyFormat]?
+  internal var limit: Int?
+  internal var nextToken: String?
+  internal var keyFormats: [KeyFormat]?
 
-  public init(limit: Int? = nil, nextToken: String? = nil, keyFormats: [KeyFormat]?) {
+  internal init(limit: Int? = nil, nextToken: String? = nil, keyFormats: [KeyFormat]?) {
     self.limit = limit
     self.nextToken = nextToken
     self.keyFormats = keyFormats
   }
 
-  public var variables: GraphQLMap? {
+  internal var variables: GraphQLMap? {
     return ["limit": limit, "nextToken": nextToken, "keyFormats": keyFormats]
   }
 
-  public struct Data: GraphQLSelectionSet {
-    public static let possibleTypes = ["Query"]
+  internal struct Data: GraphQLSelectionSet {
+    internal static let possibleTypes = ["Query"]
 
-    public static let selections: [GraphQLSelection] = [
+    internal static let selections: [GraphQLSelection] = [
       GraphQLField("getPublicKeysForRelay", arguments: ["limit": GraphQLVariable("limit"), "nextToken": GraphQLVariable("nextToken"), "keyFormats": GraphQLVariable("keyFormats")], type: .nonNull(.object(GetPublicKeysForRelay.selections))),
     ]
 
-    public var snapshot: Snapshot
+    internal var snapshot: Snapshot
 
-    public init(snapshot: Snapshot) {
+    internal init(snapshot: Snapshot) {
       self.snapshot = snapshot
     }
 
-    public init(getPublicKeysForRelay: GetPublicKeysForRelay) {
+    internal init(getPublicKeysForRelay: GetPublicKeysForRelay) {
       self.init(snapshot: ["__typename": "Query", "getPublicKeysForRelay": getPublicKeysForRelay.snapshot])
     }
 
-    public var getPublicKeysForRelay: GetPublicKeysForRelay {
+    internal var getPublicKeysForRelay: GetPublicKeysForRelay {
       get {
         return GetPublicKeysForRelay(snapshot: snapshot["getPublicKeysForRelay"]! as! Snapshot)
       }
@@ -476,26 +519,26 @@ public final class GetPublicKeysForRelayQuery: GraphQLQuery {
       }
     }
 
-    public struct GetPublicKeysForRelay: GraphQLSelectionSet {
-      public static let possibleTypes = ["PaginatedPublicKey"]
+    internal struct GetPublicKeysForRelay: GraphQLSelectionSet {
+      internal static let possibleTypes = ["PaginatedPublicKey"]
 
-      public static let selections: [GraphQLSelection] = [
+      internal static let selections: [GraphQLSelection] = [
         GraphQLField("__typename", type: .nonNull(.scalar(String.self))),
         GraphQLField("items", type: .nonNull(.list(.nonNull(.object(Item.selections))))),
         GraphQLField("nextToken", type: .scalar(String.self)),
       ]
 
-      public var snapshot: Snapshot
+      internal var snapshot: Snapshot
 
-      public init(snapshot: Snapshot) {
+      internal init(snapshot: Snapshot) {
         self.snapshot = snapshot
       }
 
-      public init(items: [Item], nextToken: String? = nil) {
+      internal init(items: [Item], nextToken: String? = nil) {
         self.init(snapshot: ["__typename": "PaginatedPublicKey", "items": items.map { $0.snapshot }, "nextToken": nextToken])
       }
 
-      public var __typename: String {
+      internal var __typename: String {
         get {
           return snapshot["__typename"]! as! String
         }
@@ -504,7 +547,7 @@ public final class GetPublicKeysForRelayQuery: GraphQLQuery {
         }
       }
 
-      public var items: [Item] {
+      internal var items: [Item] {
         get {
           return (snapshot["items"] as! [Snapshot]).map { Item(snapshot: $0) }
         }
@@ -513,7 +556,7 @@ public final class GetPublicKeysForRelayQuery: GraphQLQuery {
         }
       }
 
-      public var nextToken: String? {
+      internal var nextToken: String? {
         get {
           return snapshot["nextToken"] as? String
         }
@@ -522,10 +565,10 @@ public final class GetPublicKeysForRelayQuery: GraphQLQuery {
         }
       }
 
-      public struct Item: GraphQLSelectionSet {
-        public static let possibleTypes = ["PublicKey"]
+      internal struct Item: GraphQLSelectionSet {
+        internal static let possibleTypes = ["PublicKey"]
 
-        public static let selections: [GraphQLSelection] = [
+        internal static let selections: [GraphQLSelection] = [
           GraphQLField("__typename", type: .nonNull(.scalar(String.self))),
           GraphQLField("id", type: .nonNull(.scalar(GraphQLID.self))),
           GraphQLField("keyId", type: .nonNull(.scalar(String.self))),
@@ -539,17 +582,17 @@ public final class GetPublicKeysForRelayQuery: GraphQLQuery {
           GraphQLField("updatedAtEpochMs", type: .nonNull(.scalar(Double.self))),
         ]
 
-        public var snapshot: Snapshot
+        internal var snapshot: Snapshot
 
-        public init(snapshot: Snapshot) {
+        internal init(snapshot: Snapshot) {
           self.snapshot = snapshot
         }
 
-        public init(id: GraphQLID, keyId: String, keyRingId: String, algorithm: String, keyFormat: KeyFormat? = nil, publicKey: String, owner: GraphQLID, version: Int, createdAtEpochMs: Double, updatedAtEpochMs: Double) {
+        internal init(id: GraphQLID, keyId: String, keyRingId: String, algorithm: String, keyFormat: KeyFormat? = nil, publicKey: String, owner: GraphQLID, version: Int, createdAtEpochMs: Double, updatedAtEpochMs: Double) {
           self.init(snapshot: ["__typename": "PublicKey", "id": id, "keyId": keyId, "keyRingId": keyRingId, "algorithm": algorithm, "keyFormat": keyFormat, "publicKey": publicKey, "owner": owner, "version": version, "createdAtEpochMs": createdAtEpochMs, "updatedAtEpochMs": updatedAtEpochMs])
         }
 
-        public var __typename: String {
+        internal var __typename: String {
           get {
             return snapshot["__typename"]! as! String
           }
@@ -558,7 +601,7 @@ public final class GetPublicKeysForRelayQuery: GraphQLQuery {
           }
         }
 
-        public var id: GraphQLID {
+        internal var id: GraphQLID {
           get {
             return snapshot["id"]! as! GraphQLID
           }
@@ -567,7 +610,7 @@ public final class GetPublicKeysForRelayQuery: GraphQLQuery {
           }
         }
 
-        public var keyId: String {
+        internal var keyId: String {
           get {
             return snapshot["keyId"]! as! String
           }
@@ -576,7 +619,7 @@ public final class GetPublicKeysForRelayQuery: GraphQLQuery {
           }
         }
 
-        public var keyRingId: String {
+        internal var keyRingId: String {
           get {
             return snapshot["keyRingId"]! as! String
           }
@@ -585,7 +628,7 @@ public final class GetPublicKeysForRelayQuery: GraphQLQuery {
           }
         }
 
-        public var algorithm: String {
+        internal var algorithm: String {
           get {
             return snapshot["algorithm"]! as! String
           }
@@ -594,7 +637,7 @@ public final class GetPublicKeysForRelayQuery: GraphQLQuery {
           }
         }
 
-        public var keyFormat: KeyFormat? {
+        internal var keyFormat: KeyFormat? {
           get {
             return snapshot["keyFormat"] as? KeyFormat
           }
@@ -603,7 +646,7 @@ public final class GetPublicKeysForRelayQuery: GraphQLQuery {
           }
         }
 
-        public var publicKey: String {
+        internal var publicKey: String {
           get {
             return snapshot["publicKey"]! as! String
           }
@@ -612,7 +655,7 @@ public final class GetPublicKeysForRelayQuery: GraphQLQuery {
           }
         }
 
-        public var owner: GraphQLID {
+        internal var owner: GraphQLID {
           get {
             return snapshot["owner"]! as! GraphQLID
           }
@@ -621,7 +664,7 @@ public final class GetPublicKeysForRelayQuery: GraphQLQuery {
           }
         }
 
-        public var version: Int {
+        internal var version: Int {
           get {
             return snapshot["version"]! as! Int
           }
@@ -630,7 +673,7 @@ public final class GetPublicKeysForRelayQuery: GraphQLQuery {
           }
         }
 
-        public var createdAtEpochMs: Double {
+        internal var createdAtEpochMs: Double {
           get {
             return snapshot["createdAtEpochMs"]! as! Double
           }
@@ -639,7 +682,7 @@ public final class GetPublicKeysForRelayQuery: GraphQLQuery {
           }
         }
 
-        public var updatedAtEpochMs: Double {
+        internal var updatedAtEpochMs: Double {
           get {
             return snapshot["updatedAtEpochMs"]! as! Double
           }
@@ -652,44 +695,44 @@ public final class GetPublicKeysForRelayQuery: GraphQLQuery {
   }
 }
 
-public final class GetKeyRingForRelayQuery: GraphQLQuery {
-  public static let operationString =
+internal final class GetKeyRingForRelayQuery: GraphQLQuery {
+  internal static let operationString =
     "query GetKeyRingForRelay($keyRingId: String!, $limit: Int, $nextToken: String, $keyFormats: [KeyFormat!]) {\n  getKeyRingForRelay(keyRingId: $keyRingId, limit: $limit, nextToken: $nextToken, keyFormats: $keyFormats) {\n    __typename\n    items {\n      __typename\n      id\n      keyId\n      keyRingId\n      algorithm\n      keyFormat\n      publicKey\n      owner\n      version\n      createdAtEpochMs\n      updatedAtEpochMs\n    }\n    nextToken\n  }\n}"
 
-  public var keyRingId: String
-  public var limit: Int?
-  public var nextToken: String?
-  public var keyFormats: [KeyFormat]?
+  internal var keyRingId: String
+  internal var limit: Int?
+  internal var nextToken: String?
+  internal var keyFormats: [KeyFormat]?
 
-  public init(keyRingId: String, limit: Int? = nil, nextToken: String? = nil, keyFormats: [KeyFormat]?) {
+  internal init(keyRingId: String, limit: Int? = nil, nextToken: String? = nil, keyFormats: [KeyFormat]?) {
     self.keyRingId = keyRingId
     self.limit = limit
     self.nextToken = nextToken
     self.keyFormats = keyFormats
   }
 
-  public var variables: GraphQLMap? {
+  internal var variables: GraphQLMap? {
     return ["keyRingId": keyRingId, "limit": limit, "nextToken": nextToken, "keyFormats": keyFormats]
   }
 
-  public struct Data: GraphQLSelectionSet {
-    public static let possibleTypes = ["Query"]
+  internal struct Data: GraphQLSelectionSet {
+    internal static let possibleTypes = ["Query"]
 
-    public static let selections: [GraphQLSelection] = [
+    internal static let selections: [GraphQLSelection] = [
       GraphQLField("getKeyRingForRelay", arguments: ["keyRingId": GraphQLVariable("keyRingId"), "limit": GraphQLVariable("limit"), "nextToken": GraphQLVariable("nextToken"), "keyFormats": GraphQLVariable("keyFormats")], type: .nonNull(.object(GetKeyRingForRelay.selections))),
     ]
 
-    public var snapshot: Snapshot
+    internal var snapshot: Snapshot
 
-    public init(snapshot: Snapshot) {
+    internal init(snapshot: Snapshot) {
       self.snapshot = snapshot
     }
 
-    public init(getKeyRingForRelay: GetKeyRingForRelay) {
+    internal init(getKeyRingForRelay: GetKeyRingForRelay) {
       self.init(snapshot: ["__typename": "Query", "getKeyRingForRelay": getKeyRingForRelay.snapshot])
     }
 
-    public var getKeyRingForRelay: GetKeyRingForRelay {
+    internal var getKeyRingForRelay: GetKeyRingForRelay {
       get {
         return GetKeyRingForRelay(snapshot: snapshot["getKeyRingForRelay"]! as! Snapshot)
       }
@@ -698,26 +741,26 @@ public final class GetKeyRingForRelayQuery: GraphQLQuery {
       }
     }
 
-    public struct GetKeyRingForRelay: GraphQLSelectionSet {
-      public static let possibleTypes = ["PaginatedPublicKey"]
+    internal struct GetKeyRingForRelay: GraphQLSelectionSet {
+      internal static let possibleTypes = ["PaginatedPublicKey"]
 
-      public static let selections: [GraphQLSelection] = [
+      internal static let selections: [GraphQLSelection] = [
         GraphQLField("__typename", type: .nonNull(.scalar(String.self))),
         GraphQLField("items", type: .nonNull(.list(.nonNull(.object(Item.selections))))),
         GraphQLField("nextToken", type: .scalar(String.self)),
       ]
 
-      public var snapshot: Snapshot
+      internal var snapshot: Snapshot
 
-      public init(snapshot: Snapshot) {
+      internal init(snapshot: Snapshot) {
         self.snapshot = snapshot
       }
 
-      public init(items: [Item], nextToken: String? = nil) {
+      internal init(items: [Item], nextToken: String? = nil) {
         self.init(snapshot: ["__typename": "PaginatedPublicKey", "items": items.map { $0.snapshot }, "nextToken": nextToken])
       }
 
-      public var __typename: String {
+      internal var __typename: String {
         get {
           return snapshot["__typename"]! as! String
         }
@@ -726,7 +769,7 @@ public final class GetKeyRingForRelayQuery: GraphQLQuery {
         }
       }
 
-      public var items: [Item] {
+      internal var items: [Item] {
         get {
           return (snapshot["items"] as! [Snapshot]).map { Item(snapshot: $0) }
         }
@@ -735,7 +778,7 @@ public final class GetKeyRingForRelayQuery: GraphQLQuery {
         }
       }
 
-      public var nextToken: String? {
+      internal var nextToken: String? {
         get {
           return snapshot["nextToken"] as? String
         }
@@ -744,10 +787,10 @@ public final class GetKeyRingForRelayQuery: GraphQLQuery {
         }
       }
 
-      public struct Item: GraphQLSelectionSet {
-        public static let possibleTypes = ["PublicKey"]
+      internal struct Item: GraphQLSelectionSet {
+        internal static let possibleTypes = ["PublicKey"]
 
-        public static let selections: [GraphQLSelection] = [
+        internal static let selections: [GraphQLSelection] = [
           GraphQLField("__typename", type: .nonNull(.scalar(String.self))),
           GraphQLField("id", type: .nonNull(.scalar(GraphQLID.self))),
           GraphQLField("keyId", type: .nonNull(.scalar(String.self))),
@@ -761,17 +804,17 @@ public final class GetKeyRingForRelayQuery: GraphQLQuery {
           GraphQLField("updatedAtEpochMs", type: .nonNull(.scalar(Double.self))),
         ]
 
-        public var snapshot: Snapshot
+        internal var snapshot: Snapshot
 
-        public init(snapshot: Snapshot) {
+        internal init(snapshot: Snapshot) {
           self.snapshot = snapshot
         }
 
-        public init(id: GraphQLID, keyId: String, keyRingId: String, algorithm: String, keyFormat: KeyFormat? = nil, publicKey: String, owner: GraphQLID, version: Int, createdAtEpochMs: Double, updatedAtEpochMs: Double) {
+        internal init(id: GraphQLID, keyId: String, keyRingId: String, algorithm: String, keyFormat: KeyFormat? = nil, publicKey: String, owner: GraphQLID, version: Int, createdAtEpochMs: Double, updatedAtEpochMs: Double) {
           self.init(snapshot: ["__typename": "PublicKey", "id": id, "keyId": keyId, "keyRingId": keyRingId, "algorithm": algorithm, "keyFormat": keyFormat, "publicKey": publicKey, "owner": owner, "version": version, "createdAtEpochMs": createdAtEpochMs, "updatedAtEpochMs": updatedAtEpochMs])
         }
 
-        public var __typename: String {
+        internal var __typename: String {
           get {
             return snapshot["__typename"]! as! String
           }
@@ -780,7 +823,7 @@ public final class GetKeyRingForRelayQuery: GraphQLQuery {
           }
         }
 
-        public var id: GraphQLID {
+        internal var id: GraphQLID {
           get {
             return snapshot["id"]! as! GraphQLID
           }
@@ -789,7 +832,7 @@ public final class GetKeyRingForRelayQuery: GraphQLQuery {
           }
         }
 
-        public var keyId: String {
+        internal var keyId: String {
           get {
             return snapshot["keyId"]! as! String
           }
@@ -798,7 +841,7 @@ public final class GetKeyRingForRelayQuery: GraphQLQuery {
           }
         }
 
-        public var keyRingId: String {
+        internal var keyRingId: String {
           get {
             return snapshot["keyRingId"]! as! String
           }
@@ -807,7 +850,7 @@ public final class GetKeyRingForRelayQuery: GraphQLQuery {
           }
         }
 
-        public var algorithm: String {
+        internal var algorithm: String {
           get {
             return snapshot["algorithm"]! as! String
           }
@@ -816,7 +859,7 @@ public final class GetKeyRingForRelayQuery: GraphQLQuery {
           }
         }
 
-        public var keyFormat: KeyFormat? {
+        internal var keyFormat: KeyFormat? {
           get {
             return snapshot["keyFormat"] as? KeyFormat
           }
@@ -825,7 +868,7 @@ public final class GetKeyRingForRelayQuery: GraphQLQuery {
           }
         }
 
-        public var publicKey: String {
+        internal var publicKey: String {
           get {
             return snapshot["publicKey"]! as! String
           }
@@ -834,7 +877,7 @@ public final class GetKeyRingForRelayQuery: GraphQLQuery {
           }
         }
 
-        public var owner: GraphQLID {
+        internal var owner: GraphQLID {
           get {
             return snapshot["owner"]! as! GraphQLID
           }
@@ -843,7 +886,7 @@ public final class GetKeyRingForRelayQuery: GraphQLQuery {
           }
         }
 
-        public var version: Int {
+        internal var version: Int {
           get {
             return snapshot["version"]! as! Int
           }
@@ -852,7 +895,7 @@ public final class GetKeyRingForRelayQuery: GraphQLQuery {
           }
         }
 
-        public var createdAtEpochMs: Double {
+        internal var createdAtEpochMs: Double {
           get {
             return snapshot["createdAtEpochMs"]! as! Double
           }
@@ -861,7 +904,7 @@ public final class GetKeyRingForRelayQuery: GraphQLQuery {
           }
         }
 
-        public var updatedAtEpochMs: Double {
+        internal var updatedAtEpochMs: Double {
           get {
             return snapshot["updatedAtEpochMs"]! as! Double
           }
@@ -874,38 +917,38 @@ public final class GetKeyRingForRelayQuery: GraphQLQuery {
   }
 }
 
-public final class GetMessagesQuery: GraphQLQuery {
-  public static let operationString =
+internal final class GetMessagesQuery: GraphQLQuery {
+  internal static let operationString =
     "query GetMessages($input: IdAsInput!) {\n  getMessages(input: $input) {\n    __typename\n    messageId\n    connectionId\n    cipherText\n    direction\n    utcTimestamp\n  }\n}"
 
-  public var input: IdAsInput
+  internal var input: IdAsInput
 
-  public init(input: IdAsInput) {
+  internal init(input: IdAsInput) {
     self.input = input
   }
 
-  public var variables: GraphQLMap? {
+  internal var variables: GraphQLMap? {
     return ["input": input]
   }
 
-  public struct Data: GraphQLSelectionSet {
-    public static let possibleTypes = ["Query"]
+  internal struct Data: GraphQLSelectionSet {
+    internal static let possibleTypes = ["Query"]
 
-    public static let selections: [GraphQLSelection] = [
+    internal static let selections: [GraphQLSelection] = [
       GraphQLField("getMessages", arguments: ["input": GraphQLVariable("input")], type: .nonNull(.list(.object(GetMessage.selections)))),
     ]
 
-    public var snapshot: Snapshot
+    internal var snapshot: Snapshot
 
-    public init(snapshot: Snapshot) {
+    internal init(snapshot: Snapshot) {
       self.snapshot = snapshot
     }
 
-    public init(getMessages: [GetMessage?]) {
+    internal init(getMessages: [GetMessage?]) {
       self.init(snapshot: ["__typename": "Query", "getMessages": getMessages.map { $0.flatMap { $0.snapshot } }])
     }
 
-    public var getMessages: [GetMessage?] {
+    internal var getMessages: [GetMessage?] {
       get {
         return (snapshot["getMessages"] as! [Snapshot?]).map { $0.flatMap { GetMessage(snapshot: $0) } }
       }
@@ -914,10 +957,10 @@ public final class GetMessagesQuery: GraphQLQuery {
       }
     }
 
-    public struct GetMessage: GraphQLSelectionSet {
-      public static let possibleTypes = ["MessageEntry"]
+    internal struct GetMessage: GraphQLSelectionSet {
+      internal static let possibleTypes = ["MessageEntry"]
 
-      public static let selections: [GraphQLSelection] = [
+      internal static let selections: [GraphQLSelection] = [
         GraphQLField("__typename", type: .nonNull(.scalar(String.self))),
         GraphQLField("messageId", type: .nonNull(.scalar(GraphQLID.self))),
         GraphQLField("connectionId", type: .nonNull(.scalar(GraphQLID.self))),
@@ -926,17 +969,17 @@ public final class GetMessagesQuery: GraphQLQuery {
         GraphQLField("utcTimestamp", type: .nonNull(.scalar(Double.self))),
       ]
 
-      public var snapshot: Snapshot
+      internal var snapshot: Snapshot
 
-      public init(snapshot: Snapshot) {
+      internal init(snapshot: Snapshot) {
         self.snapshot = snapshot
       }
 
-      public init(messageId: GraphQLID, connectionId: GraphQLID, cipherText: String, direction: Direction, utcTimestamp: Double) {
+      internal init(messageId: GraphQLID, connectionId: GraphQLID, cipherText: String, direction: Direction, utcTimestamp: Double) {
         self.init(snapshot: ["__typename": "MessageEntry", "messageId": messageId, "connectionId": connectionId, "cipherText": cipherText, "direction": direction, "utcTimestamp": utcTimestamp])
       }
 
-      public var __typename: String {
+      internal var __typename: String {
         get {
           return snapshot["__typename"]! as! String
         }
@@ -945,7 +988,7 @@ public final class GetMessagesQuery: GraphQLQuery {
         }
       }
 
-      public var messageId: GraphQLID {
+      internal var messageId: GraphQLID {
         get {
           return snapshot["messageId"]! as! GraphQLID
         }
@@ -954,7 +997,7 @@ public final class GetMessagesQuery: GraphQLQuery {
         }
       }
 
-      public var connectionId: GraphQLID {
+      internal var connectionId: GraphQLID {
         get {
           return snapshot["connectionId"]! as! GraphQLID
         }
@@ -963,7 +1006,7 @@ public final class GetMessagesQuery: GraphQLQuery {
         }
       }
 
-      public var cipherText: String {
+      internal var cipherText: String {
         get {
           return snapshot["cipherText"]! as! String
         }
@@ -972,7 +1015,7 @@ public final class GetMessagesQuery: GraphQLQuery {
         }
       }
 
-      public var direction: Direction {
+      internal var direction: Direction {
         get {
           return snapshot["direction"]! as! Direction
         }
@@ -981,7 +1024,7 @@ public final class GetMessagesQuery: GraphQLQuery {
         }
       }
 
-      public var utcTimestamp: Double {
+      internal var utcTimestamp: Double {
         get {
           return snapshot["utcTimestamp"]! as! Double
         }
@@ -993,38 +1036,147 @@ public final class GetMessagesQuery: GraphQLQuery {
   }
 }
 
-public final class CreatePublicKeyForRelayMutation: GraphQLMutation {
-  public static let operationString =
-    "mutation CreatePublicKeyForRelay($input: CreatePublicKeyInput!) {\n  createPublicKeyForRelay(input: $input) {\n    __typename\n    id\n    keyId\n    keyRingId\n    algorithm\n    keyFormat\n    publicKey\n    owner\n    version\n    createdAtEpochMs\n    updatedAtEpochMs\n  }\n}"
+internal final class ListPostboxesForSudoIdQuery: GraphQLQuery {
+  internal static let operationString =
+    "query ListPostboxesForSudoId($input: ListPostboxesForSudoIdInput) {\n  listPostboxesForSudoId(input: $input) {\n    __typename\n    connectionId\n    sudoId\n    owner\n    utcTimestamp\n  }\n}"
 
-  public var input: CreatePublicKeyInput
+  internal var input: ListPostboxesForSudoIdInput?
 
-  public init(input: CreatePublicKeyInput) {
+  internal init(input: ListPostboxesForSudoIdInput? = nil) {
     self.input = input
   }
 
-  public var variables: GraphQLMap? {
+  internal var variables: GraphQLMap? {
     return ["input": input]
   }
 
-  public struct Data: GraphQLSelectionSet {
-    public static let possibleTypes = ["Mutation"]
+  internal struct Data: GraphQLSelectionSet {
+    internal static let possibleTypes = ["Query"]
 
-    public static let selections: [GraphQLSelection] = [
-      GraphQLField("createPublicKeyForRelay", arguments: ["input": GraphQLVariable("input")], type: .nonNull(.object(CreatePublicKeyForRelay.selections))),
+    internal static let selections: [GraphQLSelection] = [
+      GraphQLField("listPostboxesForSudoId", arguments: ["input": GraphQLVariable("input")], type: .nonNull(.list(.object(ListPostboxesForSudoId.selections)))),
     ]
 
-    public var snapshot: Snapshot
+    internal var snapshot: Snapshot
 
-    public init(snapshot: Snapshot) {
+    internal init(snapshot: Snapshot) {
       self.snapshot = snapshot
     }
 
-    public init(createPublicKeyForRelay: CreatePublicKeyForRelay) {
+    internal init(listPostboxesForSudoId: [ListPostboxesForSudoId?]) {
+      self.init(snapshot: ["__typename": "Query", "listPostboxesForSudoId": listPostboxesForSudoId.map { $0.flatMap { $0.snapshot } }])
+    }
+
+    internal var listPostboxesForSudoId: [ListPostboxesForSudoId?] {
+      get {
+        return (snapshot["listPostboxesForSudoId"] as! [Snapshot?]).map { $0.flatMap { ListPostboxesForSudoId(snapshot: $0) } }
+      }
+      set {
+        snapshot.updateValue(newValue.map { $0.flatMap { $0.snapshot } }, forKey: "listPostboxesForSudoId")
+      }
+    }
+
+    internal struct ListPostboxesForSudoId: GraphQLSelectionSet {
+      internal static let possibleTypes = ["ListPostboxesForSudoIdResult"]
+
+      internal static let selections: [GraphQLSelection] = [
+        GraphQLField("__typename", type: .nonNull(.scalar(String.self))),
+        GraphQLField("connectionId", type: .nonNull(.scalar(GraphQLID.self))),
+        GraphQLField("sudoId", type: .nonNull(.scalar(GraphQLID.self))),
+        GraphQLField("owner", type: .nonNull(.scalar(GraphQLID.self))),
+        GraphQLField("utcTimestamp", type: .nonNull(.scalar(Double.self))),
+      ]
+
+      internal var snapshot: Snapshot
+
+      internal init(snapshot: Snapshot) {
+        self.snapshot = snapshot
+      }
+
+      internal init(connectionId: GraphQLID, sudoId: GraphQLID, owner: GraphQLID, utcTimestamp: Double) {
+        self.init(snapshot: ["__typename": "ListPostboxesForSudoIdResult", "connectionId": connectionId, "sudoId": sudoId, "owner": owner, "utcTimestamp": utcTimestamp])
+      }
+
+      internal var __typename: String {
+        get {
+          return snapshot["__typename"]! as! String
+        }
+        set {
+          snapshot.updateValue(newValue, forKey: "__typename")
+        }
+      }
+
+      internal var connectionId: GraphQLID {
+        get {
+          return snapshot["connectionId"]! as! GraphQLID
+        }
+        set {
+          snapshot.updateValue(newValue, forKey: "connectionId")
+        }
+      }
+
+      internal var sudoId: GraphQLID {
+        get {
+          return snapshot["sudoId"]! as! GraphQLID
+        }
+        set {
+          snapshot.updateValue(newValue, forKey: "sudoId")
+        }
+      }
+
+      internal var owner: GraphQLID {
+        get {
+          return snapshot["owner"]! as! GraphQLID
+        }
+        set {
+          snapshot.updateValue(newValue, forKey: "owner")
+        }
+      }
+
+      internal var utcTimestamp: Double {
+        get {
+          return snapshot["utcTimestamp"]! as! Double
+        }
+        set {
+          snapshot.updateValue(newValue, forKey: "utcTimestamp")
+        }
+      }
+    }
+  }
+}
+
+internal final class CreatePublicKeyForRelayMutation: GraphQLMutation {
+  internal static let operationString =
+    "mutation CreatePublicKeyForRelay($input: CreatePublicKeyInput!) {\n  createPublicKeyForRelay(input: $input) {\n    __typename\n    id\n    keyId\n    keyRingId\n    algorithm\n    keyFormat\n    publicKey\n    owner\n    version\n    createdAtEpochMs\n    updatedAtEpochMs\n  }\n}"
+
+  internal var input: CreatePublicKeyInput
+
+  internal init(input: CreatePublicKeyInput) {
+    self.input = input
+  }
+
+  internal var variables: GraphQLMap? {
+    return ["input": input]
+  }
+
+  internal struct Data: GraphQLSelectionSet {
+    internal static let possibleTypes = ["Mutation"]
+
+    internal static let selections: [GraphQLSelection] = [
+      GraphQLField("createPublicKeyForRelay", arguments: ["input": GraphQLVariable("input")], type: .nonNull(.object(CreatePublicKeyForRelay.selections))),
+    ]
+
+    internal var snapshot: Snapshot
+
+    internal init(snapshot: Snapshot) {
+      self.snapshot = snapshot
+    }
+
+    internal init(createPublicKeyForRelay: CreatePublicKeyForRelay) {
       self.init(snapshot: ["__typename": "Mutation", "createPublicKeyForRelay": createPublicKeyForRelay.snapshot])
     }
 
-    public var createPublicKeyForRelay: CreatePublicKeyForRelay {
+    internal var createPublicKeyForRelay: CreatePublicKeyForRelay {
       get {
         return CreatePublicKeyForRelay(snapshot: snapshot["createPublicKeyForRelay"]! as! Snapshot)
       }
@@ -1033,10 +1185,10 @@ public final class CreatePublicKeyForRelayMutation: GraphQLMutation {
       }
     }
 
-    public struct CreatePublicKeyForRelay: GraphQLSelectionSet {
-      public static let possibleTypes = ["PublicKey"]
+    internal struct CreatePublicKeyForRelay: GraphQLSelectionSet {
+      internal static let possibleTypes = ["PublicKey"]
 
-      public static let selections: [GraphQLSelection] = [
+      internal static let selections: [GraphQLSelection] = [
         GraphQLField("__typename", type: .nonNull(.scalar(String.self))),
         GraphQLField("id", type: .nonNull(.scalar(GraphQLID.self))),
         GraphQLField("keyId", type: .nonNull(.scalar(String.self))),
@@ -1050,17 +1202,17 @@ public final class CreatePublicKeyForRelayMutation: GraphQLMutation {
         GraphQLField("updatedAtEpochMs", type: .nonNull(.scalar(Double.self))),
       ]
 
-      public var snapshot: Snapshot
+      internal var snapshot: Snapshot
 
-      public init(snapshot: Snapshot) {
+      internal init(snapshot: Snapshot) {
         self.snapshot = snapshot
       }
 
-      public init(id: GraphQLID, keyId: String, keyRingId: String, algorithm: String, keyFormat: KeyFormat? = nil, publicKey: String, owner: GraphQLID, version: Int, createdAtEpochMs: Double, updatedAtEpochMs: Double) {
+      internal init(id: GraphQLID, keyId: String, keyRingId: String, algorithm: String, keyFormat: KeyFormat? = nil, publicKey: String, owner: GraphQLID, version: Int, createdAtEpochMs: Double, updatedAtEpochMs: Double) {
         self.init(snapshot: ["__typename": "PublicKey", "id": id, "keyId": keyId, "keyRingId": keyRingId, "algorithm": algorithm, "keyFormat": keyFormat, "publicKey": publicKey, "owner": owner, "version": version, "createdAtEpochMs": createdAtEpochMs, "updatedAtEpochMs": updatedAtEpochMs])
       }
 
-      public var __typename: String {
+      internal var __typename: String {
         get {
           return snapshot["__typename"]! as! String
         }
@@ -1069,7 +1221,7 @@ public final class CreatePublicKeyForRelayMutation: GraphQLMutation {
         }
       }
 
-      public var id: GraphQLID {
+      internal var id: GraphQLID {
         get {
           return snapshot["id"]! as! GraphQLID
         }
@@ -1078,7 +1230,7 @@ public final class CreatePublicKeyForRelayMutation: GraphQLMutation {
         }
       }
 
-      public var keyId: String {
+      internal var keyId: String {
         get {
           return snapshot["keyId"]! as! String
         }
@@ -1087,7 +1239,7 @@ public final class CreatePublicKeyForRelayMutation: GraphQLMutation {
         }
       }
 
-      public var keyRingId: String {
+      internal var keyRingId: String {
         get {
           return snapshot["keyRingId"]! as! String
         }
@@ -1096,7 +1248,7 @@ public final class CreatePublicKeyForRelayMutation: GraphQLMutation {
         }
       }
 
-      public var algorithm: String {
+      internal var algorithm: String {
         get {
           return snapshot["algorithm"]! as! String
         }
@@ -1105,7 +1257,7 @@ public final class CreatePublicKeyForRelayMutation: GraphQLMutation {
         }
       }
 
-      public var keyFormat: KeyFormat? {
+      internal var keyFormat: KeyFormat? {
         get {
           return snapshot["keyFormat"] as? KeyFormat
         }
@@ -1114,7 +1266,7 @@ public final class CreatePublicKeyForRelayMutation: GraphQLMutation {
         }
       }
 
-      public var publicKey: String {
+      internal var publicKey: String {
         get {
           return snapshot["publicKey"]! as! String
         }
@@ -1123,7 +1275,7 @@ public final class CreatePublicKeyForRelayMutation: GraphQLMutation {
         }
       }
 
-      public var owner: GraphQLID {
+      internal var owner: GraphQLID {
         get {
           return snapshot["owner"]! as! GraphQLID
         }
@@ -1132,7 +1284,7 @@ public final class CreatePublicKeyForRelayMutation: GraphQLMutation {
         }
       }
 
-      public var version: Int {
+      internal var version: Int {
         get {
           return snapshot["version"]! as! Int
         }
@@ -1141,7 +1293,7 @@ public final class CreatePublicKeyForRelayMutation: GraphQLMutation {
         }
       }
 
-      public var createdAtEpochMs: Double {
+      internal var createdAtEpochMs: Double {
         get {
           return snapshot["createdAtEpochMs"]! as! Double
         }
@@ -1150,7 +1302,7 @@ public final class CreatePublicKeyForRelayMutation: GraphQLMutation {
         }
       }
 
-      public var updatedAtEpochMs: Double {
+      internal var updatedAtEpochMs: Double {
         get {
           return snapshot["updatedAtEpochMs"]! as! Double
         }
@@ -1162,38 +1314,38 @@ public final class CreatePublicKeyForRelayMutation: GraphQLMutation {
   }
 }
 
-public final class DeletePublicKeyForRelayMutation: GraphQLMutation {
-  public static let operationString =
+internal final class DeletePublicKeyForRelayMutation: GraphQLMutation {
+  internal static let operationString =
     "mutation DeletePublicKeyForRelay($input: DeletePublicKeyInput) {\n  deletePublicKeyForRelay(input: $input) {\n    __typename\n    id\n    keyId\n    keyRingId\n    algorithm\n    keyFormat\n    publicKey\n    owner\n    version\n    createdAtEpochMs\n    updatedAtEpochMs\n  }\n}"
 
-  public var input: DeletePublicKeyInput?
+  internal var input: DeletePublicKeyInput?
 
-  public init(input: DeletePublicKeyInput? = nil) {
+  internal init(input: DeletePublicKeyInput? = nil) {
     self.input = input
   }
 
-  public var variables: GraphQLMap? {
+  internal var variables: GraphQLMap? {
     return ["input": input]
   }
 
-  public struct Data: GraphQLSelectionSet {
-    public static let possibleTypes = ["Mutation"]
+  internal struct Data: GraphQLSelectionSet {
+    internal static let possibleTypes = ["Mutation"]
 
-    public static let selections: [GraphQLSelection] = [
+    internal static let selections: [GraphQLSelection] = [
       GraphQLField("deletePublicKeyForRelay", arguments: ["input": GraphQLVariable("input")], type: .object(DeletePublicKeyForRelay.selections)),
     ]
 
-    public var snapshot: Snapshot
+    internal var snapshot: Snapshot
 
-    public init(snapshot: Snapshot) {
+    internal init(snapshot: Snapshot) {
       self.snapshot = snapshot
     }
 
-    public init(deletePublicKeyForRelay: DeletePublicKeyForRelay? = nil) {
+    internal init(deletePublicKeyForRelay: DeletePublicKeyForRelay? = nil) {
       self.init(snapshot: ["__typename": "Mutation", "deletePublicKeyForRelay": deletePublicKeyForRelay.flatMap { $0.snapshot }])
     }
 
-    public var deletePublicKeyForRelay: DeletePublicKeyForRelay? {
+    internal var deletePublicKeyForRelay: DeletePublicKeyForRelay? {
       get {
         return (snapshot["deletePublicKeyForRelay"] as? Snapshot).flatMap { DeletePublicKeyForRelay(snapshot: $0) }
       }
@@ -1202,10 +1354,10 @@ public final class DeletePublicKeyForRelayMutation: GraphQLMutation {
       }
     }
 
-    public struct DeletePublicKeyForRelay: GraphQLSelectionSet {
-      public static let possibleTypes = ["PublicKey"]
+    internal struct DeletePublicKeyForRelay: GraphQLSelectionSet {
+      internal static let possibleTypes = ["PublicKey"]
 
-      public static let selections: [GraphQLSelection] = [
+      internal static let selections: [GraphQLSelection] = [
         GraphQLField("__typename", type: .nonNull(.scalar(String.self))),
         GraphQLField("id", type: .nonNull(.scalar(GraphQLID.self))),
         GraphQLField("keyId", type: .nonNull(.scalar(String.self))),
@@ -1219,17 +1371,17 @@ public final class DeletePublicKeyForRelayMutation: GraphQLMutation {
         GraphQLField("updatedAtEpochMs", type: .nonNull(.scalar(Double.self))),
       ]
 
-      public var snapshot: Snapshot
+      internal var snapshot: Snapshot
 
-      public init(snapshot: Snapshot) {
+      internal init(snapshot: Snapshot) {
         self.snapshot = snapshot
       }
 
-      public init(id: GraphQLID, keyId: String, keyRingId: String, algorithm: String, keyFormat: KeyFormat? = nil, publicKey: String, owner: GraphQLID, version: Int, createdAtEpochMs: Double, updatedAtEpochMs: Double) {
+      internal init(id: GraphQLID, keyId: String, keyRingId: String, algorithm: String, keyFormat: KeyFormat? = nil, publicKey: String, owner: GraphQLID, version: Int, createdAtEpochMs: Double, updatedAtEpochMs: Double) {
         self.init(snapshot: ["__typename": "PublicKey", "id": id, "keyId": keyId, "keyRingId": keyRingId, "algorithm": algorithm, "keyFormat": keyFormat, "publicKey": publicKey, "owner": owner, "version": version, "createdAtEpochMs": createdAtEpochMs, "updatedAtEpochMs": updatedAtEpochMs])
       }
 
-      public var __typename: String {
+      internal var __typename: String {
         get {
           return snapshot["__typename"]! as! String
         }
@@ -1238,7 +1390,7 @@ public final class DeletePublicKeyForRelayMutation: GraphQLMutation {
         }
       }
 
-      public var id: GraphQLID {
+      internal var id: GraphQLID {
         get {
           return snapshot["id"]! as! GraphQLID
         }
@@ -1247,7 +1399,7 @@ public final class DeletePublicKeyForRelayMutation: GraphQLMutation {
         }
       }
 
-      public var keyId: String {
+      internal var keyId: String {
         get {
           return snapshot["keyId"]! as! String
         }
@@ -1256,7 +1408,7 @@ public final class DeletePublicKeyForRelayMutation: GraphQLMutation {
         }
       }
 
-      public var keyRingId: String {
+      internal var keyRingId: String {
         get {
           return snapshot["keyRingId"]! as! String
         }
@@ -1265,7 +1417,7 @@ public final class DeletePublicKeyForRelayMutation: GraphQLMutation {
         }
       }
 
-      public var algorithm: String {
+      internal var algorithm: String {
         get {
           return snapshot["algorithm"]! as! String
         }
@@ -1274,7 +1426,7 @@ public final class DeletePublicKeyForRelayMutation: GraphQLMutation {
         }
       }
 
-      public var keyFormat: KeyFormat? {
+      internal var keyFormat: KeyFormat? {
         get {
           return snapshot["keyFormat"] as? KeyFormat
         }
@@ -1283,7 +1435,7 @@ public final class DeletePublicKeyForRelayMutation: GraphQLMutation {
         }
       }
 
-      public var publicKey: String {
+      internal var publicKey: String {
         get {
           return snapshot["publicKey"]! as! String
         }
@@ -1292,7 +1444,7 @@ public final class DeletePublicKeyForRelayMutation: GraphQLMutation {
         }
       }
 
-      public var owner: GraphQLID {
+      internal var owner: GraphQLID {
         get {
           return snapshot["owner"]! as! GraphQLID
         }
@@ -1301,7 +1453,7 @@ public final class DeletePublicKeyForRelayMutation: GraphQLMutation {
         }
       }
 
-      public var version: Int {
+      internal var version: Int {
         get {
           return snapshot["version"]! as! Int
         }
@@ -1310,7 +1462,7 @@ public final class DeletePublicKeyForRelayMutation: GraphQLMutation {
         }
       }
 
-      public var createdAtEpochMs: Double {
+      internal var createdAtEpochMs: Double {
         get {
           return snapshot["createdAtEpochMs"]! as! Double
         }
@@ -1319,7 +1471,7 @@ public final class DeletePublicKeyForRelayMutation: GraphQLMutation {
         }
       }
 
-      public var updatedAtEpochMs: Double {
+      internal var updatedAtEpochMs: Double {
         get {
           return snapshot["updatedAtEpochMs"]! as! Double
         }
@@ -1331,38 +1483,38 @@ public final class DeletePublicKeyForRelayMutation: GraphQLMutation {
   }
 }
 
-public final class SendInitMutation: GraphQLMutation {
-  public static let operationString =
-    "mutation SendInit($input: IdAsInput!) {\n  sendInit(input: $input) {\n    __typename\n    connectionId\n    owner\n    utcTimestamp\n  }\n}"
+internal final class SendInitMutation: GraphQLMutation {
+  internal static let operationString =
+    "mutation SendInit($input: CreatePostboxInput!) {\n  sendInit(input: $input) {\n    __typename\n    connectionId\n    owner\n    utcTimestamp\n  }\n}"
 
-  public var input: IdAsInput
+  internal var input: CreatePostboxInput
 
-  public init(input: IdAsInput) {
+  internal init(input: CreatePostboxInput) {
     self.input = input
   }
 
-  public var variables: GraphQLMap? {
+  internal var variables: GraphQLMap? {
     return ["input": input]
   }
 
-  public struct Data: GraphQLSelectionSet {
-    public static let possibleTypes = ["Mutation"]
+  internal struct Data: GraphQLSelectionSet {
+    internal static let possibleTypes = ["Mutation"]
 
-    public static let selections: [GraphQLSelection] = [
+    internal static let selections: [GraphQLSelection] = [
       GraphQLField("sendInit", arguments: ["input": GraphQLVariable("input")], type: .object(SendInit.selections)),
     ]
 
-    public var snapshot: Snapshot
+    internal var snapshot: Snapshot
 
-    public init(snapshot: Snapshot) {
+    internal init(snapshot: Snapshot) {
       self.snapshot = snapshot
     }
 
-    public init(sendInit: SendInit? = nil) {
+    internal init(sendInit: SendInit? = nil) {
       self.init(snapshot: ["__typename": "Mutation", "sendInit": sendInit.flatMap { $0.snapshot }])
     }
 
-    public var sendInit: SendInit? {
+    internal var sendInit: SendInit? {
       get {
         return (snapshot["sendInit"] as? Snapshot).flatMap { SendInit(snapshot: $0) }
       }
@@ -1371,27 +1523,27 @@ public final class SendInitMutation: GraphQLMutation {
       }
     }
 
-    public struct SendInit: GraphQLSelectionSet {
-      public static let possibleTypes = ["CreatePostboxResult"]
+    internal struct SendInit: GraphQLSelectionSet {
+      internal static let possibleTypes = ["CreatePostboxResult"]
 
-      public static let selections: [GraphQLSelection] = [
+      internal static let selections: [GraphQLSelection] = [
         GraphQLField("__typename", type: .nonNull(.scalar(String.self))),
         GraphQLField("connectionId", type: .nonNull(.scalar(GraphQLID.self))),
         GraphQLField("owner", type: .nonNull(.scalar(String.self))),
         GraphQLField("utcTimestamp", type: .nonNull(.scalar(Double.self))),
       ]
 
-      public var snapshot: Snapshot
+      internal var snapshot: Snapshot
 
-      public init(snapshot: Snapshot) {
+      internal init(snapshot: Snapshot) {
         self.snapshot = snapshot
       }
 
-      public init(connectionId: GraphQLID, owner: String, utcTimestamp: Double) {
+      internal init(connectionId: GraphQLID, owner: String, utcTimestamp: Double) {
         self.init(snapshot: ["__typename": "CreatePostboxResult", "connectionId": connectionId, "owner": owner, "utcTimestamp": utcTimestamp])
       }
 
-      public var __typename: String {
+      internal var __typename: String {
         get {
           return snapshot["__typename"]! as! String
         }
@@ -1400,7 +1552,7 @@ public final class SendInitMutation: GraphQLMutation {
         }
       }
 
-      public var connectionId: GraphQLID {
+      internal var connectionId: GraphQLID {
         get {
           return snapshot["connectionId"]! as! GraphQLID
         }
@@ -1409,7 +1561,7 @@ public final class SendInitMutation: GraphQLMutation {
         }
       }
 
-      public var owner: String {
+      internal var owner: String {
         get {
           return snapshot["owner"]! as! String
         }
@@ -1418,7 +1570,7 @@ public final class SendInitMutation: GraphQLMutation {
         }
       }
 
-      public var utcTimestamp: Double {
+      internal var utcTimestamp: Double {
         get {
           return snapshot["utcTimestamp"]! as! Double
         }
@@ -1430,38 +1582,38 @@ public final class SendInitMutation: GraphQLMutation {
   }
 }
 
-public final class StoreMessageMutation: GraphQLMutation {
-  public static let operationString =
+internal final class StoreMessageMutation: GraphQLMutation {
+  internal static let operationString =
     "mutation StoreMessage($input: WriteToRelayInput!) {\n  storeMessage(input: $input) {\n    __typename\n    messageId\n    connectionId\n    cipherText\n    direction\n    utcTimestamp\n  }\n}"
 
-  public var input: WriteToRelayInput
+  internal var input: WriteToRelayInput
 
-  public init(input: WriteToRelayInput) {
+  internal init(input: WriteToRelayInput) {
     self.input = input
   }
 
-  public var variables: GraphQLMap? {
+  internal var variables: GraphQLMap? {
     return ["input": input]
   }
 
-  public struct Data: GraphQLSelectionSet {
-    public static let possibleTypes = ["Mutation"]
+  internal struct Data: GraphQLSelectionSet {
+    internal static let possibleTypes = ["Mutation"]
 
-    public static let selections: [GraphQLSelection] = [
+    internal static let selections: [GraphQLSelection] = [
       GraphQLField("storeMessage", arguments: ["input": GraphQLVariable("input")], type: .object(StoreMessage.selections)),
     ]
 
-    public var snapshot: Snapshot
+    internal var snapshot: Snapshot
 
-    public init(snapshot: Snapshot) {
+    internal init(snapshot: Snapshot) {
       self.snapshot = snapshot
     }
 
-    public init(storeMessage: StoreMessage? = nil) {
+    internal init(storeMessage: StoreMessage? = nil) {
       self.init(snapshot: ["__typename": "Mutation", "storeMessage": storeMessage.flatMap { $0.snapshot }])
     }
 
-    public var storeMessage: StoreMessage? {
+    internal var storeMessage: StoreMessage? {
       get {
         return (snapshot["storeMessage"] as? Snapshot).flatMap { StoreMessage(snapshot: $0) }
       }
@@ -1470,10 +1622,10 @@ public final class StoreMessageMutation: GraphQLMutation {
       }
     }
 
-    public struct StoreMessage: GraphQLSelectionSet {
-      public static let possibleTypes = ["MessageEntry"]
+    internal struct StoreMessage: GraphQLSelectionSet {
+      internal static let possibleTypes = ["MessageEntry"]
 
-      public static let selections: [GraphQLSelection] = [
+      internal static let selections: [GraphQLSelection] = [
         GraphQLField("__typename", type: .nonNull(.scalar(String.self))),
         GraphQLField("messageId", type: .nonNull(.scalar(GraphQLID.self))),
         GraphQLField("connectionId", type: .nonNull(.scalar(GraphQLID.self))),
@@ -1482,17 +1634,17 @@ public final class StoreMessageMutation: GraphQLMutation {
         GraphQLField("utcTimestamp", type: .nonNull(.scalar(Double.self))),
       ]
 
-      public var snapshot: Snapshot
+      internal var snapshot: Snapshot
 
-      public init(snapshot: Snapshot) {
+      internal init(snapshot: Snapshot) {
         self.snapshot = snapshot
       }
 
-      public init(messageId: GraphQLID, connectionId: GraphQLID, cipherText: String, direction: Direction, utcTimestamp: Double) {
+      internal init(messageId: GraphQLID, connectionId: GraphQLID, cipherText: String, direction: Direction, utcTimestamp: Double) {
         self.init(snapshot: ["__typename": "MessageEntry", "messageId": messageId, "connectionId": connectionId, "cipherText": cipherText, "direction": direction, "utcTimestamp": utcTimestamp])
       }
 
-      public var __typename: String {
+      internal var __typename: String {
         get {
           return snapshot["__typename"]! as! String
         }
@@ -1501,7 +1653,7 @@ public final class StoreMessageMutation: GraphQLMutation {
         }
       }
 
-      public var messageId: GraphQLID {
+      internal var messageId: GraphQLID {
         get {
           return snapshot["messageId"]! as! GraphQLID
         }
@@ -1510,7 +1662,7 @@ public final class StoreMessageMutation: GraphQLMutation {
         }
       }
 
-      public var connectionId: GraphQLID {
+      internal var connectionId: GraphQLID {
         get {
           return snapshot["connectionId"]! as! GraphQLID
         }
@@ -1519,7 +1671,7 @@ public final class StoreMessageMutation: GraphQLMutation {
         }
       }
 
-      public var cipherText: String {
+      internal var cipherText: String {
         get {
           return snapshot["cipherText"]! as! String
         }
@@ -1528,7 +1680,7 @@ public final class StoreMessageMutation: GraphQLMutation {
         }
       }
 
-      public var direction: Direction {
+      internal var direction: Direction {
         get {
           return snapshot["direction"]! as! Direction
         }
@@ -1537,7 +1689,7 @@ public final class StoreMessageMutation: GraphQLMutation {
         }
       }
 
-      public var utcTimestamp: Double {
+      internal var utcTimestamp: Double {
         get {
           return snapshot["utcTimestamp"]! as! Double
         }
@@ -1549,38 +1701,38 @@ public final class StoreMessageMutation: GraphQLMutation {
   }
 }
 
-public final class DeletePostBoxMutation: GraphQLMutation {
-  public static let operationString =
+internal final class DeletePostBoxMutation: GraphQLMutation {
+  internal static let operationString =
     "mutation DeletePostBox($input: IdAsInput!) {\n  deletePostBox(input: $input) {\n    __typename\n    status\n  }\n}"
 
-  public var input: IdAsInput
+  internal var input: IdAsInput
 
-  public init(input: IdAsInput) {
+  internal init(input: IdAsInput) {
     self.input = input
   }
 
-  public var variables: GraphQLMap? {
+  internal var variables: GraphQLMap? {
     return ["input": input]
   }
 
-  public struct Data: GraphQLSelectionSet {
-    public static let possibleTypes = ["Mutation"]
+  internal struct Data: GraphQLSelectionSet {
+    internal static let possibleTypes = ["Mutation"]
 
-    public static let selections: [GraphQLSelection] = [
+    internal static let selections: [GraphQLSelection] = [
       GraphQLField("deletePostBox", arguments: ["input": GraphQLVariable("input")], type: .nonNull(.object(DeletePostBox.selections))),
     ]
 
-    public var snapshot: Snapshot
+    internal var snapshot: Snapshot
 
-    public init(snapshot: Snapshot) {
+    internal init(snapshot: Snapshot) {
       self.snapshot = snapshot
     }
 
-    public init(deletePostBox: DeletePostBox) {
+    internal init(deletePostBox: DeletePostBox) {
       self.init(snapshot: ["__typename": "Mutation", "deletePostBox": deletePostBox.snapshot])
     }
 
-    public var deletePostBox: DeletePostBox {
+    internal var deletePostBox: DeletePostBox {
       get {
         return DeletePostBox(snapshot: snapshot["deletePostBox"]! as! Snapshot)
       }
@@ -1589,25 +1741,25 @@ public final class DeletePostBoxMutation: GraphQLMutation {
       }
     }
 
-    public struct DeletePostBox: GraphQLSelectionSet {
-      public static let possibleTypes = ["AsyncInvokeStatus"]
+    internal struct DeletePostBox: GraphQLSelectionSet {
+      internal static let possibleTypes = ["AsyncInvokeStatus"]
 
-      public static let selections: [GraphQLSelection] = [
+      internal static let selections: [GraphQLSelection] = [
         GraphQLField("__typename", type: .nonNull(.scalar(String.self))),
         GraphQLField("status", type: .nonNull(.scalar(Int.self))),
       ]
 
-      public var snapshot: Snapshot
+      internal var snapshot: Snapshot
 
-      public init(snapshot: Snapshot) {
+      internal init(snapshot: Snapshot) {
         self.snapshot = snapshot
       }
 
-      public init(status: Int) {
+      internal init(status: Int) {
         self.init(snapshot: ["__typename": "AsyncInvokeStatus", "status": status])
       }
 
-      public var __typename: String {
+      internal var __typename: String {
         get {
           return snapshot["__typename"]! as! String
         }
@@ -1616,7 +1768,7 @@ public final class DeletePostBoxMutation: GraphQLMutation {
         }
       }
 
-      public var status: Int {
+      internal var status: Int {
         get {
           return snapshot["status"]! as! Int
         }
@@ -1628,38 +1780,38 @@ public final class DeletePostBoxMutation: GraphQLMutation {
   }
 }
 
-public final class InternalFireOnPostBoxDeletedMutation: GraphQLMutation {
-  public static let operationString =
+internal final class InternalFireOnPostBoxDeletedMutation: GraphQLMutation {
+  internal static let operationString =
     "mutation InternalFireOnPostBoxDeleted($input: PostBoxDeletionInput!) {\n  internalFireOnPostBoxDeleted(input: $input) {\n    __typename\n    connectionId\n    remainingMessages {\n      __typename\n      connectionId\n      messageId\n    }\n  }\n}"
 
-  public var input: PostBoxDeletionInput
+  internal var input: PostBoxDeletionInput
 
-  public init(input: PostBoxDeletionInput) {
+  internal init(input: PostBoxDeletionInput) {
     self.input = input
   }
 
-  public var variables: GraphQLMap? {
+  internal var variables: GraphQLMap? {
     return ["input": input]
   }
 
-  public struct Data: GraphQLSelectionSet {
-    public static let possibleTypes = ["Mutation"]
+  internal struct Data: GraphQLSelectionSet {
+    internal static let possibleTypes = ["Mutation"]
 
-    public static let selections: [GraphQLSelection] = [
+    internal static let selections: [GraphQLSelection] = [
       GraphQLField("internalFireOnPostBoxDeleted", arguments: ["input": GraphQLVariable("input")], type: .object(InternalFireOnPostBoxDeleted.selections)),
     ]
 
-    public var snapshot: Snapshot
+    internal var snapshot: Snapshot
 
-    public init(snapshot: Snapshot) {
+    internal init(snapshot: Snapshot) {
       self.snapshot = snapshot
     }
 
-    public init(internalFireOnPostBoxDeleted: InternalFireOnPostBoxDeleted? = nil) {
+    internal init(internalFireOnPostBoxDeleted: InternalFireOnPostBoxDeleted? = nil) {
       self.init(snapshot: ["__typename": "Mutation", "internalFireOnPostBoxDeleted": internalFireOnPostBoxDeleted.flatMap { $0.snapshot }])
     }
 
-    public var internalFireOnPostBoxDeleted: InternalFireOnPostBoxDeleted? {
+    internal var internalFireOnPostBoxDeleted: InternalFireOnPostBoxDeleted? {
       get {
         return (snapshot["internalFireOnPostBoxDeleted"] as? Snapshot).flatMap { InternalFireOnPostBoxDeleted(snapshot: $0) }
       }
@@ -1668,26 +1820,26 @@ public final class InternalFireOnPostBoxDeletedMutation: GraphQLMutation {
       }
     }
 
-    public struct InternalFireOnPostBoxDeleted: GraphQLSelectionSet {
-      public static let possibleTypes = ["PostBoxDeletionResult"]
+    internal struct InternalFireOnPostBoxDeleted: GraphQLSelectionSet {
+      internal static let possibleTypes = ["PostBoxDeletionResult"]
 
-      public static let selections: [GraphQLSelection] = [
+      internal static let selections: [GraphQLSelection] = [
         GraphQLField("__typename", type: .nonNull(.scalar(String.self))),
         GraphQLField("connectionId", type: .nonNull(.scalar(GraphQLID.self))),
         GraphQLField("remainingMessages", type: .nonNull(.list(.nonNull(.object(RemainingMessage.selections))))),
       ]
 
-      public var snapshot: Snapshot
+      internal var snapshot: Snapshot
 
-      public init(snapshot: Snapshot) {
+      internal init(snapshot: Snapshot) {
         self.snapshot = snapshot
       }
 
-      public init(connectionId: GraphQLID, remainingMessages: [RemainingMessage]) {
+      internal init(connectionId: GraphQLID, remainingMessages: [RemainingMessage]) {
         self.init(snapshot: ["__typename": "PostBoxDeletionResult", "connectionId": connectionId, "remainingMessages": remainingMessages.map { $0.snapshot }])
       }
 
-      public var __typename: String {
+      internal var __typename: String {
         get {
           return snapshot["__typename"]! as! String
         }
@@ -1696,7 +1848,7 @@ public final class InternalFireOnPostBoxDeletedMutation: GraphQLMutation {
         }
       }
 
-      public var connectionId: GraphQLID {
+      internal var connectionId: GraphQLID {
         get {
           return snapshot["connectionId"]! as! GraphQLID
         }
@@ -1705,7 +1857,7 @@ public final class InternalFireOnPostBoxDeletedMutation: GraphQLMutation {
         }
       }
 
-      public var remainingMessages: [RemainingMessage] {
+      internal var remainingMessages: [RemainingMessage] {
         get {
           return (snapshot["remainingMessages"] as! [Snapshot]).map { RemainingMessage(snapshot: $0) }
         }
@@ -1714,26 +1866,26 @@ public final class InternalFireOnPostBoxDeletedMutation: GraphQLMutation {
         }
       }
 
-      public struct RemainingMessage: GraphQLSelectionSet {
-        public static let possibleTypes = ["MessageTableKey"]
+      internal struct RemainingMessage: GraphQLSelectionSet {
+        internal static let possibleTypes = ["MessageTableKey"]
 
-        public static let selections: [GraphQLSelection] = [
+        internal static let selections: [GraphQLSelection] = [
           GraphQLField("__typename", type: .nonNull(.scalar(String.self))),
           GraphQLField("connectionId", type: .nonNull(.scalar(GraphQLID.self))),
           GraphQLField("messageId", type: .nonNull(.scalar(GraphQLID.self))),
         ]
 
-        public var snapshot: Snapshot
+        internal var snapshot: Snapshot
 
-        public init(snapshot: Snapshot) {
+        internal init(snapshot: Snapshot) {
           self.snapshot = snapshot
         }
 
-        public init(connectionId: GraphQLID, messageId: GraphQLID) {
+        internal init(connectionId: GraphQLID, messageId: GraphQLID) {
           self.init(snapshot: ["__typename": "MessageTableKey", "connectionId": connectionId, "messageId": messageId])
         }
 
-        public var __typename: String {
+        internal var __typename: String {
           get {
             return snapshot["__typename"]! as! String
           }
@@ -1742,7 +1894,7 @@ public final class InternalFireOnPostBoxDeletedMutation: GraphQLMutation {
           }
         }
 
-        public var connectionId: GraphQLID {
+        internal var connectionId: GraphQLID {
           get {
             return snapshot["connectionId"]! as! GraphQLID
           }
@@ -1751,7 +1903,7 @@ public final class InternalFireOnPostBoxDeletedMutation: GraphQLMutation {
           }
         }
 
-        public var messageId: GraphQLID {
+        internal var messageId: GraphQLID {
           get {
             return snapshot["messageId"]! as! GraphQLID
           }
@@ -1764,38 +1916,38 @@ public final class InternalFireOnPostBoxDeletedMutation: GraphQLMutation {
   }
 }
 
-public final class InternalFireOnMessageReceivedMutation: GraphQLMutation {
-  public static let operationString =
+internal final class InternalFireOnMessageReceivedMutation: GraphQLMutation {
+  internal static let operationString =
     "mutation InternalFireOnMessageReceived($input: WriteToRelayInput) {\n  internalFireOnMessageReceived(input: $input) {\n    __typename\n    messageId\n    connectionId\n    cipherText\n    direction\n    utcTimestamp\n  }\n}"
 
-  public var input: WriteToRelayInput?
+  internal var input: WriteToRelayInput?
 
-  public init(input: WriteToRelayInput? = nil) {
+  internal init(input: WriteToRelayInput? = nil) {
     self.input = input
   }
 
-  public var variables: GraphQLMap? {
+  internal var variables: GraphQLMap? {
     return ["input": input]
   }
 
-  public struct Data: GraphQLSelectionSet {
-    public static let possibleTypes = ["Mutation"]
+  internal struct Data: GraphQLSelectionSet {
+    internal static let possibleTypes = ["Mutation"]
 
-    public static let selections: [GraphQLSelection] = [
+    internal static let selections: [GraphQLSelection] = [
       GraphQLField("internalFireOnMessageReceived", arguments: ["input": GraphQLVariable("input")], type: .object(InternalFireOnMessageReceived.selections)),
     ]
 
-    public var snapshot: Snapshot
+    internal var snapshot: Snapshot
 
-    public init(snapshot: Snapshot) {
+    internal init(snapshot: Snapshot) {
       self.snapshot = snapshot
     }
 
-    public init(internalFireOnMessageReceived: InternalFireOnMessageReceived? = nil) {
+    internal init(internalFireOnMessageReceived: InternalFireOnMessageReceived? = nil) {
       self.init(snapshot: ["__typename": "Mutation", "internalFireOnMessageReceived": internalFireOnMessageReceived.flatMap { $0.snapshot }])
     }
 
-    public var internalFireOnMessageReceived: InternalFireOnMessageReceived? {
+    internal var internalFireOnMessageReceived: InternalFireOnMessageReceived? {
       get {
         return (snapshot["internalFireOnMessageReceived"] as? Snapshot).flatMap { InternalFireOnMessageReceived(snapshot: $0) }
       }
@@ -1804,10 +1956,10 @@ public final class InternalFireOnMessageReceivedMutation: GraphQLMutation {
       }
     }
 
-    public struct InternalFireOnMessageReceived: GraphQLSelectionSet {
-      public static let possibleTypes = ["MessageEntry"]
+    internal struct InternalFireOnMessageReceived: GraphQLSelectionSet {
+      internal static let possibleTypes = ["MessageEntry"]
 
-      public static let selections: [GraphQLSelection] = [
+      internal static let selections: [GraphQLSelection] = [
         GraphQLField("__typename", type: .nonNull(.scalar(String.self))),
         GraphQLField("messageId", type: .nonNull(.scalar(GraphQLID.self))),
         GraphQLField("connectionId", type: .nonNull(.scalar(GraphQLID.self))),
@@ -1816,17 +1968,17 @@ public final class InternalFireOnMessageReceivedMutation: GraphQLMutation {
         GraphQLField("utcTimestamp", type: .nonNull(.scalar(Double.self))),
       ]
 
-      public var snapshot: Snapshot
+      internal var snapshot: Snapshot
 
-      public init(snapshot: Snapshot) {
+      internal init(snapshot: Snapshot) {
         self.snapshot = snapshot
       }
 
-      public init(messageId: GraphQLID, connectionId: GraphQLID, cipherText: String, direction: Direction, utcTimestamp: Double) {
+      internal init(messageId: GraphQLID, connectionId: GraphQLID, cipherText: String, direction: Direction, utcTimestamp: Double) {
         self.init(snapshot: ["__typename": "MessageEntry", "messageId": messageId, "connectionId": connectionId, "cipherText": cipherText, "direction": direction, "utcTimestamp": utcTimestamp])
       }
 
-      public var __typename: String {
+      internal var __typename: String {
         get {
           return snapshot["__typename"]! as! String
         }
@@ -1835,7 +1987,7 @@ public final class InternalFireOnMessageReceivedMutation: GraphQLMutation {
         }
       }
 
-      public var messageId: GraphQLID {
+      internal var messageId: GraphQLID {
         get {
           return snapshot["messageId"]! as! GraphQLID
         }
@@ -1844,7 +1996,7 @@ public final class InternalFireOnMessageReceivedMutation: GraphQLMutation {
         }
       }
 
-      public var connectionId: GraphQLID {
+      internal var connectionId: GraphQLID {
         get {
           return snapshot["connectionId"]! as! GraphQLID
         }
@@ -1853,7 +2005,7 @@ public final class InternalFireOnMessageReceivedMutation: GraphQLMutation {
         }
       }
 
-      public var cipherText: String {
+      internal var cipherText: String {
         get {
           return snapshot["cipherText"]! as! String
         }
@@ -1862,7 +2014,7 @@ public final class InternalFireOnMessageReceivedMutation: GraphQLMutation {
         }
       }
 
-      public var direction: Direction {
+      internal var direction: Direction {
         get {
           return snapshot["direction"]! as! Direction
         }
@@ -1871,7 +2023,7 @@ public final class InternalFireOnMessageReceivedMutation: GraphQLMutation {
         }
       }
 
-      public var utcTimestamp: Double {
+      internal var utcTimestamp: Double {
         get {
           return snapshot["utcTimestamp"]! as! Double
         }
@@ -1883,31 +2035,31 @@ public final class InternalFireOnMessageReceivedMutation: GraphQLMutation {
   }
 }
 
-public final class PingSubscription: GraphQLSubscription {
-  public static let operationString =
+internal final class PingSubscription: GraphQLSubscription {
+  internal static let operationString =
     "subscription Ping {\n  ping\n}"
 
-  public init() {
+  internal init() {
   }
 
-  public struct Data: GraphQLSelectionSet {
-    public static let possibleTypes = ["Subscription"]
+  internal struct Data: GraphQLSelectionSet {
+    internal static let possibleTypes = ["Subscription"]
 
-    public static let selections: [GraphQLSelection] = [
+    internal static let selections: [GraphQLSelection] = [
       GraphQLField("ping", type: .scalar(String.self)),
     ]
 
-    public var snapshot: Snapshot
+    internal var snapshot: Snapshot
 
-    public init(snapshot: Snapshot) {
+    internal init(snapshot: Snapshot) {
       self.snapshot = snapshot
     }
 
-    public init(ping: String? = nil) {
+    internal init(ping: String? = nil) {
       self.init(snapshot: ["__typename": "Subscription", "ping": ping])
     }
 
-    public var ping: String? {
+    internal var ping: String? {
       get {
         return snapshot["ping"] as? String
       }
@@ -1918,40 +2070,40 @@ public final class PingSubscription: GraphQLSubscription {
   }
 }
 
-public final class OnMessageCreatedSubscription: GraphQLSubscription {
-  public static let operationString =
+internal final class OnMessageCreatedSubscription: GraphQLSubscription {
+  internal static let operationString =
     "subscription OnMessageCreated($connectionId: ID!, $direction: Direction!) {\n  onMessageCreated(connectionId: $connectionId, direction: $direction) {\n    __typename\n    messageId\n    connectionId\n    cipherText\n    direction\n    utcTimestamp\n  }\n}"
 
-  public var connectionId: GraphQLID
-  public var direction: Direction
+  internal var connectionId: GraphQLID
+  internal var direction: Direction
 
-  public init(connectionId: GraphQLID, direction: Direction) {
+  internal init(connectionId: GraphQLID, direction: Direction) {
     self.connectionId = connectionId
     self.direction = direction
   }
 
-  public var variables: GraphQLMap? {
+  internal var variables: GraphQLMap? {
     return ["connectionId": connectionId, "direction": direction]
   }
 
-  public struct Data: GraphQLSelectionSet {
-    public static let possibleTypes = ["Subscription"]
+  internal struct Data: GraphQLSelectionSet {
+    internal static let possibleTypes = ["Subscription"]
 
-    public static let selections: [GraphQLSelection] = [
+    internal static let selections: [GraphQLSelection] = [
       GraphQLField("onMessageCreated", arguments: ["connectionId": GraphQLVariable("connectionId"), "direction": GraphQLVariable("direction")], type: .object(OnMessageCreated.selections)),
     ]
 
-    public var snapshot: Snapshot
+    internal var snapshot: Snapshot
 
-    public init(snapshot: Snapshot) {
+    internal init(snapshot: Snapshot) {
       self.snapshot = snapshot
     }
 
-    public init(onMessageCreated: OnMessageCreated? = nil) {
+    internal init(onMessageCreated: OnMessageCreated? = nil) {
       self.init(snapshot: ["__typename": "Subscription", "onMessageCreated": onMessageCreated.flatMap { $0.snapshot }])
     }
 
-    public var onMessageCreated: OnMessageCreated? {
+    internal var onMessageCreated: OnMessageCreated? {
       get {
         return (snapshot["onMessageCreated"] as? Snapshot).flatMap { OnMessageCreated(snapshot: $0) }
       }
@@ -1960,10 +2112,10 @@ public final class OnMessageCreatedSubscription: GraphQLSubscription {
       }
     }
 
-    public struct OnMessageCreated: GraphQLSelectionSet {
-      public static let possibleTypes = ["MessageEntry"]
+    internal struct OnMessageCreated: GraphQLSelectionSet {
+      internal static let possibleTypes = ["MessageEntry"]
 
-      public static let selections: [GraphQLSelection] = [
+      internal static let selections: [GraphQLSelection] = [
         GraphQLField("__typename", type: .nonNull(.scalar(String.self))),
         GraphQLField("messageId", type: .nonNull(.scalar(GraphQLID.self))),
         GraphQLField("connectionId", type: .nonNull(.scalar(GraphQLID.self))),
@@ -1972,17 +2124,17 @@ public final class OnMessageCreatedSubscription: GraphQLSubscription {
         GraphQLField("utcTimestamp", type: .nonNull(.scalar(Double.self))),
       ]
 
-      public var snapshot: Snapshot
+      internal var snapshot: Snapshot
 
-      public init(snapshot: Snapshot) {
+      internal init(snapshot: Snapshot) {
         self.snapshot = snapshot
       }
 
-      public init(messageId: GraphQLID, connectionId: GraphQLID, cipherText: String, direction: Direction, utcTimestamp: Double) {
+      internal init(messageId: GraphQLID, connectionId: GraphQLID, cipherText: String, direction: Direction, utcTimestamp: Double) {
         self.init(snapshot: ["__typename": "MessageEntry", "messageId": messageId, "connectionId": connectionId, "cipherText": cipherText, "direction": direction, "utcTimestamp": utcTimestamp])
       }
 
-      public var __typename: String {
+      internal var __typename: String {
         get {
           return snapshot["__typename"]! as! String
         }
@@ -1991,7 +2143,7 @@ public final class OnMessageCreatedSubscription: GraphQLSubscription {
         }
       }
 
-      public var messageId: GraphQLID {
+      internal var messageId: GraphQLID {
         get {
           return snapshot["messageId"]! as! GraphQLID
         }
@@ -2000,7 +2152,7 @@ public final class OnMessageCreatedSubscription: GraphQLSubscription {
         }
       }
 
-      public var connectionId: GraphQLID {
+      internal var connectionId: GraphQLID {
         get {
           return snapshot["connectionId"]! as! GraphQLID
         }
@@ -2009,7 +2161,7 @@ public final class OnMessageCreatedSubscription: GraphQLSubscription {
         }
       }
 
-      public var cipherText: String {
+      internal var cipherText: String {
         get {
           return snapshot["cipherText"]! as! String
         }
@@ -2018,7 +2170,7 @@ public final class OnMessageCreatedSubscription: GraphQLSubscription {
         }
       }
 
-      public var direction: Direction {
+      internal var direction: Direction {
         get {
           return snapshot["direction"]! as! Direction
         }
@@ -2027,7 +2179,7 @@ public final class OnMessageCreatedSubscription: GraphQLSubscription {
         }
       }
 
-      public var utcTimestamp: Double {
+      internal var utcTimestamp: Double {
         get {
           return snapshot["utcTimestamp"]! as! Double
         }
@@ -2039,38 +2191,38 @@ public final class OnMessageCreatedSubscription: GraphQLSubscription {
   }
 }
 
-public final class OnPostBoxDeletedSubscription: GraphQLSubscription {
-  public static let operationString =
+internal final class OnPostBoxDeletedSubscription: GraphQLSubscription {
+  internal static let operationString =
     "subscription OnPostBoxDeleted($connectionId: ID!) {\n  onPostBoxDeleted(connectionId: $connectionId) {\n    __typename\n    connectionId\n    remainingMessages {\n      __typename\n      connectionId\n      messageId\n    }\n  }\n}"
 
-  public var connectionId: GraphQLID
+  internal var connectionId: GraphQLID
 
-  public init(connectionId: GraphQLID) {
+  internal init(connectionId: GraphQLID) {
     self.connectionId = connectionId
   }
 
-  public var variables: GraphQLMap? {
+  internal var variables: GraphQLMap? {
     return ["connectionId": connectionId]
   }
 
-  public struct Data: GraphQLSelectionSet {
-    public static let possibleTypes = ["Subscription"]
+  internal struct Data: GraphQLSelectionSet {
+    internal static let possibleTypes = ["Subscription"]
 
-    public static let selections: [GraphQLSelection] = [
+    internal static let selections: [GraphQLSelection] = [
       GraphQLField("onPostBoxDeleted", arguments: ["connectionId": GraphQLVariable("connectionId")], type: .object(OnPostBoxDeleted.selections)),
     ]
 
-    public var snapshot: Snapshot
+    internal var snapshot: Snapshot
 
-    public init(snapshot: Snapshot) {
+    internal init(snapshot: Snapshot) {
       self.snapshot = snapshot
     }
 
-    public init(onPostBoxDeleted: OnPostBoxDeleted? = nil) {
+    internal init(onPostBoxDeleted: OnPostBoxDeleted? = nil) {
       self.init(snapshot: ["__typename": "Subscription", "onPostBoxDeleted": onPostBoxDeleted.flatMap { $0.snapshot }])
     }
 
-    public var onPostBoxDeleted: OnPostBoxDeleted? {
+    internal var onPostBoxDeleted: OnPostBoxDeleted? {
       get {
         return (snapshot["onPostBoxDeleted"] as? Snapshot).flatMap { OnPostBoxDeleted(snapshot: $0) }
       }
@@ -2079,26 +2231,26 @@ public final class OnPostBoxDeletedSubscription: GraphQLSubscription {
       }
     }
 
-    public struct OnPostBoxDeleted: GraphQLSelectionSet {
-      public static let possibleTypes = ["PostBoxDeletionResult"]
+    internal struct OnPostBoxDeleted: GraphQLSelectionSet {
+      internal static let possibleTypes = ["PostBoxDeletionResult"]
 
-      public static let selections: [GraphQLSelection] = [
+      internal static let selections: [GraphQLSelection] = [
         GraphQLField("__typename", type: .nonNull(.scalar(String.self))),
         GraphQLField("connectionId", type: .nonNull(.scalar(GraphQLID.self))),
         GraphQLField("remainingMessages", type: .nonNull(.list(.nonNull(.object(RemainingMessage.selections))))),
       ]
 
-      public var snapshot: Snapshot
+      internal var snapshot: Snapshot
 
-      public init(snapshot: Snapshot) {
+      internal init(snapshot: Snapshot) {
         self.snapshot = snapshot
       }
 
-      public init(connectionId: GraphQLID, remainingMessages: [RemainingMessage]) {
+      internal init(connectionId: GraphQLID, remainingMessages: [RemainingMessage]) {
         self.init(snapshot: ["__typename": "PostBoxDeletionResult", "connectionId": connectionId, "remainingMessages": remainingMessages.map { $0.snapshot }])
       }
 
-      public var __typename: String {
+      internal var __typename: String {
         get {
           return snapshot["__typename"]! as! String
         }
@@ -2107,7 +2259,7 @@ public final class OnPostBoxDeletedSubscription: GraphQLSubscription {
         }
       }
 
-      public var connectionId: GraphQLID {
+      internal var connectionId: GraphQLID {
         get {
           return snapshot["connectionId"]! as! GraphQLID
         }
@@ -2116,7 +2268,7 @@ public final class OnPostBoxDeletedSubscription: GraphQLSubscription {
         }
       }
 
-      public var remainingMessages: [RemainingMessage] {
+      internal var remainingMessages: [RemainingMessage] {
         get {
           return (snapshot["remainingMessages"] as! [Snapshot]).map { RemainingMessage(snapshot: $0) }
         }
@@ -2125,26 +2277,26 @@ public final class OnPostBoxDeletedSubscription: GraphQLSubscription {
         }
       }
 
-      public struct RemainingMessage: GraphQLSelectionSet {
-        public static let possibleTypes = ["MessageTableKey"]
+      internal struct RemainingMessage: GraphQLSelectionSet {
+        internal static let possibleTypes = ["MessageTableKey"]
 
-        public static let selections: [GraphQLSelection] = [
+        internal static let selections: [GraphQLSelection] = [
           GraphQLField("__typename", type: .nonNull(.scalar(String.self))),
           GraphQLField("connectionId", type: .nonNull(.scalar(GraphQLID.self))),
           GraphQLField("messageId", type: .nonNull(.scalar(GraphQLID.self))),
         ]
 
-        public var snapshot: Snapshot
+        internal var snapshot: Snapshot
 
-        public init(snapshot: Snapshot) {
+        internal init(snapshot: Snapshot) {
           self.snapshot = snapshot
         }
 
-        public init(connectionId: GraphQLID, messageId: GraphQLID) {
+        internal init(connectionId: GraphQLID, messageId: GraphQLID) {
           self.init(snapshot: ["__typename": "MessageTableKey", "connectionId": connectionId, "messageId": messageId])
         }
 
-        public var __typename: String {
+        internal var __typename: String {
           get {
             return snapshot["__typename"]! as! String
           }
@@ -2153,7 +2305,7 @@ public final class OnPostBoxDeletedSubscription: GraphQLSubscription {
           }
         }
 
-        public var connectionId: GraphQLID {
+        internal var connectionId: GraphQLID {
           get {
             return snapshot["connectionId"]! as! GraphQLID
           }
@@ -2162,7 +2314,7 @@ public final class OnPostBoxDeletedSubscription: GraphQLSubscription {
           }
         }
 
-        public var messageId: GraphQLID {
+        internal var messageId: GraphQLID {
           get {
             return snapshot["messageId"]! as! GraphQLID
           }

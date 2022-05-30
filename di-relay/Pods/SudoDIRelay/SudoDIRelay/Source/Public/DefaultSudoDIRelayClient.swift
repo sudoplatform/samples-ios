@@ -4,12 +4,12 @@
 // SPDX-License-Identifier: Apache-2.0
 //
 // swiftlint:disable nesting
-// swiftlint:disable type_name
 
 import AWSAppSync
 import SudoLogging
 import SudoConfigManager
 import SudoUser
+import SudoApiClient
 
 /// Default Client API Endpoint for interacting with the Relay Service.
 public class DefaultSudoDIRelayClient: SudoDIRelayClient {
@@ -29,9 +29,6 @@ public class DefaultSudoDIRelayClient: SudoDIRelayClient {
 
     // MARK: - Properties
 
-    /// App sync client for peforming operations against the relay service.
-    let appSyncClient: AWSAppSyncClient
-
     /// Used to log diagnostic and error information.
     let logger: Logger
 
@@ -44,14 +41,11 @@ public class DefaultSudoDIRelayClient: SudoDIRelayClient {
     /// Helper class to create AWS AppSyncClient
     let appSyncClientHelper: AppSyncClientHelper
 
+    /// App sync client for peforming operations against the relay service.
+    let sudoApiClient: SudoApiClient
+
     /// Relay service that does the work of interacting with the service via GraphQL.
     let relayService: RelayService
-
-    var allResetables: [Resetable] {
-        return [
-            relayService
-        ]
-    }
 
     // MARK: - Lifecycle
 
@@ -74,13 +68,12 @@ public class DefaultSudoDIRelayClient: SudoDIRelayClient {
 
         let appSyncHelper = try DefaultAppSyncClientHelper(userClient: sudoUserClient)
 
-        guard let appSyncClient = appSyncHelper.getAppSyncClient() else {
-            throw SudoDIRelayError.invalidConfig
-        }
+        let sudoApiClient = appSyncHelper.getSudoApiClient()
 
-        let relayService = DefaultRelayService(appSyncClient: appSyncClient, appSyncClientHelper: appSyncHelper)
+        let relayService = DefaultRelayService(sudoApiClient: sudoApiClient, appSyncClientHelper: appSyncHelper)
+
         self.init(
-            appSyncClient: appSyncClient,
+            sudoApiClient: sudoApiClient,
             appSyncClientHelper: appSyncHelper,
             sudoUserClient: sudoUserClient,
             useCaseFactory: UseCaseFactory(relayService: relayService),
@@ -92,14 +85,14 @@ public class DefaultSudoDIRelayClient: SudoDIRelayClient {
     ///
     /// This is used internally for injection and mock testing.
     init(
-        appSyncClient: AWSAppSyncClient,
+        sudoApiClient: SudoApiClient,
         appSyncClientHelper: AppSyncClientHelper,
         sudoUserClient: SudoUserClient,
         useCaseFactory: UseCaseFactory,
         relayService: RelayService,
         logger: Logger = .relaySDKLogger
     ) {
-        self.appSyncClient = appSyncClient
+        self.sudoApiClient = sudoApiClient
         self.appSyncClientHelper = appSyncClientHelper
         self.sudoUserClient = sudoUserClient
         self.useCaseFactory = useCaseFactory
@@ -109,52 +102,29 @@ public class DefaultSudoDIRelayClient: SudoDIRelayClient {
     // MARK: - Methods
 
     public func reset() throws {
-        allResetables.forEach { $0.reset() }
-        try self.appSyncClient.clearCaches(options: .init(clearQueries: true, clearMutations: true, clearSubscriptions: false))
+        try self.sudoApiClient.clearCaches(options: .init(clearQueries: true, clearMutations: true, clearSubscriptions: false))
     }
 
 // MARK: - Conformance: SudoDIRelayClient
 
-    public func getMessages(withConnectionId connectionId: String, completion: @escaping ClientCompletion<[RelayMessage]>) {
-        let useCase = useCaseFactory.generateGetMessages()
-        useCase.execute(withConnectionId: connectionId, completion: completion)
+    public func listMessages(withConnectionId connectionId: String) async throws -> [RelayMessage] {
+        let useCase = useCaseFactory.generateListMessages()
+        return try await useCase.execute(withConnectionId: connectionId)
     }
 
-    public func storeMessage(
-        withConnectionId connectionId: String,
-        message: String,
-        completion: @escaping ClientCompletion<RelayMessage?>
-    ) {
+    public func storeMessage(withConnectionId connectionId: String, message: String) async throws -> RelayMessage? {
         let useCase = useCaseFactory.generateStoreMessage()
-        useCase.execute(withConnectionId: connectionId, message: message, completion: completion)
+        return try await useCase.execute(withConnectionId: connectionId, message: message)
     }
 
-    public func createPostbox(withConnectionId connectionId: String, completion: @escaping ClientCompletion<Void>) {
+    public func createPostbox(withConnectionId connectionId: String, ownershipProofToken: String) async throws {
         let useCase = useCaseFactory.generateCreatePostbox()
-        useCase.execute(withConnectionId: connectionId, completion: completion)
+        try await useCase.execute(withConnectionId: connectionId, ownershipProofToken: ownershipProofToken)
     }
 
-    public func deletePostbox(withConnectionId connectionId: String, completion: @escaping ClientCompletion<Void>) {
+    public func deletePostbox(withConnectionId connectionId: String) async throws {
         let useCase = useCaseFactory.generateDeletePostbox()
-        useCase.execute(withConnectionId: connectionId, completion: completion)
-    }
-
-    public func subscribeToMessagesReceived(
-        withConnectionId connectionId: String,
-        resultHandler: @escaping ClientCompletion<RelayMessage>
-    ) -> SubscriptionToken? {
-        let useCase = useCaseFactory.generateSubscribeToMessagesReceived()
-        let token = useCase.execute(withConnectionId: connectionId, completion: resultHandler)
-        return token
-    }
-
-    public func subscribeToPostboxDeleted(
-        withConnectionId connectionId: String,
-        resultHandler: @escaping ClientCompletion<Status>
-    ) -> SubscriptionToken? {
-        let useCase = useCaseFactory.generateSubscribeToPostboxDeleted()
-        let token = useCase.execute(withConnectionId: connectionId, completion: resultHandler)
-        return token
+        try await useCase.execute(withConnectionId: connectionId)
     }
 
     public func getPostboxEndpoint(withConnectionId connectionId: String) -> URL? {
@@ -162,4 +132,28 @@ public class DefaultSudoDIRelayClient: SudoDIRelayClient {
         let endpoint = useCase.execute(withConnectionId: connectionId)
         return endpoint
     }
+
+    public func listPostboxes(withSudoId sudoId: String) async throws -> [Postbox] {
+        let useCase = useCaseFactory.generateListPostboxes()
+        return try await useCase.execute(withSudoId: sudoId)
+    }
+
+    public func subscribeToMessagesReceived(
+        withConnectionId connectionId: String,
+        resultHandler: @escaping ClientCompletion<RelayMessage>
+    ) async throws -> SubscriptionToken? {
+        let useCase = useCaseFactory.generateSubscribeToMessagesReceived()
+        let token = try await useCase.execute(withConnectionId: connectionId, completion: resultHandler)
+        return token
+    }
+
+    public func subscribeToPostboxDeleted(
+        withConnectionId connectionId: String,
+        resultHandler: @escaping ClientCompletion<Status>
+    ) async throws -> SubscriptionToken? {
+        let useCase = useCaseFactory.generateSubscribeToPostboxDeleted()
+        let token = try await useCase.execute(withConnectionId: connectionId, completion: resultHandler)
+        return token
+    }
+
 }

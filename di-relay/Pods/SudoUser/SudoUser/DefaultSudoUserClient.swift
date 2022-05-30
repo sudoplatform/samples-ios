@@ -14,6 +14,20 @@ import AWSS3
 import AWSAppSync
 import SudoConfigManager
 
+fileprivate extension Array {
+    func chunks(size: Int) -> [[Element]] {
+        return stride(from: 0, to: count, by: size).map {
+            Array(self[$0 ..< Swift.min($0 + size, count)])
+        }
+    }
+}
+
+fileprivate extension String {
+    func chunks(size: Int) -> [String] {
+        map { $0 }.chunks(size: size).compactMap { String($0) }
+    }
+}
+
 /// Default implementation for `SudoUserClient`.
 public class DefaultSudoUserClient: SudoUserClient {
 
@@ -68,7 +82,6 @@ public class DefaultSudoUserClient: SudoUserClient {
     private struct Constants {
 
         struct KeyName {
-            static let symmetricKeyId = "symmetricKeyId"
             static let userId = "userId"
             static let userKeyId = "userKeyId"
             static let idToken = "idToken"
@@ -96,6 +109,18 @@ public class DefaultSudoUserClient: SudoUserClient {
             static let authTokenExpiryClockSkewToleranceInSec = 600.0
         }
 
+        struct ValidationDataName {
+            static let challengeType = "challengeType"
+            static let answer = "answer"
+            static let vendorId = "vendorId"
+            static let publicKey = "publicKey"
+            static let registrationId = "registrationId"
+        }
+
+        struct Limit {
+            static let maxValidationDataSize = 2048
+        }
+
     }
 
     /// Default logger for SudoUserClient.
@@ -116,14 +141,17 @@ public class DefaultSudoUserClient: SudoUserClient {
 
     private let queue = DispatchQueue(label: "com.sudoplatform.sudouser")
 
-    private var registerOperationQueue = UserOperationQueue()
-
-    private var signInOperationQueue = UserOperationQueue()
-
-    private let syncQueue = DispatchQueue(label: "com.sudoplatform.sudouser.sync")
-
     /// Identity provider to use for registration and authentication.
     private var identityProvider: IdentityProvider
+
+    /// Actor for synchronizing access to client state information.
+    private lazy var clientStateActor: ClientStateActor = {
+        return ClientStateActor(
+            keyManager: self.keyManager,
+            credentialsProvider: self.credentialsProvider,
+            authUI: self.authUI
+        )
+    }()
 
     /// Lifetime of private key based token in seconds.
     private var tokenLifetime: Int = 300
@@ -169,8 +197,7 @@ public class DefaultSudoUserClient: SudoUserClient {
     /// List of supported registration challenge types.
     private let challengeTypes: [ChallengeType]
 
-    /// List of sign in status observers.
-    private var signInStatusObservers: [String: SignInStatusObserver] = [:]
+    private let signInObserversActor: SignInObserversActor
 
     /// Intializes a new `DefaultSudoUserClient` instance. It uses configuration parameters defined in
     /// `sudoplatformconfig.json` file located in the app bundle.
@@ -204,7 +231,6 @@ public class DefaultSudoUserClient: SudoUserClient {
     ///   - keyNamespace: Namespace to use for the keys and passwords.
     ///   - credentialsProvider: Credentials provider to use for obtaining AWS credential. Mainly used for unit testing.
     ///   - identityProvider: Identity provider to use to user management. Mainly used for unit testing.
-    ///   - registrationChallengeClient: GraphQL client to use for communicating with the challenge service.
     ///         Mainly used for unit testing.
     ///   - apiClient: GrpahQL client to use for Identity Service API. Mainly used for unit testing.
     ///   - authUI: AuthUI used for presenting federated sign in UI. Mainly used for unit testing.
@@ -214,7 +240,6 @@ public class DefaultSudoUserClient: SudoUserClient {
                 keyNamespace: String,
                 credentialsProvider: CredentialsProvider? = nil,
                 identityProvider: IdentityProvider? = nil,
-                registrationChallengeClient: GraphQLClient? = nil,
                 apiClient: AWSAppSyncClient? = nil,
                 authUI: AuthUI? = nil,
                 logger: Logger? = nil) throws {
@@ -227,6 +252,8 @@ public class DefaultSudoUserClient: SudoUserClient {
                                         keyTag: Constants.KeyManager.defaultKeyManagerKeyTag,
                                         namespace: keyNamespace)
         self.keyManager = keyManager
+
+        self.signInObserversActor = SignInObserversActor()
 
         guard let identityServiceConfig = config[Config.Namespace.identityService] as? [String: Any] else {
             throw SudoUserClientError.identityServiceConfigNotFound
@@ -287,203 +314,134 @@ public class DefaultSudoUserClient: SudoUserClient {
         if let credentialsProvider = credentialsProvider {
             self.credentialsProvider = credentialsProvider
         }
+
+        self.clientStateActor = ClientStateActor(keyManager: keyManager, credentialsProvider: self.credentialsProvider, authUI: self.authUI)
     }
 
-    public func isRegistered() -> Bool {
-        var username: String?
-        do {
-            username = try self.getUserName()
-        } catch {
-            self.logger.error("Failed to retrieve key from the keychain.")
-        }
-
-        return username != nil
+    public func isRegistered() async throws -> Bool {
+        return try await self.clientStateActor.isRegistered()
     }
 
-    public func getSymmetricKeyId() throws -> String {
-        guard let symmKeyIdData = try self.keyManager.getPassword(Constants.KeyName.symmetricKeyId), let symmetricKeyId = String(data: symmKeyIdData, encoding: .utf8) else {
-            throw SudoUserClientError.fatalError(description: "Symmetric key missing.")
-        }
-
-        return symmetricKeyId
-    }
-
-    public func reset() throws {
+    public func reset() async throws {
         self.logger.info("Resetting client.")
-
-        do {
-            try self.keyManager.removeAllKeys()
-            self.credentialsProvider.reset()
-        } catch let error {
-            let message = "Unexpected error occurred while trying to remove all keys: \(error)."
-            self.logger.error(message)
-            throw SudoUserClientError.fatalError(description: message)
-        }
+        try await self.clientStateActor.reset()
     }
 
-    public func register(challenge: RegistrationChallenge,
-                         vendorId: UUID? = nil,
-                         registrationId: String? = nil,
-                         completion: @escaping (Swift.Result<String, Error>) -> Void) throws {
-        self.logger.info("Performing registration.")
+    public func registerWithDeviceCheck(
+        token: Data,
+        buildType: String,
+        vendorId: UUID,
+        registrationId: String?
+    ) async throws -> String {
+        let registrationId = registrationId ?? UUID().uuidString
+        self.logger.info("Performing registration with DeviceCheck token: registrationId=\(registrationId)")
 
-        try self.queue.sync {
-            guard !isRegistered() else {
-                throw SudoUserClientError.alreadyRegistered
-            }
-
-            guard self.registerOperationQueue.operationCount == 0 else {
-                throw SudoUserClientError.registerOperationAlreadyInProgress
-            }
-
-            // Clear out any partial registration data.
-            try self.reset()
-
-            let publicKey = try self.generateRegistrationData()
-
-            let op = Register(challenge: challenge,
-                                       vendorId: vendorId,
-                                       registrationId: registrationId,
-                                       publicKey: publicKey,
-                                       identityProvider: self.identityProvider,
-                                       logger: self.logger)
-            op.completionBlock = {
-                if let error = op.error {
-                    completion(.failure(error))
-                } else {
-                    guard let uid = op.uid else {
-                        return completion(.failure(SudoUserClientError.fatalError(description: "uid not found.")))
-                    }
-
-                    do {
-                        try self.setUserName(name: uid)
-                    } catch let error {
-                        return completion(.failure(SudoUserClientError.fatalError(description: "Failed to set user name: \(error)")))
-                    }
-
-                    self.logger.info("Registration completed successfully..")
-
-                    completion(.success(uid))
-                }
-            }
-
-            self.registerOperationQueue.addOperation(op)
+        guard !(try await self.clientStateActor.isRegistered()) else {
+            throw SudoUserClientError.alreadyRegistered
         }
+
+        // Clear out any partial registration data.
+        try await self.reset()
+
+        let publicKey = try await self.clientStateActor.generateRegistrationData()
+
+        let challenge = RegistrationChallenge()
+        challenge.type = .deviceCheck
+        let answer = token.base64EncodedString()
+        let buildType = buildType
+
+        let uuid = UUID().uuidString
+        var registrationParameters: [String: String] = [:]
+        registrationParameters[CognitoUserPoolIdentityProvider.RegistrationParameter.challengeType] = challenge.type.rawValue
+        if answer.count > Constants.Limit.maxValidationDataSize {
+            // If the answer exceeds the validation data size limit then divide up the answer to parts.
+            let parts = answer.chunks(size: Constants.Limit.maxValidationDataSize)
+            var parameters: [(String, String)] = []
+            for (index, part) in parts.enumerated() {
+                parameters.append(("\(CognitoUserPoolIdentityProvider.RegistrationParameter.answer).\(index)", part))
+            }
+
+            registrationParameters.merge(parameters) {(_, new) in new}
+            let answerMetadata: [String: Any] = ["parts": parameters.map { $0.0 }]
+            guard let jsonData = answerMetadata.toJSONData() else {
+                throw SudoUserClientError.fatalError(description: "Cannot serialize the answer metadata.")
+            }
+            registrationParameters[CognitoUserPoolIdentityProvider.RegistrationParameter.answerMetadata] = String(data: jsonData, encoding: .utf8)
+        } else {
+            registrationParameters[CognitoUserPoolIdentityProvider.RegistrationParameter.answer] = answer
+        }
+        registrationParameters[CognitoUserPoolIdentityProvider.RegistrationParameter.registrationId] = registrationId
+
+        let data = withUnsafePointer(to: vendorId.uuid) {
+            Data(bytes: $0, count: MemoryLayout.size(ofValue: vendorId.uuid))
+        }
+        registrationParameters[CognitoUserPoolIdentityProvider.RegistrationParameter.deviceId] = data.base64EncodedString()
+        registrationParameters[CognitoUserPoolIdentityProvider.RegistrationParameter.buildType] = buildType
+
+        guard let encodedKey = try String(data: publicKey.toData(), encoding: .utf8) else {
+            throw SudoUserClientError.fatalError(description: "Cannot serialize the public key.")
+        }
+
+        registrationParameters[CognitoUserPoolIdentityProvider.RegistrationParameter.publicKey] = encodedKey
+
+        let uid = try await self.identityProvider.register(uid: uuid, parameters: registrationParameters)
+        try await self.setUserName(name: uid)
+
+        self.logger.info("Registration with DeviceCheck token completed successfully.")
+
+        return uid
     }
 
-    public func registerWithDeviceCheck(token: Data,
-                                        buildType: String,
-                                        vendorId: UUID?,
-                                        registrationId: String?,
-                                        completion: @escaping (Swift.Result<String, Error>) -> Void) throws {
-        self.logger.info("Performing registration.")
+    public func registerWithAuthenticationProvider(
+        authenticationProvider: AuthenticationProvider,
+        registrationId: String?
+    ) async throws -> String {
+        let registrationId = registrationId ?? UUID().uuidString
+        self.logger.info("Performing registration with authentication provider: registrationId=\(registrationId)")
 
-        try self.queue.sync {
-            guard !isRegistered() else {
-                throw SudoUserClientError.alreadyRegistered
-            }
-
-            guard self.registerOperationQueue.operationCount == 0 else {
-                throw SudoUserClientError.registerOperationAlreadyInProgress
-            }
-
-            // Clear out any partial registration data.
-            try self.reset()
-
-            // Generate the shared encryption key.
-            try self.generateSymmetricKey()
-
-            let publicKey = try self.generateRegistrationData()
-
-            let challenge = RegistrationChallenge()
-            challenge.type = .deviceCheck
-            challenge.answer = token.base64EncodedString()
-            challenge.buildType = buildType
-
-            let op = Register(challenge: challenge,
-                                       vendorId: vendorId,
-                                       registrationId: registrationId,
-                                       publicKey: publicKey,
-                                       identityProvider: self.identityProvider,
-                                       logger: self.logger)
-            op.completionBlock = {
-                if let error = op.error {
-                    completion(.failure(error))
-                } else {
-                    guard let uid = op.uid else {
-                        return completion(.failure(SudoUserClientError.fatalError(description: "uid not found.")))
-                    }
-
-                    do {
-                        try self.setUserName(name: uid)
-                    } catch let error {
-                        return completion(.failure(SudoUserClientError.fatalError(description: "Failed to set user name: \(error)")))
-                    }
-
-                    self.logger.info("Registration completed successfully..")
-
-                    completion(.success(uid))
-                }
-            }
-
-            self.registerOperationQueue.addOperation(op)
+        guard !(try await self.clientStateActor.isRegistered()) else {
+            throw SudoUserClientError.alreadyRegistered
         }
+
+        // Clear out any partial registration data.
+        try await self.reset()
+
+        var publicKey: PublicKey?
+        if authenticationProvider is TESTAuthenticationProvider {
+            publicKey = try await self.clientStateActor.generateRegistrationData()
+        }
+
+        var registrationParameters: [String: String] = [:]
+
+        let authInfo = try await authenticationProvider.getAuthenticationInfo()
+        let token = authInfo.toString()
+
+        let jwt: JWT
+        jwt = try JWT(string: token)
+
+        let uuid = (jwt.payload["sub"] as? String) ?? UUID().uuidString
+
+        registrationParameters[CognitoUserPoolIdentityProvider.RegistrationParameter.challengeType] = authInfo.type
+        registrationParameters[CognitoUserPoolIdentityProvider.RegistrationParameter.answer] = authInfo.toString()
+        registrationParameters[CognitoUserPoolIdentityProvider.RegistrationParameter.registrationId] = UUID().uuidString
+
+        if let publicKey = publicKey {
+            guard let encodedKey = try String(data: publicKey.toData(), encoding: .utf8) else {
+                throw SudoUserClientError.fatalError(description: "Cannot serialize the public key.")
+            }
+
+            registrationParameters[CognitoUserPoolIdentityProvider.RegistrationParameter.publicKey] = encodedKey
+        }
+
+        let uid = try await self.identityProvider.register(uid: uuid, parameters: registrationParameters)
+        try await self.setUserName(name: uid)
+
+        self.logger.info("Registration with authentication provider completed successfully.")
+
+        return uid
     }
 
-    public func registerWithAuthenticationProvider(authenticationProvider: AuthenticationProvider,
-                                                   registrationId: String?,
-                                                   completion: @escaping (Swift.Result<String, Error>) -> Void) throws {
-        self.logger.info("Performing registration with external authentication provider.")
-
-        try self.queue.sync {
-            guard !isRegistered() else {
-                throw SudoUserClientError.alreadyRegistered
-            }
-
-            guard self.registerOperationQueue.operationCount == 0 else {
-                throw SudoUserClientError.registerOperationAlreadyInProgress
-            }
-
-            // Clear out any partial registration data.
-            try self.reset()
-
-            // Generate the shared encryption key.
-            try self.generateSymmetricKey()
-
-            var publicKey: PublicKey?
-            if authenticationProvider is TESTAuthenticationProvider {
-                publicKey = try self.generateRegistrationData()
-            }
-
-            let op = RegisterWithAuthenticationProvider(authenticationProvider: authenticationProvider,
-                                                                 registrationId: registrationId,
-                                                                 publicKey: publicKey,
-                                                                 identityProvider: self.identityProvider,
-                                                                 logger: self.logger)
-            op.completionBlock = {
-                if let error = op.error {
-                    completion(.failure(error))
-                } else {
-                    guard let uid = op.uid else {
-                        return completion(.failure(SudoUserClientError.fatalError(description: "uid not found.")))
-                    }
-
-                    do {
-                        try self.generateSymmetricKey()
-                        try self.setUserName(name: uid)
-                    } catch let error {
-                        return completion(.failure(SudoUserClientError.fatalError(description: "Failed to set user name: \(error)")))
-                    }
-
-                    completion(.success(uid))
-                }
-            }
-
-            self.registerOperationQueue.addOperation(op)
-        }
-    }
-
-    public func deregister(completion: @escaping (Swift.Result<String, Error>) -> Void) throws {
+    public func deregister() async throws -> String {
         self.logger.info("Performing deregistration.")
 
         guard let uid = try self.getUserName() else {
@@ -494,198 +452,126 @@ public class DefaultSudoUserClient: SudoUserClient {
             throw SudoUserClientError.invalidConfig
         }
 
-        apiClient.perform(mutation: DeregisterMutation(), queue: self.queue, resultHandler: { (result, error) in
-            if let error = error as? AWSAppSyncClientError {
-                completion(.failure(GraphQLClientError.graphQLError(cause: [error])))
-            } else {
-                if let errors = result?.errors {
-                    completion(.failure(GraphQLClientError.graphQLError(cause: errors)))
+        return try await withCheckedThrowingContinuation({ (continuation: CheckedContinuation<String, Error>) in
+            apiClient.perform(mutation: DeregisterMutation(), queue: self.queue, resultHandler: { (result, error) in
+                if let error = error as? AWSAppSyncClientError {
+                    continuation.resume(throwing: SudoUserClientError.graphQLError(cause: [error]))
                 } else {
-                    self.logger.info("User deregistered successfully..")
+                    if let errors = result?.errors {
+                        continuation.resume(throwing: SudoUserClientError.graphQLError(cause: errors))
+                    } else {
+                        self.logger.info("User deregistered successfully..")
 
-                    do {
-                        try self.reset()
-                        completion(.success(uid))
-                    } catch let error {
-                        completion(.failure(error))
+                        Task(priority: .medium) {
+                            do {
+                                try await self.reset()
+                                continuation.resume(returning: uid)
+                            } catch let error {
+                                continuation.resume(throwing: error)
+                            }
+                        }
                     }
                 }
-            }
+            })
         })
     }
 
-    public func signInWithKey(completion: @escaping (Swift.Result<AuthenticationTokens, Error>) -> Void) throws {
+    public func signInWithKey() async throws -> AuthenticationTokens {
         self.logger.info("Performing sign in with private key.")
 
-        try self.queue.sync {
-            guard self.signInOperationQueue.operationCount == 0 else {
-                throw SudoUserClientError.signInOperationAlreadyInProgress
-            }
+        guard let apiClient = self.apiClient else {
+            throw SudoUserClientError.invalidConfig
+        }
 
-            guard let apiClient = self.apiClient else {
-                throw SudoUserClientError.invalidConfig
-            }
+        // Retrieve the stored user name and private key ID from the keychain.
+        guard let uid = try self.getUserName(),
+              let data = try self.keyManager.getPassword(Constants.KeyName.userKeyId),
+              let keyId = String(data: data, encoding: .utf8) else {
+                  throw SudoUserClientError.notRegistered
+              }
 
-            // Retrieve the stored user name and private key ID from the keychain.
-            guard let uid = try self.getUserName(),
-                let data = try self.keyManager.getPassword(Constants.KeyName.userKeyId),
-                let keyId = String(data: data, encoding: .utf8) else {
-                    throw SudoUserClientError.notRegistered
-            }
+        await self.signInObserversActor.notifyObservers(status: .signingIn)
 
-            self.signInStatusObservers.values.forEach { (observer) in
-                observer.signInStatusChanged(status: .signingIn)
-            }
+        let parameters: [String: Any] = [CognitoUserPoolIdentityProvider.AuthenticationParameter.keyId: keyId,
+                                         CognitoUserPoolIdentityProvider.AuthenticationParameter.tokenLifetime: self.tokenLifetime]
 
-            let parameters: [String: Any] = [CognitoUserPoolIdentityProvider.AuthenticationParameter.keyId: keyId,
-                                             CognitoUserPoolIdentityProvider.AuthenticationParameter.tokenLifetime: self.tokenLifetime]
+        do {
+            var tokens = try await self.identityProvider.signIn(uid: uid, parameters: parameters)
+            try await self.clientStateActor.storeTokens(tokens: tokens)
+            self.credentialsProvider.clearCredentials()
+            try await self.clientStateActor.storeRefreshTokenLifetime(refreshTokenLifetime: self.refreshTokenLifetime)
+            tokens = try await self.registerFederatedIdAndRefreshTokens(apiClient: apiClient, sudoUserClient: self, tokens: tokens)
 
-            let op = SignIn(identityProvider: self.identityProvider, sudoUserClient: self, uid: uid, parameters: parameters)
-            op.completionBlock = {
-                if let error = op.error {
-                    self.signInStatusObservers.values.forEach { (observer) in
-                        observer.signInStatusChanged(status: .notSignedIn(cause: error))
-                    }
+            await self.signInObserversActor.notifyObservers(status: .signedIn)
 
-                    completion(.failure(error))
-                } else {
-                    if let tokens = op.tokens {
-                        self.credentialsProvider.clearCredentials()
-                        do {
-                            try self.storeRefreshTokenLifetime(refreshTokenLifetime: self.refreshTokenLifetime)
-                            try self.registerFederatedIdAndRefreshTokens(apiClient: apiClient, sudoUserClient: self, tokens: tokens, completion: completion)
-                        } catch {
-                            self.signInStatusObservers.values.forEach { (observer) in
-                                observer.signInStatusChanged(status: .notSignedIn(cause: error))
-                            }
+            self.logger.info("Sign in with private key completed successfully.")
 
-                            completion(.failure(error))
-                        }
-                    } else {
-                        let error = SudoUserClientError.fatalError(description: "SignIn operation completed successfully but tokens were missing.")
-
-                        self.signInStatusObservers.values.forEach { (observer) in
-                            observer.signInStatusChanged(status: .notSignedIn(cause: error))
-                        }
-
-                        completion(.failure(error))
-                    }
-                }
-            }
-            self.signInOperationQueue.addOperation(op)
+            return tokens
+        } catch {
+            await self.signInObserversActor.notifyObservers(status: .notSignedIn(cause: error))
+            throw error
         }
     }
 
-    public func signInWithAuthenticationProvider(authenticationProvider: AuthenticationProvider, completion: @escaping (Swift.Result<AuthenticationTokens, Error>) -> Void) throws {
+    public func signInWithAuthenticationProvider(authenticationProvider: AuthenticationProvider) async throws -> AuthenticationTokens {
         self.logger.info("Performing sign in with authentication provider.")
 
-        try self.queue.sync {
-            guard self.signInOperationQueue.operationCount == 0 else {
-                throw SudoUserClientError.signInOperationAlreadyInProgress
-            }
+        guard let apiClient = self.apiClient else {
+            throw SudoUserClientError.invalidConfig
+        }
 
-            guard let apiClient = self.apiClient else {
-                throw SudoUserClientError.invalidConfig
-            }
+        await self.signInObserversActor.notifyObservers(status: .signingIn)
 
-            self.signInStatusObservers.values.forEach { (observer) in
-                observer.signInStatusChanged(status: .signingIn)
-            }
+        let authInfo = try await authenticationProvider.getAuthenticationInfo()
+        let uid = authInfo.getUsername()
+        let parameters: [String: Any] = [
+            CognitoUserPoolIdentityProvider.AuthenticationParameter.challengeType: "FSSO",
+            CognitoUserPoolIdentityProvider.AuthenticationParameter.answer: authInfo.toString()
+        ]
 
-            authenticationProvider.getAuthenticationInfo { (result) in
-                switch result {
-                case .success(let authenticationInfo):
-                    let uid = authenticationInfo.getUsername()
-                    let parameters: [String: Any] = [
-                        CognitoUserPoolIdentityProvider.AuthenticationParameter.challengeType: "FSSO",
-                        CognitoUserPoolIdentityProvider.AuthenticationParameter.answer: authenticationInfo.toString()
-                    ]
+        do {
+            var tokens = try await self.identityProvider.signIn(uid: uid, parameters: parameters)
+            try await self.clientStateActor.storeTokens(tokens: tokens)
+            self.credentialsProvider.clearCredentials()
+            try await self.clientStateActor.storeRefreshTokenLifetime(refreshTokenLifetime: self.refreshTokenLifetime)
+            tokens = try await self.registerFederatedIdAndRefreshTokens(apiClient: apiClient, sudoUserClient: self, tokens: tokens)
 
-                    let op = SignIn(identityProvider: self.identityProvider, sudoUserClient: self, uid: uid, parameters: parameters)
-                    op.completionBlock = {
-                        if let error = op.error {
-                            self.signInStatusObservers.values.forEach { (observer) in
-                                observer.signInStatusChanged(status: .notSignedIn(cause: error))
-                            }
+            await self.signInObserversActor.notifyObservers(status: .signedIn)
 
-                            completion(.failure(error))
-                        } else {
-                            if let tokens = op.tokens {
-                                self.credentialsProvider.clearCredentials()
-                                do {
-                                    try self.storeRefreshTokenLifetime(refreshTokenLifetime: self.refreshTokenLifetime)
-                                    try self.registerFederatedIdAndRefreshTokens(apiClient: apiClient, sudoUserClient: self, tokens: tokens, completion: completion)
-                                } catch {
-                                    self.signInStatusObservers.values.forEach { (observer) in
-                                        observer.signInStatusChanged(status: .notSignedIn(cause: error))
-                                    }
+            self.logger.info("Sign in with authentication provider completed successfully.")
 
-                                    completion(.failure(error))
-                                }
-                            } else {
-                                let error = SudoUserClientError.fatalError(description: "SignIn operation completed successfully but tokens were missing.")
-
-                                self.signInStatusObservers.values.forEach { (observer) in
-                                    observer.signInStatusChanged(status: .notSignedIn(cause: error))
-                                }
-
-                                completion(.failure(error))
-                            }
-                        }
-                    }
-                    self.signInOperationQueue.addOperation(op)
-                case .failure(let error):
-                    completion(.failure(error))
-                }
-            }
+            return tokens
+        } catch {
+            await self.signInObserversActor.notifyObservers(status: .notSignedIn(cause: error))
+            throw error
         }
     }
 
-    public func presentFederatedSignInUI(presentationAnchor: ASPresentationAnchor,
-                                         completion: @escaping(Swift.Result<AuthenticationTokens, Error>) -> Void) throws {
+    public func presentFederatedSignInUI(presentationAnchor: ASPresentationAnchor) async throws -> AuthenticationTokens {
         guard let authUI = self.authUI,
             let apiClient = self.apiClient else {
             throw SudoUserClientError.invalidConfig
         }
 
-        try authUI.presentFederatedSignInUI(presentationAnchor: presentationAnchor) { (result) in
-            do {
-                switch result {
-                case let .success(tokens):
-                    self.logger.info("Sign in completed successfully.")
+        let tokens = try await authUI.presentFederatedSignInUI(presentationAnchor: presentationAnchor)
+        try await self.setUserName(name: tokens.username)
+        try await self.clientStateActor.storeRefreshTokenLifetime(refreshTokenLifetime: self.refreshTokenLifetime)
+        try await self.clientStateActor.storeTokens(tokens: tokens)
 
-                    try self.setUserName(name: tokens.username)
-                    try self.storeRefreshTokenLifetime(refreshTokenLifetime: self.refreshTokenLifetime)
-                    try self.storeTokens(tokens: tokens)
+        self.credentialsProvider.clearCredentials()
 
-                    // Generate the symmetric key if one does not exist already.
-                    do {
-                        _ = try self.getSymmetricKeyId()
-                    } catch {
-                        try self.generateSymmetricKey()
-                    }
-
-                    self.credentialsProvider.clearCredentials()
-                    try self.registerFederatedIdAndRefreshTokens(apiClient: apiClient, sudoUserClient: self, tokens: tokens, completion: completion)
-                case let .failure(cause):
-                    completion(.failure(cause))
-                }
-            } catch let error {
-                completion(.failure(error))
-            }
-        }
+        return try await self.registerFederatedIdAndRefreshTokens(apiClient: apiClient, sudoUserClient: self, tokens: tokens)
     }
 
-    public func presentFederatedSignOutUI(presentationAnchor: ASPresentationAnchor,
-                                          completion: @escaping(Swift.Result<Void, Error>) -> Void) throws {
+    public func presentFederatedSignOutUI(presentationAnchor: ASPresentationAnchor) async throws {
         guard let authUI = self.authUI else {
             throw SudoUserClientError.invalidConfig
         }
 
-        try authUI.presentFederatedSignOutUI(presentationAnchor: presentationAnchor, completion: completion)
+        try await authUI.presentFederatedSignOutUI(presentationAnchor: presentationAnchor)
     }
 
-    public func processFederatedSignInTokens(url: URL) throws -> Bool {
+    public func processFederatedSignInTokens(url: URL) async throws -> Bool {
         guard let authUI = self.authUI else {
             throw SudoUserClientError.invalidConfig
         }
@@ -693,56 +579,33 @@ public class DefaultSudoUserClient: SudoUserClient {
         return authUI.processFederatedSignInTokens(url: url)
     }
 
-    public func refreshTokens(refreshToken: String, completion: @escaping (Swift.Result<AuthenticationTokens, Error>) -> Void) throws {
+    public func refreshTokens(refreshToken: String) async throws -> AuthenticationTokens {
         self.logger.info("Refreshing authentication tokens.")
 
-        try self.queue.sync {
-            guard self.signInOperationQueue.operationCount == 0 else {
-                throw SudoUserClientError.refreshTokensOperationAlreadyInProgress
-            }
+        await self.signInObserversActor.notifyObservers(status: .signingIn)
 
-            self.signInStatusObservers.values.forEach { (observer) in
-                observer.signInStatusChanged(status: .signingIn)
-            }
+        do {
+            let tokens = try await self.identityProvider.refreshTokens(refreshToken: refreshToken)
+            try await self.clientStateActor.storeTokens(tokens: tokens)
+            self.credentialsProvider.clearCredentials()
 
-            let op = RefreshTokens(identityProvider: self.identityProvider, sudoUserClient: self, refreshToken: refreshToken)
-            op.completionBlock = {
-                if let error = op.error {
-                    self.signInStatusObservers.values.forEach { (observer) in
-                        observer.signInStatusChanged(status: .notSignedIn(cause: error))
-                    }
+            await self.signInObserversActor.notifyObservers(status: .signedIn)
 
-                    completion(.failure(error))
-                } else {
-                    if let tokens = op.tokens {
-                        self.credentialsProvider.clearCredentials()
+            self.logger.info("Authentication tokens refreshed successfully.")
 
-                        self.signInStatusObservers.values.forEach { (observer) in
-                            observer.signInStatusChanged(status: .signedIn)
-                        }
-
-                        completion(.success(tokens))
-                    } else {
-                        let error = SudoUserClientError.fatalError(description: "RefreshTokens operation completed successfully but tokens were missing.")
-
-                        self.signInStatusObservers.values.forEach { (observer) in
-                            observer.signInStatusChanged(status: .notSignedIn(cause: error))
-                        }
-
-                        completion(.failure(error))
-                    }
-                }
-            }
-            self.signInOperationQueue.addOperation(op)
+            return tokens
+        } catch {
+            await self.signInObserversActor.notifyObservers(status: .notSignedIn(cause: error))
+            throw error
         }
     }
 
-    public func refreshTokens(completion: @escaping (Swift.Result<AuthenticationTokens, Error>) -> Void) throws {
+    public func refreshTokens() async throws -> AuthenticationTokens {
         guard let refreshToken = try self.getRefreshToken() else {
             throw SudoUserClientError.notSignedIn
         }
 
-        try self.refreshTokens(refreshToken: refreshToken, completion: completion)
+        return try await self.refreshTokens(refreshToken: refreshToken)
     }
 
     public func getUserName() throws -> String? {
@@ -810,61 +673,52 @@ public class DefaultSudoUserClient: SudoUserClient {
         return refreshToken
     }
 
-    public func encrypt(keyId: String, algorithm: SymmetricKeyEncryptionAlgorithm, data: Data) throws -> Data {
-        let iv = try self.keyManager.createIV()
-        let encryptedData = try self.keyManager.encryptWithSymmetricKey(keyId, data: data, iv: iv)
-        return encryptedData + iv
+    public func clearAuthTokens() async throws {
+        try await self.clientStateActor.clearAuthTokens()
     }
-
-    public func decrypt(keyId: String, algorithm: SymmetricKeyEncryptionAlgorithm, data: Data) throws -> Data {
-        guard data.count > SudoKeyManagerImpl.Constants.defaultBlockSizeAES else {
-            throw SudoUserClientError.invalidInput
+    
+    public func signOut() async throws {
+        self.logger.info("Performing sign out.")
+        
+        guard let refreshToken = try self.getRefreshToken() else {
+            throw SudoUserClientError.notSignedIn
         }
 
-        let encryptedData = data[0..<data.count - 16]
-        let iv = data[data.count - 16..<data.count]
-        return try self.keyManager.decryptWithSymmetricKey(keyId, data: encryptedData, iv: iv)
+        try await self.identityProvider.signOut(refreshToken: refreshToken)
+        try await self.clearAuthTokens()
     }
 
-    public func clearAuthTokens() throws {
-        try self.keyManager.deletePassword(Constants.KeyName.idToken)
-        try self.keyManager.deletePassword(Constants.KeyName.accessToken)
-        try self.keyManager.deletePassword(Constants.KeyName.refreshToken)
-        try self.keyManager.deletePassword(Constants.KeyName.tokenExpiry)
-
-        if let authUI = self.authUI {
-            authUI.reset()
-        }
-    }
-
-    public func globalSignOut(completion: @escaping(Swift.Result<Void, Error>) -> Void) throws {
+    public func globalSignOut() async throws {
         self.logger.info("Performing global sign out.")
 
         guard let apiClient = self.apiClient else {
             throw SudoUserClientError.invalidConfig
         }
 
-        apiClient.perform(mutation: GlobalSignOutMutation(), queue: self.queue, resultHandler: { (result, error) in
-            if let error = error as? AWSAppSyncClientError {
-                completion(.failure(GraphQLClientError.graphQLError(cause: [error])))
-            } else {
-                if let errors = result?.errors {
-                    completion(.failure(GraphQLClientError.graphQLError(cause: errors)))
+        return try await withCheckedThrowingContinuation({ (continuation: CheckedContinuation<Void, Error>) in
+            apiClient.perform(mutation: GlobalSignOutMutation(), queue: self.queue, resultHandler: { (result, error) in
+                if let error = error as? AWSAppSyncClientError {
+                    continuation.resume(throwing: SudoUserClientError.graphQLError(cause: [error]))
                 } else {
-                    self.logger.info("User globally signed out successfully.")
-
-                    do {
-                        try self.clearAuthTokens()
-                        completion(.success(()))
-                    } catch let error {
-                        completion(.failure(error))
+                    if let errors = result?.errors {
+                        continuation.resume(throwing: SudoUserClientError.graphQLError(cause: errors))
+                    } else {
+                        self.logger.info("User globally signed out successfully.")
+                        Task(priority: .medium) {
+                            do {
+                                try await self.clearAuthTokens()
+                                continuation.resume()
+                            } catch let error {
+                                continuation.resume(throwing: error)
+                            }
+                        }
                     }
                 }
-            }
+            })
         })
     }
 
-    public func getIdentityId() -> String? {
+    public func getIdentityId() async -> String? {
         return try? self.getUserClaim(name: "custom:identityId") as? String
     }
 
@@ -877,7 +731,7 @@ public class DefaultSudoUserClient: SudoUserClient {
         return jwt.payload[name]
     }
 
-    public func isSignedIn() throws -> Bool {
+    public func isSignedIn() async throws -> Bool {
         guard try self.getIdToken() != nil,
             try self.getAccessToken() != nil,
             let expiry = try self.getRefreshTokenExpiry() else {
@@ -888,46 +742,12 @@ public class DefaultSudoUserClient: SudoUserClient {
         return expiry > Date(timeIntervalSinceNow: 60 * 60)
     }
 
-    public func registerSignInStatusObserver(id: String, observer: SignInStatusObserver) {
-        self.syncQueue.sync {
-            self.signInStatusObservers[id] = observer
-        }
+    public func registerSignInStatusObserver(id: String, observer: SignInStatusObserver) async {
+        await self.signInObserversActor.registerSignInStatusObserver(id: id, observer: observer)
     }
 
-    public func deregisterSignInStatusObserver(id: String) {
-        self.syncQueue.sync {
-            _ = self.signInStatusObservers.removeValue(forKey: id)
-        }
-    }
-
-    public func storeTokens(tokens: AuthenticationTokens) throws {
-        guard let idTokenData = tokens.idToken.data(using: .utf8),
-            let accessTokenData = tokens.accessToken.data(using: .utf8),
-            let refreshTokenData = tokens.refreshToken.data(using: .utf8),
-            let tokenExpiryData = "\(Date().timeIntervalSince1970 + Double(tokens.lifetime))".data(using: .utf8) else {
-                throw SudoUserClientError.fatalError(description: "Tokens cannot be serialized.")
-        }
-
-        // Cache the tokens and token lifetime in the keychain.
-        try self.keyManager.deletePassword(Constants.KeyName.idToken)
-        try self.keyManager.addPassword(idTokenData, name: Constants.KeyName.idToken)
-
-        try self.keyManager.deletePassword(Constants.KeyName.accessToken)
-        try self.keyManager.addPassword(accessTokenData, name: Constants.KeyName.accessToken)
-
-        try self.keyManager.deletePassword(Constants.KeyName.refreshToken)
-        try self.keyManager.addPassword(refreshTokenData, name: Constants.KeyName.refreshToken)
-
-        try self.keyManager.deletePassword(Constants.KeyName.tokenExpiry)
-        try self.keyManager.addPassword(tokenExpiryData, name: Constants.KeyName.tokenExpiry)
-    }
-
-    private func storeRefreshTokenLifetime(refreshTokenLifetime: Int) throws {
-        // If a new refresh token lifetime is specified then stored that in the keychain as well.
-        if let refreshTokenExpiryData = "\(Date().timeIntervalSince1970 + Double(refreshTokenLifetime * 24 * 60 * 60))".data(using: .utf8) {
-            try self.keyManager.deletePassword(Constants.KeyName.refreshTokenExpiry)
-            try self.keyManager.addPassword(refreshTokenExpiryData, name: Constants.KeyName.refreshTokenExpiry)
-        }
+    public func deregisterSignInStatusObserver(id: String) async {
+        await self.signInObserversActor.deregisterSignInStatusObserver(id: id)
     }
 
     private func getPrivateKeyId() throws -> String? {
@@ -943,57 +763,8 @@ public class DefaultSudoUserClient: SudoUserClient {
         }
     }
 
-    public func setUserName(name: String) throws {
-        guard let data = name.data(using: .utf8) else {
-            throw SudoUserClientError.fatalError(description: "Cannot serialize user name.")
-        }
-
-        // Delete the user name first so there won't be a conflict when adding the new one.
-        try self.keyManager.deletePassword(Constants.KeyName.userId)
-
-        try self.keyManager.addPassword(data, name: Constants.KeyName.userId)
-    }
-
-    private func generateRegistrationData() throws -> PublicKey {
-        // Generate a public/private key pair for this identity.
-        let keyId = try self.keyManager.generateKeyId()
-        try self.keyManager.deleteKeyPair(keyId)
-        try self.keyManager.generateKeyPair(keyId)
-
-        guard let publicKeyData = try self.keyManager.getPublicKey(keyId) else {
-            throw SudoUserClientError.fatalError(description: "Public key not found.")
-        }
-
-        // Make sure the key ID that we are trying to add don't exist.
-        try self.keyManager.deletePassword(Constants.KeyName.userKeyId)
-
-        // Store the key ID for user key in the keychain.
-        guard let keyIdData = keyId.data(using: .utf8) else {
-            throw SudoUserClientError.fatalError(description: "Cannot convert key ID to data.")
-        }
-
-        try self.keyManager.addPassword(keyIdData, name: Constants.KeyName.userKeyId)
-
-        let publicKey = PublicKey(publicKey: publicKeyData, keyId: keyId)
-
-        return publicKey
-    }
-
-    private func generateSymmetricKey() throws {
-        // Generate symmetric key and store it under a unique key ID.
-        let symmetricKeyId = try self.keyManager.generateKeyId()
-
-        // Make sure symmetric key does not exists.
-        try self.keyManager.deletePassword(Constants.KeyName.symmetricKeyId)
-        try self.keyManager.deletePassword(symmetricKeyId)
-
-        try self.keyManager.generateSymmetricKey(symmetricKeyId)
-
-        guard let symmetricKeyIdData = symmetricKeyId.data(using: .utf8) else {
-            throw SudoUserClientError.fatalError(description: "Cannot convert key ID to data.")
-        }
-
-        try self.keyManager.addPassword(symmetricKeyIdData, name: Constants.KeyName.symmetricKeyId)
+    public func setUserName(name: String) async throws {
+        try await self.clientStateActor.setUserName(name: name)
     }
 
     /// Performs federated sign in and binds the resulting identity ID to the user. It also refreshes the authentication tokens so that
@@ -1005,56 +776,40 @@ public class DefaultSudoUserClient: SudoUserClient {
     ///   - idToken: ID token to use for federated sign in.
     ///   - refreshToken: Refresh token to use for refreshing authentication tokens.
     ///   - completion: completion handler to pass the resulting tokens or error.
-    private func registerFederatedIdAndRefreshTokens(apiClient: AWSAppSyncClient,
-                                                     sudoUserClient: SudoUserClient,
-                                                     tokens: AuthenticationTokens,
-                                                     completion: @escaping (Swift.Result<AuthenticationTokens, Error>) -> Void) throws {
+    private func registerFederatedIdAndRefreshTokens(
+        apiClient: AWSAppSyncClient,
+        sudoUserClient: SudoUserClient,
+        tokens: AuthenticationTokens
+    ) async throws -> AuthenticationTokens {
         guard try self.getUserClaim(name: "custom:identityId") == nil else {
-            self.signInStatusObservers.values.forEach { (observer) in
-                observer.signInStatusChanged(status: .signedIn)
-            }
-
-            return completion(.success(tokens))
+            await self.signInObserversActor.notifyObservers(status: .signedIn)
+            return tokens
         }
 
         self.logger.info("Registering federated identity.")
 
-        let registerFederatedIdOp = RegisterFederatedId(apiClient: apiClient, idToken: tokens.idToken)
-        let getIdentityIdOp = GetIdentityId(credentialsProvider: self.credentialsProvider)
-        let refreshTokensOp = RefreshTokens(identityProvider: self.identityProvider, sudoUserClient: self, refreshToken: tokens.refreshToken)
-        let operations: [UserOperation] = [registerFederatedIdOp, getIdentityIdOp, refreshTokensOp]
-
-        getIdentityIdOp.addDependency(registerFederatedIdOp)
-        refreshTokensOp.addDependency(getIdentityIdOp)
-
-        refreshTokensOp.completionBlock = {
-            let errors = operations.compactMap { $0.error }
-            if let error = errors.first {
-                self.signInStatusObservers.values.forEach { (observer) in
-                    observer.signInStatusChanged(status: .notSignedIn(cause: error))
-                }
-
-                completion(.failure(error))
-            } else {
-                if let tokens = refreshTokensOp.tokens {
-                    self.signInStatusObservers.values.forEach { (observer) in
-                        observer.signInStatusChanged(status: .signedIn)
-                    }
-
-                    completion(.success(tokens))
+        try await withCheckedThrowingContinuation({ (continuation: CheckedContinuation<Void, Error>) in
+            let input = RegisterFederatedIdInput(idToken: tokens.idToken)
+            apiClient.perform(mutation: RegisterFederatedIdMutation(input: input), queue: self.queue, resultHandler: { (result, error) in
+                if let error = error as? AWSAppSyncClientError {
+                    continuation.resume(throwing: SudoUserClientError.graphQLError(cause: [error]))
                 } else {
-                    let error = SudoUserClientError.fatalError(description: "RefreshTokens operation completed successfully but tokens were missing.")
-
-                    self.signInStatusObservers.values.forEach { (observer) in
-                        observer.signInStatusChanged(status: .notSignedIn(cause: error))
+                    if let errors = result?.errors {
+                        continuation.resume(throwing: SudoUserClientError.graphQLError(cause: errors))
                     }
 
-                    completion(.failure(error))
-                }
-            }
-        }
+                    self.logger.info("Federated identity registered successfully.")
 
-        self.signInOperationQueue.addOperations(operations, waitUntilFinished: false)
+                    continuation.resume()
+                }
+            })
+        })
+
+        // Refresh the cached identity ID.
+        _ = try await self.credentialsProvider.getIdentityId()
+
+        // Refresh the ID token so it contains the registered identity ID as a claim.
+        return try await self.refreshTokens(refreshToken: tokens.refreshToken)
     }
 
     public func getSupportedRegistrationChallengeType() -> [ChallengeType] {

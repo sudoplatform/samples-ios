@@ -8,6 +8,7 @@
 import XCTest
 import UIKit
 import SudoDIRelay
+
 @testable import DIRelayExample
 
 class ConnectionViewControllerTests: XCTestCase {
@@ -20,11 +21,8 @@ class ConnectionViewControllerTests: XCTestCase {
     // MARK: - Lifecycle
 
     override func setUp() {
-        do {
-            testUtility = try DIRelayExampleTestUtility()
-        } catch {
-            XCTFail(error.localizedDescription)
-        }
+
+        testUtility = DIRelayExampleTestUtility()
         instanceUnderTest = testUtility.storyBoard.resolveViewController(identifier: "connection")
         instanceUnderTest.loadViewIfNeeded()
         testUtility.window.rootViewController = instanceUnderTest
@@ -77,16 +75,25 @@ class ConnectionViewControllerTests: XCTestCase {
         //XCTAssert(self.instanceUnderTest.messageLog[0].message == message)
     }
 
-    func test_PrepareMetadataOnLoad_CallsSubscribeToMessagesReceived() {
-        instanceUnderTest.prepareMetadataOnLoad()
-        waitForAsync()
-        XCTAssertTrue(testUtility.relayClient.subscribeToMessagesReceivedCalled)
+    func test_PrepareMetadataOnLoad_CallsSubscribeToMessagesReceived() async {
+        testUtility.relayClient.listMessagesResult = []
+        do {
+            try await instanceUnderTest.prepareMetadataOnLoad()
+            XCTAssertTrue(testUtility.relayClient.subscribeToMessagesReceivedCalled)
+        } catch {
+            XCTFail("Unexpected throw in test.")
+        }
     }
 
-    func test_PrepareMetadataOnLoad_CallsGetMessages() {
-        instanceUnderTest.prepareMetadataOnLoad()
-        waitForAsync()
-        XCTAssertTrue(testUtility.relayClient.getMessagesCalled)
+    func test_PrepareMetadataOnLoad_CallsListMessages() async {
+        testUtility.relayClient.listMessagesResult = []
+        do {
+            try await instanceUnderTest.prepareMetadataOnLoad()
+            XCTAssertTrue(testUtility.relayClient.listMessagesCalled)
+        } catch {
+            XCTFail("Unexpected throw in test.")
+        }
+
     }
 
     func test_PerformSegue_SeguesToConnectionView() {

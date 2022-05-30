@@ -25,16 +25,21 @@ public protocol S3Client: AnyObject {
     ///
     /// - Parameters:
     ///   - key: S3 key associated with the object.
-    ///   - completion: Completion handler to invoke to pass the retrieved object as `Data` or error.
+    ///
+    /// - Returns: Retrieved object as `Data`.
+    ///
     /// - Throws: `S3ClientError`
-    func getObject(key: String, completion: @escaping (Swift.Result<Data, Error>) -> Void) throws
+    func getObject(key: String) async throws -> Data
     
     /// Lists the content of the S3 bucket associated with this client.
     ///
     /// - Parameters:
-    ///   - completion: Completion handler to invoke to pass the list of object keys or error.
+    ///   - completion: Completion handler to invoke to pass the
+    ///
+    /// - Returns: List of object keys.
+    ///
     /// - Throws: `S3ClientError`
-    func listObjects(completion: @escaping (Swift.Result<[String], Error>) -> Void) throws
+    func listObjects() async throws -> [String]
     
 }
 
@@ -68,7 +73,7 @@ class DefaultS3Client: S3Client {
         self.s3Client = AWSS3.s3(forKey: Constants.serviceClientKey)
     }
     
-    func getObject(key: String, completion: @escaping (Swift.Result<Data, Error>) -> Void) throws {
+    func getObject(key: String) async throws -> Data {
         self.logger.info("Retrieving a S3 object. bucket: \(self.bucket), key: \(key)")
         
         guard let request = AWSS3GetObjectRequest() else {
@@ -77,23 +82,26 @@ class DefaultS3Client: S3Client {
         
         request.bucket = self.bucket
         request.key = key
-        self.s3Client.getObject(request).continueWith { (task) -> AnyObject? in
-            if let error = task.error {
-                completion(.failure(S3ClientError.serviceError(cause: error)))
+        
+        return try await withCheckedThrowingContinuation({ (continuation: CheckedContinuation<Data, Error>) in
+            self.s3Client.getObject(request).continueWith { (task) -> AnyObject? in
+                if let error = task.error {
+                    continuation.resume(throwing: S3ClientError.serviceError(cause: error))
+                    return nil
+                }
+                
+                guard let body = task.result?.body as? Data else {
+                    continuation.resume(throwing: S3ClientError.fatalError(description: "Result did not contain JSON data."))
+                    return nil
+                }
+                
+                continuation.resume(returning: body)
                 return nil
             }
-            
-            guard let body = task.result?.body as? Data else {
-                completion(.failure(S3ClientError.fatalError(description: "Result did not contain JSON data.")))
-                return nil
-            }
-            
-            completion(.success(body))
-            return nil
-        }
+        })
     }
     
-    func listObjects(completion: @escaping (Result<[String], Error>) -> Void) throws {
+    func listObjects() async throws -> [String] {
         self.logger.info("Listing objects in S3 bucket: \(self.bucket)")
         
         guard let request = AWSS3ListObjectsV2Request() else {
@@ -101,20 +109,23 @@ class DefaultS3Client: S3Client {
         }
         
         request.bucket = self.bucket
-        self.s3Client.listObjectsV2(request).continueWith { (task) -> AnyObject? in
-            if let error = task.error {
-                completion(.failure(S3ClientError.serviceError(cause: error)))
+        
+        return try await withCheckedThrowingContinuation({ (continuation: CheckedContinuation<[String], Error>) in
+            self.s3Client.listObjectsV2(request).continueWith { (task) -> AnyObject? in
+                if let error = task.error {
+                    continuation.resume(throwing: S3ClientError.serviceError(cause: error))
+                    return nil
+                }
+                
+                guard let objects = task.result?.contents else {
+                    continuation.resume(returning: [])
+                    return nil
+                }
+                
+                continuation.resume(returning: objects.compactMap { $0.key })
                 return nil
             }
-            
-            guard let objects = task.result?.contents else {
-                completion(.success([]))
-                return nil
-            }
-            
-            completion(.success(objects.compactMap { $0.key }))
-            return nil
-        }
+        })
     }
     
 }

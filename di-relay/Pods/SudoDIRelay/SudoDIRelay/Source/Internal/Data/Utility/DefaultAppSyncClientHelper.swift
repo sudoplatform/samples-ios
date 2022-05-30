@@ -10,6 +10,7 @@ import SudoLogging
 import AWSCore
 import SudoConfigManager
 import SudoUser
+import SudoApiClient
 
 public class DefaultAppSyncClientHelper: AppSyncClientHelper {
 
@@ -36,8 +37,8 @@ public class DefaultAppSyncClientHelper: AppSyncClientHelper {
     /// Default logger for DefaultAppSyncClientHelper.
     private let logger: Logger = Logger(identifier: "DefaultAppSyncClientHelper", driver: NSLogDriver(level: .debug))
 
-    /// GraphQL client used calling Identity Service API.
-    private var appSyncClient: AWSAppSyncClient?
+    /// Client used to call into GraphQL endpoints
+    private var sudoApiClient: SudoApiClient
 
     /// HTTP endpoint for peers to post messages to.
     private var relayServiceEndpoint: String
@@ -62,15 +63,23 @@ public class DefaultAppSyncClientHelper: AppSyncClientHelper {
         }
 
         /// AppSync client
-        let config: SudoDIRelayConfig = SudoDIRelayConfig(endpoint: graphQlUrl, region: AWSRegionType.USEast1)
+        let config = SudoDIRelayConfig(endpoint: graphQlUrl, region: AWSRegionType.USEast1)
         let authProvider = GraphQLAuthProvider(client: userClient)
         let cacheConfiguration = try AWSAppSyncCacheConfiguration()
         let appSyncConfig = try AWSAppSyncClientConfiguration(
             appSyncServiceConfig: config,
             userPoolsAuthProvider: authProvider,
             cacheConfiguration: cacheConfiguration)
-        self.appSyncClient = try AWSAppSyncClient(appSyncConfig: appSyncConfig)
-        self.appSyncClient?.apolloClient?.cacheKeyForObject = { $0["id"] }
+        let appSyncClient = try AWSAppSyncClient(appSyncConfig: appSyncConfig)
+        appSyncClient.apolloClient?.cacheKeyForObject = { $0["id"] }
+
+        /// SudoApiClient
+        self.sudoApiClient = try SudoApiClient(
+            configProvider: config,
+            sudoUserClient: userClient,
+            logger: Logger.sudoApiClientLogger,
+            appSyncClient: appSyncClient
+        )
 
         /// HTTP endpoint
         guard let endpoint = relayServiceConfig[RelayService.httpEndpoint] as? String else {
@@ -81,8 +90,8 @@ public class DefaultAppSyncClientHelper: AppSyncClientHelper {
 
     // MARK: - Conformance: AppSyncClientHelper
 
-    public func getAppSyncClient() -> AWSAppSyncClient? {
-        return self.appSyncClient
+    public func getSudoApiClient() -> SudoApiClient {
+        return self.sudoApiClient
     }
 
     public func getHttpEndpoint() -> String {

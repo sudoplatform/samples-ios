@@ -20,11 +20,7 @@ class CreateInvitationCodeViewControllerTests: XCTestCase {
     // MARK: - Lifecycle
 
     override func setUp() {
-        do {
-            testUtility = try DIRelayExampleTestUtility()
-        } catch {
-            XCTFail(error.localizedDescription)
-        }
+        testUtility = DIRelayExampleTestUtility()
         instanceUnderTest = testUtility.storyBoard.resolveViewController(identifier: "createInvitation")
         instanceUnderTest.loadViewIfNeeded()
         testUtility.window.rootViewController = instanceUnderTest
@@ -33,12 +29,11 @@ class CreateInvitationCodeViewControllerTests: XCTestCase {
         instanceUnderTest.myPostboxId = DataFactory.RelaySDK.randomConnectionId()
     }
 
-    func test_CreateInvitationCode_CallsSubscription() {
+    func test_CreateInvitationCode_CallsSubscription() async {
         testUtility.relayClient.subscribeToMessagesReceivedResult = .success(DataFactory.RelaySDK.generateRelayMessage())
-        waitUntil { done in
-            defer { done() }
-            self.instanceUnderTest.createInvitationCode()
-        }
+
+        await self.instanceUnderTest.createInvitationCode()
+
         XCTAssertTrue(self.testUtility.relayClient.subscribeToMessagesReceivedCalled)
     }
 

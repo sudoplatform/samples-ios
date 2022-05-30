@@ -23,20 +23,6 @@ open class MockSudoUserClient: SudoUserClient {
         return self.isRegisteredReturn
     }
 
-    public var getSymmetricKeyIdCalled: Bool = false
-    public var getSymmetricKeyIdReturn: String = ""
-    public var getSymmetricKeyIdError: Error?
-
-    open func getSymmetricKeyId() throws -> String {
-        self.getSymmetricKeyIdCalled = true
-
-        if let error = self.getSymmetricKeyIdError {
-            throw error
-        }
-
-        return self.getSymmetricKeyIdReturn
-    }
-
     public var resetCalled: Bool = false
     public var resetError: Error?
 
@@ -48,35 +34,15 @@ open class MockSudoUserClient: SudoUserClient {
         }
     }
 
-    public var registerCalled: Bool = false
-    public var registerResult: Result<String, Error> = .success("")
-    public var registerError: Error?
-    public var registerParamChallenge: RegistrationChallenge?
-    public var registerParamVendorId: UUID?
-    public var registerParamRegistrationId: String?
-
-    open func register(challenge: RegistrationChallenge, vendorId: UUID?, registrationId: String?, completion: @escaping (Result<String, Error>) -> Void) throws {
-        self.registerCalled = true
-        self.registerParamChallenge = challenge
-        self.registerParamVendorId = vendorId
-        self.registerParamRegistrationId = registrationId
-
-        if let error = self.registerError {
-            throw error
-        }
-
-        completion(self.registerResult)
-    }
-
     public var registerWithDeviceCheckCalled: Bool = false
-    public var registerWithDeviceCheckResult: Result<String, Error> = .success("")
+    public var registerWithDeviceCheckResult: String = ""
     public var registerWithDeviceCheckError: Error?
     public var registerWithDeviceCheckParamToken: Data?
     public var registerWithDeviceCheckParamBuildType: String?
     public var registerWithDeviceCheckParamVendorId: UUID?
     public var registerWithDeviceCheckParamRegistrationId: String?
 
-    open func registerWithDeviceCheck(token: Data, buildType: String, vendorId: UUID?, registrationId: String?, completion: @escaping (Result<String, Error>) -> Void) throws {
+    open func registerWithDeviceCheck(token: Data, buildType: String, vendorId: UUID, registrationId: String?) async throws -> String {
         self.registerWithDeviceCheckCalled = true
         self.registerWithDeviceCheckParamBuildType = buildType
         self.registerWithDeviceCheckParamToken = token
@@ -87,16 +53,16 @@ open class MockSudoUserClient: SudoUserClient {
             throw error
         }
 
-        completion(self.registerWithDeviceCheckResult)
+        return self.registerWithDeviceCheckResult
     }
 
     public var registerWithAuthenticationProviderCalled: Bool = false
-    public var registerWithAuthenticationProviderResult: Result<String, Error> = .success("")
+    public var registerWithAuthenticationProviderResult: String = ""
     public var registerWithAuthenticationProviderError: Error?
     public var registerWithAuthenticationProviderParamAuthenticationProvider: AuthenticationProvider?
     public var registerWithAuthenticationProviderParamRegistrationId: String?
 
-    open func registerWithAuthenticationProvider(authenticationProvider: AuthenticationProvider, registrationId: String?, completion: @escaping (Result<String, Error>) -> Void) throws {
+    open func registerWithAuthenticationProvider(authenticationProvider: AuthenticationProvider, registrationId: String?) async throws -> String {
         self.registerWithAuthenticationProviderCalled = true
         self.registerWithAuthenticationProviderParamAuthenticationProvider = authenticationProvider
         self.registerWithAuthenticationProviderParamRegistrationId = registrationId
@@ -105,37 +71,43 @@ open class MockSudoUserClient: SudoUserClient {
             throw error
         }
 
-        completion(self.registerWithAuthenticationProviderResult)
+        return  self.registerWithAuthenticationProviderResult
     }
 
     public var deregisterCalled: Bool = false
-    public var deregisterResult: Result<String, Error> = .success("")
+    public var deregisterResult: String = ""
+    public var deregisterError: Error?
 
-    open func deregister(completion: @escaping (Result<String, Error>) -> Void) {
+    open func deregister() async throws -> String {
         self.deregisterCalled = true
-        completion(self.deregisterResult)
+        
+        if let error = self.deregisterError {
+            throw error
+        }
+        
+        return self.deregisterResult
     }
 
     public var signInWithKeyCalled: Bool = false
-    public var signInWithKeyResult: Result<AuthenticationTokens, Error> = .success(AuthenticationTokens(idToken: "", accessToken: "", refreshToken: "", lifetime: 0, username: ""))
+    public var signInWithKeyResult: AuthenticationTokens = AuthenticationTokens(idToken: "", accessToken: "", refreshToken: "", lifetime: 0, username: "")
     public var signInWithKeyError: Error?
 
-    open func signInWithKey(completion: @escaping (Result<AuthenticationTokens, Error>) -> Void) throws {
+    open func signInWithKey() async throws -> AuthenticationTokens {
         self.signInWithKeyCalled = true
 
         if let error = self.signInWithKeyError {
             throw error
         }
 
-        completion(self.signInWithKeyResult)
+        return self.signInWithKeyResult
     }
 
     public var refreshTokensCalled: Bool = false
-    public var refreshTokensResult: Result<AuthenticationTokens, Error> = .success(AuthenticationTokens(idToken: "", accessToken: "", refreshToken: "", lifetime: 0, username: ""))
+    public var refreshTokensResult: AuthenticationTokens = AuthenticationTokens(idToken: "", accessToken: "", refreshToken: "", lifetime: 0, username: "")
     public var refreshTokensError: Error?
     public var refreshTokensParamRefreshToken: String?
 
-    open func refreshTokens(refreshToken: String, completion: @escaping (Result<AuthenticationTokens, Error>) -> Void) throws {
+    open func refreshTokens(refreshToken: String) async throws -> AuthenticationTokens {
         self.refreshTokensCalled = true
         self.refreshTokensParamRefreshToken = refreshToken
 
@@ -143,13 +115,13 @@ open class MockSudoUserClient: SudoUserClient {
             throw error
         }
 
-        completion(self.refreshTokensResult)
+        return self.refreshTokensResult
     }
 
     public var refreshToken: String = ""
 
-    open func refreshTokens(completion: @escaping (Result<AuthenticationTokens, Error>) -> Void) throws {
-        try self.refreshTokens(refreshToken: self.refreshToken, completion: completion)
+    open func refreshTokens() async throws -> AuthenticationTokens {
+        return try await self.refreshTokens(refreshToken: self.refreshToken)
     }
 
     public var getUserNameCalled: Bool = false
@@ -249,72 +221,29 @@ open class MockSudoUserClient: SudoUserClient {
         return self.getRefreshTokenExpiryReturn
     }
 
-    public var encryptCalled: Bool = false
-    public var encryptReturn = Data()
-    public var encryptError: Error?
-    public var encryptParamKeyId: String?
-    public var encryptParamAlgorithm: SymmetricKeyEncryptionAlgorithm?
-    public var encryptParamData: Data?
-
-    open func encrypt(keyId: String, algorithm: SymmetricKeyEncryptionAlgorithm, data: Data) throws -> Data {
-        self.encryptCalled = true
-        self.encryptParamKeyId = keyId
-        self.encryptParamAlgorithm = algorithm
-        self.encryptParamData = data
-
-        if let error = self.encryptError {
-            throw error
-        }
-
-        return self.encryptReturn
-    }
-
-    public var decryptCalled: Bool = false
-    public var decryptReturn = Data()
-    public var decryptError: Error?
-    public var decryptParamKeyId: String?
-    public var decryptParamAlgorithm: SymmetricKeyEncryptionAlgorithm?
-    public var decryptParamData: Data?
-
-    open func decrypt(keyId: String, algorithm: SymmetricKeyEncryptionAlgorithm, data: Data) throws -> Data {
-        self.decryptCalled = true
-        self.decryptParamKeyId = keyId
-        self.decryptParamAlgorithm = algorithm
-        self.decryptParamData = data
-
-        if let error = self.decryptError {
-            throw error
-        }
-
-        return self.decryptReturn
-    }
-
     public var presentFederatedSignInUICalled: Bool = false
     public var presentFederatedSignInUIError: Error?
-    public var presentFederatedSignInUIResult: Result<AuthenticationTokens, Error> = .success(AuthenticationTokens(idToken: "", accessToken: "", refreshToken: "", lifetime: 0, username: ""))
+    public var presentFederatedSignInUIResult: AuthenticationTokens = AuthenticationTokens(idToken: "", accessToken: "", refreshToken: "", lifetime: 0, username: "")
 
-    open func presentFederatedSignInUI(presentationAnchor: ASPresentationAnchor, completion: @escaping (Result<AuthenticationTokens, Error>) -> Void) throws {
+    open func presentFederatedSignInUI(presentationAnchor: ASPresentationAnchor) async throws -> AuthenticationTokens {
         self.presentFederatedSignInUICalled = true
 
         if let error = self.presentFederatedSignInUIError {
             throw error
         }
 
-        completion(self.presentFederatedSignInUIResult)
+        return self.presentFederatedSignInUIResult
     }
 
     public var presentFederatedSignOutUICalled: Bool = false
     public var presentFederatedSignOutUIError: Error?
-    public var presentFederatedSignOutUIResult: Result<Void, Error> = .success(())
 
-    open func presentFederatedSignOutUI(presentationAnchor: ASPresentationAnchor, completion: @escaping (Result<Void, Error>) -> Void) throws {
+    open func presentFederatedSignOutUI(presentationAnchor: ASPresentationAnchor) async throws {
         self.presentFederatedSignOutUICalled = true
 
         if let error = self.presentFederatedSignOutUIError {
             throw error
         }
-
-        completion(self.presentFederatedSignOutUIResult)
     }
 
     public var processFederatedSignInTokensCalled: Bool = false
@@ -343,19 +272,27 @@ open class MockSudoUserClient: SudoUserClient {
             throw error
         }
     }
+    
+    public var signOutCalled: Bool = false
+    public var signOutError: Error?
+
+    open func signOut() async throws {
+        self.signOutCalled = true
+
+        if let error = self.signOutError {
+            throw error
+        }
+    }
 
     public var globalSignOutCalled: Bool = false
     public var globalSignOutError: Error?
-    public var globalSignOutResult: Result<Void, Error> = .success(())
 
-    open func globalSignOut(completion: @escaping (Result<Void, Error>) -> Void) throws {
+    open func globalSignOut() async throws {
         self.globalSignOutCalled = true
 
         if let error = self.globalSignOutError {
             throw error
         }
-
-        completion(self.globalSignOutResult)
     }
 
     public var getIdentityIdCalled: Bool = false
@@ -441,11 +378,11 @@ open class MockSudoUserClient: SudoUserClient {
     }
 
     public var signInWithAuthenticationProviderCalled: Bool = false
-    public var signInWithAuthenticationProviderResult: Result<AuthenticationTokens, Error> = .success(AuthenticationTokens(idToken: "", accessToken: "", refreshToken: "", lifetime: 0, username: ""))
+    public var signInWithAuthenticationProviderResult: AuthenticationTokens = AuthenticationTokens(idToken: "", accessToken: "", refreshToken: "", lifetime: 0, username: "")
     public var signInWithAuthenticationProviderError: Error?
     public var signInWithAuthenticationProviderParamAuthenticationProvider: AuthenticationProvider?
 
-    open func signInWithAuthenticationProvider(authenticationProvider: AuthenticationProvider, completion: @escaping (Result<AuthenticationTokens, Error>) -> Void) throws {
+    open func signInWithAuthenticationProvider(authenticationProvider: AuthenticationProvider) async throws -> AuthenticationTokens {
         self.signInWithAuthenticationProviderCalled = true
         self.signInWithAuthenticationProviderParamAuthenticationProvider = authenticationProvider
 
@@ -453,7 +390,7 @@ open class MockSudoUserClient: SudoUserClient {
             throw error
         }
 
-        completion(self.signInWithAuthenticationProviderResult)
+        return self.signInWithAuthenticationProviderResult
     }
 
 }

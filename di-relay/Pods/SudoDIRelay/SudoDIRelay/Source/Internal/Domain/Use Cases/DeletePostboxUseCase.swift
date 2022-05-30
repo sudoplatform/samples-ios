@@ -22,7 +22,7 @@ class DeletePostboxUseCase {
 
     // MARK: - Methods
 
-    func execute(withConnectionId connectionId: String, completion: @escaping ClientCompletion<Void>) {
-        relayService.deletePostbox(withConnectionId: connectionId, completion: completion)
+    func execute(withConnectionId connectionId: String) async throws {
+        try await relayService.deletePostbox(withConnectionId: connectionId)
     }
 }

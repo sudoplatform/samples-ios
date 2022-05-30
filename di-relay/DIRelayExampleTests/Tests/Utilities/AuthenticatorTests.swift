@@ -6,39 +6,42 @@
 
 import XCTest
 import SudoUser
+import SudoKeyManager
 @testable import DIRelayExample
 
 class AuthenticatorTests: XCTestCase {
 
     // MARK: - Properties
 
-    var instanceUnderTest: DefaultAuthenticator!
-
+    var instanceUnderTest: Authenticator!
+    var testUtility: DIRelayExampleTestUtility!
     var userClient: MockSudoUserClient!
-    var keyManager: KeyManagerMock!
+    var keyManager: SudoKeyManager!
     var fileReadable: FileReadableMock!
 
     // MARK: - Lifecycle
 
     override func setUp() {
-        userClient = MockSudoUserClient()
-        keyManager = KeyManagerMock()
+        testUtility = DIRelayExampleTestUtility()
+        userClient = testUtility.userClient
+        keyManager = testUtility.keyManager
         fileReadable = FileReadableMock()
-        instanceUnderTest = DefaultAuthenticator(userClient: userClient, keyManager: keyManager, fileReadable: fileReadable)
+        instanceUnderTest = Authenticator(userClient: userClient, keyManager: keyManager, fileReadable: fileReadable)
+
     }
 
     // MARK: - Helpers
 
-    func performRegisterFailureTest(expectedError: AuthenticatorError, file: StaticString = #file, line: UInt = #line) {
-        waitUntil { done in
-            self.instanceUnderTest.register { result in
-                defer { done() }
-                switch result {
-                case let .failure(error as AuthenticatorError):
-                    XCTAssertEqual(error, expectedError, file: file, line: line)
-                default:
-                    XCTFail("Unexpected result: \(result)", file: file, line: line)
-                }
+    func performRegisterFailureTest(expectedError: AuthenticatorError, file: StaticString = #file, line: UInt = #line) async  {
+        do {
+            _ = try await self.instanceUnderTest.register()
+            XCTFail("Unexpected success. ", file: file, line: line)
+        } catch {
+            switch error {
+                case let authenticatorError as AuthenticatorError:
+                XCTAssertEqual(authenticatorError, expectedError, file: file, line: line)
+            default:
+                XCTFail("Unexpected error. \(error)")
             }
         }
     }
@@ -46,35 +49,35 @@ class AuthenticatorTests: XCTestCase {
     // MARK: - Tests
 
     func test_init() {
-        let instanceUnderTest = DefaultAuthenticator(userClient: userClient, keyManager: keyManager)
+        let instanceUnderTest = Authenticator(userClient: userClient, keyManager: keyManager)
         XCTAssertTrue(instanceUnderTest.userClient === userClient)
     }
 
-    func test_register_IsRegistered_ReturnsAlreadyRegistered() {
+    func test_register_IsRegistered_ReturnsAlreadyRegistered() async {
         userClient.isRegisteredReturn = true
-        performRegisterFailureTest(expectedError: .alreadyRegistered)
+        await performRegisterFailureTest(expectedError: .alreadyRegistered)
     }
 
-    func test_register_NoTestKey_ReturnsError() {
+    func test_register_NoTestKey_ReturnsError() async {
         userClient.isRegisteredReturn = false
         fileReadable.pathResult = nil
-        performRegisterFailureTest(expectedError: .missingTestKey)
+        await performRegisterFailureTest(expectedError: .missingTestKey)
     }
 
-    func test_register_NoTestKeyId_ReturnsError() {
+    func test_register_NoTestKeyId_ReturnsError() async {
         userClient.isRegisteredReturn = false
         // Load register_key.private but not register_key.id
         fileReadable.pathResults.append("dummyRegisterKey_Private")
-        performRegisterFailureTest(expectedError: .missingTestKeyId)
+        await performRegisterFailureTest(expectedError: .missingTestKeyId)
     }
 
-    func test_deregister() throws {
-        try instanceUnderTest.deregister(completion: {_ in })
+    func test_deregister() async throws {
+        _ = try await instanceUnderTest.deregister()
         XCTAssertTrue(userClient.deregisterCalled)
     }
 
-    func test_reset() throws {
-        try instanceUnderTest.reset()
+    func test_reset() async throws {
+        try await instanceUnderTest.reset()
         XCTAssertTrue(userClient.resetCalled)
     }
 

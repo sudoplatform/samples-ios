@@ -71,12 +71,12 @@ public class GraphQLAuthProvider: AWSCognitoUserPoolsAuthProviderAsync {
                 callback(idToken, nil)
             } else if autoRefreshTokens {
                 // Refresh the token if it has expired or will expire in 1 min.
-                try self.client.refreshTokens(refreshToken: refreshToken) { (result) in
-                    switch result {
-                    case let .success(tokens):
+                Task.detached(priority: .medium) {
+                    do {
+                        let tokens = try await self.client.refreshTokens(refreshToken: refreshToken)
                         callback(tokens.idToken, nil)
-                    case let .failure(cause):
-                        callback(nil, GraphQLAuthProviderError.fromSudoUserClientError(error: cause))
+                    } catch {
+                        callback(nil, GraphQLAuthProviderError.fromSudoUserClientError(error: error))
                     }
                 }
             } else {

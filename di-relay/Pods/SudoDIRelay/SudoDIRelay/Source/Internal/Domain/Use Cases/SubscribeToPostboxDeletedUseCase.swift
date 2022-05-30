@@ -22,9 +22,9 @@ class SubscribeToPostboxDeletedUseCase {
 
     // MARK: - Methods
 
-    func execute(withConnectionId connectionId: String, completion: @escaping ClientCompletion<Status>) -> SubscriptionToken? {
+    func execute(withConnectionId connectionId: String, completion: @escaping ClientCompletion<Status>) async throws -> SubscriptionToken? {
         do {
-            return try relayService.subscribeToPostboxDeleted(withConnectionId: connectionId, resultHandler: completion)
+            return try await relayService.subscribeToPostboxDeleted(withConnectionId: connectionId, resultHandler: completion)
         } catch let error {
             completion(.failure(error))
             return nil

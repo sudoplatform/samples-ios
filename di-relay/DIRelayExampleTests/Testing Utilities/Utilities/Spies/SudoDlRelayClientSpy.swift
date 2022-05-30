@@ -15,10 +15,9 @@ class MockSubscriptionToken: SubscriptionToken {
 }
 
 class SudoDIRelayClientSpy: SudoDIRelayClient {
-
     var getPostboxEndpointCalled: Bool = false
     var getPostboxEndpointParameters: (String)?
-    var getPostboxEndpointResult: URL? = nil
+    var getPostboxEndpointResult: URL?
 
     func getPostboxEndpoint(withConnectionId connectionId: String) -> URL? {
         getPostboxEndpointCalled = true
@@ -26,61 +25,59 @@ class SudoDIRelayClientSpy: SudoDIRelayClient {
         return getPostboxEndpointResult
     }
 
-    var getMessagesCalled: Bool = false
-    var getMessagesParameters: (withConnectionId: String, completion: ClientCompletion<[RelayMessage]>)?
-    var getMessagesResult: Result<[RelayMessage], Error> = .failure(
-        AnyError("Please add base result to `SudoDIRelayClientSpy.getMessages`")
-    )
-    func getMessages(
-        withConnectionId connectionId: String,
-        completion: @escaping ClientCompletion<[RelayMessage]>
-    ) {
-        getMessagesCalled = true
-        getMessagesParameters = (connectionId, completion)
-        completion(getMessagesResult)
+    var listMessagesCalled: Bool = false
+    var listMessagesParameters: String? = nil
+    var listMessagesResult: [RelayMessage]?
+    var listMessagesError: Error?
+
+    func listMessages(withConnectionId connectionId: String) async throws -> [RelayMessage] {
+        listMessagesCalled = true
+        listMessagesParameters = connectionId
+
+        if let listMessagesError = listMessagesError {
+            throw listMessagesError
+        }
+        if let listMessagesResult = listMessagesResult {
+            return listMessagesResult
+        }
+        throw AnyError("Please add base result to `SudoDIRelayClientSpy.listMessages`")
     }
 
     var storeMessageCalled: Bool = false
-    var storeMessageParameters: (withConnectionId: String, message: String, completion: ClientCompletion<RelayMessage?>)?
-    var storeMessageResult: Result<RelayMessage?, Error> = .failure(
-        AnyError("Please add base result to `SudoDIRelayClientSpy.storeMessage`")
-    )
-    func storeMessage(
-        withConnectionId connectionId: String,
-        message: String,
-        completion: @escaping ClientCompletion<RelayMessage?>
-    ) {
+    var storeMessageParameters: (withConnectionId: String, message: String)?
+    var storeMessageResult: RelayMessage?
+    var storeMessageError: Error?
+    func storeMessage(withConnectionId connectionId: String, message: String) async throws -> RelayMessage? {
         storeMessageCalled = true
-        storeMessageParameters = (connectionId, message, completion)
-        completion(storeMessageResult)
+        storeMessageParameters = (connectionId, message)
+
+        if let storeMessageError = storeMessageError {
+            throw storeMessageError
+        }
+        return storeMessageResult
     }
 
     var createPostboxCalled: Bool = false
-    var createPostboxParameters: (withConnectionId: String, completion: ClientCompletion<Void>)?
-    var createPostboxResult: Result<Void, Error> = .failure(
-        AnyError("Please add base result to `SudoDIRelayClientSpy.createPostbox`")
-    )
-    func createPostbox(
-        withConnectionId connectionId: String,
-        completion: @escaping ClientCompletion<Void>
-    ) {
+    var createPostboxParameters: String?
+    var createPostboxError: Error?
+    func createPostbox(withConnectionId connectionId: String, ownershipProofToken: String) async throws {
         createPostboxCalled = true
-        createPostboxParameters = (connectionId, completion)
-        completion(createPostboxResult)
+        createPostboxParameters = connectionId
+
+        if let createPostboxError = createPostboxError {
+             throw createPostboxError
+        }
     }
 
     var deletePostboxCalled: Bool = false
-    var deletePostboxParameters: (withConnectionId: String, completion: ClientCompletion<Void>)?
-    var deletePostboxResult: Result<Void, Error> = .failure(
-        AnyError("Please add base result to `SudoDIRelayClientSpy.deletePostbox`")
-    )
-    func deletePostbox(
-        withConnectionId connectionId: String,
-        completion: @escaping ClientCompletion<Void>
-    ) {
+    var deletePostboxParameters: String?
+    var deletePostboxError: Error?
+    func deletePostbox(withConnectionId connectionId: String) async throws {
         deletePostboxCalled = true
-        deletePostboxParameters = (connectionId, completion)
-        completion(deletePostboxResult)
+        deletePostboxParameters = connectionId
+        if let deletePostboxError = deletePostboxError {
+            throw deletePostboxError
+        }
     }
 
     var subscribeToMessagesReceivedCalled: Bool = false
@@ -111,6 +108,26 @@ class SudoDIRelayClientSpy: SudoDIRelayClient {
         subscribeToPostboxDeletedParameters = (connectionId, resultHandler)
         resultHandler(subscribeToPostboxDeletedResult)
         return MockSubscriptionToken()
+    }
+
+    var listPostboxesCalled: Bool = false
+    var listPostboxesParameters: String? = nil
+    var listPostboxesResult: [Postbox]?
+    var listPostboxesError: Error?
+
+    func listPostboxes(withSudoId sudoId: String) async throws -> [Postbox] {
+        listPostboxesCalled = true
+        listPostboxesParameters = sudoId
+
+        if let listPostboxesError = listPostboxesError {
+            throw listPostboxesError
+        }
+
+        if let listPostboxesResult = listPostboxesResult {
+            return listPostboxesResult
+        }
+
+        throw AnyError("Please add base result to `SudoDIRelayClientSpy.listPostboxesForSudoIdResult`")
     }
 
     var resetCalled: Bool = false

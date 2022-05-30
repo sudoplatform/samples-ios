@@ -1,0 +1,6 @@
+framework module SudoProfiles {
+  umbrella header "SudoProfiles-umbrella.h"
+
+  export *
+  module * { export * }
+}

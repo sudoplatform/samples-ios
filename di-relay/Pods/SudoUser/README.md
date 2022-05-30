@@ -19,3 +19,4 @@ Visit the [Users section](https://sudoplatform.com/docs) of the Sudo Platform De
 File any issues you find on the project's GitHub repository. Be careful not to share any Personally Identifiable Information (PII) or sensitive account information (API keys, credentials, etc.) when reporting an issue.
 
 For general inquiries related to the Sudo Platform, please contact [partners@sudoplatform.com](mailto:partners@sudoplatform.com)
+

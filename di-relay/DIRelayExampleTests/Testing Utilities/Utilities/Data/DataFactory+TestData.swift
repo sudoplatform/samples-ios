@@ -5,6 +5,7 @@
 //
 
 import Foundation
+import SudoDIRelay
 @testable import DIRelayExample
 
 private class DataFactoryBundleLoader {}

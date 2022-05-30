@@ -35,6 +35,10 @@ public enum ApiOperationError: Error {
     /// Operation failed because the user account is locked.
     case accountLocked
 
+    /// Indicates that an operation rejects the request because a provided argument
+    /// did not have a valid value
+    case invalidArgument
+
     /// Operation failed due to an invalid request. This maybe due to the version mismatch between the
     /// client and the backend.
     case invalidRequest
@@ -73,6 +77,8 @@ public enum ApiOperationError: Error {
         switch errorType {
         case ApiOperation.SudoPlatformServiceError.insufficientEntitlementsError:
             return .insufficientEntitlements
+        case ApiOperation.SudoPlatformServiceError.invalidArgumentError:
+            return .invalidArgument
         case ApiOperation.SudoPlatformServiceError.limitExceededError:
             return .limitExceeded
         case ApiOperation.SudoPlatformServiceError.conditionalCheckFailedException:
@@ -126,11 +132,12 @@ open class ApiOperation: Operation {
 
     struct SudoPlatformServiceError {
         static let type = "errorType"
-        static let insufficientEntitlementsError = "sudoplatform.InsufficientEntitlementsError"
-        static let decodingError = "sudoplatform.DecodingError"
         static let accountLockedError = "sudoplatform.AccountLockedError"
-        static let limitExceededError = "sudoplatform.LimitExceededError"
         static let conditionalCheckFailedException = "DynamoDB:ConditionalCheckFailedException"
+        static let decodingError = "sudoplatform.DecodingError"
+        static let insufficientEntitlementsError = "sudoplatform.InsufficientEntitlementsError"
+        static let invalidArgumentError = "sudoplatform.InvalidArgumentError"
+        static let limitExceededError = "sudoplatform.LimitExceededError"
         static let serviceError = "sudoplatform.ServiceError"
     }
 

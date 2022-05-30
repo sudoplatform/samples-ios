@@ -22,9 +22,9 @@ class SubscribeToMessagesReceivedUseCase {
 
     // MARK: - Methods
 
-    func execute(withConnectionId connectionId: String, completion: @escaping ClientCompletion<RelayMessage>) -> SubscriptionToken? {
+    func execute(withConnectionId connectionId: String, completion: @escaping ClientCompletion<RelayMessage>) async throws -> SubscriptionToken? {
         do {
-            return try relayService.subscribeToMessagesReceived(withConnectionId: connectionId, resultHandler: completion)
+            return try await relayService.subscribeToMessagesReceived(withConnectionId: connectionId, resultHandler: completion)
         } catch let error {
             completion(.failure(error))
             return nil

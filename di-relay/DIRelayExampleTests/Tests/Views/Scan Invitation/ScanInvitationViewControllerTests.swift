@@ -20,11 +20,7 @@ class ScanInvitationCodeViewControllerTests: XCTestCase {
     // MARK: - Lifecycle
 
     override func setUp() {
-        do {
-            testUtility = try DIRelayExampleTestUtility()
-        } catch {
-            XCTFail(error.localizedDescription)
-        }
+        testUtility = DIRelayExampleTestUtility()
         instanceUnderTest = testUtility.storyBoard.resolveViewController(identifier: "scanInvitation")
         instanceUnderTest.loadViewIfNeeded()
         testUtility.window.rootViewController = instanceUnderTest
@@ -33,18 +29,18 @@ class ScanInvitationCodeViewControllerTests: XCTestCase {
         instanceUnderTest.postboxId = DataFactory.RelaySDK.randomConnectionId()
     }
 
-    func test_HandleInvitationObtained_CannotGenerateDetailsToSend() {
-        self.instanceUnderTest.handleInvitationObtained("bad-invitation")
-        waitForAsync()
+    @MainActor func test_HandleInvitationObtained_CannotGenerateDetailsToSend() async {
+        await self.instanceUnderTest.handleInvitationObtained("bad-invitation")
         let presentedAlert = self.instanceUnderTest.presentedViewController as? UIAlertController
+
         XCTAssertNotNil(presentedAlert)
         XCTAssertEqual(presentedAlert?.title, "Error")
         XCTAssertTrue(((presentedAlert?.message?.contains("Failed to parse invitation")) != nil))
+
     }
 
-    func test_HandleInvitationObtained_CanGenerateDetailsToSend() {
-        self.instanceUnderTest.handleInvitationObtained(DataFactory.TestData.generateInvitationString())
-        waitForAsync()
+    @MainActor func test_HandleInvitationObtained_CanGenerateDetailsToSend() async {
+        await self.instanceUnderTest.handleInvitationObtained(DataFactory.TestData.generateInvitationString())
 
         let presentedAlert = self.instanceUnderTest.presentedViewController as? UIAlertController
         XCTAssertNotNil(presentedAlert)

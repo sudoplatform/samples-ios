@@ -8,6 +8,7 @@
 import XCTest
 import UIKit
 import SudoDIRelay
+import SudoProfiles
 @testable import DIRelayExample
 
 class PostboxViewControllerTests: XCTestCase {
@@ -16,16 +17,15 @@ class PostboxViewControllerTests: XCTestCase {
 
     var testUtility: DIRelayExampleTestUtility!
     var instanceUnderTest: PostboxViewController!
+    let sudo = Sudo()
 
     // MARK: - Lifecycle
 
     override func setUp() {
-        do {
-            testUtility = try DIRelayExampleTestUtility()
-        } catch {
-            XCTFail(error.localizedDescription)
-        }
+        testUtility = DIRelayExampleTestUtility()
         instanceUnderTest = testUtility.storyBoard.resolveViewController(identifier: "postboxList")
+        instanceUnderTest.sudo = sudo
+        instanceUnderTest.ownershipProofs = [sudo.id ?? "": "proof"]
         instanceUnderTest.loadViewIfNeeded()
         testUtility.window.rootViewController = instanceUnderTest
         testUtility.window.makeKeyAndVisible()
@@ -68,32 +68,10 @@ class PostboxViewControllerTests: XCTestCase {
         XCTAssertTrue(presentedViewController is CreateConnectionViewController)
     }
 
-    func test_DeletePostboxFromRelayAndCache_DeletePostbox() {
-        let postboxId = DataFactory.RelaySDK.randomConnectionId()
-        instanceUnderTest.postboxIds = [postboxId]
-        waitForAsync()
-        waitUntil(timeout: 5.0) { done in
-            defer { done() }
-            let _ = self.instanceUnderTest.deletePostboxFromRelayAndCache(postBoxId: postboxId)
-        }
-        XCTAssertTrue(testUtility.relayClient.deletePostboxCalled)
-    }
-
     func test_PostboxRowSwipeOnZeroIndexReturnsNil() {
         instanceUnderTest.postboxIds = [DataFactory.RelaySDK.randomConnectionId()]
         let res = self.instanceUnderTest.tableView(self.instanceUnderTest.tableView, trailingSwipeActionsConfigurationForRowAt: [0, 0])
         XCTAssertNil(res)
-    }
-
-    func test_PostboxDeletionSucceeds() {
-        testUtility.relayClient.deletePostboxResult = .success(())
-        waitForAsync()
-        waitUntil { done in
-            defer { done() }
-            let id = DataFactory.RelaySDK.randomConnectionId()
-            self.instanceUnderTest.deletePostboxFromRelayAndCache(postBoxId: id)
-            XCTAssertTrue(self.testUtility.relayClient.deletePostboxCalled)
-        }
     }
 
     func test_performSegue_SeguesToCreateConnectionView() {
@@ -112,5 +90,13 @@ class PostboxViewControllerTests: XCTestCase {
             return XCTFail("Failed to get UITableView as presented view controller")
         }
         XCTAssertTrue(resultTableViewController is CreateConnectionViewController)
+    }
+
+    func test_createPostBoxAndSaveToCache_CallsCreatePostbox() async {
+        await instanceUnderTest.createPostBoxAndSaveToCache()
+        if await instanceUnderTest.presentedViewController == nil {
+            return XCTFail("Failed to get presented view controller")
+        }
+        XCTAssertTrue(testUtility.relayClient.createPostboxCalled)
     }
 }

@@ -54,20 +54,16 @@ public class IdentityProviderManager: NSObject, AWSIdentityProviderManager {
             } else {
                 let completion = AWSTaskCompletionSource<NSDictionary>()
 
-                // Refresh the token if it has expired or will expire in 10 mins.
-                try self.client.refreshTokens(refreshToken: refreshToken) { (result) in
-                    switch result {
-                    case let .success(tokens):
-                        let logins: NSDictionary = ["cognito-idp.\(self.region).amazonaws.com/\(self.poolId)": tokens.idToken]
-                        completion.set(result: logins)
-                    case let .failure(cause):
-                        completion.set(error: cause)
-                    }
+                Task.detached(priority: .medium) {
+                    // Refresh the token if it has expired or will expire in 10 mins.
+                    let tokens = try await self.client.refreshTokens(refreshToken: refreshToken)
+                    let logins: NSDictionary = ["cognito-idp.\(self.region).amazonaws.com/\(self.poolId)": tokens.idToken]
+                    completion.set(result: logins)
                 }
 
                 return completion.task
             }
-        } catch let error {
+        } catch {
             return AWSTask(error: error)
         }
     }

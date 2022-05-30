@@ -8,19 +8,6 @@ import Foundation
 import SudoLogging
 import AWSMobileClient
 
-/// List of possible errors thrown by `AuthUI` implementation.
-///
-/// - invalidInput: Indicates the input to the API was invalid.
-/// - invalidConfig: Indicates the configuration dictionary passed to initialize the client was not valid.
-/// - fatalError: Indicates that a fatal error occurred. This could be due to
-///     coding error, out-of-memory condition or other conditions that is
-///     beyond control of `AuthUI` implementation.
-public enum AuthUIError: Error {
-    case invalidInput
-    case invalidConfig
-    case fatalError(description: String)
-}
-
 /// Responsible for managing the authentication flow for browser based federated sign in.
 public protocol AuthUI: AnyObject {
 
@@ -28,17 +15,14 @@ public protocol AuthUI: AnyObject {
     ///
     /// - Parameters:
     ///   - presentationAnchor: Window to act as the anchor for this UI.
-    ///   - completion: The completion handler to invoke to pass the sign in result.
-    func presentFederatedSignInUI(presentationAnchor: ASPresentationAnchor,
-                                  completion: @escaping(Result<AuthenticationTokens, Error>) -> Void) throws
+    /// - Returns: Authentication tokens.
+    func presentFederatedSignInUI(presentationAnchor: ASPresentationAnchor) async throws -> AuthenticationTokens
 
     /// Presents the sign out UI for federated sign in using an external identity provider.
     ///
     /// - Parameters:
     ///   - presentationAnchor: Window to act as the anchor for this UI.
-    ///   - completion: The completion handler to invoke to pass the sign out result.
-    func presentFederatedSignOutUI(presentationAnchor: ASPresentationAnchor,
-                                   completion: @escaping(Result<Void, Error>) -> Void) throws
+    func presentFederatedSignOutUI(presentationAnchor: ASPresentationAnchor) async throws
 
     /// Processes federated sign in redirect URL to obtain the authentication tokens required for API access..
     ///
@@ -125,55 +109,57 @@ public class CognitoAuthUI: AuthUI {
         self.cognitoAuth = AWSCognitoAuth(forKey: Constants.Auth.cognitoAuthKey)
     }
 
-    public func presentFederatedSignInUI(presentationAnchor: ASPresentationAnchor,
-                                         completion: @escaping(Result<AuthenticationTokens, Error>) -> Void) throws {
-        self.cognitoAuth.getSessionWithWebUI(presentationAnchor) { (session, error) in
-            if let error = error {
-                if let error = error as? ASWebAuthenticationSessionError {
-                    switch error.errorCode {
-                    case ASWebAuthenticationSessionError.canceledLogin.rawValue:
-                        return completion(.failure(SudoUserClientError.signInCanceled))
-                    default:
-                        return completion(.failure(error))
+    public func presentFederatedSignInUI(presentationAnchor: ASPresentationAnchor) async throws -> AuthenticationTokens {
+        return try await withCheckedThrowingContinuation({ (continuation: CheckedContinuation<AuthenticationTokens, Error>) in
+            self.cognitoAuth.getSessionWithWebUI(presentationAnchor) { (session, error) in
+                if let error = error {
+                    if let error = error as? ASWebAuthenticationSessionError {
+                        switch error.errorCode {
+                        case ASWebAuthenticationSessionError.canceledLogin.rawValue:
+                            return continuation.resume(throwing: SudoUserClientError.signInCanceled)
+                        default:
+                            return continuation.resume(throwing: error)
+                        }
+                    } else {
+                        return continuation.resume(throwing: error)
                     }
-                } else {
-                    return completion(.failure(error))
                 }
+
+                guard let session = session,
+                      let idToken = session.idToken?.tokenString,
+                      let username = session.username,
+                      let accessToken = session.accessToken?.tokenString,
+                      let refreshToken = session.refreshToken?.tokenString,
+                      let expirationTime = session.expirationTime else {
+                          return continuation.resume(throwing: SudoUserClientError.fatalError(description: "Required tokens not found."))
+                      }
+
+                let lifetime = Int(expirationTime.timeIntervalSince1970 - Date().timeIntervalSince1970)
+
+                continuation.resume(returning: AuthenticationTokens(idToken: idToken, accessToken: accessToken, refreshToken: refreshToken, lifetime: lifetime, username: username))
             }
-
-            guard let session = session,
-                let idToken = session.idToken?.tokenString,
-                let username = session.username,
-                let accessToken = session.accessToken?.tokenString,
-                let refreshToken = session.refreshToken?.tokenString,
-                let expirationTime = session.expirationTime else {
-                return completion(.failure(SudoUserClientError.fatalError(description: "Required tokens not found.")))
-            }
-
-            let lifetime = Int(expirationTime.timeIntervalSince1970 - Date().timeIntervalSince1970)
-
-            completion(.success(AuthenticationTokens(idToken: idToken, accessToken: accessToken, refreshToken: refreshToken, lifetime: lifetime, username: username)))
-        }
+        })
     }
 
-    public func presentFederatedSignOutUI(presentationAnchor: ASPresentationAnchor,
-                                          completion: @escaping(Result<Void, Error>) -> Void) throws {
-        self.cognitoAuth.signOut(withWebUI: presentationAnchor) { (error) in
-            if let error = error {
-                if let error = error as? ASWebAuthenticationSessionError {
-                    switch error.errorCode {
-                    case ASWebAuthenticationSessionError.canceledLogin.rawValue:
-                        completion(.failure(SudoUserClientError.signInCanceled))
-                    default:
-                        completion(.failure(error))
+    public func presentFederatedSignOutUI(presentationAnchor: ASPresentationAnchor) async throws {
+        return try await withCheckedThrowingContinuation({ (continuation: CheckedContinuation<Void, Error>) in
+            self.cognitoAuth.signOut(withWebUI: presentationAnchor) { (error) in
+                if let error = error {
+                    if let error = error as? ASWebAuthenticationSessionError {
+                        switch error.errorCode {
+                        case ASWebAuthenticationSessionError.canceledLogin.rawValue:
+                            continuation.resume(throwing: SudoUserClientError.signInCanceled)
+                        default:
+                            continuation.resume(throwing: error)
+                        }
+                    } else {
+                        return continuation.resume(throwing: error)
                     }
                 } else {
-                    return completion(.failure(error))
+                    continuation.resume()
                 }
-            } else {
-                completion(.success(()))
             }
-        }
+        })
     }
 
     public func processFederatedSignInTokens(url: URL) -> Bool {

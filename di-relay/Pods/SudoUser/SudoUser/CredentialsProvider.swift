@@ -8,21 +8,14 @@ import Foundation
 import AWSCognitoIdentityProvider
 import AWSS3
 
-/// Result returned by API for retrieving identity ID. The API can fail with an
-/// error or return the identity ID.
-public enum GetIdentityIdResult {
-    case success(identityId: String)
-    case failure(cause: Error)
-}
-
 /// Interface common to credential providers. Mainly used for mocking AWS Cognito credentials provider.
 public protocol CredentialsProvider: AnyObject {
 
     /// Retrieves and returns the identity ID associated with the temporary credential used for
     /// accessing certain backend resources, e.g. large blobs stored in AWS S3.
     ///
-    /// - Parameter completion: The completion handler to invoke to pass the result.
-    func getIdentityId(completion: @escaping(GetIdentityIdResult) -> Void) throws
+    /// - Returns: Identity ID.
+    func getIdentityId() async throws -> String
 
     /// Returns the identity ID cached during sign in.
     ///
@@ -88,18 +81,20 @@ class AWSCredentialsProvider: CredentialsProvider {
         AWSS3.register(with: configuration, forKey: Config.S3.serviceClientKey)
     }
 
-    func getIdentityId(completion: @escaping (GetIdentityIdResult) -> Void) throws {
-        self.credentialsProvider.getIdentityId().continueWith(block: { (task) -> AnyObject? in
-            if let error = task.error {
-                completion(.failure(cause: error))
-            } else {
-                if let identityId = task.result as String? {
-                    completion(.success(identityId: identityId))
+    func getIdentityId() async throws -> String {
+        return try await withCheckedThrowingContinuation({ (continuation: CheckedContinuation<String, Error>) in
+            self.credentialsProvider.getIdentityId().continueWith(block: { (task) -> AnyObject? in
+                if let error = task.error {
+                    continuation.resume(throwing: error)
                 } else {
-                    completion(.failure(cause: SudoUserClientError.fatalError(description: "Identity ID missing from getIdentityId call.")))
+                    if let identityId = task.result as String? {
+                        continuation.resume(returning: identityId)
+                    } else {
+                        continuation.resume(throwing: SudoUserClientError.fatalError(description: "Identity ID missing from getIdentityId call."))
+                    }
                 }
-            }
-            return task
+                return task
+            })
         })
     }
 

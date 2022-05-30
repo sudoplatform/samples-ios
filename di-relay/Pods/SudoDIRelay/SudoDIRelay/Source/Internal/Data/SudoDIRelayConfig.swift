@@ -8,7 +8,7 @@ import Foundation
 import AWSAppSync
 import AWSCore
 
-/// Configuration for connecting to the Sudo Email Service via AppSync.
+/// Configuration for connecting to the Sudo Relay Service via AppSync.
 struct SudoDIRelayConfig: AWSAppSyncServiceConfigProvider {
 
     // MARK: - Conformance: AWSAppSyncServiceConfigProvider

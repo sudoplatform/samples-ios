@@ -22,7 +22,7 @@ class CreatePostboxUseCase {
 
     // MARK: - Methods
 
-    func execute(withConnectionId connectionId: String, completion: @escaping ClientCompletion<Void>) {
-        relayService.createPostbox(withConnectionId: connectionId, completion: completion)
+    func execute(withConnectionId connectionId: String, ownershipProofToken: String) async throws {
+        try await relayService.createPostbox(withConnectionId: connectionId, ownershipProofToken: ownershipProofToken)
     }
 }

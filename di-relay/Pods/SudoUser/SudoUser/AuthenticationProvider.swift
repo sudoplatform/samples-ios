@@ -15,7 +15,7 @@ public protocol AuthenticationProvider {
     ///
     /// - Parameters:
     ///   - completion: The completion handler to invoke to pass the authentication information or error.
-    func getAuthenticationInfo(completion: @escaping(Swift.Result<AuthenticationInfo, Error>) -> Void)
+    func getAuthenticationInfo() async throws -> AuthenticationInfo
 
     /// Resets any cached authentication information.
     func reset()

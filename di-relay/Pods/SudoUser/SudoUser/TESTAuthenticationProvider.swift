@@ -26,7 +26,7 @@ public class TESTAuthenticationInfo: AuthenticationInfo {
         self.jwt = jwt
     }
 
-    public static var type: String = "TEST"
+    public let type: String = "TEST"
 
     public func isValid() -> Bool {
         return true
@@ -86,18 +86,14 @@ public class TESTAuthenticationProvider: AuthenticationProvider {
         try self.keyManager.addPrivateKey(keyData, name: self.keyId)
     }
 
-    public func getAuthenticationInfo(completion: @escaping(Swift.Result<AuthenticationInfo, Error>) -> Void) {
-        do {
-            let jwt = JWT(issuer: Constants.testRegistrationIssuer,
-                          audience: Constants.testRegistrationAudience,
-                          subject: "\(self.name)-\(UUID().uuidString)",
-                id: UUID().uuidString)
-            jwt.payload = self.customAttributes
-            let encoded = try jwt.signAndEncode(keyManager: self.keyManager, keyId: self.keyId)
-            completion(.success(TESTAuthenticationInfo(jwt: encoded)))
-        } catch {
-            completion(.failure(error))
-        }
+    public func getAuthenticationInfo() async throws -> AuthenticationInfo {
+        let jwt = JWT(issuer: Constants.testRegistrationIssuer,
+                      audience: Constants.testRegistrationAudience,
+                      subject: "\(self.name)-\(UUID().uuidString)",
+                      id: UUID().uuidString)
+        jwt.payload = self.customAttributes
+        let encoded = try jwt.signAndEncode(keyManager: self.keyManager, keyId: self.keyId)
+        return TESTAuthenticationInfo(jwt: encoded)
     }
 
     public func reset() {

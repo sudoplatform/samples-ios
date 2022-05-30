@@ -113,32 +113,37 @@ public class SudoApiClient {
     ///   - queue: A dispatch queue on which the result handler will be called. Defaults to the main queue.
     ///   - optimisticUpdate: An optional closure which gets executed before making the network call, should be used to update local store using the `transaction` object.
     ///   - conflictResolutionBlock: An optional closure that is called when mutation results into a conflict.
-    ///   - resultHandler: An optional closure that is called when mutation results are available or when an error occurs.
-    ///   - result: The result of the performed mutation, or `nil` if an error occurred.
-    ///   - error: An error that indicates why the mutation failed, or `nil` if the mutation was succesful.
+    ///
+    /// - Returns: The result of the mutation or error.
     public func perform<Mutation: GraphQLMutation>(
         mutation: Mutation,
         queue: DispatchQueue = .main,
         optimisticUpdate: OptimisticResponseBlock? = nil,
-        conflictResolutionBlock: MutationConflictHandler<Mutation>? = nil,
-        resultHandler: OperationResultHandler<Mutation>? = nil
-    ) throws {
+        conflictResolutionBlock: MutationConflictHandler<Mutation>? = nil
+    ) async throws -> (result: GraphQLResult<Mutation.Data>?, error: Error?) {
         if let sudoUserClient = self.sudoUserClient {
-            guard try sudoUserClient.isSignedIn() else {
+            guard try await sudoUserClient.isSignedIn() else {
                 throw ApiOperationError.notSignedIn
             }
         }
 
-        let op = MutationOperation(
-            appSyncClient: self.appSyncClient,
-            logger: self.logger,
-            mutation: mutation,
-            dispatchQueue: queue,
-            optimisticUpdate: optimisticUpdate,
-            conflictResolutionBlock: conflictResolutionBlock,
-            resultHandler: resultHandler
-        )
-        try self.serialQueue.addOperation(op)
+        return try await withCheckedThrowingContinuation({ (continuation: CheckedContinuation<(result: GraphQLResult<Mutation.Data>?, error: Error?), Error>) in
+            do {
+                let op = MutationOperation(
+                    appSyncClient: self.appSyncClient,
+                    logger: self.logger,
+                    mutation: mutation,
+                    dispatchQueue: queue,
+                    optimisticUpdate: optimisticUpdate,
+                    conflictResolutionBlock: conflictResolutionBlock,
+                    resultHandler: { (result, error) in
+                        continuation.resume(returning: (result, error))
+                    })
+                try self.serialQueue.addOperation(op)
+            } catch {
+                continuation.resume(throwing: error)
+            }
+        })
     }
 
     /// Fetches a query from the server or from the local cache, depending on the current contents of the cache and the
@@ -149,40 +154,45 @@ public class SudoApiClient {
     ///   - cachePolicy: A cache policy that specifies when results should be fetched from the server and when data should be loaded from the local cache.
     ///   - queue: A dispatch queue on which the result handler will be called. Defaults to the main queue.
     ///   - resultHandler: An optional closure that is called when query results are available or when an error occurs.
-    ///   - result: The result of the fetched query, or `nil` if an error occurred.
     ///   - error: An error that indicates why the fetch failed, or `nil` if the fetch was succesful.
+    ///
+    /// - Returns: The result of the query or error.
     public func fetch<Query: GraphQLQuery>(
         query: Query,
         cachePolicy: CachePolicy = .returnCacheDataElseFetch,
-        queue: DispatchQueue = DispatchQueue.main,
-        resultHandler: OperationResultHandler<Query>? = nil
-    ) throws {
+        queue: DispatchQueue = DispatchQueue.main
+    ) async throws -> (result: GraphQLResult<Query.Data>?, error: Error?) {
+        var opQueue = self.serialQueue
+
         if let sudoUserClient = self.sudoUserClient {
-            guard try sudoUserClient.isSignedIn() else {
+            guard try await sudoUserClient.isSignedIn() else {
                 throw ApiOperationError.notSignedIn
             }
-        }
 
-        let op = QueryOperation(
-            appSyncClient: self.appSyncClient,
-            logger: self.logger,
-            query: query, dispatchQueue: queue,
-            cachePolicy: cachePolicy,
-            resultHandler: resultHandler
-        )
-
-        if let sudoUserClient = self.sudoUserClient {
             // If the ID token is at least good for 2 mins then allow concurrent execution of
             // queries since no auto refreshing of tokens will occur 1 min before the expiry.
             if let expiry = try sudoUserClient.getTokenExpiry(),
                expiry > Date(timeIntervalSinceNow: 120) {
-                try self.concurrentQueue.addOperation(op)
-            } else {
-                try self.serialQueue.addOperation(op)
+                opQueue = self.concurrentQueue
             }
-        } else {
-            try self.concurrentQueue.addOperation(op)
         }
+
+        return try await withCheckedThrowingContinuation({ (continuation: CheckedContinuation<(result: GraphQLResult<Query.Data>?, error: Error?), Error>) in
+            do {
+                let op = QueryOperation(
+                    appSyncClient: self.appSyncClient,
+                    logger: self.logger,
+                    query: query,
+                    dispatchQueue: queue,
+                    cachePolicy: cachePolicy,
+                    resultHandler: { (result, error) in
+                        continuation.resume(returning: (result, error))
+                    })
+                try opQueue.addOperation(op)
+            } catch {
+                continuation.resume(throwing: error)
+            }
+        })
     }
 
     /// Subscribes to a GraphQL subscription.
@@ -199,9 +209,9 @@ public class SudoApiClient {
         queue: DispatchQueue = DispatchQueue.main,
         statusChangeHandler: SubscriptionStatusChangeHandler? = nil,
         resultHandler: @escaping SubscriptionResultHandler<Subscription>
-    ) throws -> AWSAppSyncSubscriptionWatcher<Subscription>? {
+    ) async throws -> AWSAppSyncSubscriptionWatcher<Subscription>? {
         if let sudoUserClient = self.sudoUserClient {
-            guard try sudoUserClient.isSignedIn() else {
+            guard try await sudoUserClient.isSignedIn() else {
                 throw ApiOperationError.notSignedIn
             }
         }

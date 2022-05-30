@@ -14,17 +14,13 @@ class UIViewControllerExtensionsTests: XCTestCase {
 
 
     var testUtility: DIRelayExampleTestUtility!
-    var instanceUnderTest: WelcomeViewController!
+    var instanceUnderTest: RegistrationViewController!
 
     // MARK: - Lifecycle
 
     override func setUp() {
-        do {
-            testUtility = try DIRelayExampleTestUtility()
-        } catch {
-            XCTFail(error.localizedDescription)
-        }
-        instanceUnderTest = testUtility.storyBoard.instantiateViewController(identifier: "welcome")
+        testUtility = DIRelayExampleTestUtility()
+        instanceUnderTest = testUtility.storyBoard.instantiateViewController(identifier: "register")
         instanceUnderTest.loadViewIfNeeded()
         testUtility.window.rootViewController = instanceUnderTest
         testUtility.window.makeKeyAndVisible()

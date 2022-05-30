@@ -31,7 +31,7 @@ public struct CredentialInfo {
 public protocol AuthenticationInfo {
 
     /// Authentication type.
-    static var type: String { get }
+    var type: String { get }
 
     /// Indicates whether or not the authentication information is valid, i.e. well-formed
     /// and has not expired.

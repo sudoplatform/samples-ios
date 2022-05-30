@@ -20,12 +20,7 @@ class CreateConnectionViewControllerTests: XCTestCase {
     // MARK: - Lifecycle
 
     override func setUp() {
-        print("TESTING")
-        do {
-            testUtility = try DIRelayExampleTestUtility()
-        } catch {
-            XCTFail(error.localizedDescription)
-        }
+        testUtility = DIRelayExampleTestUtility()
         instanceUnderTest = testUtility.storyBoard.resolveViewController(identifier: "createConnection")
         instanceUnderTest.loadViewIfNeeded()
         testUtility.window.rootViewController = instanceUnderTest

@@ -28,7 +28,7 @@ public class LocalAuthenticationInfo: AuthenticationInfo {
         self.username = username
     }
 
-    public static var type: String = "FSSO"
+    public let type: String = "FSSO"
 
     public func isValid() -> Bool {
         return true
@@ -90,18 +90,14 @@ public class LocalAuthenticationProvider: AuthenticationProvider {
         try self.keyManager.addPrivateKey(keyData, name: self.keyId)
     }
 
-    public func getAuthenticationInfo(completion: @escaping(Swift.Result<AuthenticationInfo, Error>) -> Void) {
-        do {
-            let jwt = JWT(issuer: self.name,
-                          audience: Constants.audience,
-                          subject: self.username,
-                id: UUID().uuidString)
-            jwt.payload = self.customAttributes
-            let encoded = try jwt.signAndEncode(keyManager: self.keyManager, keyId: self.keyId)
-            completion(.success(LocalAuthenticationInfo(jwt: encoded, username: self.username)))
-        } catch {
-            completion(.failure(error))
-        }
+    public func getAuthenticationInfo() async throws -> AuthenticationInfo {
+        let jwt = JWT(issuer: self.name,
+                      audience: Constants.audience,
+                      subject: self.username,
+                      id: UUID().uuidString)
+        jwt.payload = self.customAttributes
+        let encoded = try jwt.signAndEncode(keyManager: self.keyManager, keyId: self.keyId)
+        return LocalAuthenticationInfo(jwt: encoded, username: self.username)
     }
 
     public func reset() {

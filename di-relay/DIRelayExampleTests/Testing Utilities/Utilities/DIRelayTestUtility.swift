@@ -8,6 +8,7 @@
 import XCTest
 import UIKit
 import SudoDIRelay
+import SudoKeyManager
 import SudoUser
 @testable import DIRelayExample
 
@@ -17,22 +18,32 @@ class DIRelayExampleTestUtility {
 
     let window: UIWindow!
     let storyBoard: UIStoryboard
-    let relayClient: SudoDIRelayClientMockSpy
     let userClient: MockSudoUserClient
+    let entitlementsClient: MockSudoEntitlementsClient
+    let profilesClient: MockSudoProfilesClient
+    let keyManager: SudoKeyManager
     let authenticator: AuthenticatorMockSpy
+    let relayClient: SudoDIRelayClientMockSpy
 
     // MARK: - Lifecycle
 
-    init() throws {
+    init() {
         window = UIWindow(frame: UIScreen.main.bounds)
         storyBoard = UIStoryboard(name: "Main", bundle: .main)
         userClient = MockSudoUserClient()
+        entitlementsClient = MockSudoEntitlementsClient()
+        profilesClient = MockSudoProfilesClient()
+        keyManager = MockKeyManager()
+        authenticator = AuthenticatorMockSpy(userClient: userClient, keyManager: keyManager)
         relayClient = SudoDIRelayClientMockSpy()
-        authenticator = AuthenticatorMockSpy()
+
         AppDelegate.dependencies = AppDependencies(
             sudoUserClient: userClient,
-            sudoDIRelayClient: relayClient,
-            authenticator: authenticator
+            entitlementsClient: entitlementsClient,
+            profilesClient: profilesClient,
+            keyManager: keyManager,
+            authenticator: authenticator,
+            sudoDIRelayClient: relayClient
         )
     }
 

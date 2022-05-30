@@ -22,7 +22,7 @@ class StoreMessageUseCase {
 
     // MARK: - Methods
 
-    func execute(withConnectionId connectionId: String, message: String, completion: @escaping ClientCompletion<RelayMessage?>) {
-        relayService.storeMessage(withConnectionId: connectionId, message: message, completion: completion)
+    func execute(withConnectionId connectionId: String, message: String) async throws -> RelayMessage? {
+        return try await relayService.storeMessage(withConnectionId: connectionId, message: message)
     }
 }

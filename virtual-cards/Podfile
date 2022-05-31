@@ -1,6 +1,5 @@
 #
 source 'https://github.com/CocoaPods/Specs.git'
-source 'https://gitlab.tools.anonyome.com/anonyome/pod-repository.git'
 
 platform :ios, '14.0'
 use_frameworks!

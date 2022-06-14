@@ -17,11 +17,11 @@ pre_install do |installer|
 end
 
 target 'VirtualCardsExample' do
-    pod 'Stripe', '~> 21.2.1'
+    pod 'Stripe', '~> 22'
     pod 'SudoUser', '~> 13.0'
     pod 'SudoProfiles', '~> 15.0'
-    pod 'SudoEntitlements', '~> 6.0'
-    pod 'SudoIdentityVerification', '~> 10.0'
+    pod 'SudoEntitlements', '~> 7.0'
+    pod 'SudoIdentityVerification', '~> 12.0'
     pod 'SudoVirtualCards', '~> 18.0'
 
     target 'VirtualCardsExampleTests'

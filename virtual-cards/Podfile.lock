@@ -1,5 +1,5 @@
 PODS:
-  - AppSyncRealTimeClient (1.9.1):
+  - AppSyncRealTimeClient (1.10.0):
     - Starscream (~> 4.0.4)
   - AWSAppSync (3.4.2):
     - AppSyncRealTimeClient (~> 1.4)
@@ -26,9 +26,20 @@ PODS:
     - SQLite.swift/standard (= 0.12.2)
   - SQLite.swift/standard (0.12.2)
   - Starscream (4.0.4)
-  - Stripe (21.2.1):
-    - Stripe/Stripe3DS2 (= 21.2.1)
-  - Stripe/Stripe3DS2 (21.2.1)
+  - Stripe (22.5.0):
+    - Stripe/Stripe3DS2 (= 22.5.0)
+    - StripeApplePay (= 22.5.0)
+    - StripeCore (= 22.5.0)
+    - StripeUICore (= 22.5.0)
+  - Stripe/Stripe3DS2 (22.5.0):
+    - StripeApplePay (= 22.5.0)
+    - StripeCore (= 22.5.0)
+    - StripeUICore (= 22.5.0)
+  - StripeApplePay (22.5.0):
+    - StripeCore (= 22.5.0)
+  - StripeCore (22.5.0)
+  - StripeUICore (22.5.0):
+    - StripeCore (= 22.5.0)
   - SudoApiClient (8.0.1):
     - AWSAppSync (~> 3.4.2)
     - SudoConfigManager (~> 2.0)
@@ -37,14 +48,14 @@ PODS:
   - SudoConfigManager (2.0.2):
     - AWSS3 (~> 2.26.0)
     - SudoLogging (~> 0.3)
-  - SudoEntitlements (6.0.0):
+  - SudoEntitlements (7.0.0):
     - AWSAppSync (~> 3.2)
     - SudoApiClient (~> 8.0)
     - SudoConfigManager (~> 2.0)
     - SudoKeyManager (~> 1.2)
     - SudoLogging (~> 0.3)
     - SudoUser (~> 13.0)
-  - SudoIdentityVerification (10.0.1):
+  - SudoIdentityVerification (12.0.1):
     - SudoApiClient (~> 8.0)
     - SudoConfigManager (~> 2.0)
     - SudoLogging (~> 0.3)
@@ -73,9 +84,9 @@ PODS:
     - SudoUser (~> 13.0)
 
 DEPENDENCIES:
-  - Stripe (~> 21.2.1)
-  - SudoEntitlements (~> 6.0)
-  - SudoIdentityVerification (~> 10.0)
+  - Stripe (~> 22)
+  - SudoEntitlements (~> 7.0)
+  - SudoIdentityVerification (~> 12.0)
   - SudoProfiles (~> 15.0)
   - SudoUser (~> 13.0)
   - SudoVirtualCards (~> 18.0)
@@ -94,6 +105,9 @@ SPEC REPOS:
     - SQLite.swift
     - Starscream
     - Stripe
+    - StripeApplePay
+    - StripeCore
+    - StripeUICore
     - SudoApiClient
     - SudoConfigManager
     - SudoEntitlements
@@ -105,7 +119,7 @@ SPEC REPOS:
     - SudoVirtualCards
 
 SPEC CHECKSUMS:
-  AppSyncRealTimeClient: cdee78ab78249cb87a71d975e1436e692813a606
+  AppSyncRealTimeClient: 656ab4215e05f6ca47fe6d8c73f416d9984a8aac
   AWSAppSync: cd5702596a414ca58772d7cce0eee75139cb7e58
   AWSAuthCore: e987fce9ad13ef8ac7d39d82305af21a63c590cf
   AWSCognitoIdentityProvider: 94cb0197e41662e3d29ee0feeb0cfa10d2242302
@@ -116,17 +130,20 @@ SPEC CHECKSUMS:
   ReachabilitySwift: 985039c6f7b23a1da463388634119492ff86c825
   SQLite.swift: d2b4642190917051ce6bd1d49aab565fe794eea3
   Starscream: 5178aed56b316f13fa3bc55694e583d35dd414d9
-  Stripe: ff769d6739fbb7a60592bf665fc0e0df7db0c284
+  Stripe: fbb88e14eec8b6ed10d13aa00d5f83c1bf77ac92
+  StripeApplePay: 35910f191ef1ef2e835154b5a590bfecbe78b1d9
+  StripeCore: 936e8e06e2eb69661d7eb1278f5d508c67c39e8f
+  StripeUICore: aa77a7dc94d6ba400cddeda8eb28c865a2d7619c
   SudoApiClient: c1d3e47b1a03daeab4f34659920f98912e5a39ac
   SudoConfigManager: 324a0c0c9ea73322af5c7bb5c90e82be04c27777
-  SudoEntitlements: 91d84196c0b81a0418f7e0e613935e7c908371cf
-  SudoIdentityVerification: c913a713862b59b0ee8a1076ef26655fb8362969
+  SudoEntitlements: 0b6c77229b3cd2e51cd3394068d5ce6bdf1ca634
+  SudoIdentityVerification: 17cb14f4744063604466fa9b76c7bacd32feadeb
   SudoKeyManager: 14159babc8ad32c5ebc41e075fe0164b82e730b1
   SudoLogging: 3a469c7db097b4813d967597d7a62cfd1b580966
   SudoProfiles: a213245263c9eb6bf35d0ee9f527bbcfc9e5ac99
   SudoUser: 2a01d00fa0a82d6f89664ab978b0caf46a94197a
   SudoVirtualCards: dd4d571e4e4289c90e15cd159122f1987a2b736a
 
-PODFILE CHECKSUM: ebee8c023fd2085d64964570a267ef88dcfdeae6
+PODFILE CHECKSUM: 7b609548447406de93bfdde82603d8fbf6e933e2
 
 COCOAPODS: 1.11.3

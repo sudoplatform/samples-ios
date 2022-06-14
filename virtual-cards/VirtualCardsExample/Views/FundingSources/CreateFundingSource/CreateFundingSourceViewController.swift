@@ -18,7 +18,8 @@ class CreateFundingSourceViewController: UIViewController,
                                          UITableViewDelegate,
                                          UITableViewDataSource,
                                          InputFormCellDelegate,
-                                         LearnMoreViewDelegate {
+                                         LearnMoreViewDelegate,
+                                         STPAuthenticationContext {
 
     // MARK: - Outlets
 
@@ -243,10 +244,12 @@ class CreateFundingSourceViewController: UIViewController,
                     withInput: SetupFundingSourceInput(type: .creditCard, currency: "USD")
                 )
                 let stripeClient = STPAPIClient(publishableKey: apiKey)
+                STPAPIClient.shared.publishableKey = apiKey
                 let stripeWorker = StripeIntentWorker(
                     fromInputDetails: input,
                     clientSecret: setupResult.provisioningData.clientSecret,
-                    stripeClient: stripeClient
+                    stripeClient: stripeClient,
+                    authenticationContext: self
                 )
                 let paymentMethodId = try await stripeWorker.confirmSetupIntent()
                 _ = try await virtualCardsClient.completeFundingSource(
@@ -426,5 +429,17 @@ class CreateFundingSourceViewController: UIViewController,
             return
         }
         UIApplication.shared.open(docURL, options: [:], completionHandler: nil)
+    }
+
+    // MARK: - Conformance: STPAuthenticationContext
+
+    func authenticationPresentingViewController() -> UIViewController {
+        return self
+    }
+
+    @objc(prepareAuthenticationContextForPresentation:) func prepare(
+        forPresentation completion: @escaping STPVoidBlock
+    ) {
+            self.dismiss(animated: true, completion: completion)
     }
 }

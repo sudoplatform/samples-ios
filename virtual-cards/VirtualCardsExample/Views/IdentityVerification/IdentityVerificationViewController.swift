@@ -217,7 +217,7 @@ class IdentityVerificationViewController: UIViewController,
             address = "\(address) \(unitNumber)"
         }
         do {
-            let verifiedIdentity = try await verificationClient.verifyIdentity(
+            let input = VerifyIdentityInput(
                 firstName: formData[.firstName] ?? "",
                 lastName: formData[.lastName] ?? "",
                 address: address,
@@ -225,8 +225,10 @@ class IdentityVerificationViewController: UIViewController,
                 state: nil,
                 postalCode: formData[.zip] ?? "",
                 country: formData[.country] ?? "",
-                dateOfBirth: formData[.dateOfBirth] ?? ""
-            )
+                dateOfBirth: formData[.dateOfBirth] ?? "")
+
+            let verifiedIdentity = try await verificationClient.verifyIdentity(input: input)
+
             Task {
                 self.dismissActivityAlert {
                     Task {

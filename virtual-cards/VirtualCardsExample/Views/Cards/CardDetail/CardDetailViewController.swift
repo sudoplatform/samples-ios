@@ -162,6 +162,7 @@ class CardDetailViewController: UIViewController, UITableViewDataSource, UITable
             case .partial(let partial):
                 throw AnyError("Failure: \(partial)")
             }
+
             Task {
                 self.tableData = self.splitAndOrderTransactions(localTransactions)
                 self.tableView.reloadData()

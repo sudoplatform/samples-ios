@@ -55,7 +55,7 @@ struct AppDependencies {
         // Setup IdentityVerificationClient
         identityVerificationClient = try DefaultSudoIdentityVerificationClient(sudoUserClient: userClient)
         // Setup KeyManager
-        keyManager = SudoKeyManagerImpl(serviceName: "com.sudoplatform.appservicename", keyTag: "com.sudoplatform", namespace: "vcs")
+        keyManager = LegacySudoKeyManager(serviceName: "com.sudoplatform.appservicename", keyTag: "com.sudoplatform", namespace: "vcs")
         // Setup Authenticator
         authenticator = Authenticator(userClient: userClient, keyManager: keyManager)
         // Setup VirtualCardsClient

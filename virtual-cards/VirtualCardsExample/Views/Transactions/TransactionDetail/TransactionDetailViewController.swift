@@ -172,7 +172,12 @@ class TransactionDetailViewController: UIViewController, UITableViewDataSource, 
         withSequenceId sequenceId: String?,
         cachePolicy: SudoVirtualCards.CachePolicy
     ) async throws -> [Transaction] {
-        let result = try await virtualCardsClient.listTransactions(withLimit: Defaults.transactionLimit, nextToken: nil, cachePolicy: cachePolicy)
+        let result = try await virtualCardsClient.listTransactions(
+            withLimit: Defaults.transactionLimit,
+            nextToken: nil,
+            dateRange: nil,
+            sortOrder: nil,
+            cachePolicy: cachePolicy)
         switch result {
         case .success(let success):
             return success.items

@@ -72,22 +72,27 @@ class ServerSelectedViewController: UIViewController, SudoVPNObserving {
     @IBAction func connectButtonTapped() {
         switch vpnClient.state {
         case .error, .disconnecting, .disconnected:
-            Task.detached(.medium) {
-                updateConnectionState(.connecting)
-                let configuration = SudoVPNConfiguration(server: server, protocolType: currentProtocol)
+            Task.detached(priority: .medium) { [weak self] in
+                guard let weakSelf = self else { return }
+                await weakSelf.updateConnectionState(.connecting)
+                let configuration = await SudoVPNConfiguration(
+                    server: weakSelf.server,
+                    protocolType: weakSelf.currentProtocol
+                )
                 do {
-                    try await vpnClient.connect(withConfiguration: configuration)
+                    try await weakSelf.vpnClient.connect(withConfiguration: configuration)
                 } catch {
-                    presentErrorAlert(message: "Failed to connect", error: error)
+                    await weakSelf.presentErrorAlert(message: "Failed to connect", error: error)
                 }
             }
         case .connected, .connecting, .reconnecting:
-            Task.detached(.medium) {
-                updateConnectionState(.disconnecting)
+            Task.detached(priority: .medium) { [weak self] in
+                guard let weakSelf = self else { return }
+                await weakSelf.updateConnectionState(.disconnecting)
                 do {
-                    try await vpnClient.disconnect(isUserInitiated: true)
+                    try await weakSelf.vpnClient.disconnect(isUserInitiated: true)
                 } catch {
-                    presentErrorAlert(message: "Failed to disconnect", error: error)
+                    await weakSelf.presentErrorAlert(message: "Failed to disconnect", error: error)
                 }
             }
         }

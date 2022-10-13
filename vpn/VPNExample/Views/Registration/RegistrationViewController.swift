@@ -47,13 +47,14 @@ class RegistrationViewController: UIViewController {
         super.viewDidAppear(animated)
 
         // Sign in automatically if the user is registered.
-        Task.detached(.medium) {
-            guard let isRegistered = try? await userClient.isRegistered() else {
+        Task.detached(priority: .medium) { [weak self] in
+            guard let weakSelf = self else { return }
+            guard let isRegistered = try? await weakSelf.userClient.isRegistered() else {
                 return
             }
             if isRegistered {
                 DispatchQueue.main.async {
-                    self.registerButtonTapped()
+                    weakSelf.registerButtonTapped()
                 }
             }
         }

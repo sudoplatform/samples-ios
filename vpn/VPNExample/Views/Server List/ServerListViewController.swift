@@ -35,7 +35,7 @@ class ServerListViewController: UIViewController, UITableViewDelegate, UITableVi
 
     override func viewWillAppear(_ animated: Bool) {
         presentActivityAlert(message: "Loading Servers") { [weak self] in
-            Task.detached(.medium) { [weak self] in
+            Task.detached(priority: .medium) { [weak self] in
                 await self?.loadServerList()
             }
         }
@@ -52,9 +52,9 @@ class ServerListViewController: UIViewController, UITableViewDelegate, UITableVi
             else {
                 break
             }
-            Task.detached(.medium) { [weak self] in
+            Task.detached(priority: .medium) { [weak self] in
                 guard let self = self else { return }
-                let server = self.serverList[row]
+                let server = await self.serverList[row]
                 await serverSelected.setServer(server)
             }
         default:

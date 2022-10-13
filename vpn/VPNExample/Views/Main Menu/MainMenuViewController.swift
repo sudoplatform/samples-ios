@@ -128,7 +128,7 @@ class MainMenuViewController: UIViewController, UITableViewDelegate, UITableView
             preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
         alert.addAction(UIAlertAction(title: "Deregister", style: .default) { _ in
-            Task.detached(.medium) { [weak self] in
+            Task.detached(priority: .medium) { [weak self] in
                 await self?.deregister()
             }
         })

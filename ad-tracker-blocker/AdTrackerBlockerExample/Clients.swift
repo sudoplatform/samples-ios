@@ -21,7 +21,7 @@ class Clients {
 
     static func configure() throws {
         self.userClient = try DefaultSudoUserClient(keyNamespace: "ids")
-        self.keyManager = SudoKeyManagerImpl(serviceName: "com.sudoplatform.adtrackerblocker", keyTag: "com.sudoplatform", namespace: "client")
+        self.keyManager = LegacySudoKeyManager(serviceName: "com.sudoplatform.adtrackerblocker", keyTag: "com.sudoplatform", namespace: "client")
         self.authenticator = Authenticator(userClient: userClient, keyManager: keyManager)
         let adTrackerBlockerConfig = try SudoAdTrackerBlockerConfig(userClient: userClient)
         self.adTrackerBlockerClient = DefaultSudoAdTrackerBlockerClient(config: adTrackerBlockerConfig)

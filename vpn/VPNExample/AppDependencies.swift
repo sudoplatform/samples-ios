@@ -32,7 +32,7 @@ struct AppDependencies {
         // Setup UserClient
         userClient = try DefaultSudoUserClient(keyNamespace: "ids")
         // Setup KeyManager
-        let keyManager = SudoKeyManagerImpl(serviceName: "com.sudoplatform.appservicename", keyTag: "com.sudoplatform", namespace: "vpn")
+        let keyManager = LegacySudoKeyManager(serviceName: "com.sudoplatform.appservicename", keyTag: "com.sudoplatform", namespace: "vpn")
         authenticator = DefaultAuthenticator(userClient: userClient, keyManager: keyManager)
         // Setup VPNClient
         vpnClient = try DefaultSudoVPNClient(userClient: userClient)

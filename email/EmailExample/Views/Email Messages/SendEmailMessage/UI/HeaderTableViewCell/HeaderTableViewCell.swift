@@ -6,7 +6,7 @@
 
 import UIKit
 
-protocol HeaderCellDelegate: class {
+protocol HeaderCellDelegate: AnyObject {
     func headerCell(_ cell: HeaderTableViewCell, didUpdateInput input: String?)
 }
 

@@ -8,6 +8,9 @@ import Foundation
 
 /// Message data that can be pre-populated in send, 1st use case is when replying
 struct SendEmailInputData {
+    /// id of the draft email message this input is based on
+    var draftEmailMessageId: String?
+
     /// To address
     var to: String
 

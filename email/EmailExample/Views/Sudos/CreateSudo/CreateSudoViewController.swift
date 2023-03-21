@@ -70,35 +70,33 @@ class CreateSudoViewController: UIViewController, LearnMoreViewDelegate {
     ///
     /// This action will initiate the sequence of  creating a Sudo via the `profilesClient`.
     @objc func didTapCreateSudoButton() {
-        createSudo()
+        Task.detached(priority: .medium) {
+            await self.createSudo()
+        }
     }
 
     // MARK: - Operations
 
     /// Creates a Sudo based on the view's form inputs.
-    func createSudo() {
+    func createSudo() async {
         let sudo = Sudo(title: nil, firstName: nil, lastName: nil, label: labelTextField.text, notes: nil, avatar: nil)
         presentActivityAlert(message: "Creating sudo")
         do {
-            try profilesClient.createSudo(sudo: sudo) { result in
-                DispatchQueue.main.async {
-                    // dismiss activity alert
-                    self.dismissActivityAlert {
-                        switch result {
-                        case .success(let createdSudo):
-                            self.sudo = createdSudo
-                            self.performSegue(
-                                withIdentifier: Segue.returnToSudoList.rawValue,
-                                sender: self)
-                        case .failure(let error):
-                            self.presentErrorAlert(message: "Failed to create sudo", error: error)
-                        }
-                    }
+            let createdSudo = try await profilesClient.createSudo(sudo: sudo)
+            Task { @MainActor in
+                // dismiss activity alert
+                self.dismissActivityAlert {
+                    self.sudo = createdSudo
+                    self.performSegue(
+                        withIdentifier: Segue.returnToSudoList.rawValue,
+                        sender: self)
                 }
             }
         } catch let error {
-            dismiss(animated: true) {
-                self.presentErrorAlert(message: "Failed to create sudo", error: error)
+            Task { @MainActor in
+                dismiss(animated: true) {
+                    self.presentErrorAlert(message: "Failed to create sudo", error: error)
+                }
             }
         }
     }

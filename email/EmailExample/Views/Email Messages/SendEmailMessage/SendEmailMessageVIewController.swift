@@ -15,12 +15,6 @@ class SendEmailMessageViewController: UIViewController, UITextViewDelegate, UITa
 
     // MARK: - Supplementary
 
-    /// Typealias for a successful response call to `SudoEmailClient.sendEmailMessage(withRFC822Data:senderEmailAddress:completion:)`.
-    typealias SendEmailMessageSuccessCompletion = (String) -> Void
-
-    /// Typealias for a error response call to `SudoEmailClient.sendEmailMessage(withRFC822Data:senderEmailAddress:completion:)`.
-    typealias SendEmailMessageErrorCompletion = (Error) -> Void
-
     /// Segues that are performed in `SendEmailMessageViewController`.
     enum Segue: String {
         /// Used to navigate back to the `EmailMessageListViewController`.
@@ -90,8 +84,10 @@ class SendEmailMessageViewController: UIViewController, UITextViewDelegate, UITa
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         guard emailAddress?.emailAddress != nil else {
-            presentErrorAlert(message: "An error has occurred: no email address found") { _ in
-                self.performSegue(withIdentifier: Segue.returnToEmailMessageList.rawValue, sender: self)
+            Task { @MainActor in
+                presentErrorAlert(message: "An error has occurred: no email address found") { _ in
+                    self.performSegue(withIdentifier: Segue.returnToEmailMessageList.rawValue, sender: self)
+                }
             }
             return
         }
@@ -159,25 +155,37 @@ class SendEmailMessageViewController: UIViewController, UITextViewDelegate, UITa
             presentErrorAlert(message: "Unable to marshall email message data")
             return
         }
-        self.sendEmailMessage(data, emailAddressId: emailAddressId)
+        Task.detached(priority: .medium) {
+            await self.sendEmailMessage(data, emailAddressId: emailAddressId)
+        }
+    }
+
+    @objc func didTapBackButton() {
+        self.cancelSend()
     }
 
     // MARK: - Utilities
 
-    func sendEmailMessage(_ data: Data, emailAddressId: String) {
+    func sendEmailMessage(_ data: Data, emailAddressId: String) async {
         presentActivityAlert(message: "Sending Email Message")
-        self.emailClient.sendEmailMessage(withRFC822Data: data, emailAddressId: emailAddressId) { [weak self] result in
-            DispatchQueue.main.async {
-                switch result {
-                case .success:
-                    self?.dismissActivityAlert {
-                        self?.performSegue(withIdentifier: Segue.returnToEmailMessageList.rawValue, sender: self)
-                    }
-                case let .failure(error):
-                    self?.dismissActivityAlert {
-                        self?.presentErrorAlert(message: "Failed to send email message", error: error)
-                    }
+        do {
+            let sendInput = SendEmailMessageInput(rfc822Data: data, senderEmailAddressId: emailAddressId)
+            _ = try await emailClient.sendEmailMessage(withInput: sendInput)
+            if let draftEmailMessageId = inputData?.draftEmailMessageId {
+                let input = DeleteDraftEmailMessagesInput(
+                    ids: [draftEmailMessageId],
+                    emailAddressId: emailAddressId
+                )
+                _ = try await emailClient.deleteDraftEmailMessages(withInput: input)
+            }
+            Task { @MainActor in
+                self.dismissActivityAlert {
+                    self.performSegue(withIdentifier: Segue.returnToEmailMessageList.rawValue, sender: self)
                 }
+            }
+        } catch {
+            self.dismissActivityAlert {
+                self.presentErrorAlert(message: "Failed to send email message", error: error)
             }
         }
     }
@@ -215,6 +223,83 @@ class SendEmailMessageViewController: UIViewController, UITextViewDelegate, UITa
         }
     }
 
+    @MainActor
+    func cancelSend() {
+        let alert = UIAlertController(
+            title: "Cancel Sending",
+            message: "Would you like to save this message as a draft?",
+            preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+        alert.addAction(UIAlertAction(title: "Save Draft", style: .default) { _ in
+            Task.detached(priority: .medium) {
+                await self.saveDraft()
+            }
+        })
+        alert.addAction(UIAlertAction(title: "Don't Save", style: .default) { _ in
+            self.performSegue(withIdentifier: Segue.returnToEmailMessageList.rawValue, sender: self)
+        })
+        present(alert, animated: true, completion: nil)
+    }
+
+    func saveDraft() async {
+        let emailAddressId = emailAddress.id
+        let from = emailAddress.emailAddress
+        guard let to = formData[.to],
+              let cc = formData[.cc],
+              let bcc = formData[.bcc],
+              let subject = formData[.subject],
+              let body = formData[.body] else {
+            return
+        }
+        if to.isEmpty && cc.isEmpty && bcc.isEmpty && subject.isEmpty && body.isEmpty {
+            presentErrorAlert(message: "Nothing to save") {_ in
+                self.performSegue(withIdentifier: Segue.returnToEmailMessageList.rawValue, sender: self)
+            }
+            return
+        }
+        let message = BasicRFC822Message(
+            from: from,
+            to: addressesToArray(to),
+            cc: addressesToArray(cc),
+            bcc: addressesToArray(bcc),
+            subject: subject,
+            body: body
+        )
+
+        guard let data = RFC822Util.fromBasicRFC822(message) else {
+            presentErrorAlert(message: "Unable to marshall email message data")
+            return
+        }
+
+        presentActivityAlert(message: "Saving Draft Email Message")
+        do {
+            if let draftEmailMessageId = inputData?.draftEmailMessageId {
+                let input = UpdateDraftEmailMessageInput(
+                    id: draftEmailMessageId,
+                    rfc822Data: data,
+                    senderEmailAddressId: emailAddressId
+                )
+                _ = try await self.emailClient.updateDraftEmailMessage(withInput: input)
+            } else {
+                let input = CreateDraftEmailMessageInput(
+                    rfc822Data: data,
+                    senderEmailAddressId: emailAddressId
+                )
+                _ = try await self.emailClient.createDraftEmailMessage(withInput: input)
+            }
+            Task { @MainActor in
+                self.dismissActivityAlert {
+                    self.performSegue(withIdentifier: Segue.returnToEmailMessageList.rawValue, sender: self)
+                }
+            }
+        } catch {
+            self.dismissActivityAlert {
+                self.presentErrorAlert(message: "Failed to save draft email message", error: error)
+            }
+        }
+
+    }
+
     // MARK: - Helpers: Configuration
 
     func configureTableView() {
@@ -229,8 +314,22 @@ class SendEmailMessageViewController: UIViewController, UITextViewDelegate, UITa
 
     func configureNavigationBar() {
         let paperPlaneImage = UIImage(systemName: "paperplane")
-        let sendBarButton = UIBarButtonItem(image: paperPlaneImage, style: .plain, target: self, action: #selector(didTapSendEmailButton))
+        let sendBarButton = UIBarButtonItem(
+            image: paperPlaneImage,
+            style: .plain,
+            target: self,
+            action: #selector(didTapSendEmailButton)
+        )
         navigationItem.rightBarButtonItem = sendBarButton
+
+        let backImage = UIImage(systemName: "chevron.backward")
+        let backButton = UIBarButtonItem(
+            image: backImage,
+            style: .plain,
+            target: self,
+            action: #selector(didTapBackButton)
+        )
+        navigationItem.leftBarButtonItem = backButton
     }
 
     // MARK: - Conformance: UITableViewDataSource

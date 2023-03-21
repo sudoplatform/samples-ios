@@ -9,7 +9,7 @@ import UIKit
 /// Protocol to assign for a delegate of `InputFormTableViewCell`.
 ///
 /// This is used to receive form updates from the cell.
-protocol InputFormCellDelegate: class {
+protocol InputFormCellDelegate: AnyObject {
 
     /// Input cell has had an update in its field information from the user.
     func inputCell(_ cell: InputFormTableViewCell, didUpdateInput input: String?)

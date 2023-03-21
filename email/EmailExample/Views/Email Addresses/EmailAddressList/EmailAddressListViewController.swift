@@ -29,12 +29,6 @@ class EmailAddressListViewController: UIViewController, UITableViewDataSource, U
 
     // MARK: - Supplementary
 
-    /// Typealias for a successful response call to `SudoEmailClient.getEmailAddresssWithFilter(_:limit:nextToken:cachePolicy:completion:)`.
-    typealias EmailAddressListSuccessCompletion = ([EmailAddress]) -> Void
-
-    /// Typealias for a error response call to `SudoEmailClient.getEmailAddresssWithFilter(_:limit:nextToken:cachePolicy:completion:)`.
-    typealias EmailAddressListErrorCompletion = (Error) -> Void
-
     /// Defaults used in `EmailAddressListViewController`.
     enum Defaults {
         /// Limit used when querying email addresses from `SudoEmailClient`.
@@ -96,7 +90,10 @@ class EmailAddressListViewController: UIViewController, UITableViewDataSource, U
             )
             return
         }
-        loadCacheEmailAddressesAndFetchRemote()
+
+        Task.detached(priority: .medium) {
+            await self.loadCacheEmailAddressesAndFetchRemote()
+        }
     }
 
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -123,52 +120,35 @@ class EmailAddressListViewController: UIViewController, UITableViewDataSource, U
     ///
     /// This action will ensure that the email address list is up to date when returning from views - e.g. `CreateEmailAddressViewController`.
     @IBAction func returnToEmailAddressList(segue: UIStoryboardSegue) {
-        loadCacheEmailAddressesAndFetchRemote()
+        Task.detached(priority: .medium) {
+            await self.loadCacheEmailAddressesAndFetchRemote()
+        }
     }
 
     // MARK: - Operations
 
     func listEmailAddresses(
-        cachePolicy: SudoEmail.CachePolicy,
-        success: EmailAddressListSuccessCompletion? = nil,
-        failure: EmailAddressListErrorCompletion? = nil
-    ) {
-        var sudoId: String?
-        if let id = sudo.id {
-            sudoId = id
-        } else {
-            NSLog("No sudo id found when attempting to list email addresses")
-        }
-        emailClient.listEmailAddressesWithSudoId(
-            sudoId,
-            filter: nil,
+        cachePolicy: SudoEmail.CachePolicy
+    ) async throws -> [EmailAddress] {
+        let listEmailAddressesInput = ListEmailAddressesInput(
+            cachePolicy: cachePolicy,
             limit: Defaults.emailListLimit,
-            nextToken: nil,
-            cachePolicy: cachePolicy
-        ) { result in
-            switch result {
-            case let .success(output):
-                success?(output.items)
-            case let .failure(error):
-                failure?(error)
-            }
-        }
+            nextToken: nil
+        )
+        let output = try await emailClient.listEmailAddresses(withInput: listEmailAddressesInput)
+        return output.items
     }
 
-    func deleteEmailAddressWithId(_ id: String, _ completion: @escaping (Result<EmailAddress, Error>) -> Void) {
+    func deleteEmailAddressWithId(_ id: String) async throws -> EmailAddress {
         presentActivityAlert(message: "Deleting Email Address")
-        emailClient.deprovisionEmailAddressWithId(id) { [weak self] result in
-            DispatchQueue.main.async {
-                switch result {
-                case .success:
-                    self?.dismissActivityAlert()
-                case let .failure(error):
-                    self?.dismissActivityAlert {
-                        self?.presentErrorAlert(message: "Failed to delete email address", error: error)
-                    }
-                }
-                completion(result)
-            }
+        do {
+            let emailAddress = try await emailClient.deprovisionEmailAddress(id)
+            self.dismissActivityAlert()
+            return emailAddress
+        } catch {
+            self.dismissActivityAlert()
+            self.presentErrorAlert(message: "Failed to delete email address", error: error)
+            throw error
         }
     }
 
@@ -188,34 +168,26 @@ class EmailAddressListViewController: UIViewController, UITableViewDataSource, U
     /// On any failure, either by cache or remote call, a "Failed to list email addresses" UIAlert message will be presented to the user.
     ///
     /// All email addresses will be filtered using the `sudoId` to ensure only email addresses associated with the sudo are listed.
-    func loadCacheEmailAddressesAndFetchRemote() {
-        let failureCompletion: EmailAddressListErrorCompletion = { [weak self] error in
-            DispatchQueue.main.async {
-                self?.presentErrorAlert(message: "Failed to list Email Addresses", error: error)
+    func loadCacheEmailAddressesAndFetchRemote() async {
+        do {
+            let localAddresses = try await listEmailAddresses(cachePolicy: .cacheOnly)
+
+            Task { @MainActor in
+                self.emailAddresses = self.filterEmailAddresses(localAddresses, withSudoId: self.sudo.id ?? "")
+                self.tableView.reloadData()
+            }
+
+            let remoteAddresses = try await listEmailAddresses(cachePolicy: .remoteOnly)
+
+            Task { @MainActor in
+                self.emailAddresses = self.filterEmailAddresses(remoteAddresses, withSudoId: self.sudo.id ?? "")
+                self.tableView.reloadData()
+            }
+        } catch {
+            Task { @MainActor in
+                self.presentErrorAlert(message: "Failed to list Email Addresses", error: error)
             }
         }
-        listEmailAddresses(
-            cachePolicy: .cacheOnly,
-            success: { [weak self] emailAddresses in
-                guard let weakSelf = self else { return }
-                DispatchQueue.main.async {
-                    weakSelf.emailAddresses = weakSelf.filterEmailAddresses(emailAddresses, withSudoId: weakSelf.sudo.id ?? "")
-                    weakSelf.tableView.reloadData()
-                }
-                weakSelf.listEmailAddresses(
-                    cachePolicy: .remoteOnly,
-                    success: { [weak self] emailAddresses in
-                        DispatchQueue.main.async {
-                            guard let weakSelf = self else { return }
-                            weakSelf.emailAddresses = weakSelf.filterEmailAddresses(emailAddresses, withSudoId: weakSelf.sudo.id ?? "")
-                            weakSelf.tableView.reloadData()
-                        }
-                    },
-                    failure: failureCompletion
-                )
-            },
-            failure: failureCompletion
-        )
     }
 
     /// Filter a list of email addresses by a sudo identifier.
@@ -234,10 +206,12 @@ class EmailAddressListViewController: UIViewController, UITableViewDataSource, U
         return 1
     }
 
+    @MainActor
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return emailAddresses.count + 1
     }
 
+    @MainActor
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell: UITableViewCell
         if indexPath.row == emailAddresses.count {
@@ -249,7 +223,15 @@ class EmailAddressListViewController: UIViewController, UITableViewDataSource, U
         } else {
             let emailAddress = emailAddresses[indexPath.row]
             cell = tableView.dequeueReusableCell(withIdentifier: "default", for: indexPath)
-            cell.textLabel?.text = emailAddress.emailAddress
+            if let alias = emailAddress.alias {
+                if alias.isEmpty {
+                    cell.textLabel?.text = "Address: \(emailAddress.emailAddress)"
+                } else {
+                    cell.textLabel?.text = "Alias: \(alias)  Address: \(emailAddress.emailAddress)"
+                }
+            } else {
+                cell.textLabel?.text = "Address: \(emailAddress.emailAddress)"
+            }
             cell.textLabel?.minimumScaleFactor = 0.7
             cell.textLabel?.adjustsFontSizeToFitWidth = true
             cell.accessoryType = .disclosureIndicator
@@ -259,6 +241,7 @@ class EmailAddressListViewController: UIViewController, UITableViewDataSource, U
 
     // MARK: - Conformance: UITableViewDelegate
 
+    @MainActor
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         assert(indexPath.section == 0)
         if indexPath.row == emailAddresses.count {
@@ -269,30 +252,25 @@ class EmailAddressListViewController: UIViewController, UITableViewDataSource, U
         tableView.deselectRow(at: indexPath, animated: true)
     }
 
+    @MainActor
     func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         guard indexPath.row < emailAddresses.count else {
             return nil
         }
         let cancel = UIContextualAction(style: .destructive, title: "Delete") { _, _, completion in
             let emailAddress = self.emailAddresses[indexPath.row]
-            self.emailAddresses.remove(at: indexPath.row)
-            DispatchQueue.main.async {
-                tableView.reloadData()
-            }
-            self.deleteEmailAddressWithId(emailAddress.id, { [weak self] result in
-                guard let weakSelf = self else { return }
-                switch result {
-                case .success:
-                    // Do a call to service to update cache.
-                    weakSelf.listEmailAddresses(cachePolicy: .remoteOnly)
-                    completion(true)
-                case .failure:
-                    DispatchQueue.main.async {
-                        weakSelf.emailAddresses.insert(emailAddress, at: indexPath.row)
+
+            Task.detached(priority: .medium) {
+                do {
+                    _ = try await self.deleteEmailAddressWithId(emailAddress.id)
+                    Task { @MainActor in
+                        self.emailAddresses.remove(at: indexPath.row)
+                        completion(true)
                     }
+                } catch {
                     completion(false)
                 }
-            })
+            }
         }
         cancel.backgroundColor = .red
         return UISwipeActionsConfiguration(actions: [cancel])

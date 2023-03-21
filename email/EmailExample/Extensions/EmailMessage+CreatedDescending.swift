@@ -15,6 +15,6 @@ extension Array where Element == EmailMessage {
 
     /// Returns the elements of the array, sorted by `created`, in descending order.
     func sortedByCreatedDescending() -> [EmailMessage] {
-        return sorted(by: { $0.created > $1.created })
+        return sorted(by: { $0.createdAt > $1.createdAt })
     }
 }

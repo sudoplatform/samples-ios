@@ -6,7 +6,7 @@
 
 import UIKit
 
-protocol BodyCellDelegate: class {
+protocol BodyCellDelegate: AnyObject {
     func bodyCell(_ cell: BodyTableViewCell, didUpdateInput input: String?)
 }
 

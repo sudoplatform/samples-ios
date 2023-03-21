@@ -62,6 +62,7 @@
 		84EC6CAE24C1652B008FDED4 /* BodyTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 84EC6CAC24C1652B008FDED4 /* BodyTableViewCell.xib */; };
 		84EC6CB124C169E3008FDED4 /* HeaderTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84EC6CAF24C169E3008FDED4 /* HeaderTableViewCell.swift */; };
 		84EC6CB224C169E3008FDED4 /* HeaderTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 84EC6CB024C169E3008FDED4 /* HeaderTableViewCell.xib */; };
+		953890802963F6E100EE81EA /* FolderSwitcherView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9538907F2963F6E100EE81EA /* FolderSwitcherView.swift */; };
 		9557447824A42AFE0057A845 /* SendEmailInputData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9557447724A42AFE0057A845 /* SendEmailInputData.swift */; };
 		9557447E24A5C0320057A845 /* RegistrationViewControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9557447D24A5C0320057A845 /* RegistrationViewControllerTests.swift */; };
 		9557448124A5C1120057A845 /* EmailExampleTestUtility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9557448024A5C1120057A845 /* EmailExampleTestUtility.swift */; };
@@ -70,6 +71,8 @@
 		9566E3D025084FB9002A2DD3 /* EmailAddressListViewControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9566E3CF25084FB9002A2DD3 /* EmailAddressListViewControllerTests.swift */; };
 		9566E3D42509ABFD002A2DD3 /* SudoListViewControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9566E3D32509ABFD002A2DD3 /* SudoListViewControllerTests.swift */; };
 		9566E3D72509F638002A2DD3 /* CreateSudoViewControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9566E3D62509F638002A2DD3 /* CreateSudoViewControllerTests.swift */; };
+		95A92DB7286CFDD100D9FAA2 /* SudoEntitlementsClientMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95A92DB6286CFDD100D9FAA2 /* SudoEntitlementsClientMock.swift */; };
+		95A92DB9286D5CE900D9FAA2 /* DataFactory+EntitlementsSDK.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95A92DB8286D5CE900D9FAA2 /* DataFactory+EntitlementsSDK.swift */; };
 		95C0CDFE24A9A1570024BFBB /* SudoEmailClientSpy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95C0CDFD24A9A1570024BFBB /* SudoEmailClientSpy.swift */; };
 		95C0CE0024A9A6230024BFBB /* SudoEmailClientMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95C0CDFF24A9A6230024BFBB /* SudoEmailClientMock.swift */; };
 		95C0CE0224AAAECC0024BFBB /* XCTestCase+CustomAssertions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95C0CE0124AAAECC0024BFBB /* XCTestCase+CustomAssertions.swift */; };
@@ -166,14 +169,27 @@
 		84EC6CAF24C169E3008FDED4 /* HeaderTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeaderTableViewCell.swift; sourceTree = "<group>"; };
 		84EC6CB024C169E3008FDED4 /* HeaderTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = HeaderTableViewCell.xib; sourceTree = "<group>"; };
 		88F9B8D28C1D11496229828D /* Pods_EmailExample.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_EmailExample.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		9538907F2963F6E100EE81EA /* FolderSwitcherView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FolderSwitcherView.swift; sourceTree = "<group>"; };
 		9557447724A42AFE0057A845 /* SendEmailInputData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SendEmailInputData.swift; sourceTree = "<group>"; };
 		9557447D24A5C0320057A845 /* RegistrationViewControllerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegistrationViewControllerTests.swift; sourceTree = "<group>"; };
 		9557448024A5C1120057A845 /* EmailExampleTestUtility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmailExampleTestUtility.swift; sourceTree = "<group>"; };
 		9557448324A5C2BD0057A845 /* SudoProfilesClientMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SudoProfilesClientMock.swift; sourceTree = "<group>"; };
+		9557655029383209007293CC /* AWSS3.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = AWSS3.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		955AA1B829396EAC00715B1F /* AWSS3.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = AWSS3.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		955AA1BC293974AD00715B1F /* AppSyncRealTimeClient.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = AppSyncRealTimeClient.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		955AA1BE293974B400715B1F /* AWSAppSync.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = AWSAppSync.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		955AA1C0293974BA00715B1F /* AWSAuthCore.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = AWSAuthCore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		955AA1C2293974C100715B1F /* AWSCognitoIdentityProvider.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = AWSCognitoIdentityProvider.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		955AA1C4293974C800715B1F /* AWSCognitoIdentityProviderASF.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = AWSCognitoIdentityProviderASF.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		955AA1C6293974CF00715B1F /* AWSCore.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = AWSCore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		955AA1C8293974DA00715B1F /* AWSMobileClient.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = AWSMobileClient.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		955AA1CA293974E100715B1F /* AWSS3.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = AWSS3.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		9566E3CC2505E8E2002A2DD3 /* CreateEmailAddressViewControllerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateEmailAddressViewControllerTests.swift; sourceTree = "<group>"; };
 		9566E3CF25084FB9002A2DD3 /* EmailAddressListViewControllerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmailAddressListViewControllerTests.swift; sourceTree = "<group>"; };
 		9566E3D32509ABFD002A2DD3 /* SudoListViewControllerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SudoListViewControllerTests.swift; sourceTree = "<group>"; };
 		9566E3D62509F638002A2DD3 /* CreateSudoViewControllerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateSudoViewControllerTests.swift; sourceTree = "<group>"; };
+		95A92DB6286CFDD100D9FAA2 /* SudoEntitlementsClientMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SudoEntitlementsClientMock.swift; sourceTree = "<group>"; };
+		95A92DB8286D5CE900D9FAA2 /* DataFactory+EntitlementsSDK.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DataFactory+EntitlementsSDK.swift"; sourceTree = "<group>"; };
 		95C0CDFD24A9A1570024BFBB /* SudoEmailClientSpy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SudoEmailClientSpy.swift; sourceTree = "<group>"; };
 		95C0CDFF24A9A6230024BFBB /* SudoEmailClientMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SudoEmailClientMock.swift; sourceTree = "<group>"; };
 		95C0CE0124AAAECC0024BFBB /* XCTestCase+CustomAssertions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "XCTestCase+CustomAssertions.swift"; sourceTree = "<group>"; };
@@ -432,6 +448,7 @@
 			children = (
 				84770ABF24C8FF8500FC8C8D /* Files */,
 				847EF2C324BE799000423B74 /* DataFactory+EmailSDK.swift */,
+				95A92DB8286D5CE900D9FAA2 /* DataFactory+EntitlementsSDK.swift */,
 				84770AC224C9020200FC8C8D /* DataFactory+TestData.swift */,
 				847EF2C124BE796F00423B74 /* DataFactoryNamespace.swift */,
 			);
@@ -494,6 +511,7 @@
 			children = (
 				67014B61249AC482008733E8 /* EmailMessageTableViewCell.swift */,
 				67014B5F249AC360008733E8 /* EmailMessageTableViewCell.xib */,
+				9538907F2963F6E100EE81EA /* FolderSwitcherView.swift */,
 			);
 			path = UI;
 			sourceTree = "<group>";
@@ -633,6 +651,7 @@
 				8403256424C5214B0049C403 /* FileReadableMock.swift */,
 				8403256024C51CB50049C403 /* KeyManagerMock.swift */,
 				95C0CDFF24A9A6230024BFBB /* SudoEmailClientMock.swift */,
+				95A92DB6286CFDD100D9FAA2 /* SudoEntitlementsClientMock.swift */,
 				9557448324A5C2BD0057A845 /* SudoProfilesClientMock.swift */,
 				8483150C24B82BC7004E89EA /* UITableViewCellMockSpy.swift */,
 				8483150A24B82113004E89EA /* UITableViewMockSpy.swift */,
@@ -749,6 +768,16 @@
 		C5CDFF5F36907F29DC780D9A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				955AA1BC293974AD00715B1F /* AppSyncRealTimeClient.framework */,
+				955AA1BE293974B400715B1F /* AWSAppSync.framework */,
+				955AA1C0293974BA00715B1F /* AWSAuthCore.framework */,
+				955AA1C2293974C100715B1F /* AWSCognitoIdentityProvider.framework */,
+				955AA1C4293974C800715B1F /* AWSCognitoIdentityProviderASF.framework */,
+				955AA1C6293974CF00715B1F /* AWSCore.framework */,
+				955AA1C8293974DA00715B1F /* AWSMobileClient.framework */,
+				955AA1CA293974E100715B1F /* AWSS3.framework */,
+				955AA1B829396EAC00715B1F /* AWSS3.framework */,
+				9557655029383209007293CC /* AWSS3.framework */,
 				88F9B8D28C1D11496229828D /* Pods_EmailExample.framework */,
 				9991870B6EA4AEA026F74718 /* Pods_EmailExample_EmailExampleTests.framework */,
 			);
@@ -1020,6 +1049,7 @@
 				9566E3CD2505E8E2002A2DD3 /* CreateEmailAddressViewControllerTests.swift in Sources */,
 				9566E3D72509F638002A2DD3 /* CreateSudoViewControllerTests.swift in Sources */,
 				847EF2C424BE799000423B74 /* DataFactory+EmailSDK.swift in Sources */,
+				95A92DB9286D5CE900D9FAA2 /* DataFactory+EntitlementsSDK.swift in Sources */,
 				84770AC324C9020200FC8C8D /* DataFactory+TestData.swift in Sources */,
 				847EF2C224BE796F00423B74 /* DataFactoryNamespace.swift in Sources */,
 				847EF2D024BFE5EB00423B74 /* DateLabelTests.swift in Sources */,
@@ -1037,6 +1067,7 @@
 				67C8208024B2AEDD00E5D113 /* SendEmailMessageViewControllerTests.swift in Sources */,
 				95C0CE0024A9A6230024BFBB /* SudoEmailClientMock.swift in Sources */,
 				95C0CDFE24A9A1570024BFBB /* SudoEmailClientSpy.swift in Sources */,
+				95A92DB7286CFDD100D9FAA2 /* SudoEntitlementsClientMock.swift in Sources */,
 				9566E3D42509ABFD002A2DD3 /* SudoListViewControllerTests.swift in Sources */,
 				9557448424A5C2BD0057A845 /* SudoProfilesClientMock.swift in Sources */,
 				8483150D24B82BC7004E89EA /* UITableViewCellMockSpy.swift in Sources */,
@@ -1066,6 +1097,7 @@
 				67014B5D24983FC6008733E8 /* EmailMessageListViewController.swift in Sources */,
 				67014B62249AC482008733E8 /* EmailMessageTableViewCell.swift in Sources */,
 				8403256324C5213A0049C403 /* FileReadable.swift in Sources */,
+				953890802963F6E100EE81EA /* FolderSwitcherView.swift in Sources */,
 				84EC6CB124C169E3008FDED4 /* HeaderTableViewCell.swift in Sources */,
 				841252602533D7A100C98ED3 /* InputFormTableViewCell.swift in Sources */,
 				84309D5F2463FFEC00F48ECC /* LearnMoreView.swift in Sources */,
@@ -1119,7 +1151,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = UU2W43R8JA;
 				INFOPLIST_FILE = EmailExampleTests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1141,7 +1173,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = UU2W43R8JA;
 				INFOPLIST_FILE = EmailExampleTests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1206,7 +1238,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -1261,7 +1293,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
@@ -1279,6 +1311,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = UU2W43R8JA;
 				INFOPLIST_FILE = EmailExample/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1298,6 +1331,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = UU2W43R8JA;
 				INFOPLIST_FILE = EmailExample/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

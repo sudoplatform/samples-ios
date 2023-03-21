@@ -26,7 +26,7 @@ class DateLabel: UILabel {
     let calendar = Calendar(identifier: .iso8601)
 
     /// Date property used to format the label `text` itself.
-    var date: Date? = nil {
+    var date: Date? {
         didSet {
             updateText()
         }

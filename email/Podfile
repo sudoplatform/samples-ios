@@ -1,5 +1,5 @@
 #
-platform :ios, '13.0'
+platform :ios, '15.0'
 use_frameworks!
 use_modular_headers!
 
@@ -17,12 +17,19 @@ pre_install do |installer|
 end
 
 target 'EmailExample' do
-    pod 'SudoUser', '~> 10.1'
-    pod 'SudoProfiles', '~> 9.0'
-    pod 'SudoEmail', '~> 5.0'
+    pod 'SudoEntitlements', '~> 9.0'
+    pod 'SudoUser', '~> 15.0'
+    pod 'SudoProfiles', '~> 17.0'
     pod 'MimeParser', '~> 0.1'
+    pod 'AWSCore', '~> 2.27.15'
+    pod 'AWSAuthCore', '~> 2.27.15'
+    pod 'AWSCognitoIdentityProvider', '~> 2.27.15'
+    pod 'AWSCognitoIdentityProviderASF', '~> 2.27.15'
+    pod 'AWSS3', '~> 2.27.15'
 
     target 'EmailExampleTests'
+
+    pod 'SudoEmail', '~> 6.0'
 end
 
 # Fix Xcode nagging warning on pod install/update

@@ -23,12 +23,6 @@ class ReadEmailMessageViewController: UIViewController, ActivityAlertViewControl
 
     // MARK: - Supplementary
 
-    /// Typealias for a successful response call to `SudoEmailClient.getEmailMessageRFC822DataWithId(_:completion:)`.
-    typealias GetEmailMessageSuccessCompletion = (Data) -> Void
-
-    /// Typealias for a error response call to `SudoEmailClient.getEmailMessageRFC822DataWithId(_:completion:)`.
-    typealias GetEmailMessageErrorCompletion = (Error) -> Void
-
     /// Segues that are performed in `EmailMessageListViewController`.
     enum Segue: String {
         /// Used to navigate to the `SendEmailMessageViewController`.
@@ -64,14 +58,18 @@ class ReadEmailMessageViewController: UIViewController, ActivityAlertViewControl
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         guard let emailMessage = emailMessage else {
-            presentErrorAlert(message: "An error has occurred: no email message found") { _ in
-                self.performSegue(withIdentifier: Segue.returnToEmailMessageList.rawValue, sender: self)
+            Task { @MainActor in
+                presentErrorAlert(message: "An error has occurred: no email message found") { _ in
+                    self.performSegue(withIdentifier: Segue.returnToEmailMessageList.rawValue, sender: self)
+                }
             }
             return
         }
         guard let emailAddress = emailAddress, !emailAddress.emailAddress.isEmpty else {
-            presentErrorAlert(message: "An error has occurred: no email address found") { _ in
-                self.performSegue(withIdentifier: Segue.returnToEmailMessageList.rawValue, sender: self)
+            Task { @MainActor in
+                presentErrorAlert(message: "An error has occurred: no email address found") { _ in
+                    self.performSegue(withIdentifier: Segue.returnToEmailMessageList.rawValue, sender: self)
+                }
             }
             return
         }
@@ -108,19 +106,17 @@ class ReadEmailMessageViewController: UIViewController, ActivityAlertViewControl
 
     // MARK: - Operations
 
-    func readEmailMessage(
-        messageId: String,
-        success: @escaping GetEmailMessageSuccessCompletion,
-        failure: @escaping GetEmailMessageErrorCompletion
-    ) {
-        emailClient.getEmailMessageRFC822DataWithId(messageId) { result in
-            switch result {
-            case let .success(output):
-                success(output)
-            case let .failure(error):
-                failure(error)
-            }
+    func readEmailMessage(messageId: String) async throws -> Data {
+        let getEmailMessageInput = GetEmailMessageRfc822DataInput(id: messageId, emailAddressId: self.emailAddress.id)
+        return try await emailClient.getEmailMessageRfc822Data(withInput: getEmailMessageInput)
+    }
+
+    func readDraftEmailMessage(messageId: String) async throws -> Data {
+        let getDraftInput = GetDraftEmailMessageInput(id: messageId, emailAddressId: self.emailAddress.id)
+        guard let draftEmailMessage = try await emailClient.getDraftEmailMessage(withInput: getDraftInput) else {
+            throw SudoEmailError.emailMessageNotFound
         }
+        return draftEmailMessage.rfc822Data
     }
 
     // MARK: - Helpers: Configuration
@@ -159,23 +155,35 @@ class ReadEmailMessageViewController: UIViewController, ActivityAlertViewControl
     /// On any failure, a "Failed to get Email Message" UIAlert message will be presented to the user.
     func loadEmailMessage(_ message: EmailMessage) {
         presentCancellableActivityAlert(message: "Loading", delegate: self) {
-            self.readEmailMessage(
-                messageId: message.id,
-                success: { [weak self] rfc822Data in
-                    guard let weakSelf = self else { return }
+            Task.detached(priority: .medium) {
+                do {
+                    var rfc822Data: Data
+                    if message.folderId.contains("DRAFTS") {
+                        rfc822Data = try await self.readDraftEmailMessage(messageId: message.id)
+                        let parsedMessage = try RFC822Util.fromPlainText(rfc822Data)
+                        Task { @MainActor in
+                            self.bodyLabel.text = parsedMessage.body
+                            self.dismissActivityAlert()
+                            self.performSegue(withIdentifier: Segue.replyToEmailMessage.rawValue, sender: self)
+                        }
+                        return
+                    } else {
+                        rfc822Data = try await self.readEmailMessage(messageId: message.id)
+                    }
                     let parsedMessage: BasicRFC822Message
                     do {
                         parsedMessage = try RFC822Util.fromPlainText(rfc822Data)
                     } catch {
-                        DispatchQueue.main.async {
-                            weakSelf.presentErrorAlert(message: "Failed load email message", error: error) { _ in
-                                self?.performSegue(withIdentifier: Segue.returnToEmailMessageList.rawValue, sender: self)
+                        Task { @MainActor in
+                            self.dismissActivityAlert()
+                            self.presentErrorAlert(message: "Failed load email message", error: error) { _ in
+                                self.performSegue(withIdentifier: Segue.returnToEmailMessageList.rawValue, sender: self)
                             }
                         }
                         return
                     }
                     let body = parsedMessage.body
-                    DispatchQueue.main.async {
+                    Task { @MainActor in
                         let toLabels: [UILabel] = message.to.map {
                             let label = UILabel()
                             label.font = UIFont.systemFont(ofSize: 14.0)
@@ -192,33 +200,30 @@ class ReadEmailMessageViewController: UIViewController, ActivityAlertViewControl
                             label.minimumScaleFactor = 0.7
                             return label
                         }
-                        weakSelf.fromLabel.text = message.from.first?.displayName ?? message.from.first?.address
+                        self.fromLabel.text = message.from.first?.displayName ?? message.from.first?.address
                         toLabels.forEach {
-                            weakSelf.toMessageStackView.addArrangedSubview($0)
+                            self.toMessageStackView.addArrangedSubview($0)
                         }
                         ccLabels.forEach {
-                            weakSelf.ccMessageStackView.addArrangedSubview($0)
+                            self.ccMessageStackView.addArrangedSubview($0)
                         }
-                        weakSelf.ccMessageStackView.isHidden = weakSelf.ccMessageStackView.arrangedSubviews.isEmpty
-                        weakSelf.dateLabel.date = message.created
-                        weakSelf.subjectLabel.text = message.subject
-                        weakSelf.bodyLabel.text = body
-                        weakSelf.messageLoaded = true
-                        weakSelf.dismissActivityAlert()
+                        self.ccMessageStackView.isHidden = self.ccMessageStackView.arrangedSubviews.isEmpty
+                        self.dateLabel.date = message.createdAt
+                        self.subjectLabel.text = message.subject
+                        self.bodyLabel.text = body
+                        self.messageLoaded = true
                     }
-                },
-                failure: { [weak self] error in
-                    guard let weakSelf = self else { return }
-                    DispatchQueue.main.async {
-                        weakSelf.dismissActivityAlert()
-                        weakSelf.presentErrorAlert(message: "Failed to get Email Message", error: error)
-                    }
+                    await self.dismissActivityAlert()
                 }
-            )
+            }
         }
     }
 
     func constructReplyInput() -> SendEmailInputData? {
+        var to = ""
+        if !emailMessage.to.isEmpty {
+            to = RFC822Util.toRfc822Address(messageAddresses: emailMessage.to)
+        }
         var replyTo = ""
         if !emailMessage.from.isEmpty {
             replyTo = RFC822Util.toRfc822Address(messageAddresses: emailMessage.from)
@@ -239,7 +244,17 @@ class ReadEmailMessageViewController: UIViewController, ActivityAlertViewControl
         if let bodyText = bodyLabel.text {
             replyBody = "\n\n---------------\n\n\(bodyText)"
         }
-        return SendEmailInputData(to: replyTo, cc: replyCc, subject: replySubject, body: replyBody)
+        var sendEmailInput = SendEmailInputData(to: replyTo, cc: replyCc, subject: replySubject, body: replyBody)
+        if emailMessage.folderId.contains("DRAFTS") {
+            sendEmailInput = SendEmailInputData(
+                draftEmailMessageId: emailMessage.id,
+                to: to,
+                cc: replyCc,
+                subject: replySubject.replacingOccurrences(of: "Re:", with: ""),
+                body: replyBody.replacingOccurrences(of: "\n\n---------------\n\n", with: "")
+            )
+        }
+        return sendEmailInput
     }
 
     // MARK: - Conformance: ActivityAlertViewControllerDelegate

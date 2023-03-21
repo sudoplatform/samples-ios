@@ -5,6 +5,7 @@
 //
 
 import UIKit
+import SudoEntitlements
 import SudoUser
 import SudoProfiles
 
@@ -36,6 +37,9 @@ class RegistrationViewController: UIViewController {
     /// Sudo user client used to perform sign in  and registration operations.
     var userClient: SudoUserClient = AppDelegate.dependencies.userClient
 
+    /// Sudo user client used to perform sign in  and registration operations.
+    var entitlementsClient: SudoEntitlementsClient = AppDelegate.dependencies.entitlementsClient
+
     /// Authenticator used to perform authentication during registration.
     var authenticator: Authenticator = AppDelegate.dependencies.authenticator
 
@@ -45,8 +49,10 @@ class RegistrationViewController: UIViewController {
         super.viewDidAppear(animated)
 
         // Sign in automatically if the user is registered.
-        if userClient.isRegistered() {
-            self.registerButtonTapped()
+        Task.detached(priority: .medium) {
+            if try await self.userClient.isRegistered() {
+                await self.registerButtonTapped()
+            }
         }
     }
 
@@ -63,13 +69,17 @@ class RegistrationViewController: UIViewController {
         activityIndicator.startAnimating()
         registerButton.isEnabled = false
 
-        registerAndSignIn { registered in
-            DispatchQueue.main.async {
-                self.activityIndicator.stopAnimating()
-                self.registerButton.isEnabled = true
-
-                if registered {
+        Task.detached(priority: .medium) {
+            do {
+                try await self.registerAndSignIn()
+                Task { @MainActor in
+                    self.activityIndicator.stopAnimating()
+                    self.registerButton.isEnabled = true
                     self.navigateToMainMenu()
+                }
+            } catch {
+                Task { @MainActor in
+                    self.showSignInFailureAlert(error: error)
                 }
             }
         }
@@ -78,88 +88,32 @@ class RegistrationViewController: UIViewController {
     // MARK: - Operations
 
     /// Perform registration and sign in from the Sudo user client.
-    ///
-    /// - Parameters:
-    ///     - completion: Closure that indicates the success or failure of the registration process.
-    func registerAndSignIn(completion: @escaping (Bool) -> Void) {
+    func registerAndSignIn() async throws {
 
-        func signIn() {
-            do {
-                if try userClient.isSignedIn() {
-                    guard let refreshToken = try? userClient.getRefreshToken() else {
-                        DispatchQueue.main.async {
-                            self.showSignInFailureAlert(error: AuthenticatorError.unableToRefreshTokens)
-                        }
-                        completion(false)
-                        return
-                    }
+        func redeem() async throws {
+            _ = try await self.entitlementsClient.redeemEntitlements()
+        }
 
-                    try userClient.refreshTokens(refreshToken: refreshToken) { signInResult in
-                        switch signInResult {
-                        case .failure(let error):
-                            DispatchQueue.main.async {
-                                self.showSignInFailureAlert(error: error)
-                            }
-                            completion(false)
-                        case .success:
-                            completion(true)
-                        }
-                    }
-                    return
-                }
-
-                try userClient.signInWithKey { signInResult in
-                    switch signInResult {
-                    case .failure(let error):
-                        DispatchQueue.main.async {
-                            self.showSignInFailureAlert(error: error)
-                        }
-                        completion(false)
-                    case .success:
-                        completion(true)
-                    }
-                }
-            } catch let signInError {
-                self.showSignInFailureAlert(error: signInError)
-                completion(false)
+        func signIn() async throws {
+            if !(try await self.userClient.isSignedIn()) {
+                _ = try await self.userClient.signInWithKey()
+                _ = try await redeem()
             }
         }
 
         if userClient.getSupportedRegistrationChallengeType().contains(.fsso) {
-            guard let presentationAnchor = self.view?.window else {
-                fatalError("No window for \(String(describing: self))")
+            guard let viewControllerWindow = self.view.window else {
+                return
             }
-            do {
-                try userClient.presentFederatedSignInUI(presentationAnchor: presentationAnchor) { signInResult in
-                    switch signInResult {
-                    case .failure(let error):
-                        DispatchQueue.main.async {
-                            self.showSignInFailureAlert(error: error)
-                        }
-                        completion(false)
-                    case .success:
-                        completion(true)
-                    }
-                }
-            } catch let signInError {
-                self.showSignInFailureAlert(error: signInError)
-                completion(false)
-            }
+
+            _ = try await userClient.presentFederatedSignInUI(presentationAnchor: viewControllerWindow)
+            _ = try await redeem()
         } else {
-            if userClient.isRegistered() {
-                signIn()
+            if try await userClient.isRegistered() {
+                _ = try await signIn()
             } else {
-                authenticator.register { registerResult in
-                    switch registerResult {
-                    case .failure(let error):
-                        DispatchQueue.main.async {
-                            self.showRegistrationFailureAlert(error: error)
-                        }
-                        completion(false)
-                    case .success:
-                        signIn()
-                    }
-                }
+                try await authenticator.register()
+                _ = try await signIn()
             }
         }
     }

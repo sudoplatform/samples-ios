@@ -65,7 +65,7 @@ class EmailMessageTableViewCell: UITableViewCell {
             }
             recipientsLabel?.text = "To: " + toAddressLabel.joined(separator: ", ")
         }
-        dateLabel.date = emailMessage.created
+        dateLabel.date = emailMessage.createdAt
         subjectLabel.text = emailMessage.subject ?? Defaults.subject
     }
 }

@@ -30,18 +30,6 @@ class CreateEmailAddressViewController: UIViewController,
 
     // MARK: - Supplementary
 
-    /// Typealias for a successful response call to `SudoEmailClient.provisionEmailAddress(_:address:sudoId:completion:)`.
-    typealias ProvisionEmailAddressSuccessCompletion = (EmailAddress) -> Void
-
-    /// Typealias for a error response call to `SudoEmailClient.provisionEmailAddresss(_:address:sudoId:completion:)`.
-    typealias ProvisionEmailAddressErrorCompletion = (Error) -> Void
-
-    /// Typealias for a successful response call to `SudoEmailClient.getSupportedEmailDomainsWithCachePolicy(_:cachePolicy:completion:)`.
-    typealias GetSupportedDomainsSuccessCompletion = ([String]) -> Void
-
-    /// Typealias for a error response call to `SudoEmailClient.getSupportedEmailDomainsWithCachePolicy(_:cachePolicy:completion:)`.
-    typealias GetSupportedDomainsErrorCompletion = (Error) -> Void
-
     enum Segue: String {
         case returnToEmailAddressList
     }
@@ -50,18 +38,36 @@ class CreateEmailAddressViewController: UIViewController,
     enum InputField: Int, CaseIterable {
         /// Local part of the email address to provision
         case localPart
+        /// Alias of the email address to provision
+        case alias
 
         /// Get the label to display on the UI for the input.
         var label: String {
             switch self {
             case .localPart:
                 return "Local Part"
+            case .alias:
+                return "Alias"
+            }
+        }
+
+        /// Returns true if the field is an optional input field.
+        var isOptional: Bool {
+            switch self {
+            case .alias:
+                return true
+            default:
+                return false
             }
         }
 
         /// Get the placeholder to display on the UI for the input.
         var placeholder: String {
-            return "Enter \(label)"
+            if isOptional {
+                return "Enter \(label) (Optional)"
+            } else {
+                return "Enter \(label)"
+            }
         }
     }
 
@@ -89,6 +95,11 @@ class CreateEmailAddressViewController: UIViewController,
         return AppDelegate.dependencies.emailClient
     }
 
+    /// Sudo Profiles client used to get ownershipProofToken
+    var sudoProfilesClient: SudoProfilesClient {
+        return AppDelegate.dependencies.profilesClient
+    }
+
     /// Form data entered by user. Initialized with empty strings.
     var formData: [InputField: String] = {
         return InputField.allCases.reduce([:], { accumulator, field in
@@ -111,30 +122,23 @@ class CreateEmailAddressViewController: UIViewController,
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         startListeningForKeyboardNotifications()
-        let failureCompletion: (Error?) -> Void = { [weak self] error in
-            DispatchQueue.main.async {
-                self?.dismissActivityAlert {
-                    self?.presentErrorAlert(message: "Failed to get supported domain") { _ in
-                        self?.performSegue(withIdentifier: Segue.returnToEmailAddressList.rawValue, sender: self)
+        presentCancellableActivityAlert(message: "Loading", delegate: self) {
+            Task.detached(priority: .medium) {
+                guard let domain = try await self.getSupportedEmailDomains(cachePolicy: .remoteOnly).first else {
+                    await self.dismissActivityAlert {
+                        Task { @MainActor in
+                            self.presentErrorAlert(message: "Failed to get supported domain") {_ in
+                                self.performSegue(withIdentifier: Segue.returnToEmailAddressList.rawValue, sender: self)
+                            }
+                        }
                     }
+                    return
+                }
+                Task { @MainActor in
+                    self.domain = domain
+                    self.dismissActivityAlert()
                 }
             }
-        }
-        presentCancellableActivityAlert(message: "Loading", delegate: self) {
-            self.getSupportedEmailDomains(
-                cachePolicy: .remoteOnly,
-                success: { [weak self] domains in
-                    guard let domain = domains.first else {
-                        failureCompletion(nil)
-                        return
-                    }
-                    self?.domain = domain
-                    DispatchQueue.main.async {
-                        self?.dismissActivityAlert()
-                    }
-                },
-                failure: failureCompletion
-            )
         }
     }
 
@@ -147,99 +151,89 @@ class CreateEmailAddressViewController: UIViewController,
 
     /// Action associated with tapping the "Create" button on the navigation item.
     ///
-    /// This action will initiate the sequence of validating inputs and adding a card via the `emailClient`.
+    /// This action will initiate the sequence of validating inputs and provisioning an email address via the `emailClient`.
     @objc func didTapCreateEmailAddressButton() {
-        createEmailAddress()
+        Task.detached(priority: .medium) {
+            await self.createEmailAddress()
+        }
     }
 
     /// Action associated with firing the debounce timer on the input of the user's localPart.
     ///
     /// This action will initiate the checking of validity of the users input with the email service.
     @objc func didFireCheckEmailAddressTimer() {
-        checkInputEmailAddressAvailability()
+        Task.detached(priority: .medium) {
+            await self.checkInputEmailAddressAvailability()
+        }
     }
 
     // MARK: - Operations
 
     /// Check the input of the user for validity of the email address.
-    func checkInputEmailAddressAvailability() {
-        let localPart = formData[.localPart] ?? ""
-        emailClient.checkEmailAddressAvailabilityWithLocalParts([localPart], domains: [domain]) { [weak self] result in
-            switch result {
-            case let .success(validAddresses):
-                DispatchQueue.main.async {
-                    guard let self = self else { return }
-                    let indexPath = IndexPath(item: InputField.localPart.rawValue, section: 0)
-                    guard let cell = self.tableView.cellForRow(at: indexPath)  as? InputFormTableViewCell else {
-                        return
-                    }
-                    guard validAddresses.count == 1 else {
-                        cell.textField.textColor = .red
-                        self.setCreateButtonEnabled(false)
-                        return
-                    }
-                    cell.textField.textColor = .systemGreen
-                    self.setCreateButtonEnabled(true)
+    func checkInputEmailAddressAvailability() async {
+        do {
+            let localPart = formData[.localPart] ?? ""
+            let checkAddressInput = CheckEmailAddressAvailabilityInput(localParts: [localPart], domains: [domain])
+            let validAddresses = try await emailClient.checkEmailAddressAvailability(withInput: checkAddressInput)
+
+            let indexPath = IndexPath(item: InputField.localPart.rawValue, section: 0)
+            Task { @MainActor in
+                guard let cell = self.tableView.cellForRow(at: indexPath)  as? InputFormTableViewCell else {
+                    return
                 }
-            case let .failure(error):
-                DispatchQueue.main.async {
-                    self?.setCreateButtonEnabled(false)
-                    self?.presentErrorAlert(message: "Failed to check email address availability", error: error)
+                guard validAddresses.count == 1 else {
+                    cell.textField.textColor = .red
+                    self.setCreateButtonEnabled(false)
+                    return
                 }
+                cell.textField.textColor = .systemGreen
+                self.setCreateButtonEnabled(true)
+            }
+        } catch {
+            self.setCreateButtonEnabled(false)
+            Task { @MainActor in
+                self.presentErrorAlert(message: "Failed to check email address availability", error: error)
             }
         }
     }
 
     /// Create the email address on the email service.
-    func createEmailAddress() {
+    func createEmailAddress() async {
         view.endEditing(true)
         setCreateButtonEnabled(false)
         guard validateFormData() else {
-            presentErrorAlert(message: "Please ensure all fields are filled out")
-            return
-        }
-        guard let sudoId = sudo.id else {
-            presentErrorAlert(message: "Sudo Id cannot be found")
+            Task { @MainActor in
+                presentErrorAlert(message: "Please ensure all fields are filled out")
+            }
             return
         }
         let localPart = formData[.localPart] ?? ""
-        let failureCompletion: (Error) -> Void = { [weak self] error in
-            DispatchQueue.main.async {
-                self?.dismissActivityAlert {
-                    self?.setCreateButtonEnabled(true)
-                    self?.presentErrorAlert(message: "Failed to create email address", error: error)
-                }
-            }
-        }
+        let alias = formData[.alias]
         presentActivityAlert(message: "Creating Address")
         let address = "\(localPart)@\(domain)"
-        emailClient.provisionEmailAddress(address, sudoId: sudoId) { [weak self] result in
-            switch result {
-            case .success:
-                DispatchQueue.main.async {
-                    self?.dismissActivityAlert {
-                        self?.performSegue(withIdentifier: Segue.returnToEmailAddressList.rawValue, sender: self)
-                    }
+        do {
+            let ownershipProofToken = try await sudoProfilesClient.getOwnershipProof(sudo: sudo, audience: "sudoplatform.email.email-address")
+            let provisionAddressInput = ProvisionEmailAddressInput(
+                emailAddress: address,
+                ownershipProofToken: ownershipProofToken,
+                alias: alias
+            )
+            _ = try await emailClient.provisionEmailAddress(withInput: provisionAddressInput)
+            Task { @MainActor in
+                self.dismissActivityAlert {
+                    self.performSegue(withIdentifier: Segue.returnToEmailAddressList.rawValue, sender: self)
                 }
-            case let .failure(error):
-                failureCompletion(error)
+            }
+        } catch {
+            self.dismissActivityAlert {
+                self.setCreateButtonEnabled(true)
+                self.presentErrorAlert(message: "Failed to create email address", error: error)
             }
         }
     }
 
-    func getSupportedEmailDomains(
-        cachePolicy: CachePolicy,
-        success: @escaping GetSupportedDomainsSuccessCompletion,
-        failure: @escaping GetSupportedDomainsErrorCompletion
-    ) {
-        emailClient.getSupportedEmailDomainsWithCachePolicy(cachePolicy) { result in
-            switch result {
-            case let .success(domains):
-                success(domains)
-            case let .failure(error):
-                failure(error)
-            }
-        }
+    func getSupportedEmailDomains(cachePolicy: CachePolicy) async throws -> [String] {
+        return try await emailClient.getSupportedEmailDomains(cachePolicy)
     }
 
     // MARK: - Helpers: Configuration
@@ -346,6 +340,9 @@ class CreateEmailAddressViewController: UIViewController,
     /// Returns false if the value of the form is missing, or its length is less than 3.
     func validateFormData() -> Bool {
         return InputField.allCases.allSatisfy { fieldType in
+            if fieldType.isOptional {
+                return true
+            }
             guard let data = formData[fieldType] else {
                 return false
             }
@@ -384,7 +381,7 @@ class CreateEmailAddressViewController: UIViewController,
     // MARK: - Conformance: InputFormCellDelegate
 
     func inputCell(_ cell: InputFormTableViewCell, didUpdateInput input: String?) {
-        DispatchQueue.main.async {
+        Task { @MainActor in
             self.checkEmailAddressTimer?.invalidate()
             self.setCreateButtonEnabled(false)
             cell.textField.textColor = .label

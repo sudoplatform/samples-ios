@@ -92,35 +92,22 @@ class MainMenuViewController: UIViewController, UITableViewDelegate, UITableView
     // MARK: - Operations
 
      /// Perform de-registration from the Sudo user client and clear all local data.
-    func deregister() {
+    func deregister() async {
         presentActivityAlert(message: "Deregistering")
         do {
-            try authenticator.deregister { result in
-                DispatchQueue.main.async {
-                    // dismiss activity alert
-                    self.dismissActivityAlert()
+            _ = try await authenticator.deregister()
+            try await self.authenticator.reset()
+            try self.profilesClient.reset()
+            try self.profilesClient.generateEncryptionKey()
+            try await self.userClient.reset()
 
-                    switch result {
-                    case .success:
-                        // after deregistering, clear all local data
-                        do {
-                            try self.authenticator.reset()
-                            try self.profilesClient.reset()
-                        } catch let error {
-                            self.presentErrorAlert(message: "Failed to deregister", error: error)
-                        }
-
-                        // unwind back to registration view controller
-                        self.performSegue(withIdentifier: "returnToRegistration", sender: self)
-                    case .failure(let error):
-                        self.presentErrorAlert(message: "Failed to deregister", error: error)
-                    }
-                }
+            Task { @MainActor in
+                self.dismissActivityAlert()
+                self.performSegue(withIdentifier: "returnToRegistration", sender: self)
             }
-        } catch let error {
-            self.dismissActivityAlert {
-                self.presentErrorAlert(message: "Failed to deregister", error: error)
-            }
+        } catch {
+            self.dismissActivityAlert()
+            self.presentErrorAlert(message: "Failed to deregister", error: error)
         }
     }
 
@@ -151,7 +138,9 @@ class MainMenuViewController: UIViewController, UITableViewDelegate, UITableView
             preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
         alert.addAction(UIAlertAction(title: "Deregister", style: .default) { _ in
-            self.deregister()
+            Task.detached(priority: .medium) {
+                await self.deregister()
+            }
         })
         present(alert, animated: true, completion: nil)
     }

@@ -8,6 +8,7 @@
 import Foundation
 import SudoUser
 import SudoKeyManager
+import AWSAppSync
 
 enum AuthenticatorError: LocalizedError {
     case registerFailed
@@ -31,11 +32,11 @@ enum AuthenticatorError: LocalizedError {
 
 protocol Authenticator {
 
-    func register(completion: @escaping (Swift.Result<Void, Error>) -> Void)
+    func register() async throws
 
-    func deregister(completion: @escaping (Swift.Result<String, Error>) -> Void) throws
+    func deregister() async throws -> String
 
-    func reset() throws
+    func reset() async throws
 
 }
 
@@ -55,47 +56,64 @@ class DefaultAuthenticator: Authenticator {
         self.fileReadable = fileReadable
     }
 
-    func register(completion: @escaping (Swift.Result<Void, Error>) -> Void) {
+    func register() async throws {
+        if try await userClient.isRegistered() { throw AuthenticatorError.alreadyRegistered }
+        guard let testKeyPath = fileReadable.path(forResource: "register_key", ofType: "private") else {
+            throw AuthenticatorError.missingTestKey
+        }
+        guard let testKeyIdPath = fileReadable.path(forResource: "register_key", ofType: "id") else {
+            throw AuthenticatorError.missingTestKeyId
+        }
+        let testKey = try fileReadable.contentsOfFile(forPath: testKeyPath)
+        let testKeyId = try fileReadable.contentsOfFile(forPath: testKeyIdPath).trimmingCharacters(in: .whitespacesAndNewlines)
+        let provider = try TESTAuthenticationProvider(
+            name: "testRegisterAudience",
+            key: testKey,
+            keyId: testKeyId,
+            keyManager: keyManager
+        )
+        _ = try await userClient.registerWithAuthenticationProvider(
+            authenticationProvider: provider,
+            registrationId: UUID().uuidString
+        )
+    }
+
+    func deregister() async throws -> String {
         do {
-            if userClient.isRegistered() {
-                throw AuthenticatorError.alreadyRegistered
+            return try await userClient.deregister()
+        } catch SudoUserClientError.graphQLError(let cause) {
+            guard let err = cause.first else {
+                fatalError("No Error in cause")
             }
-            guard let testKeyPath = fileReadable.path(forResource: "register_key", ofType: "private") else {
-                throw AuthenticatorError.missingTestKey
+            guard let appSyncError = err as? AWSAppSyncClientError else {
+                throw err
             }
-            guard let testKeyIdPath = fileReadable.path(forResource: "register_key", ofType: "id") else {
-                throw AuthenticatorError.missingTestKeyId
+            let error: GraphQLAuthProviderError
+            switch appSyncError {
+            case .authenticationError(let authError):
+                guard let gqlError = authError as? GraphQLAuthProviderError else {
+                    fallthrough
+                }
+                error = gqlError
+            default:
+                throw appSyncError
             }
-            let testKey = try fileReadable.contentsOfFile(forPath: testKeyPath)
-            let testKeyId = try fileReadable.contentsOfFile(forPath: testKeyIdPath).trimmingCharacters(in: .whitespacesAndNewlines)
-            let provider = try TESTAuthenticationProvider(
-                name: "testRegisterAudience",
-                key: testKey,
-                keyId: testKeyId,
-                keyManager: keyManager
-            )
-            try userClient.registerWithAuthenticationProvider(
-                authenticationProvider: provider,
-                registrationId: UUID().uuidString) { result in
-                    switch result {
-                    case .failure(let error):
-                        NSLog("Registration Failure: \(error)")
-                        completion(.failure(error))
-                    case .success:
-                        completion(.success(()))
-                    }
+            switch error {
+            case .notAuthorized:
+                // refresh tokens and try again
+                do {
+                    _ = try await userClient.refreshTokens()
+                } catch {
+                    _ = try await userClient.signInWithKey()
+                }
+                return try await userClient.deregister()
+            default:
+                throw error
             }
-        } catch let error {
-            NSLog("Pre-registration Failure: \(error)")
-            completion(.failure(error))
         }
     }
 
-    func deregister(completion: @escaping (Swift.Result<String, Error>) -> Void) throws {
-        try userClient.deregister(completion: completion)
-    }
-
-    func reset() throws {
-        try userClient.reset()
+    func reset() async throws {
+        try await userClient.reset()
     }
 }

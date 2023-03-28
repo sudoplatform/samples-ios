@@ -18,11 +18,11 @@ end
 
 target 'VirtualCardsExample' do
     pod 'Stripe', '~> 22'
-    pod 'SudoUser', '~> 14.0'
-    pod 'SudoProfiles', '~> 16.0'
-    pod 'SudoEntitlements', '~> 8.0'
-    pod 'SudoIdentityVerification', '~> 13.0'
-    pod 'SudoVirtualCards', '~> 19.0'
+    pod 'SudoUser', '~> 15.0'
+    pod 'SudoProfiles', '~> 17.0'
+    pod 'SudoEntitlements', '~> 9.0'
+    pod 'SudoIdentityVerification', '~> 14.0'
+    pod 'SudoVirtualCards', '~> 21.0'
 
     target 'VirtualCardsExampleTests'
 end

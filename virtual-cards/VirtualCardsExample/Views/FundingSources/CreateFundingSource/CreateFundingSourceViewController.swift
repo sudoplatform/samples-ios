@@ -121,7 +121,7 @@ class CreateFundingSourceViewController: UIViewController,
             case .expirationMonth:
                 return "10"
             case .expirationYear:
-                return "2022"
+                return "2032"
             case .securityCode:
                 return "123"
             case .address:
@@ -236,18 +236,35 @@ class CreateFundingSourceViewController: UIViewController,
         let configResult = await configResult.result
         do {
             switch configResult {
-            case .success(let config):
-                guard let apiKey = config.first?.apiKey else {
+            case .success(let configs):
+                var apiKey: String?
+                for config in configs {
+                    if case .stripeCard(let stripeConfig) = config {
+                        apiKey = stripeConfig.apiKey
+                        break
+                    }
+                }
+                guard let apiKey = apiKey else {
                     throw AnyError("Failed to get API Key")
                 }
                 let setupResult = try await virtualCardsClient.setupFundingSource(
-                    withInput: SetupFundingSourceInput(type: .creditCard, currency: "USD")
+                    withInput: SetupFundingSourceInput(
+                        type: .creditCard,
+                        currency: "USD",
+                        supportedProviders: ["stripe"])
                 )
                 let stripeClient = STPAPIClient(publishableKey: apiKey)
                 STPAPIClient.shared.publishableKey = apiKey
+                var clientSecret: String?
+                if case .stripeCard(let stripeProvisioningData) = setupResult.provisioningData {
+                    clientSecret = stripeProvisioningData.clientSecret
+                }
+                guard let clientSecret = clientSecret else {
+                    throw AnyError("Failed to get client secret from setupFundingSource response")
+                }
                 let stripeWorker = StripeIntentWorker(
                     fromInputDetails: input,
-                    clientSecret: setupResult.provisioningData.clientSecret,
+                    clientSecret: clientSecret,
                     stripeClient: stripeClient,
                     authenticationContext: self
                 )
@@ -255,7 +272,7 @@ class CreateFundingSourceViewController: UIViewController,
                 _ = try await virtualCardsClient.completeFundingSource(
                     withInput: CompleteFundingSourceInput(
                         id: setupResult.id,
-                        completionData: CompletionDataInput(paymentMethodId: paymentMethodId)
+                        completionData: .stripeCard(StripeCardCompletionDataInput(paymentMethodId: paymentMethodId))
                     )
                 )
                 Task {

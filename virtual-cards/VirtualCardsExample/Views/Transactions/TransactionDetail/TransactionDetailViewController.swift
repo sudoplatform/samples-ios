@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Anonyome Labs, Inc. All rights reserved.
+// Copyright © 2023 Anonyome Labs, Inc. All rights reserved.
 //
 // SPDX-License-Identifier: Apache-2.0
 //
@@ -211,7 +211,7 @@ class TransactionDetailViewController: UIViewController, UITableViewDataSource, 
             return nil
         }
         let generalSection = generalSectionFromTransaction(selectedTransaction)
-        let amountSection = amountSectionFromTransaction(selectedTransaction)
+        let detailSections = detailSectionsFromTransaction(selectedTransaction)
         var dateSection: [CellData] = []
         switch selectedTransaction.type {
         case .pending:
@@ -230,38 +230,53 @@ class TransactionDetailViewController: UIViewController, UITableViewDataSource, 
         }
         let accountDetails = AccountDetails(sudoLabel: sudoLabel, fundingSource: fundingSource, card: card)
         let accountSection = accountSectionFromRawAccountDetails(details: accountDetails)
-        return [generalSection, amountSection, dateSection, accountSection]
+
+        var combinedArray: [[CellData]] = []
+        combinedArray.append(generalSection)
+        combinedArray.append(dateSection)
+        combinedArray.append(contentsOf: detailSections)
+        combinedArray.append(accountSection)
+        return combinedArray
     }
 
     func generalSectionFromTransaction(_ transaction: Transaction) -> [CellData] {
         let merchantCell = CellData(title: "Merchant", value: transaction.description)
+        let amountCellData = CellData(title: "Amount", value: transaction.billedAmount.presentableString)
         let statusCell = CellData(title: "Status", value: String(describing: transaction.type))
         if transaction.type == .decline {
             let declineReason = transaction.declineReason ?? TransactionDeclineReason.declined
             let declineReasonCell = CellData(title: "Decline Reason", value: String(describing: declineReason))
             return [merchantCell, statusCell, declineReasonCell]
         } else {
-            return [merchantCell, statusCell]
+            return [merchantCell, amountCellData, statusCell]
         }
     }
 
-    func amountSectionFromTransaction(_ transaction: Transaction) -> [CellData] {
-        let transactionDetail = transaction.detail.first!
-        var cells: [CellData] = []
-        let amountCellData = CellData(title: "Amount", value: transactionDetail.virtualCardAmount.presentableString)
-        cells.append(amountCellData)
-        switch inputTransaction.type {
-        case .complete, .pending:
-            let feePercentString = String(format: "%.2f%%", (Double(transactionDetail.markup.percent) / 1000.0))
-            let feeFlatString = String(format: "$%.2f", (Double(transactionDetail.markup.flat) / 100.0))
-            let serviceFeeSubtitle = "\(feePercentString) + \(feeFlatString)"
-            let serviceFeeCellData = CellData(title: "Service Fee", subtitle: serviceFeeSubtitle, value: transactionDetail.markupAmount.presentableString)
-            let totalFeeCellData = CellData(title: "Total", value: transactionDetail.fundingSourceAmount.presentableString)
-            cells.append(contentsOf: [serviceFeeCellData, totalFeeCellData])
-        default:
-            break
+    private func detailSectionsFromTransaction(_ transaction: Transaction) -> [[CellData]] {
+        var sections: [[CellData]] = []
+        for detail in transaction.detail {
+            var cells: [CellData] = []
+            let amountCellData = CellData(
+                    title: "Merchant Amount",
+                    value: detail.virtualCardAmount.presentableString)
+            cells.append(amountCellData)
+            switch transaction.type {
+            case .complete, .pending:
+                let feePercentString = String(format: "%.2f%%", (Double(detail.markup.percent) / 1000.0))
+                let feeFlatString = String(format: "$%.2f", (Double(detail.markup.flat) / 100.0))
+                let serviceFeeSubtitle = "\(feePercentString) + \(feeFlatString)"
+                let serviceFeeCellData = CellData(title: "Service Fee", subtitle: serviceFeeSubtitle, value: detail.markupAmount.presentableString)
+                let totalFeeCellData = CellData(title: "Funding Source Charge Amount", value: detail.fundingSourceAmount.presentableString)
+                cells.append(contentsOf: [serviceFeeCellData, totalFeeCellData])
+            default:
+                break
+            }
+
+            let statusCellData = CellData(title: "Charge Status", value: String(describing: detail.state))
+            cells.append(statusCellData)
+            sections.append(cells)
         }
-        return cells
+        return sections
     }
 
     func dateSectionFromPendingTransaction(_ transaction: Transaction) -> [CellData] {
@@ -288,7 +303,13 @@ class TransactionDetailViewController: UIViewController, UITableViewDataSource, 
     func accountSectionFromRawAccountDetails(details: AccountDetails) -> [CellData] {
         let sudoCell = CellData(title: "Sudo", value: details.sudoLabel)
         let cardCell = CellData(title: "Virtual card", value: details.alias ?? "")
-        let fundingSourceText = "\(details.fundingSource.network.string) ••••\(details.fundingSource.last4)"
+        var fundingSourceText = ""
+        switch details.fundingSource {
+        case .creditCardFundingSource(let creditCardFundingSource):
+            fundingSourceText = "\(creditCardFundingSource.network.string) ••••\(creditCardFundingSource.last4)"
+        case .bankAccountFundingSource(let bankAccountFundingSource):
+            fundingSourceText = "\(bankAccountFundingSource.institutionName) ••••\(bankAccountFundingSource.last4)"
+        }
         let fundedByCell = CellData(title: "Funded by", value: fundingSourceText)
         return [sudoCell, cardCell, fundedByCell]
     }

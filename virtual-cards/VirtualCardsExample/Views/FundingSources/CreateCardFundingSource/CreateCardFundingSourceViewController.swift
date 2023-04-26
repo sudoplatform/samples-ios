@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Anonyome Labs, Inc. All rights reserved.
+// Copyright © 2023 Anonyome Labs, Inc. All rights reserved.
 //
 // SPDX-License-Identifier: Apache-2.0
 //
@@ -8,17 +8,16 @@ import UIKit
 import SudoVirtualCards
 import Stripe
 
-/// This View Controller presents a form so that a user can create a `FundingSource`.
+/// This View Controller presents a form so that a user can create a Stripe credit card based `FundingSource`.
 ///
 /// - Links From:
-///     - `FundingSourceListViewController`:  A user chooses the "Create Funding Source" option at the bottom of the table view list.
+///     - `CreateFundingSourceMenuViewController`:  A user chooses the "Add Stripe Funding Source" option at the bottom of the table view list.
 /// - Links To:
 ///     - `FundingSourceListViewController`: If a user successfully creates a funding source, they will be returned to this form.
-class CreateFundingSourceViewController: UIViewController,
+class CreateCardFundingSourceViewController: UIViewController,
                                          UITableViewDelegate,
                                          UITableViewDataSource,
                                          InputFormCellDelegate,
-                                         LearnMoreViewDelegate,
                                          STPAuthenticationContext {
 
     // MARK: - Outlets
@@ -26,15 +25,9 @@ class CreateFundingSourceViewController: UIViewController,
     /// Table view that lists the input fields for the form.
     @IBOutlet var tableView: UITableView!
 
-    /// Shows supplementary information to the input form, such as the "Learn more" view.
-    @IBOutlet var tableFooterView: UIView!
-
-    /// View appearing at the end of the content providing learn more labels and buttons.
-    @IBOutlet var learnMoreView: LearnMoreView!
-
     // MARK: - Supplementary
 
-    /// Segues that are performed in `CreateFundingSourceViewController`.
+    /// Segues that are performed in `CreateCardFundingSourceViewController`.
     enum Segue: String {
         /// Used to navigate back to the `FundingSourceListViewController`.
         case returnToFundingSourceList
@@ -172,7 +165,6 @@ class CreateFundingSourceViewController: UIViewController,
         super.viewDidLoad()
         configureNavigationBar()
         configureTableView()
-        configureLearnMoreView()
         configResult = Task(priority: .background) {
             return try await virtualCardsClient.getFundingSourceClientConfiguration()
         }
@@ -187,12 +179,6 @@ class CreateFundingSourceViewController: UIViewController,
         super.viewWillDisappear(animated)
         stopListeningForKeyboardNotifications()
         configResult.cancel()
-    }
-
-    override func viewDidLayoutSubviews() {
-        // Note: This ensures the table footer height matches the custom outlet assigned in the xib file
-        super.viewDidLayoutSubviews()
-        tableView.tableFooterView?.frame.size.height = tableFooterView.frame.height
     }
 
     // MARK: - Actions
@@ -251,6 +237,7 @@ class CreateFundingSourceViewController: UIViewController,
                     withInput: SetupFundingSourceInput(
                         type: .creditCard,
                         currency: "USD",
+                        applicationData: ClientApplicationData(applicationName: "iosApplication"),
                         supportedProviders: ["stripe"])
                 )
                 let stripeClient = STPAPIClient(publishableKey: apiKey)
@@ -308,18 +295,6 @@ class CreateFundingSourceViewController: UIViewController,
     func configureTableView() {
         let inputFormTableViewCellNib = UINib(nibName: "InputFormTableViewCell", bundle: .main)
         tableView.register(inputFormTableViewCellNib, forCellReuseIdentifier: "inputFormCell")
-        tableFooterView.backgroundColor = .none
-        tableView.tableFooterView = UIView()
-        tableView.tableFooterView?.addSubview(tableFooterView)
-    }
-
-    /// Configure the view's "Learn more" view.
-    ///
-    /// Sets an informative text label and "Learn more" button which when tapped will redirect the user to a Sudo Platform webpage.
-    func configureLearnMoreView() {
-        learnMoreView.delegate = self
-        learnMoreView.label.text = "A Funding source is required to link a real credit or debit card to a virtual card. This funding source is used to fund a"
-        + " transaction performed on the virtual card."
     }
 
     // MARK: - Helpers
@@ -437,15 +412,6 @@ class CreateFundingSourceViewController: UIViewController,
             return
         }
         formData[field] = input
-    }
-
-    // MARK: - Conformance: LearnMoreViewDelegate
-
-    func didTapLearnMoreButton() {
-        guard let docURL = URL(string: "https://docs.sudoplatform.com/guides/virtual-cards/manage-funding-sources") else {
-            return
-        }
-        UIApplication.shared.open(docURL, options: [:], completionHandler: nil)
     }
 
     // MARK: - Conformance: STPAuthenticationContext

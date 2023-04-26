@@ -21,6 +21,7 @@ PODS:
     - AWSCore (= 2.27.15)
   - AWSS3 (2.27.15):
     - AWSCore (= 2.27.15)
+  - Plaid (4.2.1)
   - ReachabilitySwift (5.0.0)
   - SQLite.swift (0.12.2):
     - SQLite.swift/standard (= 0.12.2)
@@ -83,7 +84,7 @@ PODS:
     - SudoConfigManager (~> 3.0)
     - SudoKeyManager (~> 2.0)
     - SudoLogging (~> 1.0)
-  - SudoVirtualCards (21.0.0):
+  - SudoVirtualCards (22.0.1):
     - AWSAppSync (~> 3.6.1)
     - AWSCore (~> 2.27.15)
     - SudoApiClient (~> 10.0)
@@ -93,12 +94,13 @@ PODS:
     - SudoUser (~> 15.0)
 
 DEPENDENCIES:
+  - Plaid (~> 4.2)
   - Stripe (~> 22)
   - SudoEntitlements (~> 9.0)
   - SudoIdentityVerification (~> 14.0)
   - SudoProfiles (~> 17.0)
   - SudoUser (~> 15.0)
-  - SudoVirtualCards (~> 21.0)
+  - SudoVirtualCards (~> 22.0)
 
 SPEC REPOS:
   https://github.com/CocoaPods/Specs.git:
@@ -110,6 +112,7 @@ SPEC REPOS:
     - AWSCore
     - AWSMobileClient
     - AWSS3
+    - Plaid
     - ReachabilitySwift
     - SQLite.swift
     - Starscream
@@ -136,6 +139,7 @@ SPEC CHECKSUMS:
   AWSCore: c67277201b6aca10e4cf24638eadaa67c85ebf03
   AWSMobileClient: 6f60d1fb6373e21aaada443dd4d4bf087158614d
   AWSS3: 09801b290f8818f532694cabd5d503c7474eb3df
+  Plaid: 14df1dd2a64e14d0203ee8ef55d8bf9d166188ff
   ReachabilitySwift: 985039c6f7b23a1da463388634119492ff86c825
   SQLite.swift: d2b4642190917051ce6bd1d49aab565fe794eea3
   Starscream: 5178aed56b316f13fa3bc55694e583d35dd414d9
@@ -151,8 +155,8 @@ SPEC CHECKSUMS:
   SudoLogging: 93238a71338292a650804358994c67f8f3816d20
   SudoProfiles: c791410946d47cb3deace4b690a954cea6a1fc7e
   SudoUser: 1b60674a7d1894f48260a077f8ce94bc05b98d8b
-  SudoVirtualCards: 3d11c2e9a6af09c7c57073c6887957f69e6f7364
+  SudoVirtualCards: 17b14c1665ad171b65b72b85775574fca1f87d58
 
-PODFILE CHECKSUM: d85cae3c83118c9a92928bf11fdbc76ade5e0766
+PODFILE CHECKSUM: a446d0922fe0118acfd565447ee9265b886d6cd3
 
 COCOAPODS: 1.12.0

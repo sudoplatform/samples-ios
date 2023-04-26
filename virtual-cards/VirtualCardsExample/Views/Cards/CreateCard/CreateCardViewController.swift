@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Anonyome Labs, Inc. All rights reserved.
+// Copyright © 2023 Anonyome Labs, Inc. All rights reserved.
 //
 // SPDX-License-Identifier: Apache-2.0
 //
@@ -296,8 +296,16 @@ class CreateCardViewController: UIViewController,
             let metadata: JSONValue = .dictionary([
                 "alias": .string(formData[.cardLabel] ?? "")
             ])
+
+            var fundingSourceId: String
+            switch fundingSource {
+            case .creditCardFundingSource(let creditCardFundingSource):
+                fundingSourceId = creditCardFundingSource.id
+            case .bankAccountFundingSource(let bankAccountFundingSource):
+                fundingSourceId = bankAccountFundingSource.id
+            }
             let input = ProvisionVirtualCardInput(
-                fundingSourceId: fundingSource.id,
+                fundingSourceId: fundingSourceId,
                 cardHolder: formData[.cardHolder] ?? "",
                 billingAddress: billingAddressInput,
                 currency: Defaults.provisionCurrency,
@@ -383,11 +391,47 @@ class CreateCardViewController: UIViewController,
                 nextToken: nil,
                 cachePolicy: .remoteOnly
             ).items
-            if let fundingSource = fundingSources.first(where: { $0.state == .active }) {
+
+            var creditCardFundingSources: [CreditCardFundingSource] = []
+            var bankAccountFundingSources: [BankAccountFundingSource] = []
+            for fundingSource in fundingSources {
+                switch fundingSource {
+                case .creditCardFundingSource(let creditCardFundingSource):
+                    creditCardFundingSources.append(creditCardFundingSource)
+                case .bankAccountFundingSource(let bankAccountFundingSource):
+                    bankAccountFundingSources.append(bankAccountFundingSource)
+                }
+            }
+
+            var fundingSource: FundingSource?
+            let creditCardFundingSource = creditCardFundingSources.first(where: { $0.state == .active})
+            if creditCardFundingSource == nil {
+                let bankAccountFundingSource = bankAccountFundingSources.first(where: { $0.state == .active})
+                if bankAccountFundingSource != nil {
+                    fundingSource = FundingSource.bankAccountFundingSource(bankAccountFundingSource!)
+                } else {
+                    fundingSource = nil
+                }
+            } else {
+                fundingSource = FundingSource.creditCardFundingSource(creditCardFundingSource!)
+            }
+
+            if fundingSource != nil {
                 Task {
                     self.fundingSource = fundingSource
-                    let fundingSourceText = "\(fundingSource.network.string) ••••\(fundingSource.last4)"
-                    self.fundingSourceLabel.text = fundingSourceText
+                    switch fundingSource {
+                    case .creditCardFundingSource(let creditCardFundingSource):
+                        let fundingSourceText = "\(creditCardFundingSource.network.string) ••••\(creditCardFundingSource.last4)"
+                        self.fundingSourceLabel.text = fundingSourceText
+                    case .bankAccountFundingSource(let bankAccountFundingSource):
+                        let fundingSourceText = "\(bankAccountFundingSource.institutionName) ••••\(bankAccountFundingSource.last4)"
+                        self.fundingSourceLabel.text = fundingSourceText
+                    default:
+                        Task {
+                            self.setErrorLabelHidden(false)
+                            self.setCreateButtonEnabled(false)
+                        }
+                    }
                 }
             } else {
                 Task {

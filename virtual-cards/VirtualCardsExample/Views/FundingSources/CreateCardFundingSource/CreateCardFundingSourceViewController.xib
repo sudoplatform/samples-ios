@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="20037" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="21507" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="20020"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21505"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -11,8 +11,6 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="CreateFundingSourceViewController" customModule="VirtualCardsExample" customModuleProvider="target">
             <connections>
-                <outlet property="learnMoreView" destination="jUi-4Z-KuV" id="Sn0-vB-6D2"/>
-                <outlet property="tableFooterView" destination="a3z-9n-uMB" id="xfq-tG-Ibq"/>
                 <outlet property="tableView" destination="Uw4-BP-NCJ" id="LvT-ms-6dy"/>
                 <outlet property="view" destination="fZJ-ww-tzp" id="xhB-A2-KKY"/>
             </connections>
@@ -30,39 +28,13 @@
                         <outlet property="delegate" destination="-1" id="h1g-b3-nGs"/>
                     </connections>
                 </tableView>
-                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="a3z-9n-uMB" userLabel="tableFooterView">
-                    <rect key="frame" x="0.0" y="539" width="375" height="128"/>
-                    <subviews>
-                        <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="EST-ZK-vZp">
-                            <rect key="frame" x="0.0" y="0.0" width="375" height="128"/>
-                            <subviews>
-                                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="jUi-4Z-KuV" userLabel="learnMoreView" customClass="LearnMoreView" customModule="VirtualCardsExample" customModuleProvider="target">
-                                    <rect key="frame" x="16" y="16" width="343" height="96"/>
-                                    <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                                </view>
-                            </subviews>
-                            <edgeInsets key="layoutMargins" top="16" left="16" bottom="16" right="16"/>
-                        </stackView>
-                    </subviews>
-                    <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                    <constraints>
-                        <constraint firstAttribute="height" constant="128" placeholder="YES" id="4wp-mv-8ks"/>
-                        <constraint firstItem="EST-ZK-vZp" firstAttribute="leading" secondItem="a3z-9n-uMB" secondAttribute="leading" id="5nn-Xy-xTU"/>
-                        <constraint firstAttribute="bottom" secondItem="EST-ZK-vZp" secondAttribute="bottom" id="gle-bo-C9W"/>
-                        <constraint firstItem="EST-ZK-vZp" firstAttribute="top" secondItem="a3z-9n-uMB" secondAttribute="top" id="rtb-YF-KHS"/>
-                        <constraint firstAttribute="trailing" secondItem="EST-ZK-vZp" secondAttribute="trailing" id="tku-XW-czo"/>
-                    </constraints>
-                </view>
             </subviews>
             <viewLayoutGuide key="safeArea" id="I6E-JZ-TG1"/>
             <color key="backgroundColor" systemColor="systemBackgroundColor"/>
             <constraints>
                 <constraint firstItem="Uw4-BP-NCJ" firstAttribute="top" secondItem="fZJ-ww-tzp" secondAttribute="top" id="C5u-le-b0a"/>
                 <constraint firstItem="Uw4-BP-NCJ" firstAttribute="leading" secondItem="I6E-JZ-TG1" secondAttribute="leading" id="FZ8-LQ-OXL"/>
-                <constraint firstItem="a3z-9n-uMB" firstAttribute="bottom" secondItem="fZJ-ww-tzp" secondAttribute="bottom" placeholder="YES" id="ONT-FO-edz"/>
-                <constraint firstItem="a3z-9n-uMB" firstAttribute="leading" secondItem="I6E-JZ-TG1" secondAttribute="leading" id="RrL-Sr-guD"/>
                 <constraint firstItem="Uw4-BP-NCJ" firstAttribute="trailing" secondItem="I6E-JZ-TG1" secondAttribute="trailing" id="bmp-VY-MNY"/>
-                <constraint firstItem="a3z-9n-uMB" firstAttribute="trailing" secondItem="I6E-JZ-TG1" secondAttribute="trailing" id="oFt-Wq-ZtD"/>
                 <constraint firstItem="Uw4-BP-NCJ" firstAttribute="bottom" secondItem="fZJ-ww-tzp" secondAttribute="bottom" id="wCS-jY-II0"/>
             </constraints>
             <point key="canvasLocation" x="138.40000000000001" y="152.47376311844079"/>

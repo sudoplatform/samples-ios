@@ -7,6 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0C180F3229E4F42700E9C416 /* CreateBankAccountFundingSourceViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C180F3129E4F42700E9C416 /* CreateBankAccountFundingSourceViewController.swift */; };
+		0C180F3429E50B1400E9C416 /* CreateBankAccountFundingSourceViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0C180F3329E50B1400E9C416 /* CreateBankAccountFundingSourceViewController.xib */; };
+		0CA9440229D4F386003AA4AD /* CreateFundingSourceMenuViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CA9440129D4F386003AA4AD /* CreateFundingSourceMenuViewController.swift */; };
+		0CA9440429D4F3E5003AA4AD /* CreateFundingSourceMenuViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0CA9440329D4F3E5003AA4AD /* CreateFundingSourceMenuViewController.xib */; };
+		0CABCD4F29E95DFE00F8BEDB /* FundingSourceTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CABCD4E29E95DFE00F8BEDB /* FundingSourceTableViewCell.swift */; };
+		0CABCD5129E95E6C00F8BEDB /* FundingSourceTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0CABCD5029E95E6C00F8BEDB /* FundingSourceTableViewCell.xib */; };
 		0CE6FED1246B74AE00944FAC /* OrphanCardListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE6FECF246B74AE00944FAC /* OrphanCardListViewController.swift */; };
 		0CE6FED2246B74AE00944FAC /* OrphanCardListViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0CE6FED0246B74AE00944FAC /* OrphanCardListViewController.xib */; };
 		18C4FF4DF83621296B07D2EF /* Pods_VirtualCardsExample_VirtualCardsExampleTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B40CBF6358F0BA7A7177C5B4 /* Pods_VirtualCardsExample_VirtualCardsExampleTests.framework */; };
@@ -29,8 +35,8 @@
 		84309D612463FFF900F48ECC /* LearnMoreView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 84309D602463FFF900F48ECC /* LearnMoreView.xib */; };
 		84403FEA245AB02F00B2EBF2 /* IdentityVerificationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84403FE8245AB02F00B2EBF2 /* IdentityVerificationViewController.swift */; };
 		84403FEB245AB02F00B2EBF2 /* IdentityVerificationViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 84403FE9245AB02F00B2EBF2 /* IdentityVerificationViewController.xib */; };
-		84403FEE245AB07600B2EBF2 /* CreateFundingSourceViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84403FEC245AB07600B2EBF2 /* CreateFundingSourceViewController.swift */; };
-		84403FEF245AB07600B2EBF2 /* CreateFundingSourceViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 84403FED245AB07600B2EBF2 /* CreateFundingSourceViewController.xib */; };
+		84403FEE245AB07600B2EBF2 /* CreateCardFundingSourceViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84403FEC245AB07600B2EBF2 /* CreateCardFundingSourceViewController.swift */; };
+		84403FEF245AB07600B2EBF2 /* CreateCardFundingSourceViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 84403FED245AB07600B2EBF2 /* CreateCardFundingSourceViewController.xib */; };
 		84403FF1245AB09900B2EBF2 /* FundingSourceListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84403FF0245AB09900B2EBF2 /* FundingSourceListViewController.swift */; };
 		84403FF3245AB0C200B2EBF2 /* FundingSourceListViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 84403FF2245AB0C100B2EBF2 /* FundingSourceListViewController.xib */; };
 		84403FFE245AB17D00B2EBF2 /* CardListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84403FFC245AB17D00B2EBF2 /* CardListViewController.swift */; };
@@ -81,6 +87,10 @@
 		957E6093253D53980019D33A /* FileReadable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 957E6092253D53980019D33A /* FileReadable.swift */; };
 		957E6095253D5CC80019D33A /* UITableViewMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 957E6094253D5CC80019D33A /* UITableViewMock.swift */; };
 		957E6097253D5D720019D33A /* MainMenuViewControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 957E6096253D5D720019D33A /* MainMenuViewControllerTests.swift */; };
+		A43ED11CA4B328B638FAD833 /* RefreshBankAccountFundingSourceViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = A43EDDCCAF53498A3D3AF27D /* RefreshBankAccountFundingSourceViewController.xib */; };
+		A43ED161D04EB2D685DFF7CC /* RefreshBankAccountFundingSourceViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = A43ED88DABC0E8637F78A950 /* RefreshBankAccountFundingSourceViewController.xib */; };
+		A43ED5B22E81F99C727CF2E0 /* RefreshBankAccountFundingSourceViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A43EDF85F3F774A81A2AAA8B /* RefreshBankAccountFundingSourceViewController.swift */; };
+		A43EDA07CA9526DF100FF6FF /* RefreshBankAccountFundingSourceViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A43ED58D3A8AD5AF621C3293 /* RefreshBankAccountFundingSourceViewController.swift */; };
 		AB5B9DB3240EC5D100E4E5D8 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB5B9DB2240EC5D100E4E5D8 /* AppDelegate.swift */; };
 		AB5B9DBA240EC5D100E4E5D8 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AB5B9DB8240EC5D100E4E5D8 /* Main.storyboard */; };
 		AB5B9DBC240EC5D300E4E5D8 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AB5B9DBB240EC5D300E4E5D8 /* Assets.xcassets */; };
@@ -106,6 +116,12 @@
 
 /* Begin PBXFileReference section */
 		02E5A32C9AC39B2F86548DC3 /* Pods-VirtualCardsExample-VirtualCardsExampleTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-VirtualCardsExample-VirtualCardsExampleTests.debug.xcconfig"; path = "Target Support Files/Pods-VirtualCardsExample-VirtualCardsExampleTests/Pods-VirtualCardsExample-VirtualCardsExampleTests.debug.xcconfig"; sourceTree = "<group>"; };
+		0C180F3129E4F42700E9C416 /* CreateBankAccountFundingSourceViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateBankAccountFundingSourceViewController.swift; sourceTree = "<group>"; };
+		0C180F3329E50B1400E9C416 /* CreateBankAccountFundingSourceViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = CreateBankAccountFundingSourceViewController.xib; sourceTree = "<group>"; };
+		0CA9440129D4F386003AA4AD /* CreateFundingSourceMenuViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateFundingSourceMenuViewController.swift; sourceTree = "<group>"; };
+		0CA9440329D4F3E5003AA4AD /* CreateFundingSourceMenuViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = CreateFundingSourceMenuViewController.xib; sourceTree = "<group>"; };
+		0CABCD4E29E95DFE00F8BEDB /* FundingSourceTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FundingSourceTableViewCell.swift; sourceTree = "<group>"; };
+		0CABCD5029E95E6C00F8BEDB /* FundingSourceTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = FundingSourceTableViewCell.xib; sourceTree = "<group>"; };
 		0CE6FECF246B74AE00944FAC /* OrphanCardListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrphanCardListViewController.swift; sourceTree = "<group>"; };
 		0CE6FED0246B74AE00944FAC /* OrphanCardListViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = OrphanCardListViewController.xib; sourceTree = "<group>"; };
 		0DA0614F0C83FD3B174E10DB /* Pods-VirtualCardsExample.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-VirtualCardsExample.release.xcconfig"; path = "Target Support Files/Pods-VirtualCardsExample/Pods-VirtualCardsExample.release.xcconfig"; sourceTree = "<group>"; };
@@ -130,8 +146,8 @@
 		84309D602463FFF900F48ECC /* LearnMoreView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = LearnMoreView.xib; sourceTree = "<group>"; };
 		84403FE8245AB02F00B2EBF2 /* IdentityVerificationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentityVerificationViewController.swift; sourceTree = "<group>"; };
 		84403FE9245AB02F00B2EBF2 /* IdentityVerificationViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = IdentityVerificationViewController.xib; sourceTree = "<group>"; };
-		84403FEC245AB07600B2EBF2 /* CreateFundingSourceViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateFundingSourceViewController.swift; sourceTree = "<group>"; };
-		84403FED245AB07600B2EBF2 /* CreateFundingSourceViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = CreateFundingSourceViewController.xib; sourceTree = "<group>"; };
+		84403FEC245AB07600B2EBF2 /* CreateCardFundingSourceViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateCardFundingSourceViewController.swift; sourceTree = "<group>"; };
+		84403FED245AB07600B2EBF2 /* CreateCardFundingSourceViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = CreateCardFundingSourceViewController.xib; sourceTree = "<group>"; };
 		84403FF0245AB09900B2EBF2 /* FundingSourceListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FundingSourceListViewController.swift; sourceTree = "<group>"; };
 		84403FF2245AB0C100B2EBF2 /* FundingSourceListViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = FundingSourceListViewController.xib; sourceTree = "<group>"; };
 		84403FFC245AB17D00B2EBF2 /* CardListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardListViewController.swift; sourceTree = "<group>"; };
@@ -183,6 +199,10 @@
 		957E6094253D5CC80019D33A /* UITableViewMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UITableViewMock.swift; sourceTree = "<group>"; };
 		957E6096253D5D720019D33A /* MainMenuViewControllerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainMenuViewControllerTests.swift; sourceTree = "<group>"; };
 		96159C456C186D9EF6BC7028 /* Pods-VirtualCardsExample-VirtualCardsExampleTests-metadata.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-VirtualCardsExample-VirtualCardsExampleTests-metadata.plist"; sourceTree = "<group>"; };
+		A43ED58D3A8AD5AF621C3293 /* RefreshBankAccountFundingSourceViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RefreshBankAccountFundingSourceViewController.swift; sourceTree = "<group>"; };
+		A43ED88DABC0E8637F78A950 /* RefreshBankAccountFundingSourceViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = RefreshBankAccountFundingSourceViewController.xib; path = VirtualCardsExample/Views/FundingSources/RefreshBankAccountFundingSource/RefreshBankAccountFundingSourceViewController.xib; sourceTree = "<group>"; };
+		A43EDDCCAF53498A3D3AF27D /* RefreshBankAccountFundingSourceViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = RefreshBankAccountFundingSourceViewController.xib; sourceTree = "<group>"; };
+		A43EDF85F3F774A81A2AAA8B /* RefreshBankAccountFundingSourceViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = RefreshBankAccountFundingSourceViewController.swift; path = VirtualCardsExample/Views/FundingSources/RefreshBankAccountFundingSource/RefreshBankAccountFundingSourceViewController.swift; sourceTree = "<group>"; };
 		A4FCF3DF7F8D2660735D9809 /* Pods-VirtualCardsExample-VirtualCardsExampleTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-VirtualCardsExample-VirtualCardsExampleTests.release.xcconfig"; path = "Target Support Files/Pods-VirtualCardsExample-VirtualCardsExampleTests/Pods-VirtualCardsExample-VirtualCardsExampleTests.release.xcconfig"; sourceTree = "<group>"; };
 		AB5B9DAF240EC5D100E4E5D8 /* VirtualCardsExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = VirtualCardsExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AB5B9DB2240EC5D100E4E5D8 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -220,6 +240,33 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		0C180F3029E4F40000E9C416 /* CreateBankAccountFundingSource */ = {
+			isa = PBXGroup;
+			children = (
+				0C180F3129E4F42700E9C416 /* CreateBankAccountFundingSourceViewController.swift */,
+				0C180F3329E50B1400E9C416 /* CreateBankAccountFundingSourceViewController.xib */,
+			);
+			path = CreateBankAccountFundingSource;
+			sourceTree = "<group>";
+		};
+		0CA9440029D4F356003AA4AD /* CreateFundingSourceMenu */ = {
+			isa = PBXGroup;
+			children = (
+				0CA9440129D4F386003AA4AD /* CreateFundingSourceMenuViewController.swift */,
+				0CA9440329D4F3E5003AA4AD /* CreateFundingSourceMenuViewController.xib */,
+			);
+			path = CreateFundingSourceMenu;
+			sourceTree = "<group>";
+		};
+		0CABCD4D29E95D5000F8BEDB /* UI */ = {
+			isa = PBXGroup;
+			children = (
+				0CABCD4E29E95DFE00F8BEDB /* FundingSourceTableViewCell.swift */,
+				0CABCD5029E95E6C00F8BEDB /* FundingSourceTableViewCell.xib */,
+			);
+			path = UI;
+			sourceTree = "<group>";
+		};
 		0CE6FECE246B742B00944FAC /* OrphanCardList */ = {
 			isa = PBXGroup;
 			children = (
@@ -371,19 +418,20 @@
 		84403FDE245AAF9400B2EBF2 /* FundingSourceList */ = {
 			isa = PBXGroup;
 			children = (
+				0CABCD4D29E95D5000F8BEDB /* UI */,
 				84403FF0245AB09900B2EBF2 /* FundingSourceListViewController.swift */,
 				84403FF2245AB0C100B2EBF2 /* FundingSourceListViewController.xib */,
 			);
 			path = FundingSourceList;
 			sourceTree = "<group>";
 		};
-		84403FDF245AAF9D00B2EBF2 /* CreateFundingSource */ = {
+		84403FDF245AAF9D00B2EBF2 /* CreateCardFundingSource */ = {
 			isa = PBXGroup;
 			children = (
-				84403FEC245AB07600B2EBF2 /* CreateFundingSourceViewController.swift */,
-				84403FED245AB07600B2EBF2 /* CreateFundingSourceViewController.xib */,
+				84403FEC245AB07600B2EBF2 /* CreateCardFundingSourceViewController.swift */,
+				84403FED245AB07600B2EBF2 /* CreateCardFundingSourceViewController.xib */,
 			);
-			path = CreateFundingSource;
+			path = CreateCardFundingSource;
 			sourceTree = "<group>";
 		};
 		84403FE0245AAFA500B2EBF2 /* CardList */ = {
@@ -418,8 +466,11 @@
 		84403FE6245AAFE300B2EBF2 /* FundingSources */ = {
 			isa = PBXGroup;
 			children = (
-				84403FDF245AAF9D00B2EBF2 /* CreateFundingSource */,
+				0C180F3029E4F40000E9C416 /* CreateBankAccountFundingSource */,
+				84403FDF245AAF9D00B2EBF2 /* CreateCardFundingSource */,
+				0CA9440029D4F356003AA4AD /* CreateFundingSourceMenu */,
 				84403FDE245AAF9400B2EBF2 /* FundingSourceList */,
+				A43ED2A708FBB6E52D065EBE /* RefreshBankAccountFundingSource */,
 			);
 			path = FundingSources;
 			sourceTree = "<group>";
@@ -645,6 +696,15 @@
 			path = MainMenu;
 			sourceTree = "<group>";
 		};
+		A43ED2A708FBB6E52D065EBE /* RefreshBankAccountFundingSource */ = {
+			isa = PBXGroup;
+			children = (
+				A43ED58D3A8AD5AF621C3293 /* RefreshBankAccountFundingSourceViewController.swift */,
+				A43EDDCCAF53498A3D3AF27D /* RefreshBankAccountFundingSourceViewController.xib */,
+			);
+			path = RefreshBankAccountFundingSource;
+			sourceTree = "<group>";
+		};
 		AB5B9DA6240EC5D000E4E5D8 = {
 			isa = PBXGroup;
 			children = (
@@ -653,6 +713,8 @@
 				AB5B9DB0240EC5D100E4E5D8 /* Products */,
 				CB142D8F3C8CFF7109D665EA /* Pods */,
 				6BF65E5712173A069676D3CE /* Frameworks */,
+				A43EDF85F3F774A81A2AAA8B /* RefreshBankAccountFundingSourceViewController.swift */,
+				A43ED88DABC0E8637F78A950 /* RefreshBankAccountFundingSourceViewController.xib */,
 			);
 			sourceTree = "<group>";
 		};
@@ -795,10 +857,13 @@
 				8440400B245AB23E00B2EBF2 /* CardDetailViewController.xib in Resources */,
 				84403FFF245AB17D00B2EBF2 /* CardListViewController.xib in Resources */,
 				84309D542463DCB800F48ECC /* CardView.xib in Resources */,
+				0C180F3429E50B1400E9C416 /* CreateBankAccountFundingSourceViewController.xib in Resources */,
+				84403FEF245AB07600B2EBF2 /* CreateCardFundingSourceViewController.xib in Resources */,
 				84404003245AB1A000B2EBF2 /* CreateCardViewController.xib in Resources */,
-				84403FEF245AB07600B2EBF2 /* CreateFundingSourceViewController.xib in Resources */,
+				0CA9440429D4F3E5003AA4AD /* CreateFundingSourceMenuViewController.xib in Resources */,
 				8440400D245AB56D00B2EBF2 /* CreateSudoViewController.xib in Resources */,
 				84403FF3245AB0C200B2EBF2 /* FundingSourceListViewController.xib in Resources */,
+				0CABCD5129E95E6C00F8BEDB /* FundingSourceTableViewCell.xib in Resources */,
 				84403FEB245AB02F00B2EBF2 /* IdentityVerificationViewController.xib in Resources */,
 				8470A6A524612ECC00575C26 /* InputFormTableViewCell.xib in Resources */,
 				AB5B9DBF240EC5D300E4E5D8 /* LaunchScreen.storyboard in Resources */,
@@ -807,6 +872,8 @@
 				8470C8F3245AD0E200439F92 /* MainMenuViewController.xib in Resources */,
 				0CE6FED2246B74AE00944FAC /* OrphanCardListViewController.xib in Resources */,
 				839BAE971A0D7170ECAD88A0 /* Pods-VirtualCardsExample-metadata.plist in Resources */,
+				A43ED161D04EB2D685DFF7CC /* RefreshBankAccountFundingSourceViewController.xib in Resources */,
+				A43ED11CA4B328B638FAD833 /* RefreshBankAccountFundingSourceViewController.xib in Resources */,
 				8470A693245B7DC900575C26 /* RegistrationViewController.xib in Resources */,
 				8470C8F5245AD55700439F92 /* SudoListViewController.xib in Resources */,
 				845A8B2A246D184A00FAFB42 /* TransactionDetailTableViewCell.xib in Resources */,
@@ -981,8 +1048,10 @@
 				84309D532463DCB800F48ECC /* CardView.swift in Sources */,
 				84309D522463DCB800F48ECC /* CardViewModel.swift in Sources */,
 				AB93CAD9240EF6FB0065AF50 /* ConfigurationProvider.swift in Sources */,
+				0C180F3229E4F42700E9C416 /* CreateBankAccountFundingSourceViewController.swift in Sources */,
+				84403FEE245AB07600B2EBF2 /* CreateCardFundingSourceViewController.swift in Sources */,
 				84404002245AB1A000B2EBF2 /* CreateCardViewController.swift in Sources */,
-				84403FEE245AB07600B2EBF2 /* CreateFundingSourceViewController.swift in Sources */,
+				0CA9440229D4F386003AA4AD /* CreateFundingSourceMenuViewController.swift in Sources */,
 				CF2571C32444EC0B0053334E /* CreateSudoViewController.swift in Sources */,
 				84309D3B2463891200F48ECC /* CurrencyAmount+Presentable.swift in Sources */,
 				84309D3D24638D3F00F48ECC /* Date+TransactionPresentable.swift in Sources */,
@@ -990,11 +1059,14 @@
 				957E6093253D53980019D33A /* FileReadable.swift in Sources */,
 				84403FF1245AB09900B2EBF2 /* FundingSourceListViewController.swift in Sources */,
 				8470A69D2461061C00575C26 /* FundingSourceNetwork+Stringable.swift in Sources */,
+				0CABCD4F29E95DFE00F8BEDB /* FundingSourceTableViewCell.swift in Sources */,
 				84403FEA245AB02F00B2EBF2 /* IdentityVerificationViewController.swift in Sources */,
 				8470A6A424612ECC00575C26 /* InputFormTableViewCell.swift in Sources */,
 				84309D5F2463FFEC00F48ECC /* LearnMoreView.swift in Sources */,
 				8470C8F2245AD0E200439F92 /* MainMenuViewController.swift in Sources */,
 				0CE6FED1246B74AE00944FAC /* OrphanCardListViewController.swift in Sources */,
+				A43ED5B22E81F99C727CF2E0 /* RefreshBankAccountFundingSourceViewController.swift in Sources */,
+				A43EDA07CA9526DF100FF6FF /* RefreshBankAccountFundingSourceViewController.swift in Sources */,
 				CF2571BF2444EB7B0053334E /* RegistrationViewController.swift in Sources */,
 				845A8B3724721E1200FAFB42 /* Result+Convenience.swift in Sources */,
 				84309D5B2463F31E00F48ECC /* String+Separatable.swift in Sources */,
@@ -1206,6 +1278,7 @@
 			baseConfigurationReference = 87979038075400F09128C1DF /* Pods-VirtualCardsExample.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = VirtualCardsExample/VirtualCardsExample.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = UU2W43R8JA;
 				INFOPLIST_FILE = VirtualCardsExample/Info.plist;
@@ -1225,6 +1298,7 @@
 			baseConfigurationReference = 0DA0614F0C83FD3B174E10DB /* Pods-VirtualCardsExample.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = VirtualCardsExample/VirtualCardsExample.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = UU2W43R8JA;
 				INFOPLIST_FILE = VirtualCardsExample/Info.plist;

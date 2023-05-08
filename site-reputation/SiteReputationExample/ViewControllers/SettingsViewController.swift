@@ -50,7 +50,7 @@ class SettingsViewController: UITableViewController {
         alert.addAction(UIAlertAction(title: "Clear Storage", style: .default, handler: { _ in
             Task {
                 do {
-                    try await Clients.siteReputationClient.clearStorage()
+                    try await Clients.legacySiteReputationClient.clearStorage()
                 } catch {
                     print("Failed to clear data: \(error)")
                 }

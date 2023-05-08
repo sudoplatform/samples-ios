@@ -15,6 +15,8 @@ class ExploreViewController: UIViewController, UIPickerViewDataSource, UIPickerV
     @IBOutlet weak var checkButton: UIButton!
     @IBOutlet weak var loadingView: UIView!
     @IBOutlet weak var loadingLabel: UILabel!
+    @IBOutlet weak var realtimeReputationSwitch: UISwitch!
+    
     private let testUrls = [
         "aboveandbelow.com.au",
         "wildnights.co.uk",
@@ -39,6 +41,7 @@ class ExploreViewController: UIViewController, UIPickerViewDataSource, UIPickerV
         pickerView.dataSource = self
         pickerView.reloadAllComponents()
         urlTextField.text = testUrls[0]
+        self.realtimeReputationSwitch.isOn = false
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -58,7 +61,7 @@ class ExploreViewController: UIViewController, UIPickerViewDataSource, UIPickerV
 
         Task {
             do {
-                try await Clients.siteReputationClient.update()
+                try await Clients.legacySiteReputationClient.update()
                 self.setUpdatedText()
             } catch {
                 let alert = UIAlertController(title: "Update Failed", message: error.localizedDescription, preferredStyle: .alert)
@@ -71,7 +74,6 @@ class ExploreViewController: UIViewController, UIPickerViewDataSource, UIPickerV
 
     @IBAction func checkTapped(_ sender: Any) {
         showLoading(text: "Checking")
-        defer { hideLoading() }
 
         // check that a url is entered
         if (urlTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? "").isEmpty {
@@ -84,8 +86,9 @@ class ExploreViewController: UIViewController, UIPickerViewDataSource, UIPickerV
         // get SiteReputation result for URL to determine if Malicious or Safe
         Task {
             do {
-                let siteReputation = try await Clients.siteReputationClient.getSiteReputation(url: urlTextField.text ?? "")
-                if siteReputation.isMalicious {
+                let searchText = self.urlTextField.text ?? ""
+                let isBad = try await self.checkSiteSafety(site: searchText)
+                if isBad {
                     resultLabel.text = "Malicious"
                     resultLabel.textColor = .red
                 } else {
@@ -97,6 +100,24 @@ class ExploreViewController: UIViewController, UIPickerViewDataSource, UIPickerV
                 alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
                 present(alert, animated: true, completion: nil)
             }
+            await MainActor.run {
+                self.hideLoading()
+            }
+        }
+    }
+    
+    private func checkSiteSafety(site: String) async throws -> Bool {
+        if self.realtimeReputationSwitch.isOn {
+            var url = site
+            if !site.starts(with: "http") {
+                url = "https://" + site
+            }
+            let rep = try await Clients.siteReputationClient.getSiteReputation(url: url)
+            // For simplicity, this demo assumes .unknown is safe. However, in production this should
+            // be handled differently.
+            return rep.status == .malicious
+        } else {
+            return try await Clients.legacySiteReputationClient.getSiteReputation(url: site).isMalicious
         }
     }
 
@@ -106,7 +127,7 @@ class ExploreViewController: UIViewController, UIPickerViewDataSource, UIPickerV
 
     private func setUpdatedText() {
         Task {
-            let date = await Clients.siteReputationClient.lastUpdatePerformedAt()
+            let date = await Clients.legacySiteReputationClient.lastUpdatePerformedAt()
             if let date = date {
                 let formatter = DateFormatter()
                 formatter.dateFormat = "yyyy-MM-dd hh:mm:ss"

@@ -14,19 +14,22 @@ class Clients {
     static private(set) var userClient: SudoUserClient!
     static private(set) var keyManager: SudoKeyManager!
     static private(set) var authenticator: Authenticator!
+    static private(set) var legacySiteReputationClient: LegacySudoSiteReputationClient!
     static private(set) var siteReputationClient: SudoSiteReputationClient!
+    
 
     static func configure() throws {
         self.userClient = try DefaultSudoUserClient(keyNamespace: "ids")
-        self.keyManager = SudoKeyManagerImpl(serviceName: "com.sudoplatform.sitereputation", keyTag: "com.sudoplatform", namespace: "client")
+        self.keyManager = LegacySudoKeyManager(serviceName: "com.sudoplatform.sitereputation", keyTag: "com.sudoplatform", namespace: "client")
         self.authenticator = Authenticator(userClient: userClient, keyManager: keyManager)
-        self.siteReputationClient = try DefaultSudoSiteReputationClient(userClient: userClient)
+        self.legacySiteReputationClient = try DefaultLegacySiteReputationClient(userClient: userClient)
+        self.siteReputationClient = try DefaultSudoSiteReputationClient(userClient: self.userClient)
     }
 
     static func resetClients() async {
         do {
             try await userClient.reset()
-            try await siteReputationClient.clearStorage()
+            try await legacySiteReputationClient.clearStorage()
         } catch let error {
             NSLog("Failed to reset clients: \(error)")
         }

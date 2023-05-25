@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Anonyome Labs, Inc. All rights reserved.
+// Copyright © 2023 Anonyome Labs, Inc. All rights reserved.
 //
 // SPDX-License-Identifier: Apache-2.0
 //
@@ -11,33 +11,42 @@ extension DataFactory {
 
     enum RelaySDK {
 
-        static func randomConnectionId() -> String {
+        static func randomId() -> String {
             return UUID().uuidString
-        }
-
-        static func randomEmailAddress() -> String {
-            return  "\(UUID().uuidString)@\(UUID().uuidString)"
         }
 
         static func randomDate() -> Date {
             return Date(timeIntervalSince1970: Double.random(in: Range(uncheckedBounds: (1, 1000))))
         }
-
-        static func generateRelayMessage(
-            connectionId: String = UUID().uuidString,
-            messageId: String = UUID().uuidString,
-            timestamp: Date = randomDate(),
-            updated: Date = randomDate(),
-            direction: RelayMessage.Direction = .inbound,
-            cipherText: String = "Test Subject"
-        ) -> RelayMessage {
-            return RelayMessage(
-                messageId: messageId,
-                connectionId: connectionId,
-                cipherText: cipherText,
-                direction: direction,
-                timestamp: timestamp
+        
+        static func fromMessageId(messageId: String) -> Message {
+            let now = Date()
+            return Message(
+                id: messageId,
+                createdAt: now,
+                updatedAt: now,
+                ownerId: randomId(),
+                sudoId: randomId(),
+                postboxId: randomId(),
+                message: "This is a test message"
             )
+        }
+        
+        static func fromPostboxId(postboxId: String) -> Postbox {
+            let now = Date()
+            return Postbox (
+                id: postboxId,
+                createdAt: now,
+                updatedAt: now,
+                ownerId: randomId(),
+                sudoId: randomId(),
+                connectionId: randomId(),
+                isEnabled: true,
+                serviceEndpoint: "https://service.endpoint.com/di-relay"
+            )
+        }
+        static func randomPostbox() -> Postbox {
+            return fromPostboxId(postboxId: randomId())
         }
     }
 }

@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Anonyome Labs, Inc. All rights reserved.
+// Copyright © 2023 Anonyome Labs, Inc. All rights reserved.
 //
 // SPDX-License-Identifier: Apache-2.0
 //
@@ -14,7 +14,7 @@ class ExitHandlingTests: XCTestCase {
     // MARK: - Properties
 
     var testUtility: DIRelayExampleTestUtility!
-    var instanceUnderTest: PostboxViewController!
+    var instanceUnderTest: PostboxesViewController!
     let sudo = Sudo(id: "test")
 
     // MARK: - Lifecycle

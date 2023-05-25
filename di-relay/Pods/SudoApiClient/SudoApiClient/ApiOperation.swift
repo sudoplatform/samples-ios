@@ -56,6 +56,10 @@ public enum ApiOperationError: Error {
     /// difference.
     case versionMismatch
 
+    /// Indicates the API operation did not complete within the expected amount of time and has been
+    /// cancelled.
+    case timedOut
+
     /// GraphQL endpoint returned an error.
     case graphQLError(cause: GraphQLError)
 
@@ -151,6 +155,8 @@ open class ApiOperation: Operation {
 
     let logger: Logger
 
+    var graphQLOperation: Cancellable?
+
     private let stateLock = NSLock()
 
     private var _state: ApiOperationState = .ready
@@ -225,6 +231,7 @@ open class ApiOperation: Operation {
     /// or unsuccessfully.
     open func done() {
         guard !self.isFinished else {
+            self.logger.warning("\(type(of: self)) (id=\(self.id)) done called multiple times.")
             return
         }
 
@@ -242,6 +249,11 @@ open class ApiOperation: Operation {
         if isExecuting {
             self.didChangeValue(forKey: Constants.IsExecuting)
         }
+
+        // Cancel the AppSync operation so AppSync does not attempt to invoke the
+        // callback multiple times.
+        self.graphQLOperation?.cancel()
+        self.graphQLOperation = nil
 
         let elapsed = self.finishTime.timeIntervalSince(self.startTime)
         let queueTime = (self.queuedTime == Date(timeIntervalSince1970: 0) ? 0.0 : self.finishTime.timeIntervalSince(self.queuedTime))

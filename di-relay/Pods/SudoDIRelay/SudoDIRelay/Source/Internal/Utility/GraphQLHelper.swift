@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Anonyome Labs, Inc. All rights reserved.
+// Copyright © 2023 Anonyome Labs, Inc. All rights reserved.
 //
 // SPDX-License-Identifier: Apache-2.0
 //
@@ -69,7 +69,6 @@ struct GraphQLHelper {
         cachePolicy: CachePolicy,
         logger: Logger
     ) async throws -> Query.Data? {
-        let cachePolicy = self.toAWSCachePolicy(cachePolicy)
         do {
             let (result, error) = try await graphQLClient.fetch(
                 query: query,
@@ -91,15 +90,6 @@ struct GraphQLHelper {
             return result?.data
         } catch let error as ApiOperationError {
             throw SudoDIRelayError.fromApiOperationError(error: error)
-        }
-    }
-
-    private static func toAWSCachePolicy(_ cachePolicy: CachePolicy) -> AWSAppSync.CachePolicy {
-        switch cachePolicy {
-        case .cacheOnly:
-            return AWSAppSync.CachePolicy.returnCacheDataDontFetch
-        case .remoteOnly:
-            return AWSAppSync.CachePolicy.fetchIgnoringCacheData
         }
     }
 }

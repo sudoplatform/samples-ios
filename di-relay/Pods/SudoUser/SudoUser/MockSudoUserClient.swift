@@ -80,11 +80,11 @@ open class MockSudoUserClient: SudoUserClient {
 
     open func deregister() async throws -> String {
         self.deregisterCalled = true
-        
+
         if let error = self.deregisterError {
             throw error
         }
-        
+
         return self.deregisterResult
     }
 
@@ -272,7 +272,7 @@ open class MockSudoUserClient: SudoUserClient {
             throw error
         }
     }
-    
+
     public var signOutCalled: Bool = false
     public var signOutError: Error?
 

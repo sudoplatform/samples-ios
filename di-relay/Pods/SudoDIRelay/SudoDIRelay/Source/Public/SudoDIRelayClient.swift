@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Anonyome Labs, Inc. All rights reserved.
+// Copyright © 2023 Anonyome Labs, Inc. All rights reserved.
 //
 // SPDX-License-Identifier: Apache-2.0
 //
@@ -20,64 +20,81 @@ public protocol SudoDIRelayClient: AnyObject {
 
     // MARK: - Lifecycle
 
-    /// Clear all locally cached data
+    /// Clear all locally cached apppsync data
+    /// - Throws: ClearCacheError
     func reset() throws
 
     // MARK: - Queries
 
-    /// Get all messages from the Postbox associated with the given connection identifier.
+    /// Get a list of postboxes associated with the current user, ordered from oldest to newest.
+    /// - Parameters:
+    ///   - limit: The maximum number of postboxes to return from this query; if not supplied the service will determine an appropriate limit.
+    ///   - nextToken: If more than `limit` postboxes are available, pass the value returned in a previous response to allow pagination.
     /// - Returns:
-    ///   - Success: The list of messages the given connection.
+    ///   - Success: The list of postboxes.
     ///   - Failure: `SudoDIRelayError`
-    func listMessages(withConnectionId connectionId: String) async throws -> [RelayMessage]
+    func listPostboxes(limit: Int?, nextToken: String?) async throws -> ListOutput<Postbox>
 
-    /// Get HTTP endpoint of the provided postbox.
-    /// - Returns: Postbox HTTP endpoint on success, or nil on failure.
-    func getPostboxEndpoint(withConnectionId connectionId: String) -> URL?
-
-    /// Get a list of postboxes that are associated with the given`sudoId`.
-    /// - Returns: A list of postboxes on success.
-    func listPostboxes(withSudoId sudoId: String) async throws -> [Postbox]
+    /// Get all messages from all postboxes associated with the current user, ordered from oldest to newest.
+    /// - Parameters:
+    ///   - limit: The maximum number of messages to return from this query; if not supplied the service will determine an appropriate limit.
+    ///   - nextToken: If more than `limit` messages are available, pass the value returned in a previous response to allow pagination.
+    /// - Returns:
+    ///   - Success: The list of messages.
+    ///   - Failure: `SudoDIRelayError`
+    func listMessages(limit: Int?, nextToken: String?) async throws -> ListOutput<Message>
 
     // MARK: - Mutations
 
-    /// Stores a message the Postbox associated with the given connection identifier.
-    /// - Returns:
-    ///   - Success: The stored message.
-    ///   - Failure: `SudoDIRelayError`
-    func storeMessage(withConnectionId connectionId: String, message: String) async throws -> RelayMessage?
-
     /// Creates a Postbox associated with the given connection identifier.
+    /// - Parameters:
+    ///   - connectionId: The connection id, unique to the current sudo, with which to associate the postbox.
+    ///   - ownershipProofToken: A token identifying the current sudo and its authorization to create a postbox.
+    ///   - isEnabled: Whether the postbox should be created in an enabled state. If not supplied, the default is true.
     /// - Returns:
-    ///   - Success:  Void is returned on a success result.
+    ///   - Success:  The newly created postbox.
     ///   - Failure: `SudoDIRelayError`
-    func createPostbox(withConnectionId connectionId: String, ownershipProofToken: String) async throws
+    func createPostbox(withConnectionId connectionId: String, ownershipProofToken: String, isEnabled: Bool?) async throws -> Postbox
 
-    /// Deletes the Postbox associated with the given connection identifier, including all messages stored inside that Postbox.
+    /// Updates the Postbox associated with the given identifier.
+    /// - Parameters:
+    ///   - postboxId: The postbox id of the postbox to be updated.
+    ///   - isEnabled: The new setting for the postbox isEnabled flag. If not supplied, no change will be made to the postbox setting.
     /// - Returns:
-    ///   - Success: Void is returned on a success result.
+    ///   - Success:  The updated postbox.
     ///   - Failure: `SudoDIRelayError`
-    func deletePostbox(withConnectionId connectionId: String) async throws
+    func updatePostbox(withPostboxId postboxId: String, isEnabled: Bool?) async throws -> Postbox
+
+    /// Deletes the postbox associated with the given postbox identifier, including all messages stored inside that postbox.
+    /// - Parameters:
+    ///   - postboxId: The identifier of the postbox to be deleted.
+    /// - Returns:
+    ///   - Success: identifier of deleted postbox
+    ///   - Failure: `SudoDIRelayError`
+    func deletePostbox(withPostboxId postboxId: String) async throws -> String
+
+    /// Deletes the message associated with the given message identifier
+    /// - Parameters:
+    ///   - messageId: The identifier of the message to be deleted.
+    /// - Returns:
+    ///   - Success: identifier of deleted message
+    ///   - Failure: `SudoDIRelayError`
+    func deleteMessage(withMessageId messageId: String) async throws -> String
 
     // MARK: - Subscriptions
 
-    /// Subscribe to messages inbound to the Postbox associated with the connection identifier.
-    /// - Returns:
-    ///   - Success:  The relay message.
-    ///   - Failure: `SudoDIRelayError`
-    func subscribeToMessagesReceived(
-        withConnectionId connectionId: String,
-        resultHandler: @escaping ClientCompletion<RelayMessage>
+    /// Subscribe to message creation events for the current user. Subscription events will be delivered as long as the
+    /// returned  token remains in scope and the connection status remains .connected.
+    ///
+    /// - Parameter statusChangeHandler: Optional handler for connection status change.
+    /// - Parameter resultHandler: On success, the created message; on failure an error.
+    ///
+    /// - Returns: `SubscriptionToken` object to allow management of the subscription.
+    func subscribeToMessageCreated(
+            statusChangeHandler: SudoSubscriptionStatusChangeHandler?,
+            resultHandler: @escaping ClientCompletion<Message>
     ) async throws -> SubscriptionToken?
 
-    /// Subscribe to a Postbox deletion.
-    /// Subscribe to messages inbound to the Postbox associated with the connection identifier.
-    /// - Returns:
-    ///   - Success:  nil.
-    ///   - Failure: `SudoDIRelayError`.
-    func subscribeToPostboxDeleted(
-        withConnectionId connectionId: String,
-        resultHandler: @escaping ClientCompletion<Status>
-    ) async throws -> SubscriptionToken?
-
+    /// Unsubscribe from all subscriptions
+    func unsubscribeAll()
 }

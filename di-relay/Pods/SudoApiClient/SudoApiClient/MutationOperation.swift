@@ -17,7 +17,8 @@ class MutationOperation<Mutation: GraphQLMutation>: ApiOperation {
     private let dispatchQueue: DispatchQueue
     private let optimisticUpdate: OptimisticResponseBlock?
     private let conflictResolutionBlock: MutationConflictHandler<Mutation>?
-    private let resultHandler: OperationResultHandler<Mutation>?
+    private var resultHandler: OperationResultHandler<Mutation>?
+    private let operationTimeout: Int?
 
     /// Initializes an operation to perform a GraphQL mutation.
     ///
@@ -29,6 +30,7 @@ class MutationOperation<Mutation: GraphQLMutation>: ApiOperation {
     ///   - optimisticUpdate: An optional closure which gets executed before making the network call, should be used to update local store using the `transaction` object.
     ///   - conflictResolutionBlock: An optional closure that is called when mutation results into a conflict.
     ///   - resultHandler: An optional closure that is called when mutation results are available or when an error occurs.
+    ///   - operationTimeout: An optional operation timeout in seconds.
     init(
         appSyncClient: AWSAppSyncClient,
         logger: Logger = Logger.sudoApiClientLogger,
@@ -36,7 +38,8 @@ class MutationOperation<Mutation: GraphQLMutation>: ApiOperation {
         dispatchQueue: DispatchQueue = .main,
         optimisticUpdate: OptimisticResponseBlock? = nil,
         conflictResolutionBlock: MutationConflictHandler<Mutation>? = nil,
-        resultHandler: OperationResultHandler<Mutation>? = nil
+        resultHandler: OperationResultHandler<Mutation>? = nil,
+        operationTimeout: Int? = nil
     ) {
         self.appSyncClient = appSyncClient
         self.mutation = mutation
@@ -44,34 +47,56 @@ class MutationOperation<Mutation: GraphQLMutation>: ApiOperation {
         self.optimisticUpdate = optimisticUpdate
         self.conflictResolutionBlock = conflictResolutionBlock
         self.resultHandler = resultHandler
+        self.operationTimeout = operationTimeout
         super.init(logger: logger)
     }
 
+    override func done() {
+        super.done()
+        self.resultHandler = nil
+    }
+
     override func execute() {
-        self.appSyncClient.perform(
+        self.graphQLOperation = self.appSyncClient.perform(
             mutation: mutation,
             queue: self.dispatchQueue,
             optimisticUpdate: self.optimisticUpdate,
             conflictResolutionBlock: self.conflictResolutionBlock,
-            resultHandler: { (result, error) in
-            defer {
+            resultHandler: { [weak self ] (result, error) in
+                guard let self = self else {
+                    return
+                }
+
+                defer {
+                    self.done()
+                }
+
+                if let error = error {
+                    self.resultHandler?(nil, ApiOperationError.fromAppSyncClientError(error: error))
+                } else {
+                    if let result = result {
+                        if let error = result.errors?.first {
+                            self.resultHandler?(nil, ApiOperationError.fromGraphQLError(error: error))
+                        } else {
+                            self.resultHandler?(result, nil)
+                        }
+                    } else {
+                        self.resultHandler?(nil, nil)
+                    }
+                }
+            })
+
+        if let operationTimeout = self.operationTimeout {
+            self.dispatchQueue.asyncAfter(deadline: .now() + DispatchTimeInterval.seconds(operationTimeout)) { [weak self] in
+                guard let self = self else {
+                    return
+                }
+                
+                self.graphQLOperation?.cancel()
+                self.resultHandler?(nil, ApiOperationError.timedOut)
                 self.done()
             }
-
-            if let error = error {
-                self.resultHandler?(nil, ApiOperationError.fromAppSyncClientError(error: error))
-            } else {
-                if let result = result {
-                    if let error = result.errors?.first {
-                        self.resultHandler?(nil, ApiOperationError.fromGraphQLError(error: error))
-                    } else {
-                        self.resultHandler?(result, nil)
-                    }
-                } else {
-                    self.resultHandler?(nil, nil)
-                }
-            }
-        })
+        }
     }
 
 }

@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Anonyome Labs, Inc. All rights reserved.
+// Copyright © 2023 Anonyome Labs, Inc. All rights reserved.
 //
 // SPDX-License-Identifier: Apache-2.0
 //
@@ -8,64 +8,70 @@ import Foundation
 
 protocol RelayService: AnyObject {
 
-    // MARK: - Methods
+    // MARK: - Queries
 
-    /// Fetch a list of messages from the relay.
+    /// Get all messages from all postboxes associated with the current user.
+    /// - Returns:
+    ///   - Success: The list of messages.
+    ///   - Failure: `SudoDIRelayError`
+    func listMessages(limit: Int?, nextToken: String?) async throws -> ListOutput<Message>
+
+    /// Get a list of postboxes associated with the current user
+    /// - Returns:
+    ///   - Success: The list of postboxes.
+    ///   - Failure: `SudoDIRelayError`
+    func listPostboxes(limit: Int?, nextToken: String?) async throws -> ListOutput<Postbox>
+
+    // MARK: - Mutations
+
+    /// Creates a Postbox associated with the given connection identifier.
     /// - Parameters:
-    ///    - connnectionId: Identifier of the postbox to retrieve messages from.
-    /// - Throws: `SudoDIRelayError`
-    /// - Returns: Array of messages from the relay.
-    func listMessages(withConnectionId connectionId: String) async throws -> [RelayMessage]
+    ///   - connectionId: The connection id, unique to the current sudo, with which to associate the postbox.
+    ///   - ownershipProofToken: A token identifying the current sudo and its authorization to create a postbox.
+    ///   - isEnabled: Whether the postbox should be created in an enabled state. If not supplied, the default is true.
+    /// - Returns:
+    ///   - Success:  Newly created Postbox.
+    ///   - Failure: `SudoDIRelayError`
+    func createPostbox(withConnectionId connectionId: String, ownershipProofToken: String, isEnabled: Bool?) async throws -> Postbox
 
-    /// Create the postbox.
+    /// Updates the Postbox associated with the given postbox identifier,
+    /// with the provided isEnabled value, if any.
     /// - Parameters:
-    ///   - connectionId: Identifier of the postbox to create.
-    ///   - ownershipProofToken: Token attesting the user's ownership of the sudo.
-    /// - Throws: `SudoDIRelayError`
-    func createPostbox(withConnectionId connectionId: String, ownershipProofToken: String) async throws
+    ///   - postboxId: The postbox id of the postbox to be updated.
+    ///   - isEnabled: The new setting for the postbox isEnabled flag. If not supplied, no change will be made to the postbox setting. 
+    /// - Returns:
+    ///   - Success: newly updated Postbox
+    ///   - Failure: `SudoDIRelayError`
+    func updatePostbox(withPostboxId postboxId: String, isEnabled: Bool?) async throws -> Postbox
 
-    /// Store a message in the relay.
+    /// Deletes the Postbox associated with the given postbox identifier,
+    /// including all messages stored inside that Postbox.
     /// - Parameters:
-    ///   - connectionId: Identifier of the postbox to retrieve messages from.
-    ///   - message: The message to store in the relay,
-    /// - Returns: The stored message, `RelayMessage`, on success, `nil` on failure.
-    /// - Throws: `SudoDIRelayError`
-    func storeMessage(withConnectionId connectionId: String, message: String) async throws -> RelayMessage?
+    ///   - postboxId: The identifier of the postbox to be deleted.
+    /// - Returns:
+    ///   - Success: identifier of deleted postbox
+    ///   - Failure: `SudoDIRelayError`
+    func deletePostbox(withPostboxId postboxId: String) async throws -> String
 
-    /// Delete the postbox including the entire conversation thread.
+    /// Deletes the Message associated with the given message identifier.
     /// - Parameters:
-    ///   - connectionId: Identifier of the postbox to retrieve messages from.
-    /// - Throws: `SudoDIRelayError`
-    func deletePostbox(withConnectionId connectionId: String) async throws
+    ///   - messageId: The identifier of the message to be deleted.
+    /// - Returns:
+    ///   - Success: identifier of deleted message
+    ///   - Failure: `SudoDIRelayError`
+    func deleteMessage(withMessageId messageId: String) async throws -> String
 
-    /// Get HTTP endpoint of the postbox given the postbox identifier.
-    /// - Returns: The postbox HTTP endpoint on success, or nil on failure.
-    func getPostboxEndpoint(withConnectionId connectionId: String) -> URL?
-
-    /// Get a list of postboxes that are associated with the given`sudoId`.
-    /// - Returns: A list of postboxes on success.
-    /// - Throws: `SudoDIRelayError`
-    func listPostboxes(withSudoId sudoId: String) async throws -> [Postbox]
-
-    /// Subscribe to messages received to the given postbox.
+    /// Subscribe to messages received to all postboxes for the current user.
     /// - Parameters:
-    ///   - connectionId: Identifier of the postbox to retrieve messages from.
+    ///   - statusChangeHandler: Connection status change.
     ///   - resultHandler: Returns the `RelayMessage` on success, or `Error` on failure.
     /// - Returns: Token to manage subscription.
     /// - Throws: `SudoDIRelayError`
-    func subscribeToMessagesReceived(
-        withConnectionId connectionId: String,
-        resultHandler: @escaping ClientCompletion<RelayMessage>
-    ) async throws -> SubscriptionToken
+    func subscribeToMessageCreated(
+            statusChangeHandler: SudoSubscriptionStatusChangeHandler?,
+            resultHandler: @escaping ClientCompletion<Message>
+    ) async throws -> SubscriptionToken?
 
-    /// Subscribe to a postbox deletion.
-    /// - Parameters:
-    ///   - connectionId: Identifier of the postbox to retrieve messages from.
-    ///   - resultHandler: Returns `Status` on success, or `Error` on failure.
-    /// - Returns: Token to manage subscription.
-    /// - Throws: `SudoDIRelayError`
-    func subscribeToPostboxDeleted(
-        withConnectionId connectionId: String,
-        resultHandler: @escaping ClientCompletion<Status>
-    ) async throws -> SubscriptionToken
+    /// Unsubscribe from all relay subscriptions
+    func unsubscribeAll()
 }

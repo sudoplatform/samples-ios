@@ -140,7 +140,9 @@ public class CognitoUserPoolIdentityProvider: IdentityProvider {
         return try await withCheckedThrowingContinuation({ (continuation: CheckedContinuation<String, Error>) in
             self.userPool.signUp(uid, password: password, userAttributes: nil, validationData: validationData).continueWith {(task) -> Any? in
                 if let error = task.error as NSError? {
-                    if let message = error.userInfo[Constants.ServiceError.message] as? String {
+                    if error.domain == "NSURLErrorDomain" {
+                        continuation.resume(throwing: SudoUserClientError.requestError(cause: error))
+                    } else if let message = error.userInfo[Constants.ServiceError.message] as? String {
                         if message.contains(Constants.ServiceError.decodingError) {
                             continuation.resume(throwing: SudoUserClientError.invalidInput)
                         } else if message.contains(Constants.ServiceError.missingRequiredInputError) {
@@ -334,7 +336,7 @@ public class CognitoUserPoolIdentityProvider: IdentityProvider {
             }
         })
     }
-    
+
     public func signOut(refreshToken: String) async throws {
         guard let request = AWSCognitoIdentityProviderRevokeTokenRequest() else {
             throw SudoUserClientError.fatalError(description: "Failed to create revoke token request.")

@@ -248,7 +248,7 @@ public class DefaultSudoUserClient: SudoUserClient {
 
         self.logger.debug("Initializing with config: \(config), keyNamespace: \(keyNamespace)")
 
-        let keyManager = SudoKeyManagerImpl(serviceName: Constants.KeyManager.defaultKeyManagerServiceName,
+        let keyManager = LegacySudoKeyManager(serviceName: Constants.KeyManager.defaultKeyManagerServiceName,
                                         keyTag: Constants.KeyManager.defaultKeyManagerKeyTag,
                                         namespace: keyNamespace)
         self.keyManager = keyManager
@@ -414,12 +414,7 @@ public class DefaultSudoUserClient: SudoUserClient {
         var registrationParameters: [String: String] = [:]
 
         let authInfo = try await authenticationProvider.getAuthenticationInfo()
-        let token = authInfo.toString()
-
-        let jwt: JWT
-        jwt = try JWT(string: token)
-
-        let uuid = (jwt.payload["sub"] as? String) ?? UUID().uuidString
+        let uuid = authInfo.getUsername()
 
         registrationParameters[CognitoUserPoolIdentityProvider.RegistrationParameter.challengeType] = authInfo.type
         registrationParameters[CognitoUserPoolIdentityProvider.RegistrationParameter.answer] = authInfo.toString()
@@ -676,10 +671,10 @@ public class DefaultSudoUserClient: SudoUserClient {
     public func clearAuthTokens() async throws {
         try await self.clientStateActor.clearAuthTokens()
     }
-    
+
     public func signOut() async throws {
         self.logger.info("Performing sign out.")
-        
+
         guard let refreshToken = try self.getRefreshToken() else {
             throw SudoUserClientError.notSignedIn
         }
@@ -796,11 +791,10 @@ public class DefaultSudoUserClient: SudoUserClient {
                 } else {
                     if let errors = result?.errors {
                         continuation.resume(throwing: SudoUserClientError.graphQLError(cause: errors))
+                    } else {
+                        self.logger.info("Federated identity registered successfully.")
+                        continuation.resume()
                     }
-
-                    self.logger.info("Federated identity registered successfully.")
-
-                    continuation.resume()
                 }
             })
         })

@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Anonyome Labs, Inc. All rights reserved.
+// Copyright © 2023 Anonyome Labs, Inc. All rights reserved.
 //
 // SPDX-License-Identifier: Apache-2.0
 //
@@ -7,7 +7,7 @@
 import UIKit
 
 extension UIViewController {
-    
+
     /// Present a `UIAlertController` containing a `UIActivityIndicatorView` and the provided `message`.
     /// - Parameter message: message to display in the view.
     /// - Returns: `UIAlertController`

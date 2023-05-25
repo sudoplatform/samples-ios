@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Anonyome Labs, Inc. All rights reserved.
+// Copyright © 2023 Anonyome Labs, Inc. All rights reserved.
 //
 // SPDX-License-Identifier: Apache-2.0
 //
@@ -28,7 +28,6 @@ protocol PostboxIdStorage {
 class KeychainPostboxIdStorage: PostboxIdStorage {
     private let keychain = CodableKeychainStorage<[String]>()
     private let keychainEntryId = "postboxes"
-    
 
     func retrieve() throws -> [String]? {
         return try keychain.value(forKey: keychainEntryId)
@@ -45,7 +44,7 @@ class KeychainPostboxIdStorage: PostboxIdStorage {
 
     func delete(postBoxId: String) {
         if var existingIds = try? self.retrieve() {
-            existingIds = existingIds.filter(){$0 != postBoxId}
+            existingIds = existingIds.filter {$0 != postBoxId}
             try? keychain.setValue(existingIds, forKey: keychainEntryId)
         }
     }

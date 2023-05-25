@@ -117,7 +117,7 @@ public class DefaultCryptoProvider: CryptoProvider {
     private var keyManager: SudoKeyManager
 
     public init(keyNamespace: String) {
-        self.keyManager = SudoKeyManagerImpl(serviceName: Constants.KeyManager.defaultKeyManagerServiceName,
+        self.keyManager = LegacySudoKeyManager(serviceName: Constants.KeyManager.defaultKeyManagerServiceName,
                                              keyTag: Constants.KeyManager.defaultKeyManagerKeyTag,
                                              namespace: keyNamespace)
     }
@@ -137,7 +137,7 @@ public class DefaultCryptoProvider: CryptoProvider {
     }
 
     public func decrypt(keyId: String, algorithm: SymmetricKeyEncryptionAlgorithm, data: Data) throws -> Data {
-        guard data.count > SudoKeyManagerImpl.Constants.defaultBlockSizeAES else {
+        guard data.count > LegacySudoKeyManager.Constants.defaultBlockSizeAES else {
             throw SudoProfilesClientError.invalidInput
         }
 

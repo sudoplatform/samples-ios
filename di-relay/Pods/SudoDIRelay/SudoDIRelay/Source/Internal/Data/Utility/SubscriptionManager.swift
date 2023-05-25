@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Anonyome Labs, Inc. All rights reserved.
+// Copyright © 2023 Anonyome Labs, Inc. All rights reserved.
 //
 // SPDX-License-Identifier: Apache-2.0
 //
@@ -96,6 +96,9 @@ class DefaultSubscriptionManager: SubscriptionManager {
 
     func removeAllSubscriptions() {
         subscriptionQueue.sync {
+            for subscription in subscriptions {
+                subscription.cancel()
+            }
             subscriptions.removeAll()
         }
     }

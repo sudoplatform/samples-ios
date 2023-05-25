@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Anonyome Labs, Inc. All rights reserved.
+// Copyright © 2023 Anonyome Labs, Inc. All rights reserved.
 //
 // SPDX-License-Identifier: Apache-2.0
 //
@@ -7,7 +7,6 @@
 import UIKit
 import SudoUser
 import SudoProfiles
-import SudoUser
 
 /// This View Controller presents a form so that a user can create a `Sudo`.
 ///

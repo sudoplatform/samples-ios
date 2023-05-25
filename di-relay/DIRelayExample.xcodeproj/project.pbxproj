@@ -12,7 +12,6 @@
 		461E2D4A26A7AD97000A887B /* Invitation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 461E2D4926A7AD97000A887B /* Invitation.swift */; };
 		464A509D269D22FD0062D9CA /* PostBoxIdStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 464A509C269D22FD0062D9CA /* PostBoxIdStorage.swift */; };
 		464A509E269D4E1C0062D9CA /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CFD5990E245A47BF00230C6F /* Main.storyboard */; };
-		464A50A6269E408A0062D9CA /* KeyManagement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 464A50A5269E408A0062D9CA /* KeyManagement.swift */; };
 		464A513D269E603A0062D9CA /* Connection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 464A513C269E603A0062D9CA /* Connection.swift */; };
 		4660C8B52820B79000FE3805 /* SudoListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4660C8B02820B79000FE3805 /* SudoListViewController.swift */; };
 		4660C8B82820B79000FE3805 /* CreateSudoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4660C8B42820B79000FE3805 /* CreateSudoViewController.swift */; };
@@ -22,36 +21,33 @@
 		4679EBF1282BA2FC00DF1E32 /* RegistrationMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4679EBF0282BA2FC00DF1E32 /* RegistrationMode.swift */; };
 		467BC24227B0966700956605 /* AuthenticatorMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 467BC23D27B0966700956605 /* AuthenticatorMock.swift */; };
 		467BC24327B0966700956605 /* UITableViewMockSpy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 467BC23E27B0966700956605 /* UITableViewMockSpy.swift */; };
-		467BC24427B0966700956605 /* FileReadableMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 467BC23F27B0966700956605 /* FileReadableMock.swift */; };
 		467BC24527B0966700956605 /* UITableViewCellMockSpy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 467BC24027B0966700956605 /* UITableViewCellMockSpy.swift */; };
-		467BC24627B0966700956605 /* KeyManagerMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 467BC24127B0966700956605 /* KeyManagerMock.swift */; };
 		467BC24C27B1E11100956605 /* AuthenticatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 467BC24B27B1E11100956605 /* AuthenticatorTests.swift */; };
 		467BC24F27B1E1C100956605 /* RegisterViewControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 467BC24E27B1E1C100956605 /* RegisterViewControllerTests.swift */; };
-		467BC25127B1FAB900956605 /* MockKeychainPostboxIdStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 467BC25027B1FAB900956605 /* MockKeychainPostboxIdStorage.swift */; };
 		469661B6283B5A99002C176D /* CreateSudoViewControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 469661B5283B5A99002C176D /* CreateSudoViewControllerTests.swift */; };
 		469661B9283BB2B7002C176D /* SudoListViewControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 469661B8283BB2B7002C176D /* SudoListViewControllerTests.swift */; };
 		469661BC283BBD6E002C176D /* ExitHandlingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 469661BB283BBD6D002C176D /* ExitHandlingTests.swift */; };
 		46981E1F26F1B56D00E67FF8 /* AppDelegate+IsUnitTestRunning.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46981E1E26F1B56D00E67FF8 /* AppDelegate+IsUnitTestRunning.swift */; };
 		46B01AAF26F1AC6600099BAF /* AppDependencies.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46B01AAE26F1AC6600099BAF /* AppDependencies.swift */; };
-		46F538552822C8F900C361F5 /* CreateInvitationCodeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46F538542822C8F900C361F5 /* CreateInvitationCodeViewController.swift */; };
 		46F538572828968F00C361F5 /* MockSudoEntitlementsClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46F538562828968F00C361F5 /* MockSudoEntitlementsClient.swift */; };
 		46F53859282897AA00C361F5 /* MockSudoProfilesClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46F53858282897AA00C361F5 /* MockSudoProfilesClient.swift */; };
 		46F5385B282898CB00C361F5 /* MockKeyManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46F5385A282898CB00C361F5 /* MockKeyManager.swift */; };
 		46F5385D2828E50E00C361F5 /* Logger+Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46F5385C2828E50E00C361F5 /* Logger+Tests.swift */; };
 		4A7D7AD4652C9056C6543271 /* Pods_DIRelayExample.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 907BB649FC6345AD10D66CB2 /* Pods_DIRelayExample.framework */; };
+		ADFCBF732A135F8900C1341E /* PostboxViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADFCBF722A135F8900C1341E /* PostboxViewController.swift */; };
+		ADFCBF752A14403900C1341E /* SendMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADFCBF742A14403900C1341E /* SendMessage.swift */; };
+		ADFCBF772A16E06700C1341E /* FileReadableMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADFCBF762A16E06700C1341E /* FileReadableMock.swift */; };
+		ADFCBF7A2A16F1EC00C1341E /* PostboxViewControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADFCBF792A16F1EC00C1341E /* PostboxViewControllerTests.swift */; };
 		CF4E6EBE246244C400A672B2 /* HTTPTransports.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF4E6EBD246244C400A672B2 /* HTTPTransports.swift */; };
 		CF51068F2465C92700B69629 /* KeychainStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF51068E2465C92700B69629 /* KeychainStorage.swift */; };
-		CF784DED245B9F7700185CF2 /* ConnectionDetailsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF784DEC245B9F7700185CF2 /* ConnectionDetailsViewController.swift */; };
+		CF784DED245B9F7700185CF2 /* MessageDetailsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF784DEC245B9F7700185CF2 /* MessageDetailsViewController.swift */; };
 		CF9B40D2246A183B003136B4 /* Data+Base64URL.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF9B40D1246A183B003136B4 /* Data+Base64URL.swift */; };
 		CFD59909245A47BF00230C6F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFD59908245A47BF00230C6F /* AppDelegate.swift */; };
 		CFD5990D245A47BF00230C6F /* RegistrationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFD5990C245A47BF00230C6F /* RegistrationViewController.swift */; };
 		CFD59912245A47C100230C6F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CFD59911245A47C100230C6F /* Assets.xcassets */; };
 		CFD59915245A47C100230C6F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CFD59913245A47C100230C6F /* LaunchScreen.storyboard */; };
-		CFD5991D245A4E7800230C6F /* PostboxViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFD5991C245A4E7800230C6F /* PostboxViewController.swift */; };
+		CFD5991D245A4E7800230C6F /* PostboxesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFD5991C245A4E7800230C6F /* PostboxesViewController.swift */; };
 		CFD59921245A7C8000230C6F /* UIViewController+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFD59920245A7C8000230C6F /* UIViewController+Extensions.swift */; };
-		CFD59926245B4DC200230C6F /* ConnectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFD59925245B4DC200230C6F /* ConnectionViewController.swift */; };
-		CFD59928245B4DCC00230C6F /* CreateConnectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFD59927245B4DCC00230C6F /* CreateConnectionViewController.swift */; };
-		CFD5992E245B5A6D00230C6F /* ScanInvitationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFD5992D245B5A6D00230C6F /* ScanInvitationViewController.swift */; };
 		ED00FDB226F8456500311702 /* XCTestCase+Utility.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED00FDAD26F8456500311702 /* XCTestCase+Utility.swift */; };
 		ED00FDB426F8456500311702 /* UIStoryboard+Convenience.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED00FDAF26F8456500311702 /* UIStoryboard+Convenience.swift */; };
 		ED00FDB526F8456500311702 /* XCTestCaseExpectation+Convenience.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED00FDB026F8456500311702 /* XCTestCaseExpectation+Convenience.swift */; };
@@ -63,17 +59,11 @@
 		ED00FDCC26F8457800311702 /* AnyError.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED00FDBE26F8457700311702 /* AnyError.swift */; };
 		ED00FDCD26F8457800311702 /* DataFactoryNamespace.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED00FDC026F8457700311702 /* DataFactoryNamespace.swift */; };
 		ED00FDCE26F8457800311702 /* DataFactory+RelaySDK.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED00FDC126F8457700311702 /* DataFactory+RelaySDK.swift */; };
-		ED00FDCF26F8457800311702 /* ComplexBase64Email.txt in Resources */ = {isa = PBXBuildFile; fileRef = ED00FDC326F8457700311702 /* ComplexBase64Email.txt */; };
-		ED00FDD026F8457800311702 /* Base64EncodedBody.txt in Resources */ = {isa = PBXBuildFile; fileRef = ED00FDC426F8457700311702 /* Base64EncodedBody.txt */; };
-		ED00FDD126F8457800311702 /* ComplexDataEmail.txt in Resources */ = {isa = PBXBuildFile; fileRef = ED00FDC526F8457700311702 /* ComplexDataEmail.txt */; };
 		ED00FDD226F8457800311702 /* DataFactory+TestData.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED00FDC626F8457700311702 /* DataFactory+TestData.swift */; };
 		ED00FDD326F8457800311702 /* DIRelayTestUtility.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED00FDC726F8457700311702 /* DIRelayTestUtility.swift */; };
 		ED00FDD726F845B700311702 /* UIViewController+ExtensionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED00FDD626F845B700311702 /* UIViewController+ExtensionsTests.swift */; };
-		ED00FDDB26F845D100311702 /* ConnectionViewControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED00FDDA26F845D100311702 /* ConnectionViewControllerTests.swift */; };
-		ED00FDDE26F845DC00311702 /* CreateConnectionViewControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED00FDDD26F845DC00311702 /* CreateConnectionViewControllerTests.swift */; };
-		ED00FDE126F845EB00311702 /* CreateInvitationCodeViewControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED00FDE026F845EB00311702 /* CreateInvitationCodeViewControllerTests.swift */; };
-		ED00FDE426F845F100311702 /* PostboxViewControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED00FDE326F845F100311702 /* PostboxViewControllerTests.swift */; };
-		ED00FDE726F845FB00311702 /* ScanInvitationViewControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED00FDE626F845FB00311702 /* ScanInvitationViewControllerTests.swift */; };
+		ED00FDDB26F845D100311702 /* MessageDetailsViewControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED00FDDA26F845D100311702 /* MessageDetailsViewControllerTests.swift */; };
+		ED00FDE426F845F100311702 /* PostboxesViewControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED00FDE326F845F100311702 /* PostboxesViewControllerTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -92,7 +82,6 @@
 		4600B3EA282B46AC00351F86 /* ExitHandling.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExitHandling.swift; sourceTree = "<group>"; };
 		461E2D4926A7AD97000A887B /* Invitation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Invitation.swift; sourceTree = "<group>"; };
 		464A509C269D22FD0062D9CA /* PostBoxIdStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostBoxIdStorage.swift; sourceTree = "<group>"; };
-		464A50A5269E408A0062D9CA /* KeyManagement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyManagement.swift; sourceTree = "<group>"; };
 		464A513C269E603A0062D9CA /* Connection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Connection.swift; sourceTree = "<group>"; };
 		4660C8B02820B79000FE3805 /* SudoListViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SudoListViewController.swift; sourceTree = "<group>"; };
 		4660C8B42820B79000FE3805 /* CreateSudoViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CreateSudoViewController.swift; sourceTree = "<group>"; };
@@ -102,18 +91,14 @@
 		4679EBF0282BA2FC00DF1E32 /* RegistrationMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegistrationMode.swift; sourceTree = "<group>"; };
 		467BC23D27B0966700956605 /* AuthenticatorMock.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AuthenticatorMock.swift; sourceTree = "<group>"; };
 		467BC23E27B0966700956605 /* UITableViewMockSpy.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UITableViewMockSpy.swift; sourceTree = "<group>"; };
-		467BC23F27B0966700956605 /* FileReadableMock.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FileReadableMock.swift; sourceTree = "<group>"; };
 		467BC24027B0966700956605 /* UITableViewCellMockSpy.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UITableViewCellMockSpy.swift; sourceTree = "<group>"; };
-		467BC24127B0966700956605 /* KeyManagerMock.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeyManagerMock.swift; sourceTree = "<group>"; };
 		467BC24B27B1E11100956605 /* AuthenticatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticatorTests.swift; sourceTree = "<group>"; };
 		467BC24E27B1E1C100956605 /* RegisterViewControllerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterViewControllerTests.swift; sourceTree = "<group>"; };
-		467BC25027B1FAB900956605 /* MockKeychainPostboxIdStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockKeychainPostboxIdStorage.swift; sourceTree = "<group>"; };
 		469661B5283B5A99002C176D /* CreateSudoViewControllerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateSudoViewControllerTests.swift; sourceTree = "<group>"; };
 		469661B8283BB2B7002C176D /* SudoListViewControllerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SudoListViewControllerTests.swift; sourceTree = "<group>"; };
 		469661BB283BBD6D002C176D /* ExitHandlingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExitHandlingTests.swift; sourceTree = "<group>"; };
 		46981E1E26F1B56D00E67FF8 /* AppDelegate+IsUnitTestRunning.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppDelegate+IsUnitTestRunning.swift"; sourceTree = "<group>"; };
 		46B01AAE26F1AC6600099BAF /* AppDependencies.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDependencies.swift; sourceTree = "<group>"; };
-		46F538542822C8F900C361F5 /* CreateInvitationCodeViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CreateInvitationCodeViewController.swift; sourceTree = "<group>"; };
 		46F538562828968F00C361F5 /* MockSudoEntitlementsClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockSudoEntitlementsClient.swift; sourceTree = "<group>"; };
 		46F53858282897AA00C361F5 /* MockSudoProfilesClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockSudoProfilesClient.swift; sourceTree = "<group>"; };
 		46F5385A282898CB00C361F5 /* MockKeyManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockKeyManager.swift; sourceTree = "<group>"; };
@@ -122,9 +107,13 @@
 		795962014CB32B90A5280898 /* Pods-DIRelayExampleTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DIRelayExampleTests.release.xcconfig"; path = "Target Support Files/Pods-DIRelayExampleTests/Pods-DIRelayExampleTests.release.xcconfig"; sourceTree = "<group>"; };
 		907BB649FC6345AD10D66CB2 /* Pods_DIRelayExample.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_DIRelayExample.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		9577457D65F50497B6E0378C /* Pods-DIRelayExampleTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DIRelayExampleTests.debug.xcconfig"; path = "Target Support Files/Pods-DIRelayExampleTests/Pods-DIRelayExampleTests.debug.xcconfig"; sourceTree = "<group>"; };
+		ADFCBF722A135F8900C1341E /* PostboxViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostboxViewController.swift; sourceTree = "<group>"; };
+		ADFCBF742A14403900C1341E /* SendMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SendMessage.swift; sourceTree = "<group>"; };
+		ADFCBF762A16E06700C1341E /* FileReadableMock.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FileReadableMock.swift; sourceTree = "<group>"; };
+		ADFCBF792A16F1EC00C1341E /* PostboxViewControllerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostboxViewControllerTests.swift; sourceTree = "<group>"; };
 		CF4E6EBD246244C400A672B2 /* HTTPTransports.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPTransports.swift; sourceTree = "<group>"; };
 		CF51068E2465C92700B69629 /* KeychainStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainStorage.swift; sourceTree = "<group>"; };
-		CF784DEC245B9F7700185CF2 /* ConnectionDetailsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectionDetailsViewController.swift; sourceTree = "<group>"; };
+		CF784DEC245B9F7700185CF2 /* MessageDetailsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageDetailsViewController.swift; sourceTree = "<group>"; };
 		CF9B40D1246A183B003136B4 /* Data+Base64URL.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Data+Base64URL.swift"; sourceTree = "<group>"; };
 		CFD59905245A47BF00230C6F /* DIRelayExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DIRelayExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CFD59908245A47BF00230C6F /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -133,12 +122,9 @@
 		CFD59911245A47C100230C6F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		CFD59914245A47C100230C6F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		CFD59916245A47C100230C6F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		CFD5991C245A4E7800230C6F /* PostboxViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostboxViewController.swift; sourceTree = "<group>"; };
+		CFD5991C245A4E7800230C6F /* PostboxesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostboxesViewController.swift; sourceTree = "<group>"; };
 		CFD59920245A7C8000230C6F /* UIViewController+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+Extensions.swift"; sourceTree = "<group>"; };
 		CFD59922245A7F5900230C6F /* Podfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; path = Podfile; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
-		CFD59925245B4DC200230C6F /* ConnectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectionViewController.swift; sourceTree = "<group>"; };
-		CFD59927245B4DCC00230C6F /* CreateConnectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateConnectionViewController.swift; sourceTree = "<group>"; };
-		CFD5992D245B5A6D00230C6F /* ScanInvitationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanInvitationViewController.swift; sourceTree = "<group>"; };
 		D63CA33F9B4069387E1D2FFF /* Pods-DIRelayExample.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DIRelayExample.debug.xcconfig"; path = "Target Support Files/Pods-DIRelayExample/Pods-DIRelayExample.debug.xcconfig"; sourceTree = "<group>"; };
 		D9DA29EC4AED3245ECF09445 /* Pods-DIRelayExample.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DIRelayExample.release.xcconfig"; path = "Target Support Files/Pods-DIRelayExample/Pods-DIRelayExample.release.xcconfig"; sourceTree = "<group>"; };
 		DB906E826D707FD8AFACA846 /* Pods-DIRelayExample.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DIRelayExample.debug.xcconfig"; path = "Target Support Files/Pods-DIRelayExample/Pods-DIRelayExample.debug.xcconfig"; sourceTree = "<group>"; };
@@ -155,17 +141,11 @@
 		ED00FDBE26F8457700311702 /* AnyError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnyError.swift; sourceTree = "<group>"; };
 		ED00FDC026F8457700311702 /* DataFactoryNamespace.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataFactoryNamespace.swift; sourceTree = "<group>"; };
 		ED00FDC126F8457700311702 /* DataFactory+RelaySDK.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "DataFactory+RelaySDK.swift"; sourceTree = "<group>"; };
-		ED00FDC326F8457700311702 /* ComplexBase64Email.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ComplexBase64Email.txt; sourceTree = "<group>"; };
-		ED00FDC426F8457700311702 /* Base64EncodedBody.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Base64EncodedBody.txt; sourceTree = "<group>"; };
-		ED00FDC526F8457700311702 /* ComplexDataEmail.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ComplexDataEmail.txt; sourceTree = "<group>"; };
 		ED00FDC626F8457700311702 /* DataFactory+TestData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "DataFactory+TestData.swift"; sourceTree = "<group>"; };
 		ED00FDC726F8457700311702 /* DIRelayTestUtility.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DIRelayTestUtility.swift; sourceTree = "<group>"; };
 		ED00FDD626F845B700311702 /* UIViewController+ExtensionsTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIViewController+ExtensionsTests.swift"; sourceTree = "<group>"; };
-		ED00FDDA26F845D100311702 /* ConnectionViewControllerTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConnectionViewControllerTests.swift; sourceTree = "<group>"; };
-		ED00FDDD26F845DC00311702 /* CreateConnectionViewControllerTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CreateConnectionViewControllerTests.swift; sourceTree = "<group>"; };
-		ED00FDE026F845EB00311702 /* CreateInvitationCodeViewControllerTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CreateInvitationCodeViewControllerTests.swift; sourceTree = "<group>"; };
-		ED00FDE326F845F100311702 /* PostboxViewControllerTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PostboxViewControllerTests.swift; sourceTree = "<group>"; };
-		ED00FDE626F845FB00311702 /* ScanInvitationViewControllerTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScanInvitationViewControllerTests.swift; sourceTree = "<group>"; };
+		ED00FDDA26F845D100311702 /* MessageDetailsViewControllerTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MessageDetailsViewControllerTests.swift; sourceTree = "<group>"; };
+		ED00FDE326F845F100311702 /* PostboxesViewControllerTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PostboxesViewControllerTests.swift; sourceTree = "<group>"; };
 		ED61B621A8A205DD5BDFDFF7 /* Pods-DIRelayExample.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DIRelayExample.release.xcconfig"; path = "Target Support Files/Pods-DIRelayExample/Pods-DIRelayExample.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -216,25 +196,14 @@
 			name = Extensions;
 			sourceTree = "<group>";
 		};
-		464A50A4269E406B0062D9CA /* Crypto */ = {
-			isa = PBXGroup;
-			children = (
-				464A50A5269E408A0062D9CA /* KeyManagement.swift */,
-			);
-			name = Crypto;
-			sourceTree = "<group>";
-		};
 		4660C8AC2820B75B00FE3805 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				CF784DEC245B9F7700185CF2 /* ConnectionDetailsViewController.swift */,
-				CFD59925245B4DC200230C6F /* ConnectionViewController.swift */,
-				CFD59927245B4DCC00230C6F /* CreateConnectionViewController.swift */,
-				46F538542822C8F900C361F5 /* CreateInvitationCodeViewController.swift */,
 				4660C8B42820B79000FE3805 /* CreateSudoViewController.swift */,
-				CFD5991C245A4E7800230C6F /* PostboxViewController.swift */,
+				CF784DEC245B9F7700185CF2 /* MessageDetailsViewController.swift */,
+				CFD5991C245A4E7800230C6F /* PostboxesViewController.swift */,
+				ADFCBF722A135F8900C1341E /* PostboxViewController.swift */,
 				CFD5990C245A47BF00230C6F /* RegistrationViewController.swift */,
-				CFD5992D245B5A6D00230C6F /* ScanInvitationViewController.swift */,
 				4660C8B02820B79000FE3805 /* SudoListViewController.swift */,
 			);
 			path = Views;
@@ -246,6 +215,7 @@
 				4664EA3527A8C45600002075 /* Authenticator.swift */,
 				4664EA3727A8C7C400002075 /* FileReadable.swift */,
 				4679EBF0282BA2FC00DF1E32 /* RegistrationMode.swift */,
+				ADFCBF742A14403900C1341E /* SendMessage.swift */,
 			);
 			name = Utilities;
 			sourceTree = "<group>";
@@ -324,6 +294,14 @@
 			path = Pods;
 			sourceTree = "<group>";
 		};
+		ADFCBF782A16F1D400C1341E /* Postbox */ = {
+			isa = PBXGroup;
+			children = (
+				ADFCBF792A16F1EC00C1341E /* PostboxViewControllerTests.swift */,
+			);
+			path = Postbox;
+			sourceTree = "<group>";
+		};
 		CF51068D2465C90C00B69629 /* Storage */ = {
 			isa = PBXGroup;
 			children = (
@@ -359,7 +337,6 @@
 		CFD59907245A47BF00230C6F /* DIRelayExample */ = {
 			isa = PBXGroup;
 			children = (
-				464A50A4269E406B0062D9CA /* Crypto */,
 				4664EA3927A913A700002075 /* Data */,
 				461E2D4626A646D9000A887B /* Extensions */,
 				4600B3E9282B469400351F86 /* Shared */,
@@ -432,11 +409,9 @@
 			isa = PBXGroup;
 			children = (
 				467BC23D27B0966700956605 /* AuthenticatorMock.swift */,
-				467BC23F27B0966700956605 /* FileReadableMock.swift */,
-				467BC24127B0966700956605 /* KeyManagerMock.swift */,
+				ADFCBF762A16E06700C1341E /* FileReadableMock.swift */,
 				ED00FDBB26F8457700311702 /* MockAppSyncClientHelper.swift */,
 				ED00FDBA26F8457700311702 /* MockAWSNetworkTransport.swift */,
-				467BC25027B1FAB900956605 /* MockKeychainPostboxIdStorage.swift */,
 				46F5385A282898CB00C361F5 /* MockKeyManager.swift */,
 				46F538562828968F00C361F5 /* MockSudoEntitlementsClient.swift */,
 				46F53858282897AA00C361F5 /* MockSudoProfilesClient.swift */,
@@ -458,22 +433,11 @@
 		ED00FDBF26F8457700311702 /* Data */ = {
 			isa = PBXGroup;
 			children = (
-				ED00FDC226F8457700311702 /* Files */,
 				ED00FDC126F8457700311702 /* DataFactory+RelaySDK.swift */,
 				ED00FDC626F8457700311702 /* DataFactory+TestData.swift */,
 				ED00FDC026F8457700311702 /* DataFactoryNamespace.swift */,
 			);
 			path = Data;
-			sourceTree = "<group>";
-		};
-		ED00FDC226F8457700311702 /* Files */ = {
-			isa = PBXGroup;
-			children = (
-				ED00FDC426F8457700311702 /* Base64EncodedBody.txt */,
-				ED00FDC326F8457700311702 /* ComplexBase64Email.txt */,
-				ED00FDC526F8457700311702 /* ComplexDataEmail.txt */,
-			);
-			path = Files;
 			sourceTree = "<group>";
 		};
 		ED00FDD526F845B700311702 /* Extensions */ = {
@@ -487,56 +451,30 @@
 		ED00FDD826F845C800311702 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				ED00FDD926F845D100311702 /* Connection */,
-				ED00FDDC26F845DC00311702 /* Create Connection */,
-				ED00FDDF26F845EB00311702 /* Create Intivation Code */,
-				ED00FDE226F845F100311702 /* Create Postbox */,
 				469661B4283B5A85002C176D /* Create Sudo */,
+				ED00FDD926F845D100311702 /* Message */,
+				ADFCBF782A16F1D400C1341E /* Postbox */,
+				ED00FDE226F845F100311702 /* Postboxes */,
 				467BC24D27B1E19700956605 /* Registration */,
-				ED00FDE526F845FB00311702 /* Scan Invitation */,
 				469661B7283BB29D002C176D /* Sudo List */,
 			);
 			path = Views;
 			sourceTree = "<group>";
 		};
-		ED00FDD926F845D100311702 /* Connection */ = {
+		ED00FDD926F845D100311702 /* Message */ = {
 			isa = PBXGroup;
 			children = (
-				ED00FDDA26F845D100311702 /* ConnectionViewControllerTests.swift */,
+				ED00FDDA26F845D100311702 /* MessageDetailsViewControllerTests.swift */,
 			);
-			path = Connection;
+			path = Message;
 			sourceTree = "<group>";
 		};
-		ED00FDDC26F845DC00311702 /* Create Connection */ = {
+		ED00FDE226F845F100311702 /* Postboxes */ = {
 			isa = PBXGroup;
 			children = (
-				ED00FDDD26F845DC00311702 /* CreateConnectionViewControllerTests.swift */,
+				ED00FDE326F845F100311702 /* PostboxesViewControllerTests.swift */,
 			);
-			path = "Create Connection";
-			sourceTree = "<group>";
-		};
-		ED00FDDF26F845EB00311702 /* Create Intivation Code */ = {
-			isa = PBXGroup;
-			children = (
-				ED00FDE026F845EB00311702 /* CreateInvitationCodeViewControllerTests.swift */,
-			);
-			path = "Create Intivation Code";
-			sourceTree = "<group>";
-		};
-		ED00FDE226F845F100311702 /* Create Postbox */ = {
-			isa = PBXGroup;
-			children = (
-				ED00FDE326F845F100311702 /* PostboxViewControllerTests.swift */,
-			);
-			path = "Create Postbox";
-			sourceTree = "<group>";
-		};
-		ED00FDE526F845FB00311702 /* Scan Invitation */ = {
-			isa = PBXGroup;
-			children = (
-				ED00FDE626F845FB00311702 /* ScanInvitationViewControllerTests.swift */,
-			);
-			path = "Scan Invitation";
+			path = Postboxes;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -633,9 +571,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				ED00FDD026F8457800311702 /* Base64EncodedBody.txt in Resources */,
-				ED00FDCF26F8457800311702 /* ComplexBase64Email.txt in Resources */,
-				ED00FDD126F8457800311702 /* ComplexDataEmail.txt in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -716,10 +651,6 @@
 				46B01AAF26F1AC6600099BAF /* AppDependencies.swift in Sources */,
 				4664EA3627A8C45600002075 /* Authenticator.swift in Sources */,
 				464A513D269E603A0062D9CA /* Connection.swift in Sources */,
-				CF784DED245B9F7700185CF2 /* ConnectionDetailsViewController.swift in Sources */,
-				CFD59926245B4DC200230C6F /* ConnectionViewController.swift in Sources */,
-				CFD59928245B4DCC00230C6F /* CreateConnectionViewController.swift in Sources */,
-				46F538552822C8F900C361F5 /* CreateInvitationCodeViewController.swift in Sources */,
 				4660C8B82820B79000FE3805 /* CreateSudoViewController.swift in Sources */,
 				CF9B40D2246A183B003136B4 /* Data+Base64URL.swift in Sources */,
 				4600B3EB282B46AC00351F86 /* ExitHandling.swift in Sources */,
@@ -727,13 +658,14 @@
 				CF4E6EBE246244C400A672B2 /* HTTPTransports.swift in Sources */,
 				461E2D4A26A7AD97000A887B /* Invitation.swift in Sources */,
 				CF51068F2465C92700B69629 /* KeychainStorage.swift in Sources */,
-				464A50A6269E408A0062D9CA /* KeyManagement.swift in Sources */,
+				CF784DED245B9F7700185CF2 /* MessageDetailsViewController.swift in Sources */,
+				CFD5991D245A4E7800230C6F /* PostboxesViewController.swift in Sources */,
 				464A509D269D22FD0062D9CA /* PostBoxIdStorage.swift in Sources */,
-				CFD5991D245A4E7800230C6F /* PostboxViewController.swift in Sources */,
+				ADFCBF732A135F8900C1341E /* PostboxViewController.swift in Sources */,
 				4664EA3B27A913B800002075 /* RegistrationMethod.swift in Sources */,
 				4679EBF1282BA2FC00DF1E32 /* RegistrationMode.swift in Sources */,
 				CFD5990D245A47BF00230C6F /* RegistrationViewController.swift in Sources */,
-				CFD5992E245B5A6D00230C6F /* ScanInvitationViewController.swift in Sources */,
+				ADFCBF752A14403900C1341E /* SendMessage.swift in Sources */,
 				4660C8B52820B79000FE3805 /* SudoListViewController.swift in Sources */,
 				CFD59921245A7C8000230C6F /* UIViewController+Extensions.swift in Sources */,
 			);
@@ -746,27 +678,23 @@
 				ED00FDCC26F8457800311702 /* AnyError.swift in Sources */,
 				467BC24227B0966700956605 /* AuthenticatorMock.swift in Sources */,
 				467BC24C27B1E11100956605 /* AuthenticatorTests.swift in Sources */,
-				ED00FDDB26F845D100311702 /* ConnectionViewControllerTests.swift in Sources */,
-				ED00FDDE26F845DC00311702 /* CreateConnectionViewControllerTests.swift in Sources */,
-				ED00FDE126F845EB00311702 /* CreateInvitationCodeViewControllerTests.swift in Sources */,
 				469661B6283B5A99002C176D /* CreateSudoViewControllerTests.swift in Sources */,
 				ED00FDCE26F8457800311702 /* DataFactory+RelaySDK.swift in Sources */,
 				ED00FDD226F8457800311702 /* DataFactory+TestData.swift in Sources */,
 				ED00FDCD26F8457800311702 /* DataFactoryNamespace.swift in Sources */,
 				ED00FDD326F8457800311702 /* DIRelayTestUtility.swift in Sources */,
 				469661BC283BBD6E002C176D /* ExitHandlingTests.swift in Sources */,
-				467BC24427B0966700956605 /* FileReadableMock.swift in Sources */,
-				467BC24627B0966700956605 /* KeyManagerMock.swift in Sources */,
+				ADFCBF772A16E06700C1341E /* FileReadableMock.swift in Sources */,
 				46F5385D2828E50E00C361F5 /* Logger+Tests.swift in Sources */,
+				ED00FDDB26F845D100311702 /* MessageDetailsViewControllerTests.swift in Sources */,
 				ED00FDCA26F8457800311702 /* MockAppSyncClientHelper.swift in Sources */,
 				ED00FDC926F8457800311702 /* MockAWSNetworkTransport.swift in Sources */,
-				467BC25127B1FAB900956605 /* MockKeychainPostboxIdStorage.swift in Sources */,
 				46F5385B282898CB00C361F5 /* MockKeyManager.swift in Sources */,
 				46F538572828968F00C361F5 /* MockSudoEntitlementsClient.swift in Sources */,
 				46F53859282897AA00C361F5 /* MockSudoProfilesClient.swift in Sources */,
-				ED00FDE426F845F100311702 /* PostboxViewControllerTests.swift in Sources */,
+				ED00FDE426F845F100311702 /* PostboxesViewControllerTests.swift in Sources */,
+				ADFCBF7A2A16F1EC00C1341E /* PostboxViewControllerTests.swift in Sources */,
 				467BC24F27B1E1C100956605 /* RegisterViewControllerTests.swift in Sources */,
-				ED00FDE726F845FB00311702 /* ScanInvitationViewControllerTests.swift in Sources */,
 				ED00FDC826F8457800311702 /* SudoDIRelayClientMock.swift in Sources */,
 				ED00FDCB26F8457800311702 /* SudoDlRelayClientSpy.swift in Sources */,
 				469661B9283BB2B7002C176D /* SudoListViewControllerTests.swift in Sources */,
@@ -936,6 +864,7 @@
 				DEVELOPMENT_TEAM = 33X5MJEM2D;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = DIRelayExample/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -957,6 +886,7 @@
 				DEVELOPMENT_TEAM = 33X5MJEM2D;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = DIRelayExample/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -976,7 +906,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = UU2W43R8JA;
 				INFOPLIST_FILE = DIRelayExampleTests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -998,7 +928,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = UU2W43R8JA;
 				INFOPLIST_FILE = DIRelayExampleTests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

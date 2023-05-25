@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Anonyome Labs, Inc. All rights reserved.
+// Copyright © 2023 Anonyome Labs, Inc. All rights reserved.
 //
 // SPDX-License-Identifier: Apache-2.0
 //
@@ -24,7 +24,6 @@ class SudoListViewController: UIViewController, UITableViewDelegate, UITableView
         /// Navigate to the `RegistrationViewController`.
         case unwindToRegister
     }
-
 
     // MARK: - Properties
 
@@ -51,7 +50,6 @@ class SudoListViewController: UIViewController, UITableViewDelegate, UITableView
         return AppDelegate.dependencies.profilesClient
     }
 
-
     // MARK: - Outlets
 
     /// The table view that lists each Sudo.
@@ -64,7 +62,7 @@ class SudoListViewController: UIViewController, UITableViewDelegate, UITableView
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        //configureTableView()
+        // configureTableView()
         tableView.tableFooterView = UIView()
     }
 
@@ -83,7 +81,7 @@ class SudoListViewController: UIViewController, UITableViewDelegate, UITableView
                 break
             }
 
-            let destination = segue.destination as! PostboxViewController
+            let destination = segue.destination as! PostboxesViewController
             destination.sudo = sudos[row-1]
         case .unwindToRegister:
             _ = segue.destination as! RegistrationViewController
@@ -126,7 +124,7 @@ class SudoListViewController: UIViewController, UITableViewDelegate, UITableView
         do {
             sudos = try await profilesClient.listSudos(option: .cacheOnly)
             sudos = try await profilesClient.listSudos(option: .remoteOnly)
-        }  catch {
+        } catch {
             presentErrorAlert(message: "Failed to list Sudos", error: error)
         }
         tableView.reloadData()
@@ -156,7 +154,6 @@ class SudoListViewController: UIViewController, UITableViewDelegate, UITableView
         }
     }
 
-
     // MARK: - Conformance: UITableViewDelegate
 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -176,7 +173,7 @@ class SudoListViewController: UIViewController, UITableViewDelegate, UITableView
 
     func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         if indexPath.row != sudos.count {
-            let delete = UIContextualAction(style: .destructive, title: "Delete") { _, _, completion in
+            let delete = UIContextualAction(style: .destructive, title: "Delete") { _, _, _ in
                 let sudo = self.sudos[indexPath.row]
                 // Delete sudo concurrently and update table and list in main thread
                 Task(priority: .medium) {

@@ -1,11 +1,10 @@
 //
-// Copyright © 2020 Anonyome Labs, Inc. All rights reserved.
+// Copyright © 2023 Anonyome Labs, Inc. All rights reserved.
 //
 // SPDX-License-Identifier: Apache-2.0
 //
 
 import Foundation
-import KeyManager
 
 /// A connection object to be stored.
 struct Connection: Codable {
@@ -19,7 +18,7 @@ protocol ConnectionStorage {
     /// - Throws: `Errors.FailedToDecodeValue`
     /// - Returns: The peer connection ID or nil
     func retrieve(for myConnectionId: String) throws -> String?
-    
+
     /// Attempt to store the `peerConnectionId` against `myConnectionId`
     /// - Parameters:
     ///   - peerConnectionId: Connection ID of the peer to store as the value

@@ -59,9 +59,11 @@ public enum SudoEntitlementsError: Error, Equatable, LocalizedError {
     case insufficientEntitlements
     case invalidArgument
     case invalidRequest
-    case invalidTokenError
-    case noEntitlementsError
-    case policyFailed
+    case noEntitlements
+    case noExternalId
+    case noBillingGroup
+    case entitlementsSetNotFound
+    case entitlementsSequenceNotFound
 
     public static func == (lhs: SudoEntitlementsError, rhs: SudoEntitlementsError) -> Bool {
         switch (lhs, rhs) {
@@ -70,23 +72,26 @@ public enum SudoEntitlementsError: Error, Equatable, LocalizedError {
                 return lhsResponse.statusCode == rhsResponse.statusCode
             }
             return type(of: lhsCause) == type(of: rhsCause)
-        case (.invalidConfig, .invalidConfig),
-             (.notSignedIn, .notSignedIn),
-             (.accountLocked, .accountLocked),
-             (.notAuthorized, .notAuthorized),
-             (.limitExceeded, .limitExceeded),
-             (.insufficientEntitlements, .insufficientEntitlements),
-             (.serviceError, .serviceError),
-             (.rateLimitExceeded, .rateLimitExceeded),
-             (.graphQLError, .graphQLError),
-             (.fatalError, .fatalError),
-             (.policyFailed, .policyFailed),
-             (.invalidTokenError, .invalidTokenError),
-             (.ambiguousEntitlements, ambiguousEntitlements),
-             (.noEntitlementsError, noEntitlementsError),
-             (.entitlementsServiceConfigNotFound, entitlementsServiceConfigNotFound),
-             (.invalidArgument, .invalidArgument),
-             (.invalidRequest, .invalidRequest):
+        case
+            (.invalidConfig, .invalidConfig),
+            (.notSignedIn, .notSignedIn),
+            (.accountLocked, .accountLocked),
+            (.notAuthorized, .notAuthorized),
+            (.limitExceeded, .limitExceeded),
+            (.insufficientEntitlements, .insufficientEntitlements),
+            (.serviceError, .serviceError),
+            (.rateLimitExceeded, .rateLimitExceeded),
+            (.graphQLError, .graphQLError),
+            (.fatalError, .fatalError),
+            (.ambiguousEntitlements, ambiguousEntitlements),
+            (.noEntitlements, noEntitlements),
+            (.entitlementsServiceConfigNotFound, entitlementsServiceConfigNotFound),
+            (.invalidArgument, .invalidArgument),
+            (.invalidRequest, .invalidRequest),
+            (.noExternalId, .noExternalId),
+            (.noBillingGroup, .noBillingGroup),
+            (.entitlementsSetNotFound, .entitlementsSetNotFound),
+            (.entitlementsSequenceNotFound, .entitlementsSequenceNotFound):
             return true
         default:
             return false
@@ -107,7 +112,15 @@ public enum SudoEntitlementsError: Error, Equatable, LocalizedError {
         case "sudoplatform.entitlements.AmbiguousEntitlementsError":
             self = .ambiguousEntitlements
         case "sudoplatform.NoEntitlementsError":
-            self = .noEntitlementsError
+            self = .noEntitlements
+        case "sudoplatform.entitlements.NoExternalIdError":
+            self = .noExternalId
+        case "sudoplatform.entitlements.NoBillingGroupError":
+            self = .noBillingGroup
+        case "sudoplatform.entitlements.EntitlementsSetNotFoundError":
+            self = .entitlementsSetNotFound
+        case "sudoplatform.entitlements.EntitlementsSequenceNotFoundError":
+            self = .entitlementsSequenceNotFound
         default:
             self = .graphQLError(cause: error)
         }
@@ -119,38 +132,42 @@ public enum SudoEntitlementsError: Error, Equatable, LocalizedError {
             return L10n.Entitlements.Errors.accountLockedError
         case .ambiguousEntitlements:
             return L10n.Entitlements.Errors.ambiguousEntitlementsError
+        case .entitlementsServiceConfigNotFound:
+            return L10n.Entitlements.Errors.entitlementsServiceConfigNotFound
+        case .entitlementsSequenceNotFound:
+            return L10n.Entitlements.Errors.entitlementsSequenceNotFound
+        case .entitlementsSetNotFound:
+            return L10n.Entitlements.Errors.entitlementsSetNotFound
+        case .fatalError(let description):
+            return L10n.Entitlements.Errors.fatalError + ": \(description)"
+        case .graphQLError:
+            return L10n.Entitlements.Errors.graphQLError
         case .insufficientEntitlements:
             return L10n.Entitlements.Errors.insufficientEntitlementsError
         case .invalidArgument:
             return L10n.Entitlements.Errors.invalidArgument
         case .invalidConfig:
             return L10n.Entitlements.Errors.invalidConfig
-        case .invalidTokenError:
-            return L10n.Entitlements.Errors.invalidTokenError
-        case .noEntitlementsError:
-            return L10n.Entitlements.Errors.noEntitlementsError
-        case .notSignedIn:
-            return L10n.Entitlements.Errors.notSignedIn
-        case .policyFailed:
-            return L10n.Entitlements.Errors.policyFailed
-        case .serviceError:
-            return L10n.Entitlements.Errors.serviceError
-        case .entitlementsServiceConfigNotFound:
-            return L10n.Entitlements.Errors.entitlementsServiceConfigNotFound
-        case .notAuthorized:
-            return L10n.Entitlements.Errors.notAuthorized
-        case .limitExceeded:
-            return L10n.Entitlements.Errors.limitExceeded
-        case .requestFailed:
-            return L10n.Entitlements.Errors.requestFailed
-        case .rateLimitExceeded:
-            return L10n.Entitlements.Errors.rateLimitExceeded
-        case .graphQLError:
-            return L10n.Entitlements.Errors.graphQLError
-        case .fatalError(let description):
-            return L10n.Entitlements.Errors.fatalError + ": \(description)"
         case .invalidRequest:
             return L10n.Entitlements.Errors.invalidRequest
+        case .limitExceeded:
+            return L10n.Entitlements.Errors.limitExceeded
+        case .noBillingGroup:
+            return L10n.Entitlements.Errors.noBillingGroup
+        case .noEntitlements:
+            return L10n.Entitlements.Errors.noEntitlementsError
+        case .noExternalId:
+            return L10n.Entitlements.Errors.noExternalId
+        case .notAuthorized:
+            return L10n.Entitlements.Errors.notAuthorized
+        case .notSignedIn:
+            return L10n.Entitlements.Errors.notSignedIn
+        case .rateLimitExceeded:
+            return L10n.Entitlements.Errors.rateLimitExceeded
+        case .requestFailed:
+            return L10n.Entitlements.Errors.requestFailed
+        case .serviceError:
+            return L10n.Entitlements.Errors.serviceError
         }
     }
 

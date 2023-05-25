@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Anonyome Labs, Inc. All rights reserved.
+// Copyright © 2023 Anonyome Labs, Inc. All rights reserved.
 //
 // SPDX-License-Identifier: Apache-2.0
 //
@@ -27,9 +27,6 @@ public class DefaultAppSyncClientHelper: AppSyncClientHelper {
 
         /// GraphQL url.
         static let apiUrl = "apiUrl"
-
-        /// HTTP endpoint.
-        static let httpEndpoint = "httpEndpoint"
     }
 
     // MARK: - Properties
@@ -39,9 +36,6 @@ public class DefaultAppSyncClientHelper: AppSyncClientHelper {
 
     /// Client used to call into GraphQL endpoints
     private var sudoApiClient: SudoApiClient
-
-    /// HTTP endpoint for peers to post messages to.
-    private var relayServiceEndpoint: String
 
     // MARK: - Lifecycle
 
@@ -81,20 +75,11 @@ public class DefaultAppSyncClientHelper: AppSyncClientHelper {
             appSyncClient: appSyncClient
         )
 
-        /// HTTP endpoint
-        guard let endpoint = relayServiceConfig[RelayService.httpEndpoint] as? String else {
-            throw SudoDIRelayError.invalidConfig
-        }
-        self.relayServiceEndpoint = endpoint
     }
 
     // MARK: - Conformance: AppSyncClientHelper
 
     public func getSudoApiClient() -> SudoApiClient {
         return self.sudoApiClient
-    }
-
-    public func getHttpEndpoint() -> String {
-        return self.relayServiceEndpoint
     }
 }

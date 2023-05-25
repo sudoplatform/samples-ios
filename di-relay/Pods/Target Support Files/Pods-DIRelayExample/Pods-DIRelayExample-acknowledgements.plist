@@ -371,17 +371,6 @@ distribution of the accompanying software as specified below.
 		</dict>
 		<dict>
 			<key>FooterText</key>
-			<string>Copyright 2015 - Anonyome Labs, Inc.  - All rights reserved.
-</string>
-			<key>License</key>
-			<string>CUSTOM</string>
-			<key>Title</key>
-			<string>KeyManager</string>
-			<key>Type</key>
-			<string>PSGroupSpecifier</string>
-		</dict>
-		<dict>
-			<key>FooterText</key>
 			<string>Copyright (c) 2016 Ashley Mills
 
 Permission is hereby granted, free of charge, to any person obtaining a copy

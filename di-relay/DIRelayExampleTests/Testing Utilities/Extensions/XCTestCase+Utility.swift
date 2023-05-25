@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Anonyome Labs, Inc. All rights reserved.
+// Copyright © 2023 Anonyome Labs, Inc. All rights reserved.
 //
 // SPDX-License-Identifier: Apache-2.0
 //
@@ -28,6 +28,7 @@ extension XCTestCase {
 
     /// Will create an expectation and fulfill it within a `DispatchQueue.main.async {}` call.
     func waitForAsync(description: String? = nil, isInverted: Bool = false, file: StaticString = #file, line: UInt = #line) {
+
         let description = description ?? UUID().uuidString
         let expectation = self.expectation(description: description)
         DispatchQueue.main.async { expectation.fulfill() }
@@ -40,6 +41,7 @@ extension XCTestCase {
         default:
             break
         }
+
     }
 
     /// Will create an expectation and fulfill it within a `DispatchQueue.main.async {}` call.

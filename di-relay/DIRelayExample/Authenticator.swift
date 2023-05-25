@@ -1,8 +1,8 @@
 //
 //  Authenticator.swift
-//  VirtualCardsExample
+//  DIRelayExample
 //
-//  Copyright © 2020 Anonyome Labs. All rights reserved.
+//  Copyright © 2023 Anonyome Labs. All rights reserved.
 //
 
 import Foundation

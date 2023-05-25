@@ -27,6 +27,8 @@ import Foundation
 /// - signInCanceled: Indicates the sign in has been canceled by the user.
 /// - identityNotConfirmed: Indicates that the identity is not confirmed hence cannot sign in yet.
 /// - serviceError: Indicates that an internal server error occurred. Retrying at a later time may succeed.
+/// - requestError: Indicates that there was an error in sending a request to Identity Service due to
+///     network or availability issues.
 /// - graphQLError: Indicates that an unexpected GraphQL error was returned by identity service.
 /// - fatalError: Indicates that a fatal error occurred. This could be due to
 ///     coding error, out-of-memory condition or other conditions that is
@@ -49,6 +51,7 @@ public enum SudoUserClientError: Error {
     case signInCanceled
     case identityNotConfirmed
     case serviceError
+    case requestError(cause: Error)
     case graphQLError(cause: [Error])
     case fatalError(description: String)
 }

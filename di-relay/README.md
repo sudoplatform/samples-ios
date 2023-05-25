@@ -6,10 +6,10 @@ This project provides examples for interacting with the Sudo DI Relay iOS SDK on
 ## Version Support
 
 | Technology             | Supported version |
-| ---------------------- | ----------------- |
-| iOS Deployment Target  | 13.2+             |
+| ---------------------- |-------------------|
+| iOS Deployment Target  | 15.0+             |
 | Swift language version | 5.0               |
-| Xcode version          | 12.0+             |
+| Xcode version          | 14.1+             |
 
 ## Getting Started
 

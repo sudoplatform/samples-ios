@@ -37,7 +37,15 @@ public class TESTAuthenticationInfo: AuthenticationInfo {
     }
 
     public func getUsername() -> String {
-        return ""
+        do {
+            let jwt = try JWT(string: self.jwt)
+            guard let username = jwt.payload["sub"] as? String else {
+                fatalError("TEST registration JWT does not have sub.")
+            }
+            return username
+        } catch {
+            fatalError("Failed to decode TEST registration JWT.")
+        }
     }
 
 }
@@ -78,7 +86,7 @@ public class TESTAuthenticationProvider: AuthenticationProvider {
         key = key.replacingOccurrences(of: "-----BEGIN RSA PRIVATE KEY-----", with: "")
         key = key.replacingOccurrences(of: "-----END RSA PRIVATE KEY-----", with: "")
 
-        guard let keyData = Data(base64Encoded: key) else {
+        guard !key.isEmpty, let keyData = Data(base64Encoded: key) else {
             throw TESTAuthenticationProviderError.invalidKey
         }
 

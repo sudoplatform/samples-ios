@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Anonyome Labs, Inc. All rights reserved.
+// Copyright © 2023 Anonyome Labs, Inc. All rights reserved.
 //
 // SPDX-License-Identifier: Apache-2.0
 //
@@ -30,14 +30,9 @@ class RegistrationViewController: UIViewController {
     enum Segue: String {
         /// Navigate to the `SudoListViewController`.
         case navigateToSudoList
-        /// depreciate this
-        case navigateToPostboxes
     }
 
     // MARK: - Properties
-
-    /// Local postbox ID store.
-    var postboxIdStorage: KeychainPostboxIdStorage = KeychainPostboxIdStorage()
 
     // MARK: - Properties: Computed
 
@@ -51,7 +46,6 @@ class RegistrationViewController: UIViewController {
 
     /// Sudo entitlements client used to perform entitlements operations.
     var entitlementsClient: SudoEntitlementsClient = AppDelegate.dependencies.entitlementsClient
-
 
     // MARK: - Lifecycle
 
@@ -76,11 +70,6 @@ class RegistrationViewController: UIViewController {
         case .navigateToSudoList:
             let navigationController = segue.destination as! UINavigationController
             _ = navigationController.topViewController as! SudoListViewController
-        case .navigateToPostboxes: // TODO remove
-            let navigationController = segue.destination as! UINavigationController
-            let destination = navigationController.topViewController as! PostboxViewController
-            let (postBoxIds) = sender as! [String]
-            destination.postboxIds = postBoxIds
         default:
             break
         }
@@ -88,18 +77,16 @@ class RegistrationViewController: UIViewController {
 
     // MARK: - Actions
 
-    /// When the 'Register / Login' button is clicked, attempt to register. Sign in and retrieve postboxes from cache.
+    /// When the 'Register / Login' button is clicked, attempt to sign in, or register if no user is available
     @IBAction func registerButtonTapped() {
-        presentActivityAlertOnMain("Registering")
+        presentActivityAlertOnMain("Registering/Signing In")
         registerButton.isEnabled = false
         Task {
             await self.registerAndSignIn()
             self.dismissActivityAlert()
             self.registerButton.isEnabled = true
-            // Retrieve postboxes and navigate to postbox list after sign in is complete
-            if let postboxIds = self.retrievePostboxIdsFromCache() {
-                self.performSegue(withIdentifier: Segue.navigateToSudoList.rawValue, sender: postboxIds)
-            }
+            // Navigate to sudo list after sign in is complete
+            self.performSegue(withIdentifier: Segue.navigateToSudoList.rawValue, sender: [])
         }
     }
 
@@ -108,7 +95,7 @@ class RegistrationViewController: UIViewController {
     /// Perform registration and sign in with the Sudo Platform.
     /// Attempts to register with FSSO, then DeviceCheck, then finally TEST registration.
     /// Must have one of these registeration methods enabled in the environment.
-    private func registerAndSignIn() async  {
+    private func registerAndSignIn() async {
         let registered = try? await userClient.isRegistered()
         if registered == true {
             _ = await signIn()
@@ -118,19 +105,19 @@ class RegistrationViewController: UIViewController {
         let supportedChallengeTypes = userClient.getSupportedRegistrationChallengeType()
         do {
             if supportedChallengeTypes.contains(.fsso) {
-                _ = try await signInWithFsso()
                 RegistrationMode.setRegistrationMode(.fsso)
+                _ = try await signInWithFsso()
                 /// Do not need to do anything further with FSSO, so return now.
                 return
             }
 
             /// Register with DeviceCheck, or TEST if DeviceCheck is not enabled.
             if supportedChallengeTypes.contains(.deviceCheck) {
-                try await registerWithDeviceCheck()
                 RegistrationMode.setRegistrationMode(.deviceCheck)
+                try await registerWithDeviceCheck()
             } else if supportedChallengeTypes.contains(.test) {
-                try await registerWithTEST()
                 RegistrationMode.setRegistrationMode(.test)
+                try await registerWithTEST()
             }
         } catch {
             await showRegistrationFailureAlert(error: error)
@@ -171,7 +158,6 @@ class RegistrationViewController: UIViewController {
 
         return true
     }
-
 
     /// Present the Federated Single Sign On UI to allow user to continue signing in via FSSO.
     /// - Returns: Authentication tokens upon success.
@@ -218,7 +204,6 @@ class RegistrationViewController: UIViewController {
         return deviceCheckToken
     }
 
-
     /// Register with the Sudo Platform via DeviceCheck.
     private func registerWithDeviceCheck() async throws {
         let deviceCheckToken = try await generateDeviceCheckToken()
@@ -236,7 +221,6 @@ class RegistrationViewController: UIViewController {
         NSLog("Successfully registered for uid: \(uid)")
     }
 
-
     /// Register with the Sudo Platform via TEST registration keys.
     private func registerWithTEST() async throws {
         try await authenticator.register()
@@ -250,24 +234,6 @@ class RegistrationViewController: UIViewController {
     @IBAction func unwind( _ seg: UIStoryboardSegue) {}
 
     // MARK: - Helpers
-
-    /// Attempt to retrieve all postbox IDs stored in the cache.
-    /// If unsuccessful, present an error alert on the UI.
-    /// 
-    /// - Returns: Postbox IDs or nil.
-    private func retrievePostboxIdsFromCache() -> [String]? {
-        switch Result(catching: {
-            try postboxIdStorage.retrieve()
-        }) {
-        case .success(.some(let postboxIds)):
-            return postboxIds
-        case .success(.none):
-            return []
-        case .failure(let error):
-            presentErrorAlert(message: "Failed to retrieve stored postboxes", error: error)
-            return nil
-        }
-    }
 
     /// Presents a `UIAlertController` containing the sign in `error`.
     ///

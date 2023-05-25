@@ -1,6 +1,6 @@
 source 'https://github.com/CocoaPods/Specs.git'
 
-platform :ios, '14.0'
+platform :ios, '15.0'
 
 project 'DIRelayExample'
 workspace 'DIRelayExample'
@@ -10,12 +10,10 @@ target 'DIRelayExample' do
   inhibit_all_warnings!
 
   # Pods for DIRelayExample
-  pod 'SudoDIRelay', '~> 2.0.0'
-  pod 'KeyManager', '~> 5.0.0'
-  pod 'SudoLogging', '~> 0.3'
-  pod 'SudoUser', '~> 13.1.0'
-  pod 'SudoProfiles', '~> 15.0'
-  pod 'SudoEntitlements', '~> 6.0'
+  pod 'SudoDIRelay', '~> 3.0'
+  pod 'SudoUser', '~> 15.0'
+  pod 'SudoProfiles', '~> 17.0'
+  pod 'SudoEntitlements', '~> 9.0'
 
   target 'DIRelayExampleTests' do
      inherit! :search_paths

@@ -71,7 +71,7 @@ class DefaultS3Client: S3Client {
 
         do {
             try await withCheckedThrowingContinuation({ (continuation: CheckedContinuation<Void, Error>) in
-                s3Client.uploadData(data, bucket: bucket, key: key, contentType: contentType, expression: nil,  completionHandler: { (_, error) -> Void in
+                s3Client.uploadData(data, bucket: bucket, key: key, contentType: contentType, expression: nil, completionHandler: { (_, error) -> Void in
                         if let error = error {
                             continuation.resume(throwing: S3ClientError.serviceError(cause: error))
                             return

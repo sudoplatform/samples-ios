@@ -1,6 +1,6 @@
 
 //
-// Copyright © 2020 Anonyome Labs, Inc. All rights reserved.
+// Copyright © 2023 Anonyome Labs, Inc. All rights reserved.
 //
 // SPDX-License-Identifier: Apache-2.0
 //
@@ -26,8 +26,6 @@ class RegistrationViewControllerTests: XCTestCase {
         instanceUnderTest.loadViewIfNeeded()
         testUtility.window.rootViewController = instanceUnderTest
         testUtility.window.makeKeyAndVisible()
-
-        instanceUnderTest.postboxIdStorage = MockKeychainPostboxIdStorage()
     }
 
     override func tearDown() {
@@ -60,18 +58,6 @@ class RegistrationViewControllerTests: XCTestCase {
         XCTAssertEqual(RegistrationMode.getRegistrationMode(), .fsso)
     }
 
-    /*  TODO: figure out how to mock DeviceCheck tokens
-     func test_registerButtonTapped_deviceCheckEnabled_willRegisterWithDeviceCheck() throws {
-        testUtility.userClient.isRegisteredReturn = false
-        testUtility.userClient.isGetSupportedRegistrationChallengeTypeReturn = [ChallengeType.deviceCheck]
-        testUtility.userClient.isSignedInReturn = false
-        testUtility.userClient.registerWithDeviceCheckResult
-        instanceUnderTest.registerButtonTapped()
-        waitForAsync()
-        XCTAssertTrue(testUtility.userClient.registerWithDeviceCheckCalled)
-        XCTAssertEqual(instanceUnderTest.currentRegistrationMethod, .deviceCheck)
-    }*/
-
     func test_registerButtonTapped_TESTRegistrationEnabled_willRegisterWithTESTRegistration() throws {
         testUtility.userClient.isRegisteredReturn = false
         testUtility.userClient.isGetSupportedRegistrationChallengeTypeReturn = [ChallengeType.test]
@@ -93,11 +79,7 @@ class RegistrationViewControllerTests: XCTestCase {
         testUtility.userClient.isSignedInReturn = false
         let resultTokens = AuthenticationTokens(idToken: "", accessToken: "", refreshToken: "", lifetime: 0, username: "")
         testUtility.userClient.signInWithKeyResult = resultTokens
-        guard let mockStorage = instanceUnderTest.postboxIdStorage as? MockKeychainPostboxIdStorage else {
-            XCTFail("Unable to mock the postbox storage")
-            return
-        }
-        mockStorage.retrieveReturn = ["mock-id"]
+
         instanceUnderTest.registerButtonTapped()
         waitForAsync()
         XCTAssertTrue(instanceUnderTest.shouldPerformSegue(withIdentifier: "navigateToPostboxes", sender: ["mock-id"]))

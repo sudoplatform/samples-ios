@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Anonyome Labs, Inc. All rights reserved.
+// Copyright © 2023 Anonyome Labs, Inc. All rights reserved.
 //
 // SPDX-License-Identifier: Apache-2.0
 //
@@ -17,23 +17,21 @@ public enum SudoDIRelayError: Error, Equatable, LocalizedError {
     case invalidConfig
     /// User is not signed in.
     case notSignedIn
+    /// returned message is invalid
+    case invalidMessage
+    /// returned postbox is invalid
+    case invalidPostbox
 
     /// The configuration related to Relay Service is not found in the provided configuration file
     /// This may indicate that the Relay Service is not deployed into your runtime instance or the
     /// configuration file that you are using is invalid.
     case relayServiceConfigNotFound
 
-    /// Message sent to create the postbox is invalid.
-    case invalidInitMessage
-
     // MARK: - SudoPlatformError
 
     case accountLocked
-    case ambiguousRelay
     case decodingError
     case environmentError
-    case identityInsufficient
-    case identityNotVerified
     case insufficientEntitlementsError
     case internalError(_ cause: String?)
     case invalidArgument(_ msg: String?)
@@ -43,6 +41,7 @@ public enum SudoDIRelayError: Error, Equatable, LocalizedError {
     case serviceError
     case unknownTimezone
     case unauthorizedPostboxAccess
+    case invalidPostboxInput
     case invalidRequest
     case notAuthorized
     case limitExceeded
@@ -53,7 +52,7 @@ public enum SudoDIRelayError: Error, Equatable, LocalizedError {
     case requestFailed(response: HTTPURLResponse?, cause: Error?)
 
     /// Indicates that a fatal error occurred. This could be due to coding error, out-of-memory condition or other
-    /// conditions that is beyond control of `SudoIdentityVerificationClient` implementation.
+    /// conditions that is beyond control of `SudoDIRelayClient` implementation.
     case fatalError(description: String)
 
     // MARK: - Lifecycle
@@ -67,28 +66,22 @@ public enum SudoDIRelayError: Error, Equatable, LocalizedError {
             return
         }
         switch errorType {
-        case "sudoplatform.relay.AmbiguousRelayError":
-            self = .ambiguousRelay
-        case "sudoplatform.relay.InvalidInitMessage":
-            self = .invalidInitMessage
-        case "sudoplatform.relay.UnauthorizedPostboxAccess":
+        case "sudoplatform.relay.UnauthorizedPostboxAccessError":
             self = .unauthorizedPostboxAccess
+        case "sudoplatform.relay.InvalidPostboxInputError":
+            self = .invalidPostboxInput
         case "sudoplatform.AccountLocked":
             self = .accountLocked
         case "sudoplatform.DecodingError":
             self = .decodingError
         case "sudoplatform.EnvironmentError":
             self = .environmentError
-        case "sudoplatform.IdentityVerificationInsufficientError":
-            self = .identityInsufficient
-        case "sudoplatform.IdentityVerificationNotVerifiedError":
-            self = .identityNotVerified
         case "sudoplatform.InsufficientEntitlementsError":
             self = .insufficientEntitlementsError
         case "sudoplatform.InvalidArgumentError":
             let msg = error.message.isEmpty ? nil : error.message
             self = .invalidArgument(msg)
-        case "sudoplatform.relay.InvalidTokenError":
+        case "sudoplatform.InvalidTokenError":
             self = .invalidTokenError
         case "sudoplatform.NoEntitlementsError":
             self = .noEntitlementsError
@@ -107,16 +100,10 @@ public enum SudoDIRelayError: Error, Equatable, LocalizedError {
         switch self {
         case .accountLocked:
             return L10n.Relay.Errors.accountLocked
-        case .ambiguousRelay:
-            return L10n.Relay.Errors.ambiguousRelayError
         case .decodingError:
             return L10n.Relay.Errors.decodingError
         case .environmentError:
             return L10n.Relay.Errors.environmentError
-        case .identityInsufficient:
-            return L10n.Relay.Errors.identityInsufficient
-        case .identityNotVerified:
-            return L10n.Relay.Errors.identityNotVerified
         case .insufficientEntitlementsError:
             return L10n.Relay.Errors.insufficientRelayError
         case let .internalError(cause):
@@ -142,12 +129,12 @@ public enum SudoDIRelayError: Error, Equatable, LocalizedError {
             return L10n.Relay.Errors.unknownTimezone
         case .relayServiceConfigNotFound:
             return L10n.Relay.Errors.relayServiceConfigNotFound
-        case .invalidInitMessage:
-            return L10n.Relay.Errors.invalidInitMessage
         case .noEntitlementsError:
             return L10n.Relay.Errors.noEntitlementsError
         case .unauthorizedPostboxAccess:
             return L10n.Relay.Errors.unauthorizedPostboxAccess
+        case .invalidPostboxInput:
+            return L10n.Relay.Errors.invalidPostboxInput
         case .fatalError:
             return L10n.Relay.Errors.fatalError
         case .invalidRequest:
@@ -166,6 +153,10 @@ public enum SudoDIRelayError: Error, Equatable, LocalizedError {
             return L10n.Relay.Errors.limitExceeded
         case .rateLimitExceeded:
             return L10n.Relay.Errors.rateLimitExceeded
+        case .invalidMessage:
+            return L10n.Relay.Errors.invalidMessageError
+        case .invalidPostbox:
+            return L10n.Relay.Errors.invalidPostboxError
         }
     }
 
@@ -182,8 +173,6 @@ public enum SudoDIRelayError: Error, Equatable, LocalizedError {
             (.environmentError, .environmentError),
             (.fatalError, .fatalError),
             (.graphQLError, .graphQLError),
-            (.identityInsufficient, .identityInsufficient),
-            (.identityNotVerified, .identityNotVerified),
             (.insufficientEntitlements, .insufficientEntitlements),
             (.internalError, internalError),
             (.invalidArgument, .invalidArgument),
@@ -197,12 +186,12 @@ public enum SudoDIRelayError: Error, Equatable, LocalizedError {
             (.serviceError, .serviceError),
             (.unknownTimezone, .unknownTimezone),
             (.versionMismatch, .versionMismatch),
-            (.ambiguousRelay, .ambiguousRelay),
             (.decodingError, .decodingError),
             (.insufficientEntitlementsError, .insufficientEntitlementsError),
             (.noEntitlementsError, .noEntitlementsError),
             (.policyFailed, .policyFailed),
-            (.unauthorizedPostboxAccess, .unauthorizedPostboxAccess):
+            (.unauthorizedPostboxAccess, .unauthorizedPostboxAccess),
+            (.invalidPostboxInput, .invalidPostboxInput):
             return true
         default:
             return false

@@ -310,11 +310,6 @@ The AWS Mobile SDK for iOS is generally licensed under the Apache 2.0 License, w
       of your accepting any such warranty or additional liability.
 
 
-## KeyManager
-
-Copyright 2015 - Anonyome Labs, Inc.  - All rights reserved.
-
-
 ## ReachabilitySwift
 
 Copyright (c) 2016 Ashley Mills

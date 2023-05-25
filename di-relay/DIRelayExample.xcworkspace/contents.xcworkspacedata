@@ -2,6 +2,9 @@
 <Workspace
    version = "1.0">
    <FileRef
+      location = "group:DIRelayExampleTests/Testing Utilities/Utilities/Mocks/FileReadableMock.swift">
+   </FileRef>
+   <FileRef
       location = "group:Pods/Pods.xcodeproj">
    </FileRef>
    <FileRef

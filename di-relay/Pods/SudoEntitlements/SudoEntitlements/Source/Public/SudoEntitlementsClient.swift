@@ -7,9 +7,6 @@
 import SudoUser
 import SudoLogging
 
-/// Generic type associated with API completion/closures. Generic type O is the expected output result in a success case.
-public typealias ClientCompletion<O> = (Swift.Result<O, Error>) -> Void
-
 /// Client used to interface with the Sudo Entitlements Platform service.
 ///
 /// It is recommended to code to this interface, rather than the implementation class (`DefaultSudoEntitlementsClient`) as

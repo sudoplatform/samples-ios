@@ -119,7 +119,8 @@ public class SudoApiClient {
         mutation: Mutation,
         queue: DispatchQueue = .main,
         optimisticUpdate: OptimisticResponseBlock? = nil,
-        conflictResolutionBlock: MutationConflictHandler<Mutation>? = nil
+        conflictResolutionBlock: MutationConflictHandler<Mutation>? = nil,
+        operationTimeout: Int? = nil
     ) async throws -> (result: GraphQLResult<Mutation.Data>?, error: Error?) {
         if let sudoUserClient = self.sudoUserClient {
             guard try await sudoUserClient.isSignedIn() else {
@@ -129,6 +130,7 @@ public class SudoApiClient {
 
         return try await withCheckedThrowingContinuation({ (continuation: CheckedContinuation<(result: GraphQLResult<Mutation.Data>?, error: Error?), Error>) in
             do {
+                let taskId = UUID().uuidString
                 let op = MutationOperation(
                     appSyncClient: self.appSyncClient,
                     logger: self.logger,
@@ -136,7 +138,10 @@ public class SudoApiClient {
                     dispatchQueue: queue,
                     optimisticUpdate: optimisticUpdate,
                     conflictResolutionBlock: conflictResolutionBlock,
-                    resultHandler: { (result, error) in
+                    resultHandler: { [weak self] (result, error) in
+                        if let self = self {
+                            self.logger.info("Resuming continuation: operation=\(mutation.self), taskId=\(taskId), continuation: \(continuation)")
+                        }
                         continuation.resume(returning: (result, error))
                     })
                 try self.serialQueue.addOperation(op)
@@ -162,6 +167,13 @@ public class SudoApiClient {
         cachePolicy: CachePolicy = .returnCacheDataElseFetch,
         queue: DispatchQueue = DispatchQueue.main
     ) async throws -> (result: GraphQLResult<Query.Data>?, error: Error?) {
+        guard cachePolicy != .returnCacheDataAndFetch else {
+            // We cannot support this cache policy because it causes AppSyncClient
+            // to invoke the same callback multiple times. In the structured
+            // concurrency model, we can only return the result once.
+            throw ApiOperationError.invalidArgument
+        }
+
         var opQueue = self.serialQueue
 
         if let sudoUserClient = self.sudoUserClient {
@@ -179,13 +191,17 @@ public class SudoApiClient {
 
         return try await withCheckedThrowingContinuation({ (continuation: CheckedContinuation<(result: GraphQLResult<Query.Data>?, error: Error?), Error>) in
             do {
+                let taskId = UUID().uuidString
                 let op = QueryOperation(
                     appSyncClient: self.appSyncClient,
                     logger: self.logger,
                     query: query,
                     dispatchQueue: queue,
                     cachePolicy: cachePolicy,
-                    resultHandler: { (result, error) in
+                    resultHandler: { [weak self] (result, error) in
+                        if let self = self {
+                            self.logger.info("Resuming continuation: operation=\(query.self), taskId=\(taskId), continuation: \(continuation)")
+                        }
                         continuation.resume(returning: (result, error))
                     })
                 try opQueue.addOperation(op)

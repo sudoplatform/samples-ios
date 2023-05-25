@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Anonyome Labs, Inc. All rights reserved.
+// Copyright © 2023 Anonyome Labs, Inc. All rights reserved.
 //
 // SPDX-License-Identifier: Apache-2.0
 //
@@ -8,109 +8,134 @@ import Foundation
 
 /// Transformer for GraphQL types to output results of the SDK.
 struct RelayTransformer {
-
-    /// Transform the GraphQL result from the `GetMessage` query to an array of `RelayMessage`s
-    static func transform(_ result: [GetMessagesQuery.Data.GetMessage?]) throws -> [RelayMessage] {
-        let nonNilResults: [GetMessagesQuery.Data.GetMessage] = result.compactMap { $0 }
-        return try transform(nonNilResults)
+    struct Constants {
+        /// Issuer of sudos
+        static let sudoServiceOwnerIssuer: String = "sudoplatform.sudoservice"
     }
 
-    /// Transform the GraphQL result from the `StoreMessage` mutation to an optional `RelayMessage`
-    /// - Throws: `SudoDIRelayError`
-    static func transform(_ result: StoreMessageMutation.Data.StoreMessage?) throws -> RelayMessage? {
-        guard let result = result else {
-            return nil
+    /// Transform the GraphQL result from the `ListRelayMessages` query to a ListOutput of Messages
+    static func transform(_ result: ListRelayMessagesQuery.Data.ListRelayMessage) throws -> ListOutput<Message> {
+        do {
+            let transformedMessages = try result.items.map { (graphQlMessage) -> Message in
+                guard let sudoOwner = graphQlMessage.owners.first(where: {$0.issuer == Constants.sudoServiceOwnerIssuer}) else {
+                    throw SudoDIRelayError.invalidMessage
+                }
+                return Message(
+                        id: graphQlMessage.id,
+                        createdAt: transform(timestamp: graphQlMessage.createdAtEpochMs),
+                        updatedAt: transform(timestamp: graphQlMessage.updatedAtEpochMs),
+                        ownerId: graphQlMessage.owner,
+                        sudoId: sudoOwner.id,
+                        postboxId: graphQlMessage.postboxId,
+                        message: graphQlMessage.message
+                )
+            }
+            return ListOutput<Message>(items: transformedMessages, nextToken: result.nextToken)
+        } catch let error as SudoDIRelayError {
+            throw error
+        } catch {
+            // Wrap all other errors as a SudoDIRelayError
+            throw SudoDIRelayError.decodingError
         }
-        return try transform(result)
     }
 
-    /// Transform the GraphQL result from the `OnMessageCreated` subscription to a `RelayMessage` object.
+    /// Transform the GraphQL result from the `OnRelayMessageCreated` subscription to a `Message` object.
     /// Throws: `SudoDIRelayError`
-    static func transform(_ result: OnMessageCreatedSubscription.Data.OnMessageCreated) throws -> RelayMessage {
-        return RelayMessage(
-            messageId: result.messageId,
-            connectionId: result.connectionId,
-            cipherText: result.cipherText,
-            direction: try transform(result.direction),
-            timestamp: transform(timestamp: result.utcTimestamp)
+    static func transform(_ result: OnRelayMessageCreatedSubscription.Data.OnRelayMessageCreated) throws -> Message {
+        guard let sudoOwner = result.owners.first(where: {$0.issuer == Constants.sudoServiceOwnerIssuer}) else {
+            throw SudoDIRelayError.invalidMessage
+        }
+        return Message(
+                id: result.id,
+                createdAt: transform(timestamp: result.createdAtEpochMs),
+                updatedAt: transform(timestamp: result.updatedAtEpochMs),
+                ownerId: result.owner,
+                sudoId: sudoOwner.id,
+                postboxId: result.postboxId,
+                message: result.message
         )
     }
 
-    /// Transform the GraphQL result from the `listPostboxes` query to an array of `Postbox`s.
-    static func transform(_ items: [ListPostboxesForSudoIdQuery.Data.ListPostboxesForSudoId?]) -> [Postbox] {
-        let nonNilResults: [ListPostboxesForSudoIdQuery.Data.ListPostboxesForSudoId] = items.compactMap { $0 }
-
-        return transform(nonNilResults)
+    /// Transform the GraphQL result from the `DeleteRelayMessage` query to the deleted id string
+    static func transform(_ result: DeleteRelayMessageMutation.Data.DeleteRelayMessage) throws -> String {
+        return result.id
     }
 
-    /// Transform a `Status` returned from the service into `Status.ok`.
-    /// Note that non-ok statuses are not implemented  in the service yet.
-    static func transform(_ result: OnPostBoxDeletedSubscription.Data.OnPostBoxDeleted) -> Status {
-        return Status.ok
-    }
-
-    /// Transform a GraphQL `Direction` into a `RelayMessage.Direction`.
-    /// - Throws: `SudoDIRelayError`
-    static func transform(_ graphQL: Direction) throws -> RelayMessage.Direction {
-        switch graphQL {
-        case .inbound:
-            return .inbound
-        case .outbound:
-            return .outbound
-        case let .unknown(direction):
-            throw SudoDIRelayError.internalError("Unsupported relay message direction: \(direction)")
+    /// Transform the GraphQL result from the `ListRelayPostboxes` query to a ListOutput of Postboxes
+    /// Throws: `SudoDIRelayError`
+    static func transform(_ result: ListRelayPostboxesQuery.Data.ListRelayPostbox) throws -> ListOutput<Postbox> {
+        do {
+            let transformedPostboxes = try result.items.map { (graphQlPostbox) -> Postbox in
+                guard let sudoOwner = graphQlPostbox.owners.first(where: {$0.issuer == Constants.sudoServiceOwnerIssuer}) else {
+                    throw SudoDIRelayError.invalidPostbox
+                }
+                return Postbox(
+                        id: graphQlPostbox.id,
+                        createdAt: transform(timestamp: graphQlPostbox.createdAtEpochMs),
+                        updatedAt: transform(timestamp: graphQlPostbox.updatedAtEpochMs),
+                        ownerId: graphQlPostbox.owner,
+                        sudoId: sudoOwner.id,
+                        connectionId: graphQlPostbox.connectionId,
+                        isEnabled: graphQlPostbox.isEnabled,
+                        serviceEndpoint: graphQlPostbox.serviceEndpoint
+                )
+            }
+            return ListOutput<Postbox>(items: transformedPostboxes, nextToken: result.nextToken)
+        } catch let error as SudoDIRelayError {
+            throw error
+        } catch {
+            // Wrap all other errors as a SudoDIRelayError
+            throw SudoDIRelayError.decodingError
         }
+    }
+
+    /// Transform the GraphQL result from the `DeleteRelayPostbox` query to the deleted id string
+    static func transform(_ result: DeleteRelayPostboxMutation.Data.DeleteRelayPostbox) throws -> String {
+        return result.id
+    }
+
+    /// Transform the GraphQL result from the `CreateRelayPostbox` mutation to a `Postbox` object.
+    /// Throws: `SudoDIRelayError`
+    static func transform(_ postbox: CreateRelayPostboxMutation.Data.CreateRelayPostbox) throws -> Postbox {
+        guard let sudoOwner = postbox.owners.first(where: {$0.issuer == Constants.sudoServiceOwnerIssuer}) else {
+            throw SudoDIRelayError.invalidPostbox
+        }
+        return Postbox(
+                id: postbox.id,
+                createdAt: transform(timestamp: postbox.createdAtEpochMs),
+                updatedAt: transform(timestamp: postbox.updatedAtEpochMs),
+                ownerId: postbox.owner,
+                sudoId: sudoOwner.id,
+                connectionId: postbox.connectionId,
+                isEnabled: postbox.isEnabled,
+                serviceEndpoint: postbox.serviceEndpoint
+        )
+    }
+
+    /// Transform the GraphQL result from the `UpdateRelayPostbox` mutation to a `Postbox` object.
+    /// Throws: `SudoDIRelayError`
+    static func transform(_ postbox: UpdateRelayPostboxMutation.Data.UpdateRelayPostbox) throws -> Postbox {
+        guard let sudoOwner = postbox.owners.first(where: {$0.issuer == Constants.sudoServiceOwnerIssuer}) else {
+            throw SudoDIRelayError.invalidPostbox
+        }
+        return Postbox(
+                id: postbox.id,
+                createdAt: transform(timestamp: postbox.createdAtEpochMs),
+                updatedAt: transform(timestamp: postbox.updatedAtEpochMs),
+                ownerId: postbox.owner,
+                sudoId: sudoOwner.id,
+                connectionId: postbox.connectionId,
+                isEnabled: postbox.isEnabled,
+                serviceEndpoint: postbox.serviceEndpoint
+        )
     }
 
     /// Transform a `timestamp` formatted as E, d MMM yyyy HH:mm:ss zzz into a `Date` object.
     /// - Parameter timestamp: A timestamp from the relay.
     /// - Returns: `Date` representation of the timestamp
     static func transform(timestamp: Double) -> Date {
-        return Date(millisecondsSince1970: timestamp)
+        Date(millisecondsSince1970: timestamp)
     }
 
     // MARK: - Helpers
-
-    /// Transform the GraphQL result from the `GetMessage` query to an array of `RelayMessage`s.
-    /// - Throws: `SudoDIRelayError`
-    private static func transform(_ items: [GetMessagesQuery.Data.GetMessage]) throws -> [RelayMessage] {
-        do {
-        let transformedMessages = try items.map {
-            RelayMessage(
-                messageId: $0.messageId,
-                connectionId: $0.connectionId,
-                cipherText: $0.cipherText,
-                direction: try transform($0.direction),
-                timestamp: transform(timestamp: $0.utcTimestamp)
-            )
-        }
-        return transformedMessages.sorted(by: { $0.timestamp < $1.timestamp })
-        } catch let error as SudoDIRelayError {
-          throw error
-        } catch {
-          // Wrap all other errors as a SudoDIRelayError
-          throw SudoDIRelayError.decodingError
-        }
-
-    }
-
-    /// Transform the GraphQL result from the `StoreMessage` mutation to an `ArrayMessage`
-    /// - Throws: `SudoDIRelayError`
-    private static func transform(_ items: StoreMessageMutation.Data.StoreMessage) throws -> RelayMessage {
-        return RelayMessage(
-            messageId: items.messageId,
-            connectionId: items.connectionId,
-            cipherText: items.cipherText,
-            direction: try transform(items.direction),
-            timestamp: transform(timestamp: items.utcTimestamp)
-        )
-    }
-
-    /// Transform the GraphQL result from the `listPostboxes` query to an array of `Postbox`s.
-    private static func transform(_ items: [ListPostboxesForSudoIdQuery.Data.ListPostboxesForSudoId]) -> [Postbox] {
-        let postboxes = items.map {
-            Postbox(connectionId: $0.connectionId, userId: $0.owner, sudoId: $0.sudoId, timestamp: transform(timestamp: $0.utcTimestamp))
-        }
-        return postboxes.sorted(by: {$0.timestamp < $1.timestamp })
-    }
 }

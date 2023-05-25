@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Anonyome Labs, Inc. All rights reserved.
+// Copyright © 2023 Anonyome Labs, Inc. All rights reserved.
 //
 // SPDX-License-Identifier: Apache-2.0
 //
@@ -13,23 +13,24 @@ class PostboxViewController: UIViewController, UITableViewDelegate, UITableViewD
 
     // MARK: - Supplementary
 
-    /// Segues that are performed in `SudoListViewController`.
+    /// Segues that are performed in `PostboxViewController`.
     enum Segue: String {
-        /// Navigate to the `CreateConnectionViewController`.
-        case navigateToCreateConnection
+        /// Navigate to the `MessageViewController`.
+        case navigateToMessage
 
-        /// Navigate to `ConnectionViewController`.
-        case navigateToConnection
+        /// Navigate to `PostboxesViewController`.
+        case unwindToPostboxes
 
-        /// Navigate to the `RegistrationViewController`.
-        case unwindToRegistration
     }
-    
+
     // MARK: - Properties
 
     var sudo: Sudo!
-    var postboxIds: [String] = []
-    var ownershipProofs: [String: String] = [:]
+    var postboxId: String!
+
+    var postbox: Postbox!
+    var messageIds: [String] = []
+    var subscriptionToken: SubscriptionToken?
     private var presentedActivityAlert: UIAlertController?
 
     // MARK: - Properties: Computed
@@ -45,11 +46,15 @@ class PostboxViewController: UIViewController, UITableViewDelegate, UITableViewD
     var profilesClient: SudoProfilesClient {
         return AppDelegate.dependencies.profilesClient
     }
-
     // MARK: - Outlets
 
+    /// Text for service endpoint
+    @IBOutlet weak var serviceEndpoint: UILabel!
     @IBOutlet weak var tableView: UITableView!
+    @IBOutlet weak var isPostboxEnabledSwitch: UISwitch!
 
+    @IBOutlet weak var messageText: UITextView!
+    @IBOutlet weak var createMessageButton: UIButton!
     // MARK: - Lifecycle
 
     override func viewWillAppear(_ animated: Bool) {
@@ -58,7 +63,6 @@ class PostboxViewController: UIViewController, UITableViewDelegate, UITableViewD
         Task(priority: .medium) {
             await updatePostboxView()
         }
-        fetchOwnershipProof(sudo)
     }
 
     override func viewDidLoad() {
@@ -70,66 +74,47 @@ class PostboxViewController: UIViewController, UITableViewDelegate, UITableViewD
 
     /// Return the number of table rows.
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return postboxIds.count + 1
+        return messageIds.count
     }
 
     /// Return the title of the table.
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        return "Active Postboxes"
+        return "Messages for Postbox"
     }
 
-    /// Return a table cell either containing the button to create a postbox or a label containing the postbox ID.
+    /// Return a table cell with a label containing the message ID.
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        if indexPath.row == 0 {
-            return tableView.dequeueReusableCell(withIdentifier: "createPostboxCell", for: indexPath)
-        } else {
-            let postBoxId = postboxIds[indexPath.row - 1]
-            let cell = tableView.dequeueReusableCell(withIdentifier: "postboxCell", for: indexPath)
-            cell.textLabel?.text = postBoxId
-            return cell
-        }
+        let messageId = messageIds[indexPath.row]
+        let cell = tableView.dequeueReusableCell(withIdentifier: "messageCell", for: indexPath)
+        cell.textLabel?.text = messageId
+        return cell
+
     }
-    
-    /// After tapping on a row, if the `Create Postbox` button was tapped, attempt to provision a new postbox.
-    /// If a postbox ID was tapped, either navigate to creating a new connection, or to the connection conversation screen.
+
+    /// After tapping on a row, navigate to displaying the message details
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
 
-        if indexPath.row == 0 {
-            /// Clicked Create Postbox.
-            Task {
-                await self.createPostBoxAndSaveToCache()
-            }
-        } else {
-            // Clicked on an existing Postbox ID
-            let postboxId = postboxIds[indexPath.row - 1]
+        // Clicked on an existing message ID
+        let messageId = messageIds[indexPath.row]
+        performSegue(withIdentifier: Segue.navigateToMessage.rawValue, sender: messageId)
 
-            if let _ = try? KeyManagement().getPublicKeyForConnection(connectionId: postboxId) {
-                // Peer has been connected
-                performSegue(withIdentifier: Segue.navigateToConnection.rawValue, sender: postboxId)
-            } else {
-                // New connection
-                performSegue(withIdentifier: Segue.navigateToCreateConnection.rawValue, sender: postboxId)
-            }
-        }
     }
-    
-    /// Swipe on an existing postbox ID to delete postbox.
-    /// If swiping on the `Create Postbox` button, do nothing.
+
+    /// Swipe on an existing message ID to delete message.
     func tableView(
         _ tableView: UITableView,
         trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath
     ) -> UISwipeActionsConfiguration? {
-        if indexPath.row > 0 {
-            let postBoxId = postboxIds[indexPath.row - 1]
-            let action = UIContextualAction(style: .normal, title: "Delete") { [weak self] (action, view, completionHandler) in
-                self?.didSwipeToDeletePostbox(postBoxId: postBoxId)
-                completionHandler(true)
+        let messageId = messageIds[indexPath.row]
+        let action = UIContextualAction(style: .normal, title: "Delete") { [weak self] (_, _, completionHandler) in
+            Task {
+                _ = try await self?.didSwipeToDeleteMessage(messageId: messageId)
             }
-            action.backgroundColor = .systemRed
-            return UISwipeActionsConfiguration(actions: [action])
+            completionHandler(true)
         }
-        return nil
+        action.backgroundColor = .systemRed
+        return UISwipeActionsConfiguration(actions: [action])
     }
 
     // MARK: - Navigation
@@ -137,12 +122,9 @@ class PostboxViewController: UIViewController, UITableViewDelegate, UITableViewD
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         let segueType = Segue(rawValue: segue.identifier ?? "")
         switch segueType {
-        case .navigateToConnection:
-            let destination = segue.destination as! ConnectionViewController
-            destination.myPostboxId = sender as? String ?? ""
-        case .navigateToCreateConnection:
-            let destination = segue.destination as! CreateConnectionViewController
-            destination.postboxId = sender as? String
+        case .navigateToMessage:
+            let destination = segue.destination as! MessageDetailsViewController
+            destination.messageId = sender as? String ?? ""
         default:
             break
         }
@@ -154,106 +136,132 @@ class PostboxViewController: UIViewController, UITableViewDelegate, UITableViewD
     ///
     /// - Parameter sender: Exit button.
     @IBAction func didTapExitButton(_ sender: Any) {
+        subscriptionToken?.cancel()
         self.doExitButtonAction(sender)
     }
 
-    // MARK: - Helpers
-    
-    /// Attempt to create a postbox via the `SudoDIRelayClient`, using a UUID4 generated `connectionId`.
-    /// If successful, store the `connectionId` to the postbox ID storage cache.
-    /// If unsuccessful, display the an error alert on the UI.
-    func createPostBoxAndSaveToCache() async {
-        presentActivityAlert(message: "Creating postbox")
-        let connectionId = UUID().uuidString
+    @IBAction func isPostboxEnabledSwitchChanged(_ sender: Any) {
+        let enabled = isPostboxEnabledSwitch.isOn
+        presentActivityAlert(message: "Updating postbox")
 
-        do {
-            guard let proof = ownershipProofs[sudo.id ?? ""] else {
-                presentErrorAlertOnMain("Still fetching ownership proof. Try creating a postbox again. " , error: nil)
-                return
-            }
-
-            _ = try await relayClient.createPostbox(withConnectionId: connectionId, ownershipProofToken: proof)
-        } catch {
-            presentErrorAlertOnMain("Failed to create postbox. " , error: error)
+        Task(priority: .medium) {
+            let updatedPostbox = try await self.relayClient.updatePostbox(withPostboxId: postbox.id, isEnabled: enabled)
+            postbox = updatedPostbox
         }
-
-        do {
-            try KeychainPostboxIdStorage().store(postboxId: connectionId)
-            self.dismiss(animated: true)
-            Task {
-                await self.updatePostboxView()
-            }
-        } catch {
-            self.presentErrorAlert(message: "Failed to create postbox. " , error: error)
+        self.dismiss(animated: true) {
+            self.tableView.reloadData()
         }
     }
-    
+
+    @IBAction func didTapServiceEndpointLabel(sender: UITapGestureRecognizer) {
+        guard let label = sender.view as? UILabel else {
+            return
+        }
+        UIPasteboard.general.string = label.text
+    }
+
+    @IBAction func didTapCreateMessageButton(_ sender: Any) {
+        guard let messageText = messageText.text else {
+            presentErrorAlert(message: "Message contains no text and will not be sent")
+            return
+        }
+
+        presentActivityAlert(message: "Sending message")
+        Task(priority: .medium) {
+            _ = try await sendMessage(messageText: messageText)
+        }
+        self.dismiss(animated: true) {
+            self.messageText.text = ""
+        }
+    }
+
+    // MARK: - Helpers
+
+    /// Attempt to send a message using the SendMessage helper class. Note that normally a separate application
+    /// would be responsible for sending the message to the relay.
+    func sendMessage(messageText: String) async throws {
+        try await SendMessage.writeMessage(serviceEndpoint: postbox.serviceEndpoint, messageContents: Data(JSONEncoder().encode(messageText)))
+    }
+
     /// Attempt to retrieve an updated list of the postbox IDs and refresh the table.
     /// If unsuccessful, does not refresh the table.
     func updatePostboxView() async {
-        presentActivityAlert(message: "Fetching postboxes")
-        if let updatedPostboxIds = await fetchPostboxIdsOrAlert() {
-            postboxIds = updatedPostboxIds
+        presentActivityAlert(message: "Fetching messages")
+        if let fetchedMessageIds = await fetchMessageIdsOrAlert() {
+            messageIds = fetchedMessageIds
+        }
+        // Set up message subscription - we are not actually using the retrieved message
+        // but instead fire another round-trip
+        // We must store the token in order for the subscription to be created successfully, otherwise
+        // the out of scope returned value will cause the subscription to be terminated.
+        do {
+            subscriptionToken = try await relayClient.subscribeToMessageCreated(
+                statusChangeHandler: nil,
+                resultHandler: { result in
+                    switch result {
+                    case .success:
+                        Task(priority: .medium) {
+                            if let fetchedMessageIds = await self.fetchMessageIdsOrAlert() {
+                                self.messageIds = fetchedMessageIds
+                            }
+                            self.tableView.reloadData()
+                        }
+
+                    default:
+                        return
+                    }
+                })
+        } catch {
+            presentErrorAlertOnMain("Could not set up message subscription.", error: error)
         }
         self.dismiss(animated: true) {
             self.tableView.reloadData()
         }
     }
-    
-    /// Attempt to retrieve the list of postboxes from the relay.
+
+    /// Attempt to retrieve the list of messages from the relay for the given postbox
     /// If unsuccessful, display an error alert on the UI.
     ///
-    /// - Returns: List of postbox IDs or  nil.
-    func fetchPostboxIdsOrAlert() async -> [String]? {
-        guard let sudoId = sudo.id else {
-            presentErrorAlertOnMain("Sudo does not have identifier.", error: nil)
+    /// - Returns: List of message IDs or  nil.
+    func fetchMessageIdsOrAlert() async -> [String]? {
+        do {
+            let result = try await relayClient.listPostboxes(limit: 20, nextToken: nil)
+            guard let localPostbox = result.items.first(where: {$0.id == postboxId}) else {
+                presentErrorAlertOnMain("Could not fetch postbox.", error: nil)
+                return nil
+            }
+            postbox = localPostbox
+            serviceEndpoint.text = postbox.serviceEndpoint
+            isPostboxEnabledSwitch.setOn(postbox.isEnabled, animated: true)
+
+        } catch {
+            presentErrorAlertOnMain("Could not fetch postbox.", error: error)
             return nil
         }
-
         do {
-            let postboxes = try await relayClient.listPostboxes(withSudoId: sudoId)
-            return postboxes.map{$0.connectionId}
+            let result = try await relayClient.listMessages(limit: 20, nextToken: nil)
+            return result.items
+                .filter {$0.postboxId == postbox.id}
+                .map {$0.id}
         } catch {
-            presentErrorAlertOnMain("Could not fetch postboxes for sudo.", error: error)
+            presentErrorAlertOnMain("Could not fetch messages for postbox.", error: error)
             return nil
         }
     }
 
-    /// Deletes postbox from cache and updates table view. Request to delete the postbox
-    /// from the relay afterwards.
+    /// Deletes message from the relay and updates table view.
     ///
     /// If unsuccessful, present an error alert.
     ///
-    /// - Parameter postBoxId: postbox ID to delete.
-    func didSwipeToDeletePostbox(postBoxId: String) {
-        presentActivityAlertOnMain("Deleting postbox")
+    /// - Parameter messageId: postbox ID to delete.
+    func didSwipeToDeleteMessage(messageId: String) async throws {
+        presentActivityAlertOnMain("Deleting message")
 
-        // Delete from cache and update UI on main thread
-        KeychainPostboxIdStorage().delete(postBoxId: postBoxId)
-        self.postboxIds = self.postboxIds.filter {$0 != postBoxId}
+        _ = try await relayClient.deleteMessage(withMessageId: messageId)
+
+        self.messageIds = self.messageIds.filter {$0 != messageId}
         self.dismiss(animated: true) {
             self.tableView.reloadData()
-        }
-
-        // Delete from relay on background thread
-        Task(priority: .medium) {
-            _ = try await relayClient.deletePostbox(withConnectionId: postBoxId)
-        }
-    }
-
-    /// Get ownership proof of the Sudo.
-    func fetchOwnershipProof(_ sudo: Sudo) {
-        guard let sudoId = sudo.id else {
-            presentErrorAlertOnMain("Could not fetch sudo id.", error: nil)
-            return
-        }
-        if ownershipProofs[sudoId] != nil {
-            return
-        }
-
-        Task(priority: .medium) {
-            let proof = try await self.profilesClient.getOwnershipProof(sudo: sudo, audience: "sudoplatform.relay.postbox")
-            self.ownershipProofs[sudoId] = proof
         }
     }
 }

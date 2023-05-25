@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Anonyome Labs, Inc. All rights reserved.
+// Copyright © 2023 Anonyome Labs, Inc. All rights reserved.
 //
 // SPDX-License-Identifier: Apache-2.0
 //
@@ -27,7 +27,7 @@ class CodableKeychainStorage<T: Codable> {
             }
         }
     }
-    
+
     /// Attempt to store `value` against the key `key`.
     /// .
     /// - Parameters:
@@ -50,7 +50,7 @@ class CodableKeychainStorage<T: Codable> {
             throw Errors.failedToStoreInKeychain(status)
         }
     }
-    
+
     ///  Attempt to retrieve the value stored against the given `key`.
     ///
     /// - Parameter key: Key corresponding to retrieved value.
@@ -69,7 +69,7 @@ class CodableKeychainStorage<T: Codable> {
     }
 
     // MARK: - Keychain
-    
+
     /// Add `data` to keychain against given `key`.
     ///
     /// - Parameters:
@@ -77,7 +77,7 @@ class CodableKeychainStorage<T: Codable> {
     ///   - data: Data to store.
     /// - Returns: `OSStatus`
     private func set(key: String, data: Data) -> OSStatus {
-        let query: [String : Any] = [
+        let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword as String,
             kSecAttrAccount as String: key,
             kSecValueData as String: data
@@ -87,7 +87,7 @@ class CodableKeychainStorage<T: Codable> {
 
         return SecItemAdd(query as CFDictionary, nil)
     }
-    
+
     /// Retrieve data from keychain stored against `key`.
     ///
     /// - Parameter key: Key of the data stored in the keychain.
@@ -95,12 +95,12 @@ class CodableKeychainStorage<T: Codable> {
     /// - Returns: The data stored in the keychain or nil.
     private func load(key: String) throws -> Data? {
         let query = [
-            kSecClass as String       : kSecClassGenericPassword,
-            kSecAttrAccount as String : key,
-            kSecReturnData as String  : kCFBooleanTrue!,
-            kSecMatchLimit as String  : kSecMatchLimitOne ] as [String : Any]
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrAccount as String: key,
+            kSecReturnData as String: kCFBooleanTrue!,
+            kSecMatchLimit as String: kSecMatchLimitOne ] as [String: Any]
 
-        var dataTypeRef: AnyObject? = nil
+        var dataTypeRef: AnyObject?
 
         let status: OSStatus = SecItemCopyMatching(query as CFDictionary, &dataTypeRef)
 

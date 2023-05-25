@@ -17,7 +17,7 @@ class QueryOperation<Query: GraphQLQuery>: ApiOperation {
     private let query: Query
     private let dispatchQueue: DispatchQueue
     private let cachePolicy: CachePolicy
-    private let resultHandler: OperationResultHandler<Query>?
+    private var resultHandler: OperationResultHandler<Query>?
 
     /// Initializes an operation to perform a GraphQL query.
     ///
@@ -44,35 +44,39 @@ class QueryOperation<Query: GraphQLQuery>: ApiOperation {
         super.init(logger: logger)
     }
 
+    override func done() {
+        super.done()
+        self.resultHandler = nil
+    }
+
     override func execute() {
-        self.appSyncClient.fetch(
+        self.graphQLOperation = self.appSyncClient.fetch(
             query: self.query,
             cachePolicy: self.cachePolicy,
             queue: self.dispatchQueue,
-            resultHandler: { (result, error) in
-            if let error = error {
-                self.resultHandler?(nil, ApiOperationError.fromAppSyncClientError(error: error))
-                self.done()
-            } else {
-                if let result = result {
-                    if let error = result.errors?.first {
-                        self.resultHandler?(nil, ApiOperationError.fromGraphQLError(error: error))
-                        self.done()
-                    } else {
-                        self.resultHandler?(result, nil)
-                        // Don't mark the operation as done if cache policy is `returnCacheDataAndFetch`
-                        // since it causes the result handler to be called twice: once for cached data
-                        // and second time for remote data.
-                        if !(result.source == .cache && self.cachePolicy == .returnCacheDataAndFetch) {
-                            self.done()
-                        }
-                    }
-                } else {
-                    self.resultHandler?(nil, nil)
+            resultHandler: { [weak self] (result, error) in
+                guard let self = self else {
+                    return
+                }
+
+                defer {
                     self.done()
                 }
-            }
-        })
+
+                if let error = error {
+                    self.resultHandler?(nil, ApiOperationError.fromAppSyncClientError(error: error))
+                } else {
+                    if let result = result {
+                        if let error = result.errors?.first {
+                            self.resultHandler?(nil, ApiOperationError.fromGraphQLError(error: error))
+                        } else {
+                            self.resultHandler?(result, nil)
+                        }
+                    } else {
+                        self.resultHandler?(nil, nil)
+                    }
+                }
+            })
     }
 
 }

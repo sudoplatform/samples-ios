@@ -425,7 +425,6 @@ public class DefaultSudoProfilesClient: SudoProfilesClient {
 
         // First create the Sudo without any claims since we need the Sudo ID to create
         // the blob claims in S3.
-        self.logger.info("Creating a Sudo.")
         let input = CreateSudoInput(claims: [], objects: [])
         let (result, error) = try await self.graphQLClient.perform(mutation: CreateSudoMutation(input: input), queue: self.queue)
         if let error = error {

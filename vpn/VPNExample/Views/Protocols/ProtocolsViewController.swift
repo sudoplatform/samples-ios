@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Anonyome Labs, Inc. All rights reserved.
+// Copyright © 2023 Anonyome Labs, Inc. All rights reserved.
 //
 // SPDX-License-Identifier: Apache-2.0
 //
@@ -68,10 +68,6 @@ class ProtocolsViewController: UIViewController, UITableViewDelegate, UITableVie
 
     func displayTitleForProtocolType(_ protocolType: SudoVPNProtocol) -> String {
         switch protocolType {
-        case .l2tp:
-            return "Layer 2 Tunneling Protocol (L2TP)"
-        case .pptp:
-            return "Point-To-Point Tunneling Protocol (PPTP)"
         case .ipsec:
             return "Internet Protocol Security (IPSEC)"
         case .ikev2:

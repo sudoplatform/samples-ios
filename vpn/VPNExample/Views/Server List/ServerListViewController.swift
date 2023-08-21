@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Anonyome Labs, Inc. All rights reserved.
+// Copyright © 2023 Anonyome Labs, Inc. All rights reserved.
 //
 // SPDX-License-Identifier: Apache-2.0
 //
@@ -71,8 +71,12 @@ class ServerListViewController: UIViewController, UITableViewDelegate, UITableVi
 
     func loadServerList() async {
         do {
-            let servers = try await vpnClient.listServers(cachePolicy: .remoteOnly)
-            updateServerList(servers)
+            let servers = try await vpnClient.listServers(
+                countriesFilter: ["AU", "US", "NL"],
+                limit: 0,
+                nextToken: nil,
+                cachePolicy: .remoteOnly)
+            updateServerList(servers.items)
             DispatchQueue.main.async { [weak self] in
                 self?.tableView.reloadData()
                 self?.dismissActivityAlert()

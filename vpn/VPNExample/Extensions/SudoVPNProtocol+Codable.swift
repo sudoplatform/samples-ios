@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Anonyome Labs, Inc. All rights reserved.
+// Copyright © 2023 Anonyome Labs, Inc. All rights reserved.
 //
 // SPDX-License-Identifier: Apache-2.0
 //
@@ -12,10 +12,6 @@ extension SudoVPNProtocol: RawRepresentable, Codable {
 
     public init?(rawValue: String) {
         switch rawValue {
-        case "l2tp":
-            self = .l2tp
-        case "pptp":
-            self = .pptp
         case "ipsec":
             self = .ipsec
         case "ikev2":
@@ -33,10 +29,6 @@ extension SudoVPNProtocol: RawRepresentable, Codable {
 
     public var rawValue: String {
         switch self {
-        case .l2tp:
-            return "l2tp"
-        case .pptp:
-            return "pptp"
         case .ipsec:
             return "ipsec"
         case .ikev2:

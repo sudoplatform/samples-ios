@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Anonyome Labs, Inc. All rights reserved.
+// Copyright © 2023 Anonyome Labs, Inc. All rights reserved.
 //
 // SPDX-License-Identifier: Apache-2.0
 //
@@ -77,7 +77,8 @@ class ServerSelectedViewController: UIViewController, SudoVPNObserving {
                 await weakSelf.updateConnectionState(.connecting)
                 let configuration = await SudoVPNConfiguration(
                     server: weakSelf.server,
-                    protocolType: weakSelf.currentProtocol
+                    protocolType: weakSelf.currentProtocol,
+                    onDemand: true
                 )
                 do {
                     try await weakSelf.vpnClient.connect(withConfiguration: configuration)

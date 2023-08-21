@@ -21,8 +21,8 @@ target 'VPNExample' do
     inherit! :search_paths
     pod 'SudoUser', '~> 15.0'
     pod 'SudoProfiles', '~> 17.0'
-    pod 'SudoEntitlements', '~> 9.0'
-    pod 'SudoVPN', '~> 13.0'
+    pod 'SudoEntitlements', '~> 9.0.1'
+    pod 'SudoVPN',  '~> 15.1'
 
     pod 'FlagKit'
 

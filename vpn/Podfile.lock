@@ -27,7 +27,7 @@ PODS:
     - SQLite.swift/standard (= 0.12.2)
   - SQLite.swift/standard (0.12.2)
   - Starscream (4.0.4)
-  - SudoApiClient (10.0.0):
+  - SudoApiClient (10.1.0):
     - AWSAppSync (~> 3.6.1)
     - AWSCore (~> 2.27.15)
     - SudoConfigManager (~> 3.0)
@@ -37,7 +37,7 @@ PODS:
     - AWSCore (~> 2.27.15)
     - AWSS3 (~> 2.27.15)
     - SudoLogging (~> 1.0)
-  - SudoEntitlements (9.0.0):
+  - SudoEntitlements (9.0.1):
     - AWSAppSync (~> 3.6.1)
     - SudoApiClient (~> 10.0)
     - SudoConfigManager (~> 3.0)
@@ -63,7 +63,7 @@ PODS:
     - SudoConfigManager (~> 3.0)
     - SudoKeyManager (~> 2.0)
     - SudoLogging (~> 1.0)
-  - SudoVPN (13.0.0):
+  - SudoVPN (15.1.0):
     - AWSAppSync (~> 3.6.1)
     - AWSCore (~> 2.27.15)
     - SudoApiClient (~> 10.0)
@@ -72,14 +72,12 @@ PODS:
 
 DEPENDENCIES:
   - FlagKit
-  - SudoEntitlements (~> 9.0)
+  - SudoEntitlements (~> 9.0.1)
   - SudoProfiles (~> 17.0)
   - SudoUser (~> 15.0)
-  - SudoVPN (~> 13.0)
+  - SudoVPN (~> 15.1)
 
 SPEC REPOS:
-  "git@gitlab.tools.anonyome.com:anonyome/pod-repository.git":
-    - SudoVPN
   https://github.com/CocoaPods/Specs.git:
     - AppSyncRealTimeClient
     - AWSAppSync
@@ -100,6 +98,8 @@ SPEC REPOS:
     - SudoLogging
     - SudoProfiles
     - SudoUser
+  https://gitlab.tools.anonyome.com/anonyome/pod-repository.git:
+    - SudoVPN
 
 SPEC CHECKSUMS:
   AppSyncRealTimeClient: 656ab4215e05f6ca47fe6d8c73f416d9984a8aac
@@ -114,15 +114,15 @@ SPEC CHECKSUMS:
   ReachabilitySwift: 985039c6f7b23a1da463388634119492ff86c825
   SQLite.swift: d2b4642190917051ce6bd1d49aab565fe794eea3
   Starscream: 5178aed56b316f13fa3bc55694e583d35dd414d9
-  SudoApiClient: 53e6c416c466735b4760515392f22b60ad777c79
+  SudoApiClient: 31703a617ea6dbeb53e67aac063d3de07f74898e
   SudoConfigManager: aee20bc2d03e28342da663ae48378d0daae78f47
-  SudoEntitlements: af4ac922491e1955464927988ff00373bee969a5
+  SudoEntitlements: a6234950614517b64cd1c45605469619f61e1399
   SudoKeyManager: ce7d8eba742ec1ae156f586097dfa982719e611b
   SudoLogging: 93238a71338292a650804358994c67f8f3816d20
   SudoProfiles: c791410946d47cb3deace4b690a954cea6a1fc7e
   SudoUser: 1b60674a7d1894f48260a077f8ce94bc05b98d8b
-  SudoVPN: c0f2d15cfa1916bb9f2b7aab3c1ad0dc1daa8949
+  SudoVPN: 197554023cb053cf27fbf8b49928879faab56bd1
 
-PODFILE CHECKSUM: e7a753053067a1f272c4024f93a20e766d592ba0
+PODFILE CHECKSUM: b8fa7494038d45ddf259900345ed7601ff2be18c
 
-COCOAPODS: 1.12.0
+COCOAPODS: 1.12.1

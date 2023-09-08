@@ -30,6 +30,8 @@ class SettingsViewController: UIViewController, UITableViewDelegate, UITableView
         case navigateToEntitlements
         /// Used to navigate to the `ProtocolsViewController`.
         case navigateToProtocols
+        /// Used to navigate to the `ProfilesViewController`.
+        case navigateToProfiles
     }
 
     /// Menu items shown on the table view.
@@ -37,6 +39,7 @@ class SettingsViewController: UIViewController, UITableViewDelegate, UITableView
         /// Sudos table view item.
         case entitlements
         case protocols
+        case profiles
 
         /// Title label of the table view item shown to the user.
         var displayTitle: String {
@@ -45,6 +48,8 @@ class SettingsViewController: UIViewController, UITableViewDelegate, UITableView
                 return "Entitlements"
             case .protocols:
                 return "Protocols"
+            case .profiles:
+                return "Profiles"
             }
         }
     }
@@ -118,6 +123,9 @@ class SettingsViewController: UIViewController, UITableViewDelegate, UITableView
             performSegue(withSegue: Segue.navigateToEntitlements, sender: self)
         case .protocols:
             performSegue(withSegue: Segue.navigateToProtocols, sender: self)
+        case .profiles:
+            performSegue(withSegue: Segue.navigateToProfiles,
+                sender: self)
         }
     }
 

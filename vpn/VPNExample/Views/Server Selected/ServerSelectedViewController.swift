@@ -41,6 +41,25 @@ class ServerSelectedViewController: UIViewController, SudoVPNObserving {
         return userSetting
     }
 
+    var currentOnDemand: Bool {
+        get {
+            guard
+                let data = UserDefaults.standard.data(forKey: "currentOnDemand"),
+                let userSetting = try? JSONDecoder().decode(Bool.self, from: data)
+            else {
+                return false
+            }
+            return userSetting
+        }
+        set {
+            guard let encodedData = try? JSONEncoder().encode(newValue) else {
+                NSLog("Failed to set on demand flag")
+                return
+            }
+            UserDefaults.standard.setValue(encodedData, forKey: "currentOnDemand")
+        }
+    }
+
     var vpnClient = AppDelegate.dependencies.vpnClient
 
     override func viewDidLoad() {
@@ -78,7 +97,7 @@ class ServerSelectedViewController: UIViewController, SudoVPNObserving {
                 let configuration = await SudoVPNConfiguration(
                     server: weakSelf.server,
                     protocolType: weakSelf.currentProtocol,
-                    onDemand: true
+                    onDemand: weakSelf.currentOnDemand
                 )
                 do {
                     try await weakSelf.vpnClient.connect(withConfiguration: configuration)
@@ -96,6 +115,9 @@ class ServerSelectedViewController: UIViewController, SudoVPNObserving {
                     await weakSelf.presentErrorAlert(message: "Failed to disconnect", error: error)
                 }
             }
+            // If we are explicitly disconnecting then we should set onDemand to false to
+            // maintain consistent behaviour with the SDK
+            self.currentOnDemand = false
         }
     }
 
@@ -117,6 +139,7 @@ class ServerSelectedViewController: UIViewController, SudoVPNObserving {
         case .connecting, .connected, .reconnecting:
             do {
                 try await vpnClient.disconnect(isUserInitiated: false)
+                self.currentOnDemand = false
                 self.server = server
             } catch {
                 // Do nothing.

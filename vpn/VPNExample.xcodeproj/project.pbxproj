@@ -81,6 +81,7 @@
 		9537817625C27BE500CADAFF /* EntitlementsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9537817025C27BE500CADAFF /* EntitlementsViewController.swift */; };
 		9537817B25C27C3300CADAFF /* EntitlementConsumptionModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9537817A25C27C3300CADAFF /* EntitlementConsumptionModel.swift */; };
 		9537818025C27D7400CADAFF /* EntitlementsTableViewCellMockSpy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9537817F25C27D7400CADAFF /* EntitlementsTableViewCellMockSpy.swift */; };
+		AD3BD71E2AA837A0009408FF /* ProfilesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD3BD71C2AA837A0009408FF /* ProfilesViewController.swift */; };
 		B879251686FE3547B753931F /* Pods-VPNExample-metadata.plist in Resources */ = {isa = PBXBuildFile; fileRef = EE31E8A86722448E752ECA77 /* Pods-VPNExample-metadata.plist */; };
 		CD9CA139D63446F68F8EDA87 /* Pods_VPNExample.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 51FA9A91F0A2D7FDD2471CB8 /* Pods_VPNExample.framework */; };
 		FC56673AFBDD9DF0AC597D9E /* Pods-VPNExample-VPNExampleTests-metadata.plist in Resources */ = {isa = PBXBuildFile; fileRef = 6FEF39355CDA88FC929A7CA9 /* Pods-VPNExample-VPNExampleTests-metadata.plist */; };
@@ -189,6 +190,7 @@
 		9537817F25C27D7400CADAFF /* EntitlementsTableViewCellMockSpy.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EntitlementsTableViewCellMockSpy.swift; sourceTree = "<group>"; };
 		971C4F0F8048A791D41BCDB2 /* Pods_VPNExample_VPNExampleTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_VPNExample_VPNExampleTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		97A90BB945F084D05210156C /* Pods-VPNExample.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-VPNExample.debug.xcconfig"; path = "Target Support Files/Pods-VPNExample/Pods-VPNExample.debug.xcconfig"; sourceTree = "<group>"; };
+		AD3BD71C2AA837A0009408FF /* ProfilesViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProfilesViewController.swift; sourceTree = "<group>"; };
 		BADCCF3AA53784726AB02C22 /* Pods-VPNExample-VPNExampleTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-VPNExample-VPNExampleTests.debug.xcconfig"; path = "Target Support Files/Pods-VPNExample-VPNExampleTests/Pods-VPNExample-VPNExampleTests.debug.xcconfig"; sourceTree = "<group>"; };
 		D06192E0A5C9E4704229ACC2 /* Pods-VPNExample.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-VPNExample.release.xcconfig"; path = "Target Support Files/Pods-VPNExample/Pods-VPNExample.release.xcconfig"; sourceTree = "<group>"; };
 		EE31E8A86722448E752ECA77 /* Pods-VPNExample-metadata.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-VPNExample-metadata.plist"; sourceTree = "<group>"; };
@@ -403,6 +405,7 @@
 			children = (
 				9537816925C27BE500CADAFF /* Entitlements */,
 				9518491725BA934F0094B3CF /* Main Menu */,
+				AD3BD7212AA837C9009408FF /* Profiles */,
 				845AD27025C252E300685983 /* Protocols */,
 				84B925AA253FCB530076259D /* Registration */,
 				84B925B2253FD0890076259D /* Server List */,
@@ -651,6 +654,14 @@
 				9537816E25C27BE500CADAFF /* EntitlementsTableViewCell.xib */,
 			);
 			path = UI;
+			sourceTree = "<group>";
+		};
+		AD3BD7212AA837C9009408FF /* Profiles */ = {
+			isa = PBXGroup;
+			children = (
+				AD3BD71C2AA837A0009408FF /* ProfilesViewController.swift */,
+			);
+			path = Profiles;
 			sourceTree = "<group>";
 		};
 		AFA13D2393035F3A8B4997E0 /* Pods */ = {
@@ -955,6 +966,7 @@
 				9537817625C27BE500CADAFF /* EntitlementsViewController.swift in Sources */,
 				84B925A1253FCA3E0076259D /* FileReadable.swift in Sources */,
 				9518493125BE2AFC0094B3CF /* MainMenuViewController.swift in Sources */,
+				AD3BD71E2AA837A0009408FF /* ProfilesViewController.swift in Sources */,
 				845AD27325C2530900685983 /* ProtocolsViewController.swift in Sources */,
 				84B925AD253FCB770076259D /* RegistrationViewController.swift in Sources */,
 				84A1E19D255E490100EF4F70 /* Segueable.swift in Sources */,
@@ -1177,15 +1189,17 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = VPNExample/VPNExample.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = UU2W43R8JA;
+				DEVELOPMENT_TEAM = 33X5MJEM2D;
 				INFOPLIST_FILE = VPNExample/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.sudoplatform.VPNSxample;
+				PRODUCT_BUNDLE_IDENTIFIER = com.sudoplatform.VPNSxample2;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -1198,15 +1212,17 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = VPNExample/VPNExample.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = UU2W43R8JA;
+				DEVELOPMENT_TEAM = 33X5MJEM2D;
 				INFOPLIST_FILE = VPNExample/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.sudoplatform.VPNSxample;
+				PRODUCT_BUNDLE_IDENTIFIER = com.sudoplatform.VPNSxample2;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};

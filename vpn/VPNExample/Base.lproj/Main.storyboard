@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="hpv-vn-s81">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="21701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="hpv-vn-s81">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17703"/>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21679"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -39,7 +41,7 @@
             <objects>
                 <navigationController id="wtL-Kh-KAX" sceneMemberID="viewController">
                     <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="Q7t-KT-c1b">
-                        <rect key="frame" x="0.0" y="44" width="414" height="44"/>
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <connections>
@@ -102,11 +104,89 @@
                     <connections>
                         <segue destination="DBS-s3-Ddc" kind="show" identifier="navigateToEntitlements" id="ySw-PU-A79"/>
                         <segue destination="CuD-ut-pRh" kind="show" identifier="navigateToProtocols" id="91p-Vd-cMJ"/>
+                        <segue destination="use-u6-Bhv" kind="show" identifier="navigateToProfiles" id="TVy-Ct-Dxb"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="0Br-qV-jcS" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="2796" y="788"/>
+        </scene>
+        <!--Profiles View Controller-->
+        <scene sceneID="m7E-9O-ifQ">
+            <objects>
+                <tableViewController id="use-u6-Bhv" customClass="ProfilesViewController" customModule="VPNExample" customModuleProvider="target" sceneMemberID="viewController">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="static" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" id="YSp-cR-itN">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <sections>
+                            <tableViewSection id="Udq-Dp-SV6">
+                                <cells>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" id="ziG-vK-k4p">
+                                        <rect key="frame" x="0.0" y="50" width="414" height="43.5"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="ziG-vK-k4p" id="PRj-Jo-OTS">
+                                            <rect key="frame" x="0.0" y="0.0" width="414" height="43.5"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Connect on Demand" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Upf-OH-Iux">
+                                                    <rect key="frame" x="30" y="13" width="156.5" height="17.5"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="IGL-Lr-wr5">
+                                                    <rect key="frame" x="345" y="6" width="51" height="31.5"/>
+                                                    <connections>
+                                                        <action selector="onSwitchValueChanged:" destination="use-u6-Bhv" eventType="valueChanged" id="6Sk-CQ-mzr"/>
+                                                    </connections>
+                                                </switch>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="Upf-OH-Iux" firstAttribute="leading" secondItem="PRj-Jo-OTS" secondAttribute="leadingMargin" constant="10" id="1lS-Kp-BPa"/>
+                                                <constraint firstItem="IGL-Lr-wr5" firstAttribute="top" secondItem="PRj-Jo-OTS" secondAttribute="topMargin" constant="-5" id="74n-6g-JJB"/>
+                                                <constraint firstItem="IGL-Lr-wr5" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="Upf-OH-Iux" secondAttribute="trailing" constant="8" symbolic="YES" id="XI4-31-SAV"/>
+                                                <constraint firstItem="Upf-OH-Iux" firstAttribute="centerY" secondItem="IGL-Lr-wr5" secondAttribute="centerY" id="ad9-RI-xFu"/>
+                                                <constraint firstItem="IGL-Lr-wr5" firstAttribute="trailing" secondItem="PRj-Jo-OTS" secondAttribute="trailingMargin" id="dAk-zo-FBk"/>
+                                                <constraint firstAttribute="bottomMargin" secondItem="Upf-OH-Iux" secondAttribute="bottom" constant="2" id="h7z-GY-hz6"/>
+                                                <constraint firstItem="Upf-OH-Iux" firstAttribute="top" secondItem="PRj-Jo-OTS" secondAttribute="topMargin" constant="2" id="rMF-1u-Jy1"/>
+                                                <constraint firstItem="Upf-OH-Iux" firstAttribute="centerY" secondItem="PRj-Jo-OTS" secondAttribute="centerY" id="vFj-j3-cPh"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" id="GHv-Q4-yYh">
+                                        <rect key="frame" x="0.0" y="93.5" width="414" height="43.5"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="GHv-Q4-yYh" id="hZt-88-Q4j">
+                                            <rect key="frame" x="0.0" y="0.0" width="414" height="43.5"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Manually disconnecting from a VPN server will automatically set this configuration to 'off'." lineBreakMode="wordWrap" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="WTS-6c-Ay3">
+                                                    <rect key="frame" x="31" y="-2" width="363" height="46"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                </cells>
+                            </tableViewSection>
+                        </sections>
+                        <connections>
+                            <outlet property="dataSource" destination="use-u6-Bhv" id="VHf-mP-r2Q"/>
+                            <outlet property="delegate" destination="use-u6-Bhv" id="6Rw-8H-hXn"/>
+                        </connections>
+                    </tableView>
+                    <navigationItem key="navigationItem" id="LQQ-YH-ze9"/>
+                    <connections>
+                        <outlet property="connectOnDemandSwitch" destination="IGL-Lr-wr5" id="6Yi-3Q-Mp2"/>
+                    </connections>
+                </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="qtv-sP-C6i" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2147.826086956522" y="1510.7142857142856"/>
         </scene>
         <!--Entitlements-->
         <scene sceneID="aVC-kh-RZZ">
@@ -129,4 +209,9 @@
             <point key="canvasLocation" x="3784" y="795"/>
         </scene>
     </scenes>
+    <resources>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+    </resources>
 </document>

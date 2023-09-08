@@ -22,7 +22,7 @@ target 'VPNExample' do
     pod 'SudoUser', '~> 15.0'
     pod 'SudoProfiles', '~> 17.0'
     pod 'SudoEntitlements', '~> 9.0.1'
-    pod 'SudoVPN',  '~> 15.1'
+    pod 'SudoVPN',  '~> 16.0'
 
     pod 'FlagKit'
 

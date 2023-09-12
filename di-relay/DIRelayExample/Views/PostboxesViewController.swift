@@ -29,6 +29,7 @@ class PostboxesViewController: UIViewController, UITableViewDelegate, UITableVie
     var postboxIds: [String] = []
     var ownershipProofs: [String: String] = [:]
     private var presentedActivityAlert: UIAlertController?
+    var createPostboxTask: Task<Void, Never>?
 
     // MARK: - Properties: Computed
 
@@ -53,10 +54,10 @@ class PostboxesViewController: UIViewController, UITableViewDelegate, UITableVie
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         tableView.reloadData()
-        Task(priority: .medium) {
+        Task { @MainActor in
             await updatePostboxView()
+            await fetchOwnershipProof(sudo)
         }
-        fetchOwnershipProof(sudo)
     }
 
     override func viewDidLoad() {
@@ -95,7 +96,7 @@ class PostboxesViewController: UIViewController, UITableViewDelegate, UITableVie
 
         if indexPath.row == 0 {
             /// Clicked Create Postbox.
-            Task {
+            createPostboxTask = Task {
                 await self.createPostbox()
             }
         } else {
@@ -114,8 +115,10 @@ class PostboxesViewController: UIViewController, UITableViewDelegate, UITableVie
         if indexPath.row > 0 {
             let postBoxId = postboxIds[indexPath.row - 1]
             let action = UIContextualAction(style: .normal, title: "Delete") { [weak self] (_, _, completionHandler) in
-                self?.didSwipeToDeletePostbox(postboxId: postBoxId)
-                completionHandler(true)
+                Task { @MainActor in
+                    await self?.didSwipeToDeletePostbox(postboxId: postBoxId)
+                    completionHandler(true)
+                }
             }
             action.backgroundColor = .systemRed
             return UISwipeActionsConfiguration(actions: [action])
@@ -150,13 +153,13 @@ class PostboxesViewController: UIViewController, UITableViewDelegate, UITableVie
     /// Attempt to create a postbox via the `SudoDIRelayClient`, using a UUID4 generated `connectionId`.
     /// If successful, display the new postbox id in the table.
     /// If unsuccessful, display the an error alert on the UI.
-    func createPostbox() async {
-        presentActivityAlert(message: "Creating postbox")
+    @MainActor func createPostbox() async {
+        await presentActivityAlertOnMain("Creating postbox")
         let connectionId = UUID().uuidString
 
         do {
             guard let proof = ownershipProofs[sudo.id ?? ""] else {
-                presentErrorAlertOnMain("Still fetching ownership proof. Try creating a postbox again. ", error: nil)
+                await presentErrorAlertOnMain("Still fetching ownership proof. Try creating a postbox again. ", error: nil)
                 return
             }
 
@@ -167,19 +170,18 @@ class PostboxesViewController: UIViewController, UITableViewDelegate, UITableVie
             if let updatedPostboxIds = await fetchPostboxIdsOrAlert() {
                 postboxIds = updatedPostboxIds
             }
-            self.dismissActivityAlert {
-                self.tableView.reloadData()
-            }
+            await dismissActivityAlert()
+            tableView.reloadData()
         } catch {
-            presentErrorAlertOnMain("Failed to create postbox. ", error: error)
+            await presentErrorAlertOnMain("Failed to create postbox. ", error: error)
         }
 
     }
 
     /// Attempt to retrieve an updated list of the postbox IDs and refresh the table.
     /// If unsuccessful, does not refresh the table.
-    func updatePostboxView() async {
-        presentActivityAlert(message: "Fetching postboxes")
+    @MainActor func updatePostboxView() async {
+        await presentActivityAlertOnMain("Fetching postboxes")
         if let updatedPostboxIds = await fetchPostboxIdsOrAlert() {
             postboxIds = updatedPostboxIds
         }
@@ -192,12 +194,12 @@ class PostboxesViewController: UIViewController, UITableViewDelegate, UITableVie
     /// If unsuccessful, display an error alert on the UI.
     ///
     /// - Returns: List of postbox IDs or  nil.
-    func fetchPostboxIdsOrAlert() async -> [String]? {
+    @MainActor func fetchPostboxIdsOrAlert() async -> [String]? {
         do {
             let postboxes = try await relayClient.listPostboxes(limit: 20, nextToken: nil)
             return postboxes.items.map {$0.id}
         } catch {
-            presentErrorAlertOnMain("Could not fetch postboxes for sudo.", error: error)
+            await presentErrorAlertOnMain("Could not fetch postboxes for sudo.", error: error)
             return nil
         }
     }
@@ -208,8 +210,8 @@ class PostboxesViewController: UIViewController, UITableViewDelegate, UITableVie
     /// If unsuccessful, present an error alert.
     ///
     /// - Parameter postboxId: postbox ID to delete.
-    func didSwipeToDeletePostbox(postboxId: String) {
-        presentActivityAlertOnMain("Deleting postbox")
+    @MainActor func didSwipeToDeletePostbox(postboxId: String) async {
+        await presentActivityAlertOnMain("Deleting postbox")
 
         self.postboxIds = self.postboxIds.filter {$0 != postboxId}
         self.dismiss(animated: true) {
@@ -223,9 +225,9 @@ class PostboxesViewController: UIViewController, UITableViewDelegate, UITableVie
     }
 
     /// Get ownership proof of the Sudo.
-    func fetchOwnershipProof(_ sudo: Sudo) {
+    @MainActor func fetchOwnershipProof(_ sudo: Sudo) async {
         guard let sudoId = sudo.id else {
-            presentErrorAlertOnMain("Could not fetch sudo id.", error: nil)
+            await presentErrorAlertOnMain("Could not fetch sudo id.", error: nil)
             return
         }
         if ownershipProofs[sudoId] != nil {

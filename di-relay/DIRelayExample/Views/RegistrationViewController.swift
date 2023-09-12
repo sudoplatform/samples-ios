@@ -47,6 +47,8 @@ class RegistrationViewController: UIViewController {
     /// Sudo entitlements client used to perform entitlements operations.
     var entitlementsClient: SudoEntitlementsClient = AppDelegate.dependencies.entitlementsClient
 
+    var registerTask: Task<Void, Never>?
+
     // MARK: - Lifecycle
 
     override func viewDidAppear(_ animated: Bool) {
@@ -79,14 +81,14 @@ class RegistrationViewController: UIViewController {
 
     /// When the 'Register / Login' button is clicked, attempt to sign in, or register if no user is available
     @IBAction func registerButtonTapped() {
-        presentActivityAlertOnMain("Registering/Signing In")
-        registerButton.isEnabled = false
-        Task {
-            await self.registerAndSignIn()
-            self.dismissActivityAlert()
-            self.registerButton.isEnabled = true
+        registerTask = Task { @MainActor in
+            await presentActivityAlertOnMain("Registering/Signing In")
+            registerButton.isEnabled = false
+            await registerAndSignIn()
+            await dismissActivityAlert()
+            registerButton.isEnabled = true
             // Navigate to sudo list after sign in is complete
-            self.performSegue(withIdentifier: Segue.navigateToSudoList.rawValue, sender: [])
+            performSegue(withIdentifier: Segue.navigateToSudoList.rawValue, sender: [])
         }
     }
 
@@ -95,7 +97,7 @@ class RegistrationViewController: UIViewController {
     /// Perform registration and sign in with the Sudo Platform.
     /// Attempts to register with FSSO, then DeviceCheck, then finally TEST registration.
     /// Must have one of these registeration methods enabled in the environment.
-    private func registerAndSignIn() async {
+    @MainActor private func registerAndSignIn() async {
         let registered = try? await userClient.isRegistered()
         if registered == true {
             _ = await signIn()
@@ -120,7 +122,7 @@ class RegistrationViewController: UIViewController {
                 try await registerWithTEST()
             }
         } catch {
-            await showRegistrationFailureAlert(error: error)
+            showRegistrationFailureAlert(error: error)
             /// Do not proceed to sign in, if registration is unsuccessful.
             return
         }
@@ -171,7 +173,7 @@ class RegistrationViewController: UIViewController {
 
     /// Attempt to sign into the Sudo Platform. Present a failure alert if unsuccessful.
     /// - Returns: Authentication tokens if successful, nil if unsuccessful.
-    private func signIn() async -> AuthenticationTokens? {
+    @MainActor private func signIn() async -> AuthenticationTokens? {
         do {
             _ = try await refreshTokens()
 
@@ -182,7 +184,7 @@ class RegistrationViewController: UIViewController {
             // Sign in using key with back-end
             return try await userClient.signInWithKey()
         } catch {
-            await showSignInFailureAlert(error: error)
+            showSignInFailureAlert(error: error)
             return nil
         }
     }
@@ -239,7 +241,7 @@ class RegistrationViewController: UIViewController {
     ///
     /// - Parameters:
     ///     - error: Contains the given `Error`.
-    private func showSignInFailureAlert(error: Error) async {
+    private func showSignInFailureAlert(error: Error) {
         let alert = UIAlertController(title: "Error", message: "Failed to sign in:\n\(error.localizedDescription)", preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
         present(alert, animated: true, completion: nil)
@@ -249,7 +251,7 @@ class RegistrationViewController: UIViewController {
     ///
     /// - Parameter errorString: String describing the failure.
     private func showSignInFailureAlert(errorString: String) {
-        self.dismiss(animated: true) {
+        dismiss(animated: true) {
             let alert = UIAlertController(title: "Error", message: errorString, preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
             self.present(alert, animated: true, completion: nil)
@@ -259,8 +261,8 @@ class RegistrationViewController: UIViewController {
     /// Presents a `UIAlertController` containing a registration failure given an `error`.
     ///
     /// - Parameter error: Error to display.
-    private func showRegistrationFailureAlert(error: Error) async {
-        self.dismiss(animated: true) {
+    private func showRegistrationFailureAlert(error: Error) {
+        dismiss(animated: true) {
             let alert = UIAlertController(title: "Error", message: "Failed register:\n\(error.localizedDescription)", preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
             self.present(alert, animated: true, completion: nil)

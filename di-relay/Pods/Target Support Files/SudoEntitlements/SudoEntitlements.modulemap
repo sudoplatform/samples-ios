@@ -1,6 +1,0 @@
-framework module SudoEntitlements {
-  umbrella header "SudoEntitlements-umbrella.h"
-
-  export *
-  module * { export * }
-}

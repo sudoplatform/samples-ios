@@ -73,18 +73,20 @@ class CreateSudoViewController: UIViewController {
     // MARK: - Operations
 
     /// Creates a Sudo based on the view's form inputs.
-    func createSudo() async {
+    @MainActor func createSudo() async {
         let sudo = Sudo(title: nil, firstName: nil, lastName: nil, label: labelTextField.text, notes: nil, avatar: nil)
-        presentActivityAlert(message: "Creating sudo")
+        await presentActivityAlert(message: "Creating sudo")
         do {
             let createdSudo = try await profilesClient.createSudo(sudo: sudo)
-            self.dismissActivityAlert {
-                self.sudo = createdSudo
-            }
+            await dismissActivityAlert()
+            self.sudo = createdSudo
         } catch {
-            dismiss(animated: true) {
-                self.presentErrorAlert(message: "Failed to create sudo", error: error)
+            await withCheckedContinuation { continuation in
+                dismiss(animated: true) {
+                    continuation.resume()
+                }
             }
+            await presentErrorAlert(message: "Failed to create sudo", error: error)
         }
     }
 

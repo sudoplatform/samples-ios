@@ -10,8 +10,7 @@ extension UIViewController {
 
     /// Present a `UIAlertController` containing a `UIActivityIndicatorView` and the provided `message`.
     /// - Parameter message: message to display in the view.
-    /// - Returns: `UIAlertController`
-    @discardableResult func presentActivityAlert(message: String) -> UIAlertController {
+    @MainActor func presentActivityAlert(message: String) async {
         let alert = UIAlertController(title: nil, message: message, preferredStyle: .alert)
 
         let activityIndicator = UIActivityIndicatorView(frame: CGRect(x: 10, y: 5, width: 50, height: 50))
@@ -21,16 +20,18 @@ extension UIViewController {
 
         alert.view.addSubview(activityIndicator)
 
-        present(alert, animated: true, completion: nil)
-
-        return alert
+        return await withCheckedContinuation { continuation in
+            present(alert, animated: true) {
+                continuation.resume()
+            }
+        }
     }
 
     /// Presents a `UIAlertController` containing the given error message along with a detailed description from the `Error` if present.
     /// - Parameters:
     ///   - message: message to present.
     ///   - error: error which contains a description to present.
-    func presentErrorAlert(message: String, error: Error? = nil) {
+    @MainActor func presentErrorAlert(message: String, error: Error? = nil) async {
         let alert: UIAlertController
         if error != nil  && error?.localizedDescription != nil {
             let detail = error.map { ":\n\($0.localizedDescription)" } ?? ""
@@ -39,7 +40,11 @@ extension UIViewController {
             alert = UIAlertController(title: "Error", message: "\(message)", preferredStyle: .alert)
         }
         alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
-        self.present(alert, animated: true, completion: nil)
+        return await withCheckedContinuation { continuation in
+            self.present(alert, animated: true) {
+                continuation.resume()
+            }
+        }
     }
 
     /// Present an error alert containing `message` and the `error` on the main thread.
@@ -47,13 +52,16 @@ extension UIViewController {
     /// - Parameters:
     ///   - message: Message to display.
     ///   - error: Error containing a `localizedDescription` to display.
-    func presentErrorAlertOnMain(_ message: String, error: Error?) {
-        if self.presentedViewController != nil {
-            self.dismiss(animated: true) {
-                self.presentErrorAlert(message: message, error: error)
+    @MainActor func presentErrorAlertOnMain(_ message: String, error: Error?) async {
+        if presentedViewController != nil {
+            await withCheckedContinuation { continuation in
+                dismiss(animated: true) {
+                    continuation.resume()
+                }
             }
+            await presentErrorAlert(message: message, error: error)
         } else {
-            self.presentErrorAlert(message: message, error: error)
+            await presentErrorAlert(message: message, error: error)
         }
     }
 
@@ -61,13 +69,16 @@ extension UIViewController {
     ///
     /// - Parameters:
     ///   - message: Message to display.
-    func presentActivityAlertOnMain(_ message: String) {
-        if self.presentedViewController != nil {
-            self.dismiss(animated: true) {
-                self.presentActivityAlert(message: message)
+    @MainActor func presentActivityAlertOnMain(_ message: String) async {
+        if presentedViewController != nil {
+            await withCheckedContinuation { continuation in
+                dismiss(animated: true) {
+                    continuation.resume()
+                }
             }
+            await presentActivityAlert(message: message)
         } else {
-            self.presentActivityAlert(message: message)
+            await presentActivityAlert(message: message)
         }
     }
 
@@ -75,11 +86,15 @@ extension UIViewController {
     ///
     /// - Parameter completion: The block to execute after the view controller is dismissed. This block has no return value and takes no parameters. You may
     ///     specify nil for this parameter.
-    func dismissActivityAlert(_ completion: (() -> Void)? = nil) {
+    @MainActor func dismissActivityAlert() async {
         if self.presentedViewController as? UIAlertController == nil {
             print("No activity indicator found")
             return
         }
-        self.dismiss(animated: false, completion: completion)
+        return await withCheckedContinuation { continuation in
+            self.dismiss(animated: false) {
+                continuation.resume()
+            }
+        }
     }
 }

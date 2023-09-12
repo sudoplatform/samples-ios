@@ -141,15 +141,17 @@ class PostboxViewController: UIViewController, UITableViewDelegate, UITableViewD
     }
 
     @IBAction func isPostboxEnabledSwitchChanged(_ sender: Any) {
-        let enabled = isPostboxEnabledSwitch.isOn
-        presentActivityAlert(message: "Updating postbox")
+        Task { @MainActor in
+            let enabled = isPostboxEnabledSwitch.isOn
+            await presentActivityAlert(message: "Updating postbox")
 
-        Task(priority: .medium) {
-            let updatedPostbox = try await self.relayClient.updatePostbox(withPostboxId: postbox.id, isEnabled: enabled)
-            postbox = updatedPostbox
-        }
-        self.dismiss(animated: true) {
-            self.tableView.reloadData()
+            Task(priority: .medium) {
+                let updatedPostbox = try await self.relayClient.updatePostbox(withPostboxId: postbox.id, isEnabled: enabled)
+                postbox = updatedPostbox
+            }
+            self.dismiss(animated: true) {
+                self.tableView.reloadData()
+            }
         }
     }
 
@@ -161,17 +163,18 @@ class PostboxViewController: UIViewController, UITableViewDelegate, UITableViewD
     }
 
     @IBAction func didTapCreateMessageButton(_ sender: Any) {
-        guard let messageText = messageText.text else {
-            presentErrorAlert(message: "Message contains no text and will not be sent")
-            return
-        }
-
-        presentActivityAlert(message: "Sending message")
-        Task(priority: .medium) {
-            _ = try await sendMessage(messageText: messageText)
-        }
-        self.dismiss(animated: true) {
-            self.messageText.text = ""
+        Task { @MainActor in
+            guard let messageText = messageText.text else {
+                await presentErrorAlert(message: "Message contains no text and will not be sent")
+                return
+            }
+            await presentActivityAlert(message: "Sending message")
+            Task(priority: .medium) {
+                _ = try await sendMessage(messageText: messageText)
+            }
+            self.dismiss(animated: true) {
+                self.messageText.text = ""
+            }
         }
     }
 
@@ -185,8 +188,8 @@ class PostboxViewController: UIViewController, UITableViewDelegate, UITableViewD
 
     /// Attempt to retrieve an updated list of the postbox IDs and refresh the table.
     /// If unsuccessful, does not refresh the table.
-    func updatePostboxView() async {
-        presentActivityAlert(message: "Fetching messages")
+    @MainActor func updatePostboxView() async {
+        await presentActivityAlert(message: "Fetching messages")
         if let fetchedMessageIds = await fetchMessageIdsOrAlert() {
             messageIds = fetchedMessageIds
         }
@@ -212,7 +215,7 @@ class PostboxViewController: UIViewController, UITableViewDelegate, UITableViewD
                     }
                 })
         } catch {
-            presentErrorAlertOnMain("Could not set up message subscription.", error: error)
+            await presentErrorAlertOnMain("Could not set up message subscription.", error: error)
         }
         self.dismiss(animated: true) {
             self.tableView.reloadData()
@@ -223,11 +226,11 @@ class PostboxViewController: UIViewController, UITableViewDelegate, UITableViewD
     /// If unsuccessful, display an error alert on the UI.
     ///
     /// - Returns: List of message IDs or  nil.
-    func fetchMessageIdsOrAlert() async -> [String]? {
+    @MainActor func fetchMessageIdsOrAlert() async -> [String]? {
         do {
             let result = try await relayClient.listPostboxes(limit: 20, nextToken: nil)
             guard let localPostbox = result.items.first(where: {$0.id == postboxId}) else {
-                presentErrorAlertOnMain("Could not fetch postbox.", error: nil)
+                await presentErrorAlertOnMain("Could not fetch postbox.", error: nil)
                 return nil
             }
             postbox = localPostbox
@@ -235,7 +238,7 @@ class PostboxViewController: UIViewController, UITableViewDelegate, UITableViewD
             isPostboxEnabledSwitch.setOn(postbox.isEnabled, animated: true)
 
         } catch {
-            presentErrorAlertOnMain("Could not fetch postbox.", error: error)
+            await presentErrorAlertOnMain("Could not fetch postbox.", error: error)
             return nil
         }
         do {
@@ -244,7 +247,7 @@ class PostboxViewController: UIViewController, UITableViewDelegate, UITableViewD
                 .filter {$0.postboxId == postbox.id}
                 .map {$0.id}
         } catch {
-            presentErrorAlertOnMain("Could not fetch messages for postbox.", error: error)
+            await presentErrorAlertOnMain("Could not fetch messages for postbox.", error: error)
             return nil
         }
     }
@@ -254,8 +257,8 @@ class PostboxViewController: UIViewController, UITableViewDelegate, UITableViewD
     /// If unsuccessful, present an error alert.
     ///
     /// - Parameter messageId: postbox ID to delete.
-    func didSwipeToDeleteMessage(messageId: String) async throws {
-        presentActivityAlertOnMain("Deleting message")
+    @MainActor func didSwipeToDeleteMessage(messageId: String) async throws {
+        await presentActivityAlertOnMain("Deleting message")
 
         _ = try await relayClient.deleteMessage(withMessageId: messageId)
 

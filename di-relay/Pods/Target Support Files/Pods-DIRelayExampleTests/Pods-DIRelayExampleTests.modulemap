@@ -1,6 +1,0 @@
-framework module Pods_DIRelayExampleTests {
-  umbrella header "Pods-DIRelayExampleTests-umbrella.h"
-
-  export *
-  module * { export * }
-}

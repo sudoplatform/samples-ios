@@ -1,1 +1,0 @@
-let SUDO_USER_VERSION = "0.0.1"

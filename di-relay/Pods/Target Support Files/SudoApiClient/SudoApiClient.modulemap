@@ -1,6 +1,0 @@
-framework module SudoApiClient {
-  umbrella header "SudoApiClient-umbrella.h"
-
-  export *
-  module * { export * }
-}

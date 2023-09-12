@@ -1,6 +1,0 @@
-framework module SudoLogging {
-  umbrella header "SudoLogging-umbrella.h"
-
-  export *
-  module * { export * }
-}

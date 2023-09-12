@@ -52,8 +52,8 @@ class MessageDetailsViewController: UITableViewController {
     }
 
     /// Attempt to retrieve the message from the server
-    func updateMessageView() async {
-        presentActivityAlert(message: "Fetching message")
+    @MainActor func updateMessageView() async {
+        await presentActivityAlert(message: "Fetching message")
         if let message = await fetchMessage(messageId: self.messageId) {
             self.message = message
         }
@@ -67,18 +67,18 @@ class MessageDetailsViewController: UITableViewController {
         sudoOwnerLabel.text = message?.sudoId
         messageContentsLabel.text = message?.message
 
-        self.dismiss(animated: true) {
+        dismiss(animated: true) {
             self.tableView.reloadData()
         }
     }
 
-    func fetchMessage(messageId: String) async -> Message? {
+    @MainActor func fetchMessage(messageId: String) async -> Message? {
         do {
             let result = try await relayClient.listMessages(limit: 20, nextToken: nil)
             return result.items.first(where: {$0.id == messageId})
 
         } catch {
-            presentErrorAlertOnMain("Could not fetch message.", error: error)
+            await presentErrorAlertOnMain("Could not fetch message.", error: error)
             return nil
         }
     }

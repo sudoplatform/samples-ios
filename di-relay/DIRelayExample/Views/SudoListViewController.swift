@@ -105,14 +105,14 @@ class SudoListViewController: UIViewController, UITableViewDelegate, UITableView
     ///
     /// - Parameter sudo: The selected Sudo to delete.
     /// - Returns: true if successfully deleted, false if not.
-    func deleteSudo(sudo: Sudo) async -> Bool {
+    @MainActor func deleteSudo(sudo: Sudo) async -> Bool {
         do {
-            presentActivityAlertOnMain("Deleting Sudo")
+            await presentActivityAlertOnMain("Deleting Sudo")
             try await profilesClient.deleteSudo(sudo: sudo)
-            self.dismissActivityAlert()
+            await dismissActivityAlert()
             return true
         } catch {
-            presentErrorAlert(message: "Failed to delete Sudo", error: error)
+            await presentErrorAlertOnMain("Failed to delete Sudo", error: error)
             return false
         }
     }
@@ -120,12 +120,12 @@ class SudoListViewController: UIViewController, UITableViewDelegate, UITableView
     // MARK: - Helpers
 
     /// Attempts to load all Sudos from the device's cache first and then update via a remote call.
-    func loadCacheSudosAndFetchRemote() async {
+    @MainActor func loadCacheSudosAndFetchRemote() async {
         do {
             sudos = try await profilesClient.listSudos(option: .cacheOnly)
             sudos = try await profilesClient.listSudos(option: .remoteOnly)
         } catch {
-            presentErrorAlert(message: "Failed to list Sudos", error: error)
+            await presentErrorAlert(message: "Failed to list Sudos", error: error)
         }
         tableView.reloadData()
     }
@@ -176,7 +176,7 @@ class SudoListViewController: UIViewController, UITableViewDelegate, UITableView
             let delete = UIContextualAction(style: .destructive, title: "Delete") { _, _, _ in
                 let sudo = self.sudos[indexPath.row]
                 // Delete sudo concurrently and update table and list in main thread
-                Task(priority: .medium) {
+                Task(priority: .medium) { @MainActor in
                     if await self.deleteSudo(sudo: sudo) {
                         self.sudos.remove(at: indexPath.row)
                         self.tableView.deleteRows(at: [indexPath], with: .automatic)

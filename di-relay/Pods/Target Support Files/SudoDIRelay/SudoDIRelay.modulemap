@@ -1,6 +1,0 @@
-framework module SudoDIRelay {
-  umbrella header "SudoDIRelay-umbrella.h"
-
-  export *
-  module * { export * }
-}

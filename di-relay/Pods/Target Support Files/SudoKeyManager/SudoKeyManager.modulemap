@@ -1,6 +1,0 @@
-framework module SudoKeyManager {
-  umbrella header "SudoKeyManager-umbrella.h"
-
-  export *
-  module * { export * }
-}

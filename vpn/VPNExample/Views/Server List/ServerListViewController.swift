@@ -72,7 +72,7 @@ class ServerListViewController: UIViewController, UITableViewDelegate, UITableVi
     func loadServerList() async {
         do {
             let servers = try await vpnClient.listServers(
-                countriesFilter: ["AU", "US", "NL"],
+                countriesFilter: ["AU", "US", "NL", "GB"],
                 limit: 0,
                 nextToken: nil,
                 cachePolicy: .remoteOnly)

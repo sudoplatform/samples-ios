@@ -122,7 +122,7 @@ class RegistrationViewController: UIViewController {
         let entitlements = try await entitlementsClient.redeemEntitlements()
         guard
             let entitlement = entitlements.entitlements.first(where: { $0.name == "sudoplatform.vpn.vpnUserEntitled"}),
-            entitlement.value >= 1
+            entitlement.value >= 0 // Allow the application to run unentitled for testing purposes.
         else {
             throw RegistrationError.invalidEntitlements
         }

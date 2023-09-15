@@ -7,15 +7,18 @@
 import UIKit
 import SudoUser
 import SudoEntitlements
+import SudoEntitlementsAdmin
 
 /// This View Controller presents a table view so that a user can navigate through each of the menu items.
 ///
 /// - Links From:
 ///     - `SettingsViewController`: A user taps the "Entitlements" button.
-class EntitlementsViewController: UIViewController,
+class EntitlementsViewController:
+    UIViewController,
     UITableViewDelegate,
     UITableViewDataSource,
-    EntitlementsFooterViewDelegate {
+    EntitlementsFooterViewDelegate,
+    EntitlementsTableViewCellDelegate {
 
     // MARK: - Outlets
 
@@ -37,7 +40,11 @@ class EntitlementsViewController: UIViewController,
 
     var entitlementsClient = AppDelegate.dependencies.entitlementsClient
 
+    var adminEntitlementsClient = AppDelegate.dependencies.adminEntitlementsClient
+
     var entitlementsList: [EntitlementConsumptionModel] = []
+
+    var externalUserId: String = ""
 
     // MARK: - Lifecycle
 
@@ -60,6 +67,7 @@ class EntitlementsViewController: UIViewController,
 
     func loadEntitlementsList() async {
         do {
+            try await setExternalUserId()
             let entitlementsConsumption = try await entitlementsClient.getEntitlementsConsumption()
             let models: [EntitlementConsumptionModel] = entitlementsConsumption.entitlements.entitlements.map { entitlement in
                 let consumed = entitlementsConsumption.consumption.first(where: { $0.name == entitlement.name })?.consumed
@@ -118,6 +126,8 @@ class EntitlementsViewController: UIViewController,
         }
         let consumption = entitlementsList[indexPath.row]
         cell.setConsumption(consumption)
+        cell.delegate = self
+        cell.toggleEntitlementsButton?.isHidden = (self.adminEntitlementsClient == nil )
         return cell
     }
 
@@ -144,4 +154,91 @@ class EntitlementsViewController: UIViewController,
         UIApplication.shared.open(docURL, options: [:], completionHandler: nil)
     }
 
+    // MARK: - Conformance: EntitlementsTableViewCellDelegate
+    func didTapToggleEntitlementsButton(_ entitlementName: String, _ currentlyEntitled: Bool) {
+        // depending on values, either grant or revoke the entitlement (ensuring other entitlements are unaffected)
+        if currentlyEntitled {
+            revokeEntitlement(entitlementName: entitlementName )
+        } else {
+            grantEntitlement(entitlementName: entitlementName)
+        }
+    }
+
+    func setExternalUserId() async throws {
+        externalUserId = try await entitlementsClient.getExternalId()
+    }
+
+    func revokeEntitlement(entitlementName: String ) {
+        presentActivityAlert(message: "Revoking Entitlements") { [weak self] in
+            Task { [weak self] in
+                do {
+                    guard let currentEntitlements = await self?.adminLoadEntitlements() else {
+                        self?.handleEntitlementsUpdateFailure(error: nil)
+                        return
+                    }
+                    let newUserEntitlements = currentEntitlements.map {
+                        SudoEntitlementsAdmin.Entitlement(
+                            name: $0.name,
+                            description: $0.description ?? "",
+                            value: $0.name != entitlementName ? $0.value : 0
+                        )
+                    }
+                    _ = try await self?.adminEntitlementsClient?.applyEntitlementsToUserWithExternalId(
+                        self?.externalUserId ?? "missing external user id",
+                        entitlements: newUserEntitlements
+                    )
+                    await self?.loadEntitlementsList()
+                } catch {
+                    self?.handleEntitlementsUpdateFailure(error: error)
+                }
+            }
+        }
+    }
+
+    func grantEntitlement(entitlementName: String) {
+        presentActivityAlert(message: "Granting Entitlements") { [weak self] in
+            Task { [weak self] in
+                do {
+                    guard let currentEntitlements = await self?.adminLoadEntitlements() else {
+                        self?.handleEntitlementsUpdateFailure(error: nil)
+                        return
+                    }
+                    let newUserEntitlements = currentEntitlements.map {
+                        SudoEntitlementsAdmin.Entitlement(
+                            name: $0.name,
+                            description: $0.description ?? "",
+                            value: $0.name != entitlementName ?$0.value : 1
+                        )
+                    }
+                    _ = try await self?.adminEntitlementsClient?.applyEntitlementsToUserWithExternalId(
+                        self?.externalUserId ?? "missing external user id",
+                        entitlements: newUserEntitlements
+                    )
+                    await self?.loadEntitlementsList()
+                } catch {
+                    self?.handleEntitlementsUpdateFailure(error: error)
+                }
+            }
+        }
+    }
+
+    func adminLoadEntitlements() async -> [SudoEntitlementsAdmin.Entitlement] {
+        do {
+            let userEntitlementsConsumption = try await adminEntitlementsClient?.getEntitlementsForUserWithExternalId(externalUserId)
+            if let currentUserEntitlements = userEntitlementsConsumption?.entitlements.entitlements {
+                return currentUserEntitlements
+            }
+            self.handleEntitlementsUpdateFailure(error: nil)
+        } catch {
+            self.handleEntitlementsUpdateFailure(error: error)
+        }
+        return []
+    }
+
+    func handleEntitlementsUpdateFailure(error: Error?) {
+        DispatchQueue.main.async { [weak self] in
+            self?.dismissActivityAlert()
+            self?.presentErrorAlert(message: "Failure", error: error)
+        }
+    }
 }

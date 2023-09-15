@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="17701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="21701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17703"/>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21679"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -11,21 +12,21 @@
         <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="default" indentationWidth="10" rowHeight="169" id="gOO-Rx-6Tb" customClass="EntitlementsTableViewCell" customModule="VPNExample" customModuleProvider="target">
             <rect key="frame" x="0.0" y="0.0" width="538" height="169"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="gOO-Rx-6Tb" id="DQz-Gb-xWi">
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" ambiguous="YES" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="gOO-Rx-6Tb" id="DQz-Gb-xWi">
                 <rect key="frame" x="0.0" y="0.0" width="538" height="169"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="20" translatesAutoresizingMaskIntoConstraints="NO" id="R8B-uj-klM">
-                        <rect key="frame" x="20" y="41" width="498" height="87"/>
+                        <rect key="frame" x="20" y="41" width="498" height="61"/>
                         <subviews>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Entitlement" textAlignment="natural" lineBreakMode="wordWrap" baselineAdjustment="alignBaselines" minimumScaleFactor="0.5" translatesAutoresizingMaskIntoConstraints="NO" id="CaS-ze-xXg">
-                                <rect key="frame" x="0.0" y="0.0" width="498" height="46.5"/>
+                                <rect key="frame" x="0.0" y="0.0" width="498" height="20.5"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <stackView opaque="NO" contentMode="scaleToFill" distribution="fillEqually" spacing="10" translatesAutoresizingMaskIntoConstraints="NO" id="YD3-wV-pyO">
-                                <rect key="frame" x="0.0" y="66.5" width="498" height="20.5"/>
+                                <rect key="frame" x="0.0" y="-14.5" width="498" height="20.5"/>
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Limit" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wLN-NQ-Spm">
                                         <rect key="frame" x="0.0" y="0.0" width="159.5" height="20.5"/>
@@ -47,7 +48,20 @@
                                     </label>
                                 </subviews>
                             </stackView>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" id="TLc-7a-5ZV">
+                                <rect key="frame" x="162" y="26" width="174" height="35"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" title="Button"/>
+                                <buttonConfiguration key="configuration" style="filled" title="Toggle entitlements"/>
+                                <connections>
+                                    <action selector="didTapToggleEntitlementsButton:" destination="gOO-Rx-6Tb" eventType="touchUpInside" id="2W9-iC-Gjg"/>
+                                </connections>
+                            </button>
                         </subviews>
+                        <constraints>
+                            <constraint firstItem="TLc-7a-5ZV" firstAttribute="top" secondItem="YD3-wV-pyO" secondAttribute="bottom" constant="20" id="T2T-sI-KSQ"/>
+                            <constraint firstItem="TLc-7a-5ZV" firstAttribute="centerX" secondItem="YD3-wV-pyO" secondAttribute="centerX" id="pXb-FB-PeV"/>
+                        </constraints>
                     </stackView>
                 </subviews>
                 <constraints>
@@ -61,6 +75,7 @@
                 <outlet property="availableLabel" destination="LMp-UR-QLy" id="DVy-76-rNP"/>
                 <outlet property="entitlementLabel" destination="CaS-ze-xXg" id="0NR-Hf-Nlm"/>
                 <outlet property="limitLabel" destination="wLN-NQ-Spm" id="5l2-ZD-yhm"/>
+                <outlet property="toggleEntitlementsButton" destination="TLc-7a-5ZV" id="Kdb-U6-XRW"/>
                 <outlet property="usedLabel" destination="joU-6Q-dkK" id="GJN-d9-0st"/>
             </connections>
             <point key="canvasLocation" x="-249.27536231884059" y="-175.78125"/>

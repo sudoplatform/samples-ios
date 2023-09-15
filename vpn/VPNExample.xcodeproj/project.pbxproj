@@ -82,6 +82,8 @@
 		9537817B25C27C3300CADAFF /* EntitlementConsumptionModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9537817A25C27C3300CADAFF /* EntitlementConsumptionModel.swift */; };
 		9537818025C27D7400CADAFF /* EntitlementsTableViewCellMockSpy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9537817F25C27D7400CADAFF /* EntitlementsTableViewCellMockSpy.swift */; };
 		AD3BD71E2AA837A0009408FF /* ProfilesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD3BD71C2AA837A0009408FF /* ProfilesViewController.swift */; };
+		ADEDCEB62AAEED220026E307 /* ImmutableTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADEDCEB52AAEED220026E307 /* ImmutableTextView.swift */; };
+		ADEDCEB82AB03FD70026E307 /* MockEntitlementsAdminClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADEDCEB72AB03FD70026E307 /* MockEntitlementsAdminClient.swift */; };
 		B879251686FE3547B753931F /* Pods-VPNExample-metadata.plist in Resources */ = {isa = PBXBuildFile; fileRef = EE31E8A86722448E752ECA77 /* Pods-VPNExample-metadata.plist */; };
 		CD9CA139D63446F68F8EDA87 /* Pods_VPNExample.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 51FA9A91F0A2D7FDD2471CB8 /* Pods_VPNExample.framework */; };
 		FC56673AFBDD9DF0AC597D9E /* Pods-VPNExample-VPNExampleTests-metadata.plist in Resources */ = {isa = PBXBuildFile; fileRef = 6FEF39355CDA88FC929A7CA9 /* Pods-VPNExample-VPNExampleTests-metadata.plist */; };
@@ -191,6 +193,8 @@
 		971C4F0F8048A791D41BCDB2 /* Pods_VPNExample_VPNExampleTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_VPNExample_VPNExampleTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		97A90BB945F084D05210156C /* Pods-VPNExample.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-VPNExample.debug.xcconfig"; path = "Target Support Files/Pods-VPNExample/Pods-VPNExample.debug.xcconfig"; sourceTree = "<group>"; };
 		AD3BD71C2AA837A0009408FF /* ProfilesViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProfilesViewController.swift; sourceTree = "<group>"; };
+		ADEDCEB52AAEED220026E307 /* ImmutableTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImmutableTextView.swift; sourceTree = "<group>"; };
+		ADEDCEB72AB03FD70026E307 /* MockEntitlementsAdminClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockEntitlementsAdminClient.swift; sourceTree = "<group>"; };
 		BADCCF3AA53784726AB02C22 /* Pods-VPNExample-VPNExampleTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-VPNExample-VPNExampleTests.debug.xcconfig"; path = "Target Support Files/Pods-VPNExample-VPNExampleTests/Pods-VPNExample-VPNExampleTests.debug.xcconfig"; sourceTree = "<group>"; };
 		D06192E0A5C9E4704229ACC2 /* Pods-VPNExample.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-VPNExample.release.xcconfig"; path = "Target Support Files/Pods-VPNExample/Pods-VPNExample.release.xcconfig"; sourceTree = "<group>"; };
 		EE31E8A86722448E752ECA77 /* Pods-VPNExample-metadata.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-VPNExample-metadata.plist"; sourceTree = "<group>"; };
@@ -420,6 +424,7 @@
 			children = (
 				84B9259B253FC9370076259D /* Authenticator.swift */,
 				84B925A0253FCA3E0076259D /* FileReadable.swift */,
+				ADEDCEB52AAEED220026E307 /* ImmutableTextView.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -521,6 +526,7 @@
 				9537817F25C27D7400CADAFF /* EntitlementsTableViewCellMockSpy.swift */,
 				84B9260E253FE6470076259D /* FileReadableMock.swift */,
 				84B92609253FE63D0076259D /* KeyManagerMock.swift */,
+				ADEDCEB72AB03FD70026E307 /* MockEntitlementsAdminClient.swift */,
 				843346C72575C10A00CD301D /* MockEntitlementsClient.swift */,
 				84D0B401255B96EE00BFEEB8 /* MockSudoVPNClient.swift */,
 				84D0B413255B9E1E00BFEEB8 /* ServerTableViewCellMockSpy.swift */,
@@ -906,7 +912,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "returncode=0\n\necho \"Copy test key to bundle\"\nSOURCE=${PROJECT_DIR}/config/register_key.private\ncp -f ${SOURCE} \"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/\"\nif [ $? -ne 0 ]\nthen\n    echo \"error: Failed to copy test registration key. Make sure the file config/register_key.private exists in the project directory (see README.md).\"\nfi\n\necho \"Copy test key ID to bundle\"\nSOURCE=${PROJECT_DIR}/config/register_key.id \ncp -f ${SOURCE} \"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/\"\nif [ $? -ne 0 ]\nthen\n    echo \"error: Failed to copy test registration key ID. Make sure the file config/register_key.id exists in the project directory (see README.md).\"\nfi\n\necho \"Copy Sudo Platform config to bundle\"\nSOURCE=${PROJECT_DIR}/config/sudoplatformconfig.json\ncp -f ${SOURCE} \"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/\"\nif [ $? -ne 0 ]\nthen\n    echo \"error: Failed to copy sudoplatformconfig.json. Make sure the file config/sudoplatformconfig.json exists in the project directory (see README.md).\"\nfi\n\nexit ${returncode}\n";
+			shellScript = "returncode=0\n\necho \"Copy test key to bundle\"\nSOURCE=${PROJECT_DIR}/config/register_key.private\ncp -f ${SOURCE} \"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/\"\nif [ $? -ne 0 ]\nthen\n    echo \"error: Failed to copy test registration key. Make sure the file config/register_key.private exists in the project directory (see README.md).\"\nfi\n\necho \"Copy test key ID to bundle\"\nSOURCE=${PROJECT_DIR}/config/register_key.id \ncp -f ${SOURCE} \"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/\"\nif [ $? -ne 0 ]\nthen\n    echo \"error: Failed to copy test registration key ID. Make sure the file config/register_key.id exists in the project directory (see README.md).\"\nfi\n\necho \"Copy Sudo Platform config to bundle\"\nSOURCE=${PROJECT_DIR}/config/sudoplatformconfig.json\ncp -f ${SOURCE} \"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/\"\nif [ $? -ne 0 ]\nthen\n    echo \"error: Failed to copy sudoplatformconfig.json. Make sure the file config/sudoplatformconfig.json exists in the project directory (see README.md).\"\nfi\n\necho \"Copy admin API key ID to bundle (if present)\"\nSOURCE=${PROJECT_DIR}/config/api.key \ncp -f ${SOURCE} \"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/\"\nif [ $? -ne 0 ]\nthen\n    echo \"warning: Failed to copy admin API key. Revocation and granting of entitlements will not be supported.\"\nfi\n\nexit ${returncode}\n";
 		};
 		847E0194253EAD6700167D2C /* Swift Lint */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -965,6 +971,7 @@
 				9537817325C27BE500CADAFF /* EntitlementsTableViewCell.swift in Sources */,
 				9537817625C27BE500CADAFF /* EntitlementsViewController.swift in Sources */,
 				84B925A1253FCA3E0076259D /* FileReadable.swift in Sources */,
+				ADEDCEB62AAEED220026E307 /* ImmutableTextView.swift in Sources */,
 				9518493125BE2AFC0094B3CF /* MainMenuViewController.swift in Sources */,
 				AD3BD71E2AA837A0009408FF /* ProfilesViewController.swift in Sources */,
 				845AD27325C2530900685983 /* ProtocolsViewController.swift in Sources */,
@@ -1001,6 +1008,7 @@
 				84B9260F253FE6470076259D /* FileReadableMock.swift in Sources */,
 				84B9260A253FE63D0076259D /* KeyManagerMock.swift in Sources */,
 				845AD24C25C23F5500685983 /* MainMenuViewControllerTests.swift in Sources */,
+				ADEDCEB82AB03FD70026E307 /* MockEntitlementsAdminClient.swift in Sources */,
 				843346C82575C10A00CD301D /* MockEntitlementsClient.swift in Sources */,
 				84D0B402255B96EE00BFEEB8 /* MockSudoVPNClient.swift in Sources */,
 				84752FCB25C27180007DBF62 /* ProtocolsViewControllerTests.swift in Sources */,

@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="17701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="21701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17703"/>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21679"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -10,36 +11,71 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="SettingsViewController" customModule="VPNExample" customModuleProvider="target">
             <connections>
+                <outlet property="settingsFooter" destination="Vbm-mV-EDu" id="Pwr-Gf-JHR"/>
                 <outlet property="tableView" destination="zFr-tX-r4d" id="QQM-f1-F9A"/>
+                <outlet property="usernameLabel" destination="zpe-De-hjU" id="b8n-R9-EzJ"/>
+                <outlet property="usernameTextView" destination="0Be-cp-3nb" id="LIa-i2-6Da"/>
                 <outlet property="view" destination="iN0-l3-epB" id="olf-Cm-j8H"/>
             </connections>
         </placeholder>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
         <view contentMode="scaleToFill" id="iN0-l3-epB">
-            <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+            <rect key="frame" x="0.0" y="0.0" width="414" height="387"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
-                <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="zFr-tX-r4d">
-                    <rect key="frame" x="0.0" y="44" width="414" height="852"/>
+                <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="1" sectionFooterHeight="1" translatesAutoresizingMaskIntoConstraints="NO" id="zFr-tX-r4d">
+                    <rect key="frame" x="0.0" y="48" width="414" height="243.5"/>
                     <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="243.5" id="HDz-cb-SMY"/>
+                    </constraints>
                     <connections>
                         <outlet property="dataSource" destination="-1" id="3bn-79-Sjw"/>
                         <outlet property="delegate" destination="-1" id="nTk-gw-h6r"/>
                     </connections>
                 </tableView>
+                <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="7" translatesAutoresizingMaskIntoConstraints="NO" id="Vbm-mV-EDu">
+                    <rect key="frame" x="0.0" y="291.5" width="414" height="61.5"/>
+                    <subviews>
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" verticalCompressionResistancePriority="749" text="Username:" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="zpe-De-hjU">
+                            <rect key="frame" x="0.0" y="0.0" width="414" height="20.5"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                            <nil key="textColor"/>
+                            <nil key="highlightedColor"/>
+                        </label>
+                        <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" text="Loading username..." textAlignment="natural" id="0Be-cp-3nb" customClass="ImmutableTextView" customModule="VPNExample" customModuleProvider="target">
+                            <rect key="frame" x="0.0" y="27.5" width="414" height="34"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                            <color key="textColor" systemColor="labelColor"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                            <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                        </textView>
+                    </subviews>
+                    <constraints>
+                        <constraint firstItem="zpe-De-hjU" firstAttribute="leading" secondItem="Vbm-mV-EDu" secondAttribute="leading" id="kpD-VM-7eK"/>
+                        <constraint firstItem="zpe-De-hjU" firstAttribute="top" secondItem="Vbm-mV-EDu" secondAttribute="top" id="w1I-KV-peI"/>
+                    </constraints>
+                </stackView>
             </subviews>
             <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
             <color key="backgroundColor" systemColor="systemBackgroundColor"/>
             <constraints>
-                <constraint firstItem="vUN-kp-3ea" firstAttribute="trailing" secondItem="zFr-tX-r4d" secondAttribute="trailing" id="J03-bO-DFW"/>
-                <constraint firstItem="zFr-tX-r4d" firstAttribute="top" secondItem="vUN-kp-3ea" secondAttribute="top" id="ang-TI-ZMV"/>
-                <constraint firstItem="zFr-tX-r4d" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" id="gB5-dX-aRg"/>
-                <constraint firstAttribute="bottom" secondItem="zFr-tX-r4d" secondAttribute="bottom" id="hdp-T6-WYG"/>
+                <constraint firstItem="zFr-tX-r4d" firstAttribute="leading" secondItem="Vbm-mV-EDu" secondAttribute="leading" id="5dy-dt-9gK"/>
+                <constraint firstItem="Vbm-mV-EDu" firstAttribute="trailing" secondItem="vUN-kp-3ea" secondAttribute="trailing" id="6yT-Hm-wmU"/>
+                <constraint firstItem="zFr-tX-r4d" firstAttribute="trailing" secondItem="vUN-kp-3ea" secondAttribute="trailing" id="F2V-fx-crQ"/>
+                <constraint firstItem="zFr-tX-r4d" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" id="GcT-c8-AQm"/>
+                <constraint firstItem="Vbm-mV-EDu" firstAttribute="bottom" secondItem="vUN-kp-3ea" secondAttribute="bottom" id="Qqu-ch-O1h"/>
+                <constraint firstItem="Vbm-mV-EDu" firstAttribute="top" secondItem="zFr-tX-r4d" secondAttribute="bottom" id="RSD-mY-bxA"/>
+                <constraint firstItem="vUN-kp-3ea" firstAttribute="top" secondItem="zFr-tX-r4d" secondAttribute="top" id="wq1-GF-xWA"/>
             </constraints>
             <point key="canvasLocation" x="11.594202898550726" y="82.366071428571431"/>
         </view>
     </objects>
     <resources>
+        <systemColor name="labelColor">
+            <color red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>

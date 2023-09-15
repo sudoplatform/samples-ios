@@ -46,6 +46,11 @@ PODS:
     - SudoKeyManager (~> 2.0)
     - SudoLogging (~> 1.0)
     - SudoUser (~> 15.0)
+  - SudoEntitlementsAdmin (4.1.1):
+    - AWSAppSync (~> 3.6.1)
+    - AWSCore (~> 2.27.15)
+    - SudoConfigManager (~> 3.0)
+    - SudoLogging (~> 1.0)
   - SudoKeyManager (2.4.0):
     - ASN1Swift (~> 1.2)
     - GzipSwift (~> 5.0)
@@ -58,7 +63,7 @@ PODS:
     - SudoConfigManager (~> 3.0)
     - SudoLogging (~> 1.0)
     - SudoUser (~> 15.0)
-  - SudoUser (15.0.1):
+  - SudoUser (15.1.0):
     - AWSAppSync (~> 3.6.1)
     - AWSCognitoIdentityProvider (~> 2.27.15)
     - AWSCore (~> 2.27.15)
@@ -68,16 +73,17 @@ PODS:
     - SudoConfigManager (~> 3.0)
     - SudoKeyManager (~> 2.0)
     - SudoLogging (~> 1.0)
-  - SudoVPN (16.0.3):
+  - SudoVPN (16.0.4):
     - AWSAppSync (~> 3.6.1)
     - AWSCore (~> 2.27.15)
     - SudoApiClient (~> 10.0)
     - SudoLogging (~> 1.0)
-    - SudoUser (~> 15.0)
+    - SudoUser (~> 15.1)
 
 DEPENDENCIES:
   - FlagKit
   - SudoEntitlements (~> 9.0.1)
+  - SudoEntitlementsAdmin (~> 4.0)
   - SudoProfiles (~> 17.0)
   - SudoUser (~> 15.0)
   - SudoVPN (~> 16.0)
@@ -101,6 +107,7 @@ SPEC REPOS:
     - SudoApiClient
     - SudoConfigManager
     - SudoEntitlements
+    - SudoEntitlementsAdmin
     - SudoKeyManager
     - SudoLogging
     - SudoProfiles
@@ -126,12 +133,13 @@ SPEC CHECKSUMS:
   SudoApiClient: 31703a617ea6dbeb53e67aac063d3de07f74898e
   SudoConfigManager: aee20bc2d03e28342da663ae48378d0daae78f47
   SudoEntitlements: a6234950614517b64cd1c45605469619f61e1399
+  SudoEntitlementsAdmin: 51fc7f75453de24253315f77b2c92695a0eaafd2
   SudoKeyManager: 11f72b2c3f84f88d3ae623de21015c0794d90da1
   SudoLogging: 93238a71338292a650804358994c67f8f3816d20
   SudoProfiles: c791410946d47cb3deace4b690a954cea6a1fc7e
-  SudoUser: 6ae700eb8448b15c255d37df1535ea58f4c8e214
-  SudoVPN: cfd5089be80ab5076c5ecdcb52e9fa8295176f14
+  SudoUser: 61b99b0c23cf609098e42c68a56bf7873b7c6b47
+  SudoVPN: 4998ef952a1a5ad203561c91a8e1296a22eddc37
 
-PODFILE CHECKSUM: 0c3df8276c7fd4d63108c3ff11966f47d89a1c1b
+PODFILE CHECKSUM: ab605f361b4a2e7521194b629d2668b3e6aefa8f
 
 COCOAPODS: 1.12.1

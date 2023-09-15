@@ -6,6 +6,7 @@
 
 import UIKit
 import SudoUser
+import SudoEntitlements
 
 /// This View Controller presents a table view so that a user can navigate through each of the menu items.
 ///
@@ -15,12 +16,16 @@ import SudoUser
 ///     - `EntitlementsViewController`: If a user taps the "Entitlements" button, the`EntitlementsViewController` will
 ///         be presented so the user can view current status of Entitlements.
 ///     -  `ProtocolsController`: If a user taps the "Protocols" button, the `ProtocolsViewController`will be presented.
-class SettingsViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
+class SettingsViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UITextFieldDelegate {
 
     // MARK: - Outlets
 
     /// Table view that lists the menu items.
     @IBOutlet var tableView: UITableView!
+
+    @IBOutlet var settingsFooter: UIStackView!
+    @IBOutlet var usernameLabel: UILabel!
+    @IBOutlet var usernameTextView: ImmutableTextView!
 
     // MARK: - Supplementary
 
@@ -66,6 +71,11 @@ class SettingsViewController: UIViewController, UITableViewDelegate, UITableView
         return AppDelegate.dependencies.userClient
     }
 
+    /// Sudo entitlements client used to determine user entitlements.
+    var userEntitlementsClient: SudoEntitlementsClient {
+        return AppDelegate.dependencies.entitlementsClient
+    }
+
     /// Authenticator used to perform authentication during de-registration.
     var authenticator: Authenticator {
         return AppDelegate.dependencies.authenticator
@@ -75,6 +85,7 @@ class SettingsViewController: UIViewController, UITableViewDelegate, UITableView
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        configureStackView()
         configureTableView()
     }
 
@@ -88,6 +99,19 @@ class SettingsViewController: UIViewController, UITableViewDelegate, UITableView
     func configureTableView() {
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "default")
         tableView.tableFooterView = UIView()
+    }
+
+    /// Configures the user name stack section
+    func configureStackView() {
+        usernameLabel.text = "Username:"
+
+        Task {
+            do {
+                var externalUserId = try await userEntitlementsClient.getExternalId()
+                usernameTextView.text = externalUserId
+                usernameTextView.inputView = UIView()
+            }
+        }
     }
 
     // MARK: - Conformance: UITableViewDataSource

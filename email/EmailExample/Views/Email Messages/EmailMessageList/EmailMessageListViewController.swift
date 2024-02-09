@@ -52,6 +52,12 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
 
     /// A list of `EmailMessage` that are associated with the `emailAddress`.
     var emailMessages: [EmailMessage] = []
+    
+    /// A list of blocked email addresses associated with the `emailAddress`
+    var blockedAddresses: [String] = []
+    
+    /// Blocked addresses that have been selected for unblocking
+    var selectedBlockedAddresses: [String] = []
 
     /// View to allow user selection of Email Folder
     var folderNameSwitcher: FolderSwitcherView!
@@ -60,6 +66,9 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
     var allEmailMessagesCreatedSubscriptionToken: SubscriptionToken?
 
     var allEmailMessagesDeletedSubscriptionToken: SubscriptionToken?
+    
+    /// The currently folder that is open
+    var selectedFolder: FolderType = FolderType.inbox
 
     // MARK: - Properties: Computed
 
@@ -299,6 +308,8 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
         )
         let emailMessageCell = UINib(nibName: "EmailMessageTableViewCell", bundle: .main)
         tableView.register(emailMessageCell, forCellReuseIdentifier: "emailMessageCell")
+        let blockedAddressCell = UINib(nibName: "BlockedAddressTableViewCell", bundle: .main)
+        tableView.register(blockedAddressCell, forCellReuseIdentifier: "blockedAddressCell")
         tableView.tableFooterView = UIView()
     }
 
@@ -339,6 +350,21 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
         } catch {
             Task { @MainActor in
                 self.presentErrorAlert(message: "Failed to list Email Messages", error: error)
+            }
+        }
+    }
+    
+    /// Loads the list of blocked email addresses for the user
+    func loadBlockedAddresses() async {
+        do {
+            let result = try await self.emailClient.getEmailAddressBlocklist()
+            self.blockedAddresses = result
+            Task { @MainActor in
+                self.tableView.reloadData()
+            }
+        } catch {
+            Task { @MainActor in
+                self.presentErrorAlert(message: "Failed to list blocked addresses", error: error)
             }
         }
     }
@@ -536,26 +562,49 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
     }
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        if (self.selectedFolder == FolderType.blocklist) {
+            return blockedAddresses.count
+        }
         return emailMessages.count
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         assert(indexPath.section == 0)
-        let emailMessage = emailMessages[indexPath.row]
-        guard let emailMessageCell = tableView.dequeueReusableCell(withIdentifier: "emailMessageCell", for: indexPath) as? EmailMessageTableViewCell else {
-            return EmailMessageTableViewCell()
+        if (self.selectedFolder == FolderType.blocklist) {
+            let blockedAddress = blockedAddresses[indexPath.row]
+            guard let blockedAddressCell = tableView.dequeueReusableCell(withIdentifier: "blockedAddressCell", for: indexPath) as? BlockedAddressTableViewCell else {
+                return BlockedAddressTableViewCell()
+            }
+            blockedAddressCell.emailAddress = blockedAddress
+            blockedAddressCell.accessoryType = .disclosureIndicator
+            return blockedAddressCell
+        } else {
+            let emailMessage = emailMessages[indexPath.row]
+            guard let emailMessageCell = tableView.dequeueReusableCell(withIdentifier: "emailMessageCell", for: indexPath) as? EmailMessageTableViewCell else {
+                return EmailMessageTableViewCell()
+            }
+            emailMessageCell.emailMessage = emailMessage
+            emailMessageCell.accessoryType = .disclosureIndicator
+            return emailMessageCell
         }
-        emailMessageCell.emailMessage = emailMessage
-        emailMessageCell.accessoryType = .disclosureIndicator
-        return emailMessageCell
     }
 
     // MARK: - Conformance: UITableViewDelegate
 
     @MainActor
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        performSegue(withIdentifier: Segue.navigateToReadEmailMessage.rawValue, sender: self)
-        tableView.deselectRow(at: indexPath, animated: true)
+        if (selectedFolder == FolderType.blocklist) {
+            let address = blockedAddresses[indexPath.row]
+            if (selectedBlockedAddresses.contains(address)) {
+                selectedBlockedAddresses.remove(at: selectedBlockedAddresses.firstIndex(of: address)!)
+                tableView.deselectRow(at: indexPath, animated: true)
+            } else {
+                selectedBlockedAddresses.append(address)
+            }
+        } else {
+            performSegue(withIdentifier: Segue.navigateToReadEmailMessage.rawValue, sender: self)
+            tableView.deselectRow(at: indexPath, animated: true)
+        }
     }
 
     @MainActor
@@ -582,9 +631,17 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
         _ view: FolderSwitcherView,
         didSelectFolderType folderType: FolderType
     ) {
+        self.selectedFolder = folderType
+        blockedAddresses = []
         emailMessages = []
-        Task { @MainActor in
-            await self.loadCacheEmailMessagesAndFetchRemote()
+        if (self.selectedFolder == FolderType.blocklist) {
+            Task { @MainActor in
+                await self.loadBlockedAddresses()
+            }
+        } else {
+            Task { @MainActor in
+                await self.loadCacheEmailMessagesAndFetchRemote()
+            }
         }
     }
 
@@ -601,5 +658,39 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
             }
         })
         present(alert, animated: true, completion: nil)
+    }
+    
+    @MainActor
+    func unblockEmailAddresses() {
+        Task.init {
+            do {
+                let result = try await self.emailClient.unblockEmailAddresses(addresses: selectedBlockedAddresses)
+                
+                switch result {
+                case .success:
+                    self.presentAlert(title: "Success", message: "Email address(es) unblocked")
+                    blockedAddresses = blockedAddresses.filter{ item in
+                        !selectedBlockedAddresses.contains(item)
+                    }
+                    break
+                case .partial(let batchPartialResult):
+                    self.presentErrorAlert(message: "Unable to unblock some addresses. Please try again")
+                    blockedAddresses = blockedAddresses.filter{ item in
+                        !batchPartialResult.successItems.contains(item)
+                    }
+                    break
+                case .failure:
+                    self.presentErrorAlert(message: "Failed to unblock email address(es). Please try again")
+                    break
+                }
+                Task { @MainActor in
+                    self.tableView.reloadData()
+                }
+            } catch {
+                Task { @MainActor in
+                    self.presentErrorAlert(message: "Failed to unblock email address(es). Please try again", error: error)
+                }
+            }
+        }
     }
 }

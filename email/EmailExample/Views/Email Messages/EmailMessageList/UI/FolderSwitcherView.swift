@@ -11,6 +11,7 @@ enum FolderType: String, CaseIterable {
     case sent
     case drafts
     case trash
+    case blocklist
 }
 
 protocol FolderSwitcherViewDelegate: AnyObject {
@@ -27,6 +28,8 @@ protocol FolderSwitcherViewDelegate: AnyObject {
 
     /// Called when the user taps on the empty trash button
     func emptyTrash()
+    
+    func unblockEmailAddresses()
 }
 
 class FolderSwitcherView: UITableViewHeaderFooterView {
@@ -38,6 +41,8 @@ class FolderSwitcherView: UITableViewHeaderFooterView {
 
     /// Button to permanently delete email messages from the Trash folder
     let emptyTrashButton = UIButton()
+    
+    let unblockAddressesButton = UIButton()
 
     let contentContainerView = UIStackView()
 
@@ -49,6 +54,8 @@ class FolderSwitcherView: UITableViewHeaderFooterView {
 
     /// The image for the empty Trash button
     let emptyTrashImage = UIImage(systemName: "trash.slash.fill")
+    
+    let unblockAddressesImage = UIImage(systemName: "trash.slash.fill")
 
     var currentFolder: FolderType = .inbox
 
@@ -68,6 +75,7 @@ class FolderSwitcherView: UITableViewHeaderFooterView {
             self.title.text = self.titleForCurrentFolder()
             self.menuButton.sizeToFit()
             self.emptyTrashButton.isHidden = true
+            self.unblockAddressesButton.isHidden = true
         }
         let sentAction = UIAction(title: "Sent") { _ in
             self.currentFolder = .sent
@@ -75,6 +83,7 @@ class FolderSwitcherView: UITableViewHeaderFooterView {
             self.title.text = self.titleForCurrentFolder()
             self.menuButton.sizeToFit()
             self.emptyTrashButton.isHidden = true
+            self.unblockAddressesButton.isHidden = true
         }
         let draftsAction = UIAction(title: "Drafts") { _ in
             self.currentFolder = .drafts
@@ -82,6 +91,7 @@ class FolderSwitcherView: UITableViewHeaderFooterView {
             self.title.text = self.titleForCurrentFolder()
             self.menuButton.sizeToFit()
             self.emptyTrashButton.isHidden = true
+            self.unblockAddressesButton.isHidden = true
         }
         let trashAction = UIAction(title: "Trash") { _ in
             self.currentFolder = .trash
@@ -90,10 +100,26 @@ class FolderSwitcherView: UITableViewHeaderFooterView {
             self.menuButton.sizeToFit()
             self.emptyTrashButton.setImage(self.emptyTrashImage, for: .normal)
             self.emptyTrashButton.isHidden = false
+            self.unblockAddressesButton.isHidden = true
             self.emptyTrashButton.sizeToFit()
             self.emptyTrashButton.addTarget(
                 self,
                 action: #selector(self.didTapEmptyTrashButton),
+                for: .touchUpInside
+            )
+        }
+        let blocklistAction = UIAction(title: "Blocklist") { _ in
+            self.currentFolder = .blocklist
+            self.delegate?.folderSwitcherView(self, didSelectFolderType: .blocklist)
+            self.title.text = self.titleForCurrentFolder()
+            self.menuButton.sizeToFit()
+            self.emptyTrashButton.isHidden = true
+            self.unblockAddressesButton.setImage(self.emptyTrashImage, for: .normal)
+            self.unblockAddressesButton.isHidden = false
+            self.unblockAddressesButton.sizeToFit()
+            self.unblockAddressesButton.addTarget(
+                self,
+                action: #selector(self.didTapUnblockEmailAddressesButton),
                 for: .touchUpInside
             )
         }
@@ -102,7 +128,8 @@ class FolderSwitcherView: UITableViewHeaderFooterView {
                 inboxAction,
                 sentAction,
                 draftsAction,
-                trashAction
+                trashAction,
+                blocklistAction
             ]
         )
         contentContainerView.axis = .horizontal
@@ -121,6 +148,7 @@ class FolderSwitcherView: UITableViewHeaderFooterView {
         contentContainerView.addArrangedSubview(title)
         contentContainerView.addArrangedSubview(spacer)
         contentContainerView.addArrangedSubview(emptyTrashButton)
+        contentContainerView.addArrangedSubview(unblockAddressesButton)
 
         NSLayoutConstraint.activate([
             contentContainerView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 8),
@@ -145,11 +173,17 @@ class FolderSwitcherView: UITableViewHeaderFooterView {
             return "Drafts"
         case .trash:
             return "Trash"
+        case .blocklist:
+            return "Blocklist"
         }
     }
 
     // MARK: - Actions
     @objc func didTapEmptyTrashButton() {
         self.delegate?.emptyTrash()
+    }
+    
+    @objc func didTapUnblockEmailAddressesButton() {
+        self.delegate?.unblockEmailAddresses()
     }
 }

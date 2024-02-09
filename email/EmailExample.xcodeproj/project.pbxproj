@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 51;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -81,6 +81,8 @@
 		95C0CE0424AAC8AB0024BFBB /* XCTestCase+Utility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95C0CE0324AAC8AB0024BFBB /* XCTestCase+Utility.swift */; };
 		95C0CE0624AAC90E0024BFBB /* XCTestCaseExpectation+Convenience.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95C0CE0524AAC90E0024BFBB /* XCTestCaseExpectation+Convenience.swift */; };
 		95C0CE0824AACE190024BFBB /* ReadEmailMessageViewControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95C0CE0724AACE190024BFBB /* ReadEmailMessageViewControllerTests.swift */; };
+		9F97B79C2B73210000384FE7 /* BlockedAddressTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F97B79B2B73210000384FE7 /* BlockedAddressTableViewCell.swift */; };
+		9F97B79E2B732FA200384FE7 /* BlockedAddressTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9F97B79D2B732FA200384FE7 /* BlockedAddressTableViewCell.xib */; };
 		A1E5D649240B9264C74AEFB0 /* Pods-EmailExample-metadata.plist in Resources */ = {isa = PBXBuildFile; fileRef = 38A8A7CF7624D129BCA21F28 /* Pods-EmailExample-metadata.plist */; };
 		AB5B9DB3240EC5D100E4E5D8 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB5B9DB2240EC5D100E4E5D8 /* AppDelegate.swift */; };
 		AB5B9DBA240EC5D100E4E5D8 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AB5B9DB8240EC5D100E4E5D8 /* Main.storyboard */; };
@@ -197,6 +199,9 @@
 		95C0CE0324AAC8AB0024BFBB /* XCTestCase+Utility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "XCTestCase+Utility.swift"; sourceTree = "<group>"; };
 		95C0CE0524AAC90E0024BFBB /* XCTestCaseExpectation+Convenience.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "XCTestCaseExpectation+Convenience.swift"; sourceTree = "<group>"; };
 		95C0CE0724AACE190024BFBB /* ReadEmailMessageViewControllerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadEmailMessageViewControllerTests.swift; sourceTree = "<group>"; };
+		9991870B6EA4AEA026F74718 /* Pods_EmailExample_EmailExampleTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_EmailExample_EmailExampleTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		9F97B79B2B73210000384FE7 /* BlockedAddressTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockedAddressTableViewCell.swift; sourceTree = "<group>"; };
+		9F97B79D2B732FA200384FE7 /* BlockedAddressTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = BlockedAddressTableViewCell.xib; sourceTree = "<group>"; };
 		AB5B9DAF240EC5D100E4E5D8 /* EmailExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = EmailExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AB5B9DB2240EC5D100E4E5D8 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		AB5B9DB9240EC5D100E4E5D8 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -510,6 +515,8 @@
 		8483150E24B84A24004E89EA /* UI */ = {
 			isa = PBXGroup;
 			children = (
+				9F97B79B2B73210000384FE7 /* BlockedAddressTableViewCell.swift */,
+				9F97B79D2B732FA200384FE7 /* BlockedAddressTableViewCell.xib */,
 				67014B61249AC482008733E8 /* EmailMessageTableViewCell.swift */,
 				67014B5F249AC360008733E8 /* EmailMessageTableViewCell.xib */,
 				9538907F2963F6E100EE81EA /* FolderSwitcherView.swift */,
@@ -901,6 +908,7 @@
 			files = (
 				845A8B35247204E600FAFB42 /* ActivityAlertViewController.xib in Resources */,
 				AB5B9DBC240EC5D300E4E5D8 /* Assets.xcassets in Resources */,
+				9F97B79E2B732FA200384FE7 /* BlockedAddressTableViewCell.xib in Resources */,
 				84EC6CAE24C1652B008FDED4 /* BodyTableViewCell.xib in Resources */,
 				840D86DA24932C8A008E4BE5 /* CreateEmailAddressViewController.xib in Resources */,
 				8440400D245AB56D00B2EBF2 /* CreateSudoViewController.xib in Resources */,
@@ -1089,6 +1097,7 @@
 				AB5B9DB3240EC5D100E4E5D8 /* AppDelegate.swift in Sources */,
 				8470C8EE245ACCB400439F92 /* AppDependencies.swift in Sources */,
 				AB93CADA240EF6FB0065AF50 /* Authenticator.swift in Sources */,
+				9F97B79C2B73210000384FE7 /* BlockedAddressTableViewCell.swift in Sources */,
 				84EC6CAD24C1652B008FDED4 /* BodyTableViewCell.swift in Sources */,
 				840D86D924932C8A008E4BE5 /* CreateEmailAddressViewController.swift in Sources */,
 				CF2571C32444EC0B0053334E /* CreateSudoViewController.swift in Sources */,
@@ -1242,7 +1251,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -1297,7 +1306,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;

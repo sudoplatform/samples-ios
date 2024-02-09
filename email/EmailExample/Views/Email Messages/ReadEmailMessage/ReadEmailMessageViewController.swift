@@ -103,6 +103,33 @@ class ReadEmailMessageViewController: UIViewController, ActivityAlertViewControl
     @objc func replyToMessage(_ sender: ReadEmailMessageViewController) {
         performSegue(withIdentifier: Segue.replyToEmailMessage.rawValue, sender: self)
     }
+    
+    /// Action associalted with blocking an email address
+    ///
+    /// This action will block the sender of the email being read
+    @objc func blockSenderAddress() {
+        let address = emailMessage.from[0].address
+        Task.init {
+            do {
+                let blockRes = try await emailClient.blockEmailAddresses(addresses: [address])
+                
+                switch blockRes {
+                case .success:
+                    presentAlert(title: "Success", message: "\(address) has been blocked") { _ in
+                        self.performSegue(withIdentifier: Segue.returnToEmailMessageList.rawValue, sender: self)
+                    }
+                case .failure:
+                    presentErrorAlert(message: "Error blocking email address")
+                default:
+                    // no-op - Should never reach this as only passing one address
+                    NSLog("Unexpected block result \(blockRes)")
+                }
+            } catch {
+                NSLog("Error blocking email address \(error)")
+                presentErrorAlert(message: "Error blocking email address")
+            }
+        }
+    }
 
     // MARK: - Operations
 
@@ -123,8 +150,14 @@ class ReadEmailMessageViewController: UIViewController, ActivityAlertViewControl
 
     func configureNavigationBar() {
         let arrowImage = UIImage(systemName: "arrowshape.turn.up.left")
-        navigationItem.rightBarButtonItem = UIBarButtonItem(image: arrowImage, style: .plain, target: self, action: #selector(replyToMessage))
-        navigationItem.rightBarButtonItem?.accessibilityIdentifier = "replyButton"
+        let replyButton = UIBarButtonItem(image: arrowImage, style: .plain, target: self, action: #selector(replyToMessage))
+        replyButton.accessibilityIdentifier = "replyButton"
+        
+        let blockImage = UIImage(systemName: "nosign")
+        let blockButton = UIBarButtonItem(image: blockImage, style: .plain, target: self, action: #selector(blockSenderAddress))
+        blockButton.accessibilityIdentifier = "blockButton"
+        
+        navigationItem.rightBarButtonItems = [replyButton, blockButton]
     }
 
     func configureHeaderView() {

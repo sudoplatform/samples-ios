@@ -18,7 +18,7 @@ end
 
 target 'EmailExample' do
     pod 'SudoEntitlements', '~> 9.0'
-    pod 'SudoUser', '~> 15.0'
+    pod 'SudoUser', '~> 15.1'
     pod 'SudoProfiles', '~> 17.0'
     pod 'MimeParser', '~> 0.1'
     pod 'AWSCore', '~> 2.27.15'
@@ -29,12 +29,20 @@ target 'EmailExample' do
 
     target 'EmailExampleTests'
 
-    pod 'SudoEmail', '~> 6.0'
+    pod 'SudoEmail', '~> 6.3.0'
 end
 
 # Fix Xcode nagging warning on pod install/update
 post_install do |installer|
   installer.pods_project.build_configurations.each do |config|
     config.build_settings['CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED'] = 'YES'
+  end
+
+  installer.generated_projects.each do |project|
+      project.targets.each do |target|
+          target.build_configurations.each do |config|
+              config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '13.0'
+          end
+      end
   end
 end

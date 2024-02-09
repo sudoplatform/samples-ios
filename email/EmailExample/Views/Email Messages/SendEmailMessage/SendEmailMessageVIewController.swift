@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Anonyome Labs, Inc. All rights reserved.
+// Copyright © 2024 Anonyome Labs, Inc. All rights reserved.
 //
 // SPDX-License-Identifier: Apache-2.0
 //
@@ -48,6 +48,24 @@ class SendEmailMessageViewController: UIViewController, UITextViewDelegate, UITa
 
     // MARK: - Properties
 
+    /// The UI view of the indicator to be hidden/shown.
+    var encryptedIndicatorView: UIView?
+
+    /// Flag to determine is the indicator is visible or not.
+    var encryptedIndicatorViewVisible: Bool = false
+
+    /// Task that tracks the current `lookupEmailAddressesPublicInfo` SDK call.
+    /// (so it can be cancelled before trying again)
+    var encryptedIndicatorTask: Task<Void, Error>?
+
+    /// Encryption status for each email address ui input.
+    /// Used to track cases where multiple values need to be verified without stacking requests.
+    var encryptedInputStatuses: [String: Bool?] = [
+        "to": nil,
+        "cc": nil,
+        "bcc": nil
+    ]
+
     /// Address of a `EmailAddress` that was selected from a previous view. Used to send a message.
     var emailAddress: EmailAddress!
 
@@ -75,6 +93,7 @@ class SendEmailMessageViewController: UIViewController, UITextViewDelegate, UITa
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        configureEncryptedIndicatorView()
         configureTableView()
         configureNavigationBar()
         NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
@@ -223,6 +242,56 @@ class SendEmailMessageViewController: UIViewController, UITextViewDelegate, UITa
         }
     }
 
+
+    func validateEncryptedEmailAddresses(_ addressesInput: String) async throws -> Bool {
+        if !validateEmailAddressList(addresses: addressesInput) {
+            return false
+        }
+
+        let emailAddresses = addressesToArray(addressesInput)
+        let input = LookupEmailAddressesPublicInfoInput(emailAddresses: emailAddresses)
+        let emailAddressesPublicInfo = try await emailClient.lookupEmailAddressesPublicInfo(withInput: input)
+
+        // Verify all request email addresses were included in the `emailAddressesPublicInfo` response
+        let resultEmailAddresses = emailAddressesPublicInfo.map { $0.emailAddress }
+        let result = emailAddresses.allSatisfy { emailAddress in
+            resultEmailAddresses.contains(emailAddress)
+        }
+
+        return result
+    }
+
+    func handleEncryptedIndicatorView(_ addresses: String, _ fieldName: String) async throws {
+        encryptedInputStatuses[fieldName] = nil
+        hideEncryptedIndicatorView()
+
+        // Cancel task each time this function is invoked to avoid bulk requests.
+        encryptedIndicatorTask?.cancel()
+
+        // Run the email address lookup as a task to allow cancellation.
+        encryptedIndicatorTask = Task {
+            do {
+                if addresses != "" {
+                    let isEncrypted = try await validateEncryptedEmailAddresses(addresses)
+                    encryptedInputStatuses[fieldName] = isEncrypted
+                }
+
+                // Check if at least one input value is true (encrypted), and the rest are nil (empty)
+                let validInput = encryptedInputStatuses.contains { $0.value == true }
+                let invalidInput = encryptedInputStatuses.contains { $0.value == false }
+                let validInputs = validInput && !invalidInput
+
+                if validInputs {
+                    showEncryptedIndicatorView()
+                }
+            } catch {
+                self.presentErrorAlert(message: "Failed to validate email address encryption status", error: error)
+            }
+        }
+
+        try await encryptedIndicatorTask?.value
+    }
+
     @MainActor
     func cancelSend() {
         let alert = UIAlertController(
@@ -332,6 +401,40 @@ class SendEmailMessageViewController: UIViewController, UITextViewDelegate, UITa
         navigationItem.leftBarButtonItem = backButton
     }
 
+    /// Create the view that will hide/show when the email address in the `send` input field is verified.
+    func configureEncryptedIndicatorView() {
+        let height = Int(40)
+        let label = UILabel(frame: CGRect(x: 0, y: 0, width: Int(tableView.frame.size.width), height: height))
+
+        label.center = CGPoint(x: Int(UIScreen.main.bounds.width) / 2, y: height / 2)
+        label.backgroundColor = UIColor.systemGray
+        label.textAlignment = .center
+        label.font = UIFont.systemFont(ofSize: 14.0)
+
+        // "Encrypted" is a loose term here - the email address being returned from the
+        // `lookupEmailAddressesPublicInfo` endpoint simply means that the address and
+        // public key does exists in-network.
+        //
+        // "End-to-end encrypted" is what the MySudo application displays under the same use case.
+        label.text = "🔒 End-to-end encrypted"
+
+        encryptedIndicatorView = label
+    }
+
+    func hideEncryptedIndicatorView() {
+        if encryptedIndicatorViewVisible {
+            tableView.tableHeaderView = nil
+            encryptedIndicatorViewVisible = false
+        }
+    }
+
+    func showEncryptedIndicatorView() {
+        if !encryptedIndicatorViewVisible {
+            tableView.tableHeaderView = encryptedIndicatorView
+            encryptedIndicatorViewVisible = true
+        }
+    }
+
     // MARK: - Conformance: UITableViewDataSource
 
     func numberOfSections(in tableView: UITableView) -> Int {
@@ -364,7 +467,6 @@ class SendEmailMessageViewController: UIViewController, UITextViewDelegate, UITa
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        assert(indexPath.row <= 4)
         if isHeaderField(forIndexPath: indexPath) {
             guard let cell = tableView.dequeueReusableCell(withIdentifier: "headerCell") as? HeaderTableViewCell else {
                 return HeaderTableViewCell()
@@ -410,17 +512,34 @@ class SendEmailMessageViewController: UIViewController, UITextViewDelegate, UITa
         }
     }
 
-    // MARK: - Conformance: InputFormCellDelegate
-
     func headerCell(_ cell: HeaderTableViewCell, didUpdateInput input: String?) {
         guard let indexPath = tableView.indexPath(for: cell), let field = InputField(rawValue: indexPath.row) else {
             return
         }
-        guard let input = cell.textField.text, !input.isEmpty else {
+        let input = cell.textField.text
+        if input == nil || input!.isEmpty {
             formData[field] = nil
-            return
+        } else {
+            formData[field] = input
         }
-        formData[field] = input
+
+        let fieldName: String?
+        switch indexPath.row {
+        case 0:
+            fieldName = "to"
+        case 1:
+            fieldName = "cc"
+        case 2:
+            fieldName = "bcc"
+        default:
+            fieldName = nil
+        }
+
+        if fieldName != nil {
+            Task { @MainActor in
+                try await self.handleEncryptedIndicatorView(input ?? "", fieldName!)
+            }
+        }
     }
 
     func bodyCell(_ cell: BodyTableViewCell, didUpdateInput input: String?) {

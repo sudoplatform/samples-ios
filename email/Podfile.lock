@@ -1,6 +1,7 @@
 PODS:
   - AppSyncRealTimeClient (1.10.0):
     - Starscream (~> 4.0.4)
+  - ASN1Swift (1.2.3)
   - AWSAppSync (3.6.1):
     - AppSyncRealTimeClient (~> 1.7)
     - AWSCore (~> 2.27.0)
@@ -21,13 +22,14 @@ PODS:
     - AWSCore (= 2.27.15)
   - AWSS3 (2.27.15):
     - AWSCore (= 2.27.15)
+  - GzipSwift (5.1.1)
   - MimeParser (0.2.5)
   - ReachabilitySwift (5.0.0)
   - SQLite.swift (0.12.2):
     - SQLite.swift/standard (= 0.12.2)
   - SQLite.swift/standard (0.12.2)
   - Starscream (4.0.4)
-  - SudoApiClient (10.0.0):
+  - SudoApiClient (10.1.0):
     - AWSAppSync (~> 3.6.1)
     - AWSCore (~> 2.27.15)
     - SudoConfigManager (~> 3.0)
@@ -37,23 +39,25 @@ PODS:
     - AWSCore (~> 2.27.15)
     - AWSS3 (~> 2.27.15)
     - SudoLogging (~> 1.0)
-  - SudoEmail (6.0.0):
+  - SudoEmail (6.3.0):
     - AWSAppSync (~> 3.6.1)
     - AWSCore (~> 2.27.15)
     - AWSS3 (~> 2.27.15)
-    - SudoApiClient (~> 10.0)
-    - SudoConfigManager (~> 3.0)
-    - SudoKeyManager (~> 2.3)
+    - SudoApiClient (~> 10.1.0)
+    - SudoConfigManager (~> 3.0.2)
+    - SudoKeyManager (~> 2.5)
     - SudoLogging (~> 1.0)
-    - SudoUser (~> 15.0)
-  - SudoEntitlements (9.0.0):
+    - SudoUser (~> 15.1)
+  - SudoEntitlements (9.0.1):
     - AWSAppSync (~> 3.6.1)
     - SudoApiClient (~> 10.0)
     - SudoConfigManager (~> 3.0)
     - SudoKeyManager (~> 2.0)
     - SudoLogging (~> 1.0)
     - SudoUser (~> 15.0)
-  - SudoKeyManager (2.3.0)
+  - SudoKeyManager (2.5.0):
+    - ASN1Swift (~> 1.2)
+    - GzipSwift (~> 5.0)
   - SudoLogging (1.0.0)
   - SudoProfiles (17.0.0):
     - AWSAppSync (~> 3.6.1)
@@ -63,12 +67,13 @@ PODS:
     - SudoConfigManager (~> 3.0)
     - SudoLogging (~> 1.0)
     - SudoUser (~> 15.0)
-  - SudoUser (15.0.0):
+  - SudoUser (15.1.0):
     - AWSAppSync (~> 3.6.1)
     - AWSCognitoIdentityProvider (~> 2.27.15)
     - AWSCore (~> 2.27.15)
     - AWSMobileClient (~> 2.27.15)
     - AWSS3 (~> 2.27.15)
+    - Starscream (= 4.0.4)
     - SudoConfigManager (~> 3.0)
     - SudoKeyManager (~> 2.0)
     - SudoLogging (~> 1.0)
@@ -80,14 +85,15 @@ DEPENDENCIES:
   - AWSCore (~> 2.27.15)
   - AWSS3 (~> 2.27.15)
   - MimeParser (~> 0.1)
-  - SudoEmail (~> 6.0)
+  - SudoEmail (~> 6.3.0)
   - SudoEntitlements (~> 9.0)
   - SudoProfiles (~> 17.0)
-  - SudoUser (~> 15.0)
+  - SudoUser (~> 15.1)
 
 SPEC REPOS:
   https://github.com/CocoaPods/Specs.git:
     - AppSyncRealTimeClient
+    - ASN1Swift
     - AWSAppSync
     - AWSAuthCore
     - AWSCognitoIdentityProvider
@@ -95,6 +101,7 @@ SPEC REPOS:
     - AWSCore
     - AWSMobileClient
     - AWSS3
+    - GzipSwift
     - MimeParser
     - ReachabilitySwift
     - SQLite.swift
@@ -110,6 +117,7 @@ SPEC REPOS:
 
 SPEC CHECKSUMS:
   AppSyncRealTimeClient: 656ab4215e05f6ca47fe6d8c73f416d9984a8aac
+  ASN1Swift: 73ba94f1d97c1c1d059d180708ad42845aeac4f9
   AWSAppSync: 4ea012b003e2342499cc5b918e8a428849eaed77
   AWSAuthCore: 0bac0e67c28d620c8f823c88bd15d552544e801a
   AWSCognitoIdentityProvider: a8d244d0cdfeff425fe20a2fb49b7e9cb89c4748
@@ -117,19 +125,20 @@ SPEC CHECKSUMS:
   AWSCore: c67277201b6aca10e4cf24638eadaa67c85ebf03
   AWSMobileClient: 6f60d1fb6373e21aaada443dd4d4bf087158614d
   AWSS3: 09801b290f8818f532694cabd5d503c7474eb3df
+  GzipSwift: 893f3e48e597a1a4f62fafcb6514220fcf8287fa
   MimeParser: 3cd228548987bb9b67a014070e4cd984e51345a9
   ReachabilitySwift: 985039c6f7b23a1da463388634119492ff86c825
   SQLite.swift: d2b4642190917051ce6bd1d49aab565fe794eea3
   Starscream: 5178aed56b316f13fa3bc55694e583d35dd414d9
-  SudoApiClient: 53e6c416c466735b4760515392f22b60ad777c79
+  SudoApiClient: 31703a617ea6dbeb53e67aac063d3de07f74898e
   SudoConfigManager: aee20bc2d03e28342da663ae48378d0daae78f47
-  SudoEmail: 0efc50cb2c9c57a849c915bdb9b3131eb94780d5
-  SudoEntitlements: af4ac922491e1955464927988ff00373bee969a5
-  SudoKeyManager: ce7d8eba742ec1ae156f586097dfa982719e611b
+  SudoEmail: e8ae7ba697f3cf97c8da84b4ee61c6a4c67f0e6f
+  SudoEntitlements: a6234950614517b64cd1c45605469619f61e1399
+  SudoKeyManager: bf64dcce19f53de4004f4ea460fc382dd0dd012c
   SudoLogging: 93238a71338292a650804358994c67f8f3816d20
   SudoProfiles: c791410946d47cb3deace4b690a954cea6a1fc7e
-  SudoUser: 1b60674a7d1894f48260a077f8ce94bc05b98d8b
+  SudoUser: 61b99b0c23cf609098e42c68a56bf7873b7c6b47
 
-PODFILE CHECKSUM: 1babd110c954d34ea78844aad731e5f1e19ae570
+PODFILE CHECKSUM: 88a35401541f1b5b8d3ce31fdc390103cc5d7499
 
-COCOAPODS: 1.11.3
+COCOAPODS: 1.14.2

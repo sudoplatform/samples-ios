@@ -1,0 +1,28 @@
+{
+  "configurations" : [
+    {
+      "id" : "A5792EFF-82CF-4CA4-9EFC-97DC93EB55AA",
+      "name" : "Configuration 1",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "targetForVariableExpansion" : {
+      "containerPath" : "container:VirtualCardsExample.xcodeproj",
+      "identifier" : "5D3E18F52A981BA100344D9A",
+      "name" : "VirtualCardsExampleUITests"
+    }
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:VirtualCardsExample.xcodeproj",
+        "identifier" : "5D3E18F52A981BA100344D9A",
+        "name" : "VirtualCardsExampleUITests"
+      }
+    }
+  ],
+  "version" : 1
+}

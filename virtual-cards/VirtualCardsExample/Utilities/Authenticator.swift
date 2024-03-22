@@ -69,6 +69,11 @@ class Authenticator {
             guard let err = cause.first else {
                 fatalError("No Error in cause")
             }
+
+            if err.localizedDescription == "sudoplatform.identity.UserNotFound" {
+                return try userClient.getUserName() ?? ""
+            }
+
             guard let appSyncError = err as? AWSAppSyncClientError else {
                 throw err
             }
@@ -83,6 +88,7 @@ class Authenticator {
                 throw appSyncError
             }
             switch error {
+
             case .notAuthorized:
                 // refresh tokens and try again
                 do {

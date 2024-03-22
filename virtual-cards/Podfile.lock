@@ -1,6 +1,7 @@
 PODS:
   - AppSyncRealTimeClient (1.10.0):
     - Starscream (~> 4.0.4)
+  - ASN1Swift (1.2.5)
   - AWSAppSync (3.6.1):
     - AppSyncRealTimeClient (~> 1.7)
     - AWSCore (~> 2.27.0)
@@ -21,8 +22,27 @@ PODS:
     - AWSCore (= 2.27.15)
   - AWSS3 (2.27.15):
     - AWSCore (= 2.27.15)
-  - Plaid (4.2.1)
+  - Checkout (4.3.2):
+    - CheckoutEventLoggerKit (~> 1.2.4)
+    - Risk (= 2.0.1)
+  - CheckoutEventLoggerKit (1.2.4)
+  - FingerprintPro (2.2.0)
+  - Frames (4.3.2):
+    - Checkout (= 4.3.2)
+    - CheckoutEventLoggerKit (~> 1.2.4)
+    - PhoneNumberKit
+  - GzipSwift (5.1.1)
+  - PhoneNumberKit (3.7.9):
+    - PhoneNumberKit/PhoneNumberKitCore (= 3.7.9)
+    - PhoneNumberKit/UIKit (= 3.7.9)
+  - PhoneNumberKit/PhoneNumberKitCore (3.7.9)
+  - PhoneNumberKit/UIKit (3.7.9):
+    - PhoneNumberKit/PhoneNumberKitCore
+  - Plaid (4.7.3)
   - ReachabilitySwift (5.0.0)
+  - Risk (2.0.1):
+    - CheckoutEventLoggerKit (~> 1.2.4)
+    - FingerprintPro (= 2.2.0)
   - SQLite.swift (0.12.2):
     - SQLite.swift/standard (= 0.12.2)
   - SQLite.swift/standard (0.12.2)
@@ -41,7 +61,7 @@ PODS:
   - StripeCore (22.8.4)
   - StripeUICore (22.8.4):
     - StripeCore (= 22.8.4)
-  - SudoApiClient (10.0.0):
+  - SudoApiClient (10.1.0):
     - AWSAppSync (~> 3.6.1)
     - AWSCore (~> 2.27.15)
     - SudoConfigManager (~> 3.0)
@@ -51,7 +71,7 @@ PODS:
     - AWSCore (~> 2.27.15)
     - AWSS3 (~> 2.27.15)
     - SudoLogging (~> 1.0)
-  - SudoEntitlements (9.0.0):
+  - SudoEntitlements (9.0.1):
     - AWSAppSync (~> 3.6.1)
     - SudoApiClient (~> 10.0)
     - SudoConfigManager (~> 3.0)
@@ -65,7 +85,9 @@ PODS:
     - SudoConfigManager (~> 3.0)
     - SudoLogging (~> 1.0)
     - SudoUser (~> 15.0)
-  - SudoKeyManager (2.3.0)
+  - SudoKeyManager (2.5.0):
+    - ASN1Swift (~> 1.2)
+    - GzipSwift (~> 5.0)
   - SudoLogging (1.0.0)
   - SudoProfiles (17.0.0):
     - AWSAppSync (~> 3.6.1)
@@ -75,36 +97,41 @@ PODS:
     - SudoConfigManager (~> 3.0)
     - SudoLogging (~> 1.0)
     - SudoUser (~> 15.0)
-  - SudoUser (15.0.0):
+  - SudoUser (15.1.0):
     - AWSAppSync (~> 3.6.1)
     - AWSCognitoIdentityProvider (~> 2.27.15)
     - AWSCore (~> 2.27.15)
     - AWSMobileClient (~> 2.27.15)
     - AWSS3 (~> 2.27.15)
+    - Starscream (= 4.0.4)
     - SudoConfigManager (~> 3.0)
     - SudoKeyManager (~> 2.0)
     - SudoLogging (~> 1.0)
-  - SudoVirtualCards (22.0.1):
+  - SudoVirtualCards (23.6.0):
     - AWSAppSync (~> 3.6.1)
     - AWSCore (~> 2.27.15)
-    - SudoApiClient (~> 10.0)
-    - SudoConfigManager (~> 3.0)
-    - SudoKeyManager (~> 2.0)
+    - Starscream (= 4.0.4)
+    - SudoApiClient (~> 10.1.0)
+    - SudoConfigManager (~> 3.0.2)
+    - SudoKeyManager (~> 2.5)
     - SudoLogging (~> 1.0)
-    - SudoUser (~> 15.0)
+    - SudoUser (~> 15.1)
 
 DEPENDENCIES:
+  - Frames (~> 4)
+  - PhoneNumberKit (from `https://github.com/marmelroy/PhoneNumberKit`)
   - Plaid (~> 4.2)
   - Stripe (~> 22)
   - SudoEntitlements (~> 9.0)
   - SudoIdentityVerification (~> 14.0)
   - SudoProfiles (~> 17.0)
   - SudoUser (~> 15.0)
-  - SudoVirtualCards (~> 22.0)
+  - SudoVirtualCards (~> 23.6.0)
 
 SPEC REPOS:
   https://github.com/CocoaPods/Specs.git:
     - AppSyncRealTimeClient
+    - ASN1Swift
     - AWSAppSync
     - AWSAuthCore
     - AWSCognitoIdentityProvider
@@ -112,8 +139,14 @@ SPEC REPOS:
     - AWSCore
     - AWSMobileClient
     - AWSS3
+    - Checkout
+    - CheckoutEventLoggerKit
+    - FingerprintPro
+    - Frames
+    - GzipSwift
     - Plaid
     - ReachabilitySwift
+    - Risk
     - SQLite.swift
     - Starscream
     - Stripe
@@ -130,8 +163,18 @@ SPEC REPOS:
     - SudoUser
     - SudoVirtualCards
 
+EXTERNAL SOURCES:
+  PhoneNumberKit:
+    :git: https://github.com/marmelroy/PhoneNumberKit
+
+CHECKOUT OPTIONS:
+  PhoneNumberKit:
+    :commit: 96012b76e8b7bd50a799fe98e51f4dfd4b632b9e
+    :git: https://github.com/marmelroy/PhoneNumberKit
+
 SPEC CHECKSUMS:
   AppSyncRealTimeClient: 656ab4215e05f6ca47fe6d8c73f416d9984a8aac
+  ASN1Swift: be676fe8c6cd753dbc402ec68b28544d53aa0c26
   AWSAppSync: 4ea012b003e2342499cc5b918e8a428849eaed77
   AWSAuthCore: 0bac0e67c28d620c8f823c88bd15d552544e801a
   AWSCognitoIdentityProvider: a8d244d0cdfeff425fe20a2fb49b7e9cb89c4748
@@ -139,24 +182,31 @@ SPEC CHECKSUMS:
   AWSCore: c67277201b6aca10e4cf24638eadaa67c85ebf03
   AWSMobileClient: 6f60d1fb6373e21aaada443dd4d4bf087158614d
   AWSS3: 09801b290f8818f532694cabd5d503c7474eb3df
-  Plaid: 14df1dd2a64e14d0203ee8ef55d8bf9d166188ff
+  Checkout: 0ccc5857964731042f49c8addacc9671d77b7b08
+  CheckoutEventLoggerKit: b780dec46295a34942780ea6230d0d5fd08aa05a
+  FingerprintPro: 72e35dc0315b75ba36eafaaed996dbb2f35f7326
+  Frames: 7d069876d2c0323d5b6ddd54efe1217c26225819
+  GzipSwift: 893f3e48e597a1a4f62fafcb6514220fcf8287fa
+  PhoneNumberKit: 9c8d546d65c3784721d575a29e712ae8b992fe79
+  Plaid: 0bc07769a70751b7b354e0a192cbe4bf36ef5f88
   ReachabilitySwift: 985039c6f7b23a1da463388634119492ff86c825
+  Risk: 5afc8c739782cae0c26b3d605975339ea6bd0c62
   SQLite.swift: d2b4642190917051ce6bd1d49aab565fe794eea3
   Starscream: 5178aed56b316f13fa3bc55694e583d35dd414d9
   Stripe: 59f6659e8ea413def19c97c57e23f5ec6ea48cf8
   StripeApplePay: 6e9aebd3d248464836e9fbdaef6e5fb1817d56a6
   StripeCore: 193f27552fb98108ebfe0df11651fe5f38948305
   StripeUICore: 6a5bbea0164d63bd91000f001903e7901859e1a4
-  SudoApiClient: 53e6c416c466735b4760515392f22b60ad777c79
+  SudoApiClient: 31703a617ea6dbeb53e67aac063d3de07f74898e
   SudoConfigManager: aee20bc2d03e28342da663ae48378d0daae78f47
-  SudoEntitlements: af4ac922491e1955464927988ff00373bee969a5
+  SudoEntitlements: a6234950614517b64cd1c45605469619f61e1399
   SudoIdentityVerification: 1408945c84c7ec82a383546fd75040168ecd3ffc
-  SudoKeyManager: ce7d8eba742ec1ae156f586097dfa982719e611b
+  SudoKeyManager: bf64dcce19f53de4004f4ea460fc382dd0dd012c
   SudoLogging: 93238a71338292a650804358994c67f8f3816d20
   SudoProfiles: c791410946d47cb3deace4b690a954cea6a1fc7e
-  SudoUser: 1b60674a7d1894f48260a077f8ce94bc05b98d8b
-  SudoVirtualCards: 17b14c1665ad171b65b72b85775574fca1f87d58
+  SudoUser: 61b99b0c23cf609098e42c68a56bf7873b7c6b47
+  SudoVirtualCards: 8cc9c5c50784eac17af75d6a7dacc4fa92d2cc8f
 
-PODFILE CHECKSUM: a446d0922fe0118acfd565447ee9265b886d6cd3
+PODFILE CHECKSUM: 0888bb122a937b66b8422c37a7092a09ebde75d1
 
-COCOAPODS: 1.12.0
+COCOAPODS: 1.15.0

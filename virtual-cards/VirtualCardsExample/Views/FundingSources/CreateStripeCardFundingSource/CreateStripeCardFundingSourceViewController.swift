@@ -14,7 +14,7 @@ import Stripe
 ///     - `CreateFundingSourceMenuViewController`:  A user chooses the "Add Stripe Funding Source" option at the bottom of the table view list.
 /// - Links To:
 ///     - `FundingSourceListViewController`: If a user successfully creates a funding source, they will be returned to this form.
-class CreateCardFundingSourceViewController: UIViewController,
+class CreateStripeCardFundingSourceViewController: UIViewController,
                                          UITableViewDelegate,
                                          UITableViewDataSource,
                                          InputFormCellDelegate,
@@ -27,7 +27,7 @@ class CreateCardFundingSourceViewController: UIViewController,
 
     // MARK: - Supplementary
 
-    /// Segues that are performed in `CreateCardFundingSourceViewController`.
+    /// Segues that are performed in `CreateStripeCardFundingSourceViewController`.
     enum Segue: String {
         /// Used to navigate back to the `FundingSourceListViewController`.
         case returnToFundingSourceList
@@ -135,7 +135,7 @@ class CreateCardFundingSourceViewController: UIViewController,
 
     // MARK: - Properties
 
-    var configResult: Task<[FundingSourceClientConfiguration], Error>!
+    var configuration: StripeCardClientConfiguration!
 
     /// Array of input fields used on the view.
     let inputFields: [InputField] = InputField.allCases
@@ -165,9 +165,6 @@ class CreateCardFundingSourceViewController: UIViewController,
         super.viewDidLoad()
         configureNavigationBar()
         configureTableView()
-        configResult = Task(priority: .background) {
-            return try await virtualCardsClient.getFundingSourceClientConfiguration()
-        }
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -178,7 +175,6 @@ class CreateCardFundingSourceViewController: UIViewController,
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         stopListeningForKeyboardNotifications()
-        configResult.cancel()
     }
 
     // MARK: - Actions
@@ -219,56 +215,45 @@ class CreateCardFundingSourceViewController: UIViewController,
             postalCode: formData[.zip] ?? "",
             country: formData[.country] ?? ""
         )
-        let configResult = await configResult.result
+
         do {
-            switch configResult {
-            case .success(let configs):
-                var apiKey: String?
-                for config in configs {
-                    if case .stripeCard(let stripeConfig) = config {
-                        apiKey = stripeConfig.apiKey
-                        break
-                    }
-                }
-                guard let apiKey = apiKey else {
-                    throw AnyError("Failed to get API Key")
-                }
-                let setupResult = try await virtualCardsClient.setupFundingSource(
-                    withInput: SetupFundingSourceInput(
-                        type: .creditCard,
-                        currency: "USD",
-                        applicationData: ClientApplicationData(applicationName: "iosApplication"),
-                        supportedProviders: ["stripe"])
+            let apiKey = configuration.apiKey
+            let setupResult = try await virtualCardsClient.setupFundingSource(
+                withInput: SetupFundingSourceInput(
+                    type: .creditCard,
+                    currency: "USD",
+                    applicationData: ClientApplicationData(
+                        applicationName: "iosApplication"
+                    ),
+                    supportedProviders: ["stripe"]
                 )
-                let stripeClient = STPAPIClient(publishableKey: apiKey)
-                STPAPIClient.shared.publishableKey = apiKey
-                var clientSecret: String?
-                if case .stripeCard(let stripeProvisioningData) = setupResult.provisioningData {
-                    clientSecret = stripeProvisioningData.clientSecret
-                }
-                guard let clientSecret = clientSecret else {
-                    throw AnyError("Failed to get client secret from setupFundingSource response")
-                }
-                let stripeWorker = StripeIntentWorker(
-                    fromInputDetails: input,
-                    clientSecret: clientSecret,
-                    stripeClient: stripeClient,
-                    authenticationContext: self
+            )
+            let stripeClient = STPAPIClient(publishableKey: apiKey)
+            STPAPIClient.shared.publishableKey = apiKey
+            var clientSecret: String?
+            if case .stripeCard(let stripeProvisioningData) = setupResult.provisioningData {
+                clientSecret = stripeProvisioningData.clientSecret
+            }
+            guard let clientSecret = clientSecret else {
+                throw AnyError("Failed to get client secret from setupFundingSource response")
+            }
+            let stripeWorker = StripeIntentWorker(
+                fromInputDetails: input,
+                clientSecret: clientSecret,
+                stripeClient: stripeClient,
+                authenticationContext: self
+            )
+            let paymentMethodId = try await stripeWorker.confirmSetupIntent()
+            _ = try await virtualCardsClient.completeFundingSource(
+                withInput: CompleteFundingSourceInput(
+                    id: setupResult.id,
+                    completionData: .stripeCard(StripeCardCompletionDataInput(paymentMethodId: paymentMethodId))
                 )
-                let paymentMethodId = try await stripeWorker.confirmSetupIntent()
-                _ = try await virtualCardsClient.completeFundingSource(
-                    withInput: CompleteFundingSourceInput(
-                        id: setupResult.id,
-                        completionData: .stripeCard(StripeCardCompletionDataInput(paymentMethodId: paymentMethodId))
-                    )
-                )
-                Task {
-                    dismissActivityAlert {
-                        self.performSegue(withIdentifier: Segue.returnToFundingSourceList.rawValue, sender: self)
-                    }
+            )
+            Task {
+                dismissActivityAlert {
+                    self.performSegue(withIdentifier: Segue.returnToFundingSourceList.rawValue, sender: self)
                 }
-            case .failure(let error):
-                throw error
             }
         } catch {
             Task {

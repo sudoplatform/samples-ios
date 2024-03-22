@@ -135,15 +135,9 @@ class RefreshBankAccountFundingSourceViewController: UIViewController {
 
     /// Continues the bank account funding source refresh flow from the `virtualCardsClient` by
     /// launching the Plaid Link flow.
-    func startRefreshFundingSource()  {
-        do {
-            launchPlaidLink(linkToken: linkToken)
-            configureAuthorizationWebView(authorizationText: authorizationText)
-        } catch {
-            Task {
-                presentErrorAlert(message: "Failed to refresh funding source", error: error)
-            }
-        }
+    func startRefreshFundingSource() {
+        launchPlaidLink(linkToken: linkToken)
+        configureAuthorizationWebView(authorizationText: authorizationText)
     }
 
     /// Completes the bank account funding source creation flow from the `virtualCardsClient`.
@@ -152,7 +146,7 @@ class RefreshBankAccountFundingSourceViewController: UIViewController {
             presentActivityAlert(message: "Refreshing funding source")
         }
         do {
-            try await virtualCardsClient.createKeysIfAbsent()
+            _ = try await virtualCardsClient.createKeysIfAbsent()
             let refreshData = CheckoutBankAccountRefreshDataInput(
                 accountId: linkSuccess.metadata.accounts[0].id,
                 authorizationText: authorizationText[0]
@@ -163,7 +157,7 @@ class RefreshBankAccountFundingSourceViewController: UIViewController {
                     refreshData: refreshDataInput,
                     applicationData: ClientApplicationData(applicationName: "iosApplication"),
                     language: authorizationText[0].language)
-            try await virtualCardsClient.refreshFundingSource(withInput: input)
+            _ = try await virtualCardsClient.refreshFundingSource(withInput: input)
             Task {
                 dismissActivityAlert {
                     self.performSegue(withIdentifier: Segue.returnToFundingSourceList.rawValue, sender: self)
@@ -182,7 +176,7 @@ class RefreshBankAccountFundingSourceViewController: UIViewController {
     ///
     /// - Parameter linkToken: Link token required to launch Plaid Link.
     func launchPlaidLink(linkToken: String) {
-        var linkConfiguration = LinkTokenConfiguration(
+        let linkConfiguration = LinkTokenConfiguration(
             token: linkToken,
             onSuccess: { linkSuccess in
                 self.linkSuccess = linkSuccess
@@ -193,11 +187,11 @@ class RefreshBankAccountFundingSourceViewController: UIViewController {
         )
         let result = Plaid.create(linkConfiguration)
         switch result {
-          case .failure(let error):
+        case .failure(let error):
             Task {
                 presentErrorAlert(message: "Failed to refresh funding source", error: error)
             }
-          case .success(let handler):
+        case .success(let handler):
             handler.open(presentUsing: .viewController(self))
             linkHandler = handler
         }

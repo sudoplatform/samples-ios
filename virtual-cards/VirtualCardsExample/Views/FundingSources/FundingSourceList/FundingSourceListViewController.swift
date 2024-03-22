@@ -64,6 +64,7 @@ class FundingSourceListViewController: UIViewController, UITableViewDelegate, UI
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        configureNavigationBar()
         configureTableView()
     }
 
@@ -74,6 +75,7 @@ class FundingSourceListViewController: UIViewController, UITableViewDelegate, UI
             await self.loadCacheFundingSourcesAndFetchRemote()
         }
     }
+
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         let segueType = Segue(rawValue: segue.identifier ?? "")
         switch segueType {
@@ -143,6 +145,30 @@ class FundingSourceListViewController: UIViewController, UITableViewDelegate, UI
         }
     }
 
+    /// Review a funding source based on the input id.
+    ///
+    /// - Parameter id: The id of the funding source to cancel.
+    func reviewUnfundedFundingSource(id: String) async throws -> FundingSource {
+        Task {
+            self.presentActivityAlert(message: "Reviewing unfunded funding source")
+        }
+
+        do {
+            let fundingSource = try await virtualCardsClient.reviewUnfundedFundingSource(withId: id)
+            Task {
+                self.dismissActivityAlert()
+            }
+
+            return fundingSource
+        } catch {
+            Task {
+                self.dismissActivityAlert()
+                self.presentErrorAlert(message: "Failed to review funding source", error: error)
+            }
+            throw error
+        }
+    }
+
     /// Refresh a funding source based on the input id.
     ///
     /// - Parameter id: The id of the funding source to refresh.
@@ -196,6 +222,11 @@ class FundingSourceListViewController: UIViewController, UITableViewDelegate, UI
 
     // MARK: - Helpers: Configuration
 
+    func configureNavigationBar() {
+        navigationItem.backBarButtonItem = UIBarButtonItem(
+            title: "Back", style: .plain, target: nil, action: nil)
+    }
+
     /// Configures the table view used to display the navigation elements.
     func configureTableView() {
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "default")
@@ -240,15 +271,17 @@ class FundingSourceListViewController: UIViewController, UITableViewDelegate, UI
     func getDisplayTitleForFundingSource(_ fundingSource: FundingSource) -> String {
         switch fundingSource {
         case .creditCardFundingSource(let creditCardFundingSource):
-            let suffix = getSuffixForFundingSourceState(creditCardFundingSource.state)
+            let suffix = getSuffixForFundingSourceState(creditCardFundingSource.state, creditCardFundingSource.flags )
             return "••••\(creditCardFundingSource.last4) (\(creditCardFundingSource.cardType))\(suffix)"
         case .bankAccountFundingSource(let bankAccountFundingSource):
-            let suffix = getSuffixForFundingSourceState(bankAccountFundingSource.state)
+            var suffix = getSuffixForFundingSourceState(bankAccountFundingSource.state, bankAccountFundingSource.flags)
+            suffix = getSuffixForUnfundedFundingSource(bankAccountFundingSource, suffix)
             let institutionName = (bankAccountFundingSource.institutionLogo == nil) ? "\(bankAccountFundingSource.institutionName) " : ""
             return "\(institutionName)••••\(bankAccountFundingSource.last4) (\(bankAccountFundingSource.bankAccountType))\(suffix)"
         }
     }
-    private func getSuffixForFundingSourceState(_ state: FundingSourceState) -> String {
+
+    private func getSuffixForFundingSourceState(_ state: FundingSourceState, _ flags: [FundingSourceFlags]) -> String {
         var suffix = ""
         switch state {
         case .inactive:
@@ -258,7 +291,20 @@ class FundingSourceListViewController: UIViewController, UITableViewDelegate, UI
         default:
             break
         }
+        if  flags.contains(FundingSourceFlags.unfunded) {
+            suffix += " - UNFUNDED"
+        }
         return suffix
+    }
+    private func getSuffixForUnfundedFundingSource(_ fundingSource: BankAccountFundingSource, _ suffix: String) -> String {
+
+        var internalSuffix = suffix
+
+        if fundingSource .unfundedAmount != nil {
+            let unfundedAmountDisplay = "\(Double(fundingSource.unfundedAmount!.amount) / 100.0) \(fundingSource.unfundedAmount!.currency)"
+                    internalSuffix += " \(unfundedAmountDisplay)"
+                }
+        return internalSuffix
     }
 
     /// Formats the imageView which represents the logo of the credit card network or bank account institution
@@ -331,13 +377,15 @@ class FundingSourceListViewController: UIViewController, UITableViewDelegate, UI
             let fundingSource = self.fundingSources[indexPath.row]
             var canCancel = false
             var canRefresh = false
+            var canReview = false
             switch fundingSource {
             case .creditCardFundingSource(let creditCardFundingSource):
                 canCancel = creditCardFundingSource.state == .active
                 canRefresh = creditCardFundingSource.state == .refresh
             case .bankAccountFundingSource(let bankAccountFundingSource):
-                canCancel = bankAccountFundingSource.state == .active
                 canRefresh = bankAccountFundingSource.state == .refresh
+                canReview = bankAccountFundingSource.flags.contains(FundingSourceFlags.unfunded)
+                canCancel = bankAccountFundingSource.state == .active && !canReview
             }
             var actions: [UIContextualAction] = []
             if canCancel {
@@ -367,6 +415,32 @@ class FundingSourceListViewController: UIViewController, UITableViewDelegate, UI
                 }
                 cancel.backgroundColor = .red
                 actions.append(cancel)
+            }
+            if canReview {
+                let review = UIContextualAction(style: .destructive, title: "Review") { _, _, completion in
+                    let fundingSource = self.fundingSources[indexPath.row]
+                    switch fundingSource {
+                    case .creditCardFundingSource:
+                        break
+                    case .bankAccountFundingSource(let bankAccountFundingSource):
+                        Task(priority: .medium) {
+                            do {
+                                let  reviewedFundingSource = try await self.reviewUnfundedFundingSource(id: bankAccountFundingSource.id)
+                                Task {
+                                    self.fundingSources.remove(at: indexPath.row)
+                                    self.fundingSources.insert(reviewedFundingSource, at: indexPath.row)
+                                    let cell = self.tableView.cellForRow(at: indexPath)
+                                    cell?.textLabel?.text = self.getDisplayTitleForFundingSource(reviewedFundingSource)
+                                    completion(true)
+                                }
+                            } catch {
+                                completion(false)
+                            }
+                        }
+                    }
+                }
+                review.backgroundColor = .red
+                actions.append(review)
             }
             if canRefresh {
                 let refresh = UIContextualAction(style: .destructive, title: "Refresh") { _, _, completion in

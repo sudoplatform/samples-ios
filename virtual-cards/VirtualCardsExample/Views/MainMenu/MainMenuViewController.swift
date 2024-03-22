@@ -102,12 +102,12 @@ class MainMenuViewController: UIViewController, UITableViewDelegate, UITableView
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        configureNavigationBar()
         configureTableView()
     }
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        configureNavigationBar()
     }
 
     override func viewDidAppear(_ animated: Bool) {
@@ -116,7 +116,13 @@ class MainMenuViewController: UIViewController, UITableViewDelegate, UITableView
             do {
                 _ = try await self.virtualCardsClient.createKeysIfAbsent()
             } catch {
-                self.presentErrorAlert(message: "Failed to create keys", error: error)
+                do {
+                    _ = try await AppDelegate.dependencies.userClient.refreshTokens()
+                    _ = try await AppDelegate.dependencies.userClient.signInWithKey()
+                    _ = try await self.virtualCardsClient.createKeysIfAbsent()
+                } catch {
+                    self.presentErrorAlert(message: "Failed to create keys", error: error)
+                }
             }
         }
     }

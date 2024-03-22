@@ -15,7 +15,7 @@ import WebKit
 ///     - `CreateFundingSourceMenuViewController`: A user taps the "Add Checkout Bank Account" button.
 /// - Links To:
 ///     - `FundingSourceListViewController`: If a user successfully creates a funding source, they will be returned to this form.
-class CreateBankAccountFundingSourceViewController: UIViewController {
+class CreateCheckoutBankAccountFSVC: UIViewController {
 
     // MARK: - Outlets
 
@@ -171,7 +171,7 @@ class CreateBankAccountFundingSourceViewController: UIViewController {
             presentActivityAlert(message: "Creating funding source")
         }
         do {
-            try await virtualCardsClient.createKeysIfAbsent()
+            _ = try await virtualCardsClient.createKeysIfAbsent()
             let completionData = CheckoutBankAccountCompletionDataInput(
                 publicToken: linkSuccess.publicToken,
                 accountId: linkSuccess.metadata.accounts[0].id,
@@ -180,7 +180,7 @@ class CreateBankAccountFundingSourceViewController: UIViewController {
             )
             let completionDataInput = CompletionDataInput.checkoutBankAccount(completionData)
             let input = CompleteFundingSourceInput(id: provisionalFundingSource.id, completionData: completionDataInput)
-            try await virtualCardsClient.completeFundingSource(withInput: input)
+            _ = try await virtualCardsClient.completeFundingSource(withInput: input)
             Task {
                 dismissActivityAlert {
                     self.performSegue(withIdentifier: Segue.returnToFundingSourceList.rawValue, sender: self)
@@ -199,7 +199,7 @@ class CreateBankAccountFundingSourceViewController: UIViewController {
     ///
     /// - Parameter linkToken: Link token required to launch Plaid Link.
     func launchPlaidLink(linkToken: String) {
-        var linkConfiguration = LinkTokenConfiguration(
+        let linkConfiguration = LinkTokenConfiguration(
             token: linkToken,
             onSuccess: { linkSuccess in
                 self.linkSuccess = linkSuccess
@@ -210,11 +210,11 @@ class CreateBankAccountFundingSourceViewController: UIViewController {
         )
         let result = Plaid.create(linkConfiguration)
         switch result {
-          case .failure(let error):
+        case .failure(let error):
             Task {
                 presentErrorAlert(message: "Failed to create funding source", error: error)
             }
-          case .success(let handler):
+        case .success(let handler):
 
             handler.open(presentUsing: .viewController(self))
             linkHandler = handler

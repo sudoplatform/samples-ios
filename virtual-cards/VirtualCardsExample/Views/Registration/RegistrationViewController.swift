@@ -101,7 +101,7 @@ class RegistrationViewController: UIViewController {
     // MARK: - Operations
 
     /// Perform registration and sign in from the Sudo user client.
-    func registerAndSignIn() async throws {
+    func registerAndSignIn(retry: Bool = true) async throws {
 
         func redeem() async throws {
             _ = try await self.entitlementsClient.redeemEntitlements()
@@ -122,11 +122,18 @@ class RegistrationViewController: UIViewController {
             _ = try await userClient.presentFederatedSignInUI(presentationAnchor: viewControllerWindow)
             _ = try await redeem()
         } else {
-            if try await userClient.isRegistered() {
-                _ = try await signIn()
-            } else {
+            if !(try await userClient.isRegistered()) {
                 try await authenticator.register()
+            }
+            do {
                 _ = try await signIn()
+            } catch SudoUserClientError.notAuthorized {
+                if retry {
+                    try await userClient.reset()
+                    try await registerAndSignIn(retry: false)
+                } else {
+                    throw SudoUserClientError.notAuthorized
+                }
             }
         }
     }
@@ -148,7 +155,7 @@ class RegistrationViewController: UIViewController {
     /// - Parameters:
     ///     - error: Contains the given `Error`.
     private func showSignInFailureAlert(error: Error, completion: (() -> Void)? = nil) async {
-        let alert = UIAlertController(title: "Error", message: "Failed to sign in:\n\(error)", preferredStyle: .alert)
+        let alert = UIAlertController(title: "Error", message: "5)ign in:\n\(error)", preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
         self.present(alert, animated: true, completion: completion)
     }

@@ -44,6 +44,10 @@ extension TransactionDeclineReason: CustomStringConvertible {
             return "Currency Blocked"
         case .fundingError:
             return "Funding Error"
+        case .insufficientEntitlements:
+            return "Insufficient Entitlements"
+        case .serviceUnavailable:
+            return "Service Unavailable"
         }
     }
 }

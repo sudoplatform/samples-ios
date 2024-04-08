@@ -66,6 +66,8 @@ class EmailMessageTableViewCell: UITableViewCell {
             recipientsLabel?.text = "To: " + toAddressLabel.joined(separator: ", ")
         }
         dateLabel.date = emailMessage.createdAt
-        subjectLabel.text = emailMessage.subject ?? Defaults.subject
+        let isEncrypted = emailMessage.encryptionStatus == .ENCRYPTED
+        let subject = emailMessage.subject ?? Defaults.subject
+        subjectLabel.text = isEncrypted ? "🔒 " + subject : subject
     }
 }

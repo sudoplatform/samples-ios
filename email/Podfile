@@ -29,7 +29,7 @@ target 'EmailExample' do
 
     target 'EmailExampleTests'
 
-    pod 'SudoEmail', '~> 6.4.0'
+    pod 'SudoEmail', '~> 8.3.1'
 end
 
 # Fix Xcode nagging warning on pod install/update

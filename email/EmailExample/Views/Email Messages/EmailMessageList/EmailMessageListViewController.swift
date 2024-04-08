@@ -358,7 +358,18 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
     func loadBlockedAddresses() async {
         do {
             let result = try await self.emailClient.getEmailAddressBlocklist()
-            self.blockedAddresses = result
+            var cleartextAddresses: [String] = []
+            result.forEach{
+                switch ($0.status) {
+                case .completed:
+                    cleartextAddresses.append($0.address)
+                    break
+                default:
+                    // Handle error. Likely a missing key in which case address can be unblocked by hashedValue
+                    NSLog("Error")
+                }
+            }
+            self.blockedAddresses = cleartextAddresses
             Task { @MainActor in
                 self.tableView.reloadData()
             }
@@ -527,7 +538,8 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
             cc: rfc822Message.cc.map { EmailMessage.EmailAddress(address: $0) },
             bcc: rfc822Message.bcc.map { EmailMessage.EmailAddress(address: $0) },
             subject: rfc822Message.subject,
-            hasAttachments: false
+            hasAttachments: false,
+            encryptionStatus: EncryptionStatus.UNENCRYPTED
         )
         return emailDraft
     }

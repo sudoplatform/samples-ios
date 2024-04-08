@@ -1,7 +1,7 @@
 PODS:
   - AppSyncRealTimeClient (1.10.0):
     - Starscream (~> 4.0.4)
-  - ASN1Swift (1.2.5)
+  - ASN1Swift (1.2.6)
   - AWSAppSync (3.6.1):
     - AppSyncRealTimeClient (~> 1.7)
     - AWSCore (~> 2.27.0)
@@ -39,7 +39,7 @@ PODS:
     - AWSCore (~> 2.27.15)
     - AWSS3 (~> 2.27.15)
     - SudoLogging (~> 1.0)
-  - SudoEmail (6.4.0):
+  - SudoEmail (8.3.1):
     - AWSAppSync (~> 3.6.1)
     - AWSCore (~> 2.27.15)
     - AWSS3 (~> 2.27.15)
@@ -85,7 +85,7 @@ DEPENDENCIES:
   - AWSCore (~> 2.27.15)
   - AWSS3 (~> 2.27.15)
   - MimeParser (~> 0.1)
-  - SudoEmail (~> 6.4.0)
+  - SudoEmail (~> 8.3.1)
   - SudoEntitlements (~> 9.0)
   - SudoProfiles (~> 17.0)
   - SudoUser (~> 15.1)
@@ -117,7 +117,7 @@ SPEC REPOS:
 
 SPEC CHECKSUMS:
   AppSyncRealTimeClient: 656ab4215e05f6ca47fe6d8c73f416d9984a8aac
-  ASN1Swift: be676fe8c6cd753dbc402ec68b28544d53aa0c26
+  ASN1Swift: aa0443dd848f4cb46d1d43ca7b2dea0be2ad13c4
   AWSAppSync: 4ea012b003e2342499cc5b918e8a428849eaed77
   AWSAuthCore: 0bac0e67c28d620c8f823c88bd15d552544e801a
   AWSCognitoIdentityProvider: a8d244d0cdfeff425fe20a2fb49b7e9cb89c4748
@@ -132,13 +132,13 @@ SPEC CHECKSUMS:
   Starscream: 5178aed56b316f13fa3bc55694e583d35dd414d9
   SudoApiClient: 31703a617ea6dbeb53e67aac063d3de07f74898e
   SudoConfigManager: aee20bc2d03e28342da663ae48378d0daae78f47
-  SudoEmail: 82eb8b10c4e642626656bf869b21ecd307ac2f20
+  SudoEmail: 64a04838df548cba58a300ed2cc01fc43b7a750b
   SudoEntitlements: a6234950614517b64cd1c45605469619f61e1399
   SudoKeyManager: bf64dcce19f53de4004f4ea460fc382dd0dd012c
   SudoLogging: 93238a71338292a650804358994c67f8f3816d20
   SudoProfiles: c791410946d47cb3deace4b690a954cea6a1fc7e
   SudoUser: 61b99b0c23cf609098e42c68a56bf7873b7c6b47
 
-PODFILE CHECKSUM: 1bc166b1f8b59e369738d4fabb0092420e4d4c64
+PODFILE CHECKSUM: 5892c2b2f269a001f35c37f5ed0c7a5e009a2bdf
 
 COCOAPODS: 1.14.3

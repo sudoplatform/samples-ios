@@ -1,0 +1,53 @@
+Return-Path: <anotessa@sudomail.com>
+Received: from mx1.service.anonyome.com (mx1.sudomail.com [54.215.211.151])
+ by inbound-smtp.us-east-1.amazonaws.com with SMTP id 77v28uk288edg9ot66l6lrqd4708u0hdkaj382g1
+ for 77033823@team-email-dev.com;
+ Tue, 30 Jun 2020 01:43:24 +0000 (UTC)
+X-SES-Spam-Verdict: PASS
+X-SES-Virus-Verdict: PASS
+Received-SPF: pass (spfCheck: domain of sudomail.com designates 54.215.211.151 as permitted sender) client-ip=54.215.211.151; envelope-from=anotessa@sudomail.com; helo=mx1.sudomail.com;
+Authentication-Results: amazonses.com;
+ spf=pass (spfCheck: domain of sudomail.com designates 54.215.211.151 as permitted sender) client-ip=54.215.211.151; envelope-from=anotessa@sudomail.com; helo=mx1.sudomail.com;
+ dkim=pass header.i=@sudomail.com;
+ dmarc=pass header.from= Sudomail.com;
+X-SES-RECEIPT: AEFBQUFBQUFBQUFHelhNaVRBekpzVHowSUdKY2xiZmEwaWN2NnZxZ01wRGVySjgzSUJmZ0xjL1NaZ0xsUjhqZG9BOFgrYU9IV0JGaTJRM1VkWVpNYXlYaG5OLy9WZE5QdUhXSlZBMzVFUEt0UWFOR2NIRExMUjA0SVZkTGhKdmxXTUJuRTg4bDNqV0ZyOHliYmNnTWhRMmlGNmk5QnFkdXkrOU0wMTNxV1J1ZCttZkJTNFNpaW9WMDFONEMxQ3p1WEhPLyt6Y04zRUx2VFk0b1dFNHhJWFdsanRIYnpTcjZzbDB0SUxmVEl6dG81dmhMQUNkUXlSRDdDcjRwK0duaUdsT3BXZVQxNmQyR2g3VDZXNzNwdkMzRkkxbmoxOEh4Z2JXZFgzZEFJdkxrS2NtUXY0RkNFK0E9PQ==
+X-SES-DKIM-SIGNATURE: a=rsa-sha256; q=dns/txt; b=f4H2dgSYDrMJt6UcgGDl5aSu8z+brrQzi8G9NbGFP+BTs9pTOHewJLn2Qqiqh4RtMugpECJ+2aIam5dvwqHi9m5qceXz+bVa9aUsMwEyD5RSbfY4nloEkVEgLEAYz/YCqrB/MccjVL1HTlWB419JNnn+oEr7u/ylQFPEP8/lOXY=; c=relaxed/simple; s=224i4yxa5dv7c2xz3womw6peuasteono; d=amazonses.com; t=1593481404; v=1; bh=D5sxL8Jw1orJJRzFQ8iQvMO3jtvfKIebR5d4WGf7+PY=; h=From:To:Cc:Bcc:Subject:Date:Message-ID:MIME-Version:Content-Type:X-SES-RECEIPT;
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+    d= Sudomail.com; s=mail; h=Content-Type:MIME-Version:Subject:Message-ID:To:
+    From:Date; bh=D5sxL8Jw1orJJRzFQ8iQvMO3jtvfKIebR5d4WGf7+PY=; b=F0IoB+Be0mAo+qt
+    rjgL616S3QNOuXHspahp1hl/BUQohhLiNEVfLHEYaHyFwJLqgNBp7d4eFqwibf7Jl43LnW7PHqbrz
+    08InC03NkxwCDBLCQ+ZAAsgVlsYGY3k6no6X3LnofdmeofcdalqvU4lbQxH5Q2Znnc42Rj7TTsLVQ
+    eX2Z62K5E/Vi5hRkxjlFrrtVPtYuMoc1Vn3lY9V85+Mx9Q7qHq+v6Cbeph73D1Ls6XV+kCw8w9xcr
+    ui9/sVrC6zZRsJgYidAyVtq/49unWFzI3/02IQysp+1iJ/qtKjFce9Byat0Pn6V3eHpcZ7n9RoiUQ
+    CiqxMjEMTr71EMazFGw==;
+Date: Tue, 30 Jun 2020 11:43:22 +1000
+From: Ano Tessa <anotessa@sudomail.com>
+To: T3 Sudoplatz <77033823@team-email-dev.com>
+Message-ID: <1109955571.485.1593481403478.anotessa@sudomail.com>
+Subject: Testing new parser
+MIME-Version: 1.0
+Content-Type: multipart/alternative; boundary="5efa98ba_643c9869_134"
+
+--5efa98ba_643c9869_134
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+How does this look
+
+Jtcitu Clu lu tf;utfiycluso EC it lurxkutxlutxkytdlu tl ur lutxlutslutdkyr prxpu. Bc itso tdp BC f p utf. Ltd p
+
+Cheers,
+Ano
+
+
+--5efa98ba_643c9869_134
+Content-Type: text/html; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+
+<div>How does this look<div><br></div><div><br></div><div>Jtcitu Clu lu t=
+f;utfiycluso EC it lurxkutxlutxkytdlu tl ur lutxlutslutdkyr &nbsp;prxpu. =
+Bc itso tdp BC f p utf. Ltd p</div><div><br></div><div>Cheers,</div><div>=
+Ano</div></div>
+--5efa98ba_643c9869_134--

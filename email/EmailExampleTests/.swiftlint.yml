@@ -1,0 +1,5 @@
+# Disabled Rule identifiers 
+disabled_rules:
+  - type_name
+  - function_parameter_count
+

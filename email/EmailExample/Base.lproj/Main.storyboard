@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="16096" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="eKo-Lo-gZk">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="32700.99.1234" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="eKo-Lo-gZk">
     <device id="retina5_9" orientation="portrait" appearance="light"/>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16087"/>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22685"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -39,7 +40,7 @@
             <objects>
                 <navigationController storyboardIdentifier="navigation" id="9Ja-Y6-Yga" sceneMemberID="viewController">
                     <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translucent="NO" id="FRn-Dv-2Re">
-                        <rect key="frame" x="0.0" y="44" width="375" height="44"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <toolbar key="toolbar" opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="RuM-pU-aIi">
@@ -132,6 +133,7 @@
                     <connections>
                         <segue destination="E7v-bc-vE2" kind="show" identifier="navigateToReadEmailMessage" id="pLq-UM-DFE"/>
                         <segue destination="oij-Dx-RIa" kind="show" identifier="navigateToSendEmailMessage" id="yFb-Zt-iO5"/>
+                        <segue destination="zQo-F7-lRo" kind="show" identifier="navigateToEmailAddressSettings" id="tB2-24-TNg"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="6Zy-8b-Wgz" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -151,6 +153,16 @@
                 <exit id="MMW-Lt-Ahs" userLabel="Exit" sceneMemberID="exit"/>
             </objects>
             <point key="canvasLocation" x="4614" y="1026"/>
+        </scene>
+        <!--Email Address Settings-->
+        <scene sceneID="teu-hf-ZYV">
+            <objects>
+                <viewController storyboardIdentifier="emailAddressSettings" title="Email Address Settings" id="zQo-F7-lRo" customClass="EmailAddressSettingsViewController" customModule="EmailExample" customModuleProvider="target" sceneMemberID="viewController">
+                    <navigationItem key="navigationItem" id="aNl-Rz-AKc"/>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="icE-to-tLf" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="4614" y="1763"/>
         </scene>
         <!--Read Email Message View Controller-->
         <scene sceneID="JxX-kH-JRv">

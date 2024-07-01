@@ -2,7 +2,7 @@
 //  Authenticator.swift
 //  EmailExample
 //
-//  Copyright © 2020 Anonyome Labs. All rights reserved.
+//  Copyright © 2024 Anonyome Labs. All rights reserved.
 //
 
 import Foundation

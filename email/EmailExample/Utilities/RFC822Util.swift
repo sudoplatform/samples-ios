@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Anonyome Labs, Inc. All rights reserved.
+// Copyright © 2024 Anonyome Labs, Inc. All rights reserved.
 //
 // SPDX-License-Identifier: Apache-2.0
 //
@@ -33,6 +33,7 @@ struct BasicRFC822Message {
     public var bcc: [String] = []
     public var subject: String
     public var body: String
+    public var attachments: [EmailAttachment]?
 }
 
 class RFC822Util {
@@ -98,6 +99,9 @@ class RFC822Util {
             if let string = processAlternativeMimes(mimes) {
                 body = string
             }
+
+        @unknown default:
+            NSLog("Ignoring unknown mime content \(mime.content)")
         }
         return BasicRFC822Message(from: from, to: to, cc: cc, bcc: bcc, subject: subject, body: body)
     }
@@ -151,7 +155,7 @@ class RFC822Util {
         return body
     }
 
-    static func toRfc822Address(messageAddresses: [EmailMessage.EmailAddress]) -> String {
+    static func toRfc822Address(messageAddresses: [EmailAddressAndName]) -> String {
         var rfc822Address: [String] = []
         messageAddresses.forEach {
             if let displayName = $0.displayName {

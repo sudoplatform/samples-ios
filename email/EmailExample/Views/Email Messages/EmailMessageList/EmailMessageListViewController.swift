@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Anonyome Labs, Inc. All rights reserved.
+// Copyright © 2024 Anonyome Labs, Inc. All rights reserved.
 //
 // SPDX-License-Identifier: Apache-2.0
 //
@@ -41,6 +41,8 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
         case navigateToSendEmailMessage
         /// Used to navigate to the `ReadEmailMessageViewController`.
         case navigateToReadEmailMessage
+        /// Used to navigate to the `EmailAddressSettingsViewController`.
+        case navigateToEmailAddressSettings
         /// Used to navigate back to the `EmailAddressListViewController`.
         case returnToEmailAddressList
     }
@@ -52,10 +54,10 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
 
     /// A list of `EmailMessage` that are associated with the `emailAddress`.
     var emailMessages: [EmailMessage] = []
-    
+
     /// A list of blocked email addresses associated with the `emailAddress`
     var blockedAddresses: [String] = []
-    
+
     /// Blocked addresses that have been selected for unblocking
     var selectedBlockedAddresses: [String] = []
 
@@ -66,7 +68,7 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
     var allEmailMessagesCreatedSubscriptionToken: SubscriptionToken?
 
     var allEmailMessagesDeletedSubscriptionToken: SubscriptionToken?
-    
+
     /// The currently folder that is open
     var selectedFolder: FolderType = FolderType.inbox
 
@@ -134,6 +136,13 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
             }
             readEmailMessage.emailMessage = emailMessages[row]
             readEmailMessage.emailAddress = emailAddress
+
+        case .navigateToEmailAddressSettings:
+            guard let emailAddressSettings = segue.destination as? EmailAddressSettingsViewController else {
+                break
+            }
+            emailAddressSettings.emailAddress = emailAddress
+
         default:
             break
         }
@@ -152,6 +161,10 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
 
     @objc func didTapComposeEmailButton() {
         performSegue(withIdentifier: Segue.navigateToSendEmailMessage.rawValue, sender: self)
+    }
+
+    @objc func didTapEmailAddressSettingsButton() {
+        performSegue(withIdentifier: Segue.navigateToEmailAddressSettings.rawValue, sender: self)
     }
 
     // MARK: - Operations
@@ -185,6 +198,8 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
             }
             presentErrorAlert(message: "Failed to list email messages \(failedMessageIds)")
             return partialResult.items
+        @unknown default:
+            fatalError("Unknown message result \(messagesResult)")
         }
     }
 
@@ -198,9 +213,7 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
             return []
         }
         presentActivityAlert(message: "Listing Draft Email Messages")
-        let draftsMetadata = try await emailClient.listDraftEmailMessageMetadata(
-            emailAddressId: emailAddressId
-        )
+        let draftsMetadata = try await emailClient.listDraftEmailMessageMetadataForEmailAddressId(emailAddressId: emailAddressId)
         var draftMessages: [EmailMessage] = []
         if draftsMetadata.isEmpty {
             dismissActivityAlert()
@@ -314,8 +327,16 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
     }
 
     func configureNavigationBar() {
+        let gearImage = UIImage(systemName: "gearshape")
+        let emailAddressSettingsBarButton = UIBarButtonItem(
+                image: gearImage,
+                style: .plain,
+                target: self,
+                action: #selector(didTapEmailAddressSettingsButton)
+        )
+
         let composeBarButton = UIBarButtonItem(barButtonSystemItem: .compose, target: self, action: #selector(didTapComposeEmailButton))
-        navigationItem.rightBarButtonItem = composeBarButton
+        navigationItem.rightBarButtonItems = [emailAddressSettingsBarButton, composeBarButton]
     }
 
     // MARK: - Helpers
@@ -353,17 +374,16 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
             }
         }
     }
-    
+
     /// Loads the list of blocked email addresses for the user
     func loadBlockedAddresses() async {
         do {
             let result = try await self.emailClient.getEmailAddressBlocklist()
             var cleartextAddresses: [String] = []
-            result.forEach{
-                switch ($0.status) {
+            result.forEach {
+                switch $0.status {
                 case .completed:
                     cleartextAddresses.append($0.address)
-                    break
                 default:
                     // Handle error. Likely a missing key in which case address can be unblocked by hashedValue
                     NSLog("Error")
@@ -470,7 +490,7 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
             )
             do {
                 let result = try await emailClient.updateEmailMessages(withInput: input)
-                switch result {
+                switch result.status {
                 case .success:
                     self.tableView.reloadData()
                     // Do a call to service to update cache.
@@ -512,7 +532,7 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
             }
             return nil
         }
-        let fromAddress = EmailMessage.EmailAddress(address: rfc822Message.from)
+        let fromAddress = EmailAddressAndName(address: rfc822Message.from)
         let emailDraft = EmailMessage(
             id: draft.id,
             clientRefId: "draftClientRefId",
@@ -534,12 +554,13 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
             size: Double(draft.rfc822Data.count),
             from: [fromAddress],
             replyTo: [fromAddress],
-            to: rfc822Message.to.map { EmailMessage.EmailAddress(address: $0) },
-            cc: rfc822Message.cc.map { EmailMessage.EmailAddress(address: $0) },
-            bcc: rfc822Message.bcc.map { EmailMessage.EmailAddress(address: $0) },
+            to: rfc822Message.to.map { EmailAddressAndName(address: $0) },
+            cc: rfc822Message.cc.map { EmailAddressAndName(address: $0) },
+            bcc: rfc822Message.bcc.map { EmailAddressAndName(address: $0) },
             subject: rfc822Message.subject,
             hasAttachments: false,
-            encryptionStatus: EncryptionStatus.UNENCRYPTED
+            encryptionStatus: EncryptionStatus.UNENCRYPTED,
+            date: nil
         )
         return emailDraft
     }
@@ -551,15 +572,17 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
             let result = try await self.emailClient.deleteEmailMessages(
                 withIds: emailMessageIds
             )
-            switch result {
+            switch result.status {
+            case .success:
+                self.dismissActivityAlert()
             case .failure:
                 self.dismissActivityAlert()
                 self.presentErrorAlert(message: "Failed to empty Trash folder")
-            case .partial(let partialResult):
+            case .partial:
                 self.dismissActivityAlert()
-                self.presentErrorAlert(message: "Failed to delete email messages \(partialResult.failureItems)")
-            case .success:
-                self.dismissActivityAlert()
+                self.presentErrorAlert(message: "Failed to delete email messages \(result.failureItems ?? [])")
+            @unknown default:
+                fatalError("Unhandled unknown status \(String(describing: result.status))")
             }
         } catch {
             self.dismissActivityAlert()
@@ -574,7 +597,7 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
     }
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if (self.selectedFolder == FolderType.blocklist) {
+        if self.selectedFolder == FolderType.blocklist {
             return blockedAddresses.count
         }
         return emailMessages.count
@@ -582,9 +605,11 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         assert(indexPath.section == 0)
-        if (self.selectedFolder == FolderType.blocklist) {
+        if self.selectedFolder == FolderType.blocklist {
             let blockedAddress = blockedAddresses[indexPath.row]
-            guard let blockedAddressCell = tableView.dequeueReusableCell(withIdentifier: "blockedAddressCell", for: indexPath) as? BlockedAddressTableViewCell else {
+            guard let blockedAddressCell = tableView.dequeueReusableCell(
+                withIdentifier: "blockedAddressCell", for: indexPath
+            ) as? BlockedAddressTableViewCell else {
                 return BlockedAddressTableViewCell()
             }
             blockedAddressCell.emailAddress = blockedAddress
@@ -592,7 +617,9 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
             return blockedAddressCell
         } else {
             let emailMessage = emailMessages[indexPath.row]
-            guard let emailMessageCell = tableView.dequeueReusableCell(withIdentifier: "emailMessageCell", for: indexPath) as? EmailMessageTableViewCell else {
+            guard let emailMessageCell = tableView.dequeueReusableCell(
+                withIdentifier: "emailMessageCell", for: indexPath
+            ) as? EmailMessageTableViewCell else {
                 return EmailMessageTableViewCell()
             }
             emailMessageCell.emailMessage = emailMessage
@@ -605,9 +632,9 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
 
     @MainActor
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        if (selectedFolder == FolderType.blocklist) {
+        if selectedFolder == FolderType.blocklist {
             let address = blockedAddresses[indexPath.row]
-            if (selectedBlockedAddresses.contains(address)) {
+            if selectedBlockedAddresses.contains(address) {
                 selectedBlockedAddresses.remove(at: selectedBlockedAddresses.firstIndex(of: address)!)
                 tableView.deselectRow(at: indexPath, animated: true)
             } else {
@@ -646,7 +673,7 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
         self.selectedFolder = folderType
         blockedAddresses = []
         emailMessages = []
-        if (self.selectedFolder == FolderType.blocklist) {
+        if self.selectedFolder == FolderType.blocklist {
             Task { @MainActor in
                 await self.loadBlockedAddresses()
             }
@@ -671,29 +698,28 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
         })
         present(alert, animated: true, completion: nil)
     }
-    
+
     @MainActor
     func unblockEmailAddresses() {
         Task.init {
             do {
                 let result = try await self.emailClient.unblockEmailAddresses(addresses: selectedBlockedAddresses)
-                
-                switch result {
+
+                switch result.status {
                 case .success:
                     self.presentAlert(title: "Success", message: "Email address(es) unblocked")
-                    blockedAddresses = blockedAddresses.filter{ item in
+                    blockedAddresses = blockedAddresses.filter { item in
                         !selectedBlockedAddresses.contains(item)
                     }
-                    break
-                case .partial(let batchPartialResult):
+                case .partial:
                     self.presentErrorAlert(message: "Unable to unblock some addresses. Please try again")
-                    blockedAddresses = blockedAddresses.filter{ item in
-                        !batchPartialResult.successItems.contains(item)
+                    blockedAddresses = blockedAddresses.filter { item in
+                        !result.successItems!.contains(item)
                     }
-                    break
                 case .failure:
                     self.presentErrorAlert(message: "Failed to unblock email address(es). Please try again")
-                    break
+                @unknown default:
+                    fatalError("Unhandled unknown status \(String(describing: result.status))")
                 }
                 Task { @MainActor in
                     self.tableView.reloadData()

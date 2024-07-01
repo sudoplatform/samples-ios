@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Anonyome Labs, Inc. All rights reserved.
+// Copyright © 2024 Anonyome Labs, Inc. All rights reserved.
 //
 // SPDX-License-Identifier: Apache-2.0
 //
@@ -21,12 +21,6 @@ class HeaderTableViewCell: UITableViewCell {
 
     /// Delegate used to notify of update events.
     weak var delegate: HeaderCellDelegate?
-
-    // MARK: - Lifecycle
-
-    override func awakeFromNib() {
-        super.awakeFromNib()
-    }
 
     // MARK: - Actions
 

@@ -3,12 +3,12 @@ platform :ios, '15.0'
 use_frameworks!
 use_modular_headers!
 
-inhibit_all_warnings!
+# inhibit_all_warnings!
 
 source 'https://github.com/CocoaPods/Specs.git'
 
 acknowledgementsFields = ['name', 'version', 'licenseType', 'licenseText', 'homepage']
-acknowledgementsExclude = ['SudoUser', 'SudoApiClient', 'SudoConfigManager', 'SudoKeyManager', 'SudoLogging', 'SudoOperations', 'SudoProfiles']
+acknowledgementsExclude = ['SudoUser', 'SudoApiClient', 'SudoConfigManager', 'SudoEmail', 'SudoEmailNotificationExtension', 'SudoKeyManager', 'SudoLogging', 'SudoNotification', 'SudoNotificationExtension', 'SudoOperations', 'SudoProfiles']
 
 pre_install do |installer|
 	unless installer.deployment?
@@ -17,9 +17,11 @@ pre_install do |installer|
 end
 
 target 'EmailExample' do
+    pod 'SudoKeyManager', '~> 2.6', '>= 2.6.1'
     pod 'SudoEntitlements', '~> 9.0'
     pod 'SudoUser', '~> 15.1'
     pod 'SudoProfiles', '~> 17.0'
+    pod 'SudoNotification', '~> 2.1'
     pod 'MimeParser', '~> 0.1'
     pod 'AWSCore', '~> 2.27.15'
     pod 'AWSAuthCore', '~> 2.27.15'
@@ -29,7 +31,14 @@ target 'EmailExample' do
 
     target 'EmailExampleTests'
 
-    pod 'SudoEmail', '~> 8.3.1'
+    pod 'SudoEmail', '~> 14.4', '>= 14.4.1'
+end
+
+target 'EmailExampleNotificationServiceExtension' do
+    pod 'SudoNotificationExtension', '~> 2.1'
+    pod 'SudoEmailNotificationExtension', '~> 14.4', '>= 14.4.1'
+
+    target 'EmailExampleNotificationServiceExtensionTests'
 end
 
 # Fix Xcode nagging warning on pod install/update
@@ -39,10 +48,10 @@ post_install do |installer|
   end
 
   installer.generated_projects.each do |project|
-      project.targets.each do |target|
-          target.build_configurations.each do |config|
-              config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '13.0'
-          end
+    project.targets.each do |target|
+      target.build_configurations.each do |config|
+        config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.0'
       end
+    end
   end
 end

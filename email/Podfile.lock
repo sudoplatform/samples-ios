@@ -1,7 +1,8 @@
 PODS:
+  - AnonyomeMailCore2 (0.6.4)
   - AppSyncRealTimeClient (1.10.0):
     - Starscream (~> 4.0.4)
-  - ASN1Swift (1.2.6)
+  - ASN1Swift (1.2.7)
   - AWSAppSync (3.6.1):
     - AppSyncRealTimeClient (~> 1.7)
     - AWSCore (~> 2.27.0)
@@ -29,7 +30,7 @@ PODS:
     - SQLite.swift/standard (= 0.12.2)
   - SQLite.swift/standard (0.12.2)
   - Starscream (4.0.4)
-  - SudoApiClient (10.1.0):
+  - SudoApiClient (10.2.0):
     - AWSAppSync (~> 3.6.1)
     - AWSCore (~> 2.27.15)
     - SudoConfigManager (~> 3.0)
@@ -39,15 +40,21 @@ PODS:
     - AWSCore (~> 2.27.15)
     - AWSS3 (~> 2.27.15)
     - SudoLogging (~> 1.0)
-  - SudoEmail (8.3.1):
+  - SudoEmail (14.4.1):
+    - AnonyomeMailCore2 (~> 0.6.4)
     - AWSAppSync (~> 3.6.1)
     - AWSCore (~> 2.27.15)
     - AWSS3 (~> 2.27.15)
-    - SudoApiClient (~> 10.1.0)
-    - SudoConfigManager (~> 3.0.2)
-    - SudoKeyManager (~> 2.5)
+    - SudoApiClient (~> 10.2)
+    - SudoConfigManager (>= 3.0.2, ~> 3.0)
+    - SudoKeyManager (>= 2.6.1, ~> 2.6)
     - SudoLogging (~> 1.0)
+    - SudoNotification (~> 2.1)
     - SudoUser (~> 15.1)
+  - SudoEmailNotificationExtension (14.4.1):
+    - SudoKeyManager (>= 2.6.1, ~> 2.6)
+    - SudoLogging (~> 1.0)
+    - SudoNotificationExtension (~> 2.1)
   - SudoEntitlements (9.0.1):
     - AWSAppSync (~> 3.6.1)
     - SudoApiClient (~> 10.0)
@@ -55,10 +62,19 @@ PODS:
     - SudoKeyManager (~> 2.0)
     - SudoLogging (~> 1.0)
     - SudoUser (~> 15.0)
-  - SudoKeyManager (2.5.0):
+  - SudoKeyManager (2.6.1):
     - ASN1Swift (~> 1.2)
     - GzipSwift (~> 5.0)
   - SudoLogging (1.0.0)
+  - SudoNotification (2.1.4):
+    - AWSAppSync (~> 3.6.1)
+    - SudoApiClient (~> 10.2)
+    - SudoConfigManager (>= 3.0.2, ~> 3.0)
+    - SudoKeyManager (~> 2.5)
+    - SudoLogging (~> 1.0)
+    - SudoUser (~> 15.1)
+  - SudoNotificationExtension (2.1.4):
+    - SudoLogging (~> 1.0)
   - SudoProfiles (17.0.0):
     - AWSAppSync (~> 3.6.1)
     - AWSCore (~> 2.27.15)
@@ -85,13 +101,18 @@ DEPENDENCIES:
   - AWSCore (~> 2.27.15)
   - AWSS3 (~> 2.27.15)
   - MimeParser (~> 0.1)
-  - SudoEmail (~> 8.3.1)
+  - SudoEmail (>= 14.4.1, ~> 14.4)
+  - SudoEmailNotificationExtension (>= 14.4.1, ~> 14.4)
   - SudoEntitlements (~> 9.0)
+  - SudoKeyManager (>= 2.6.1, ~> 2.6)
+  - SudoNotification (~> 2.1)
+  - SudoNotificationExtension (~> 2.1)
   - SudoProfiles (~> 17.0)
   - SudoUser (~> 15.1)
 
 SPEC REPOS:
   https://github.com/CocoaPods/Specs.git:
+    - AnonyomeMailCore2
     - AppSyncRealTimeClient
     - ASN1Swift
     - AWSAppSync
@@ -109,15 +130,19 @@ SPEC REPOS:
     - SudoApiClient
     - SudoConfigManager
     - SudoEmail
+    - SudoEmailNotificationExtension
     - SudoEntitlements
     - SudoKeyManager
     - SudoLogging
+    - SudoNotification
+    - SudoNotificationExtension
     - SudoProfiles
     - SudoUser
 
 SPEC CHECKSUMS:
+  AnonyomeMailCore2: 385f16d32aa5c6179aff0be091ebe149243472c2
   AppSyncRealTimeClient: 656ab4215e05f6ca47fe6d8c73f416d9984a8aac
-  ASN1Swift: aa0443dd848f4cb46d1d43ca7b2dea0be2ad13c4
+  ASN1Swift: bbd56c299b2084ba71bd7d7769c6202451598948
   AWSAppSync: 4ea012b003e2342499cc5b918e8a428849eaed77
   AWSAuthCore: 0bac0e67c28d620c8f823c88bd15d552544e801a
   AWSCognitoIdentityProvider: a8d244d0cdfeff425fe20a2fb49b7e9cb89c4748
@@ -130,15 +155,18 @@ SPEC CHECKSUMS:
   ReachabilitySwift: 985039c6f7b23a1da463388634119492ff86c825
   SQLite.swift: d2b4642190917051ce6bd1d49aab565fe794eea3
   Starscream: 5178aed56b316f13fa3bc55694e583d35dd414d9
-  SudoApiClient: 31703a617ea6dbeb53e67aac063d3de07f74898e
+  SudoApiClient: 312601ede90e868d8275da7e26ce90daecb6430d
   SudoConfigManager: aee20bc2d03e28342da663ae48378d0daae78f47
-  SudoEmail: 64a04838df548cba58a300ed2cc01fc43b7a750b
+  SudoEmail: ff2220b6b590e0289c36577402b28c883eeead77
+  SudoEmailNotificationExtension: 3aae9f229404bfef66243840b8d615e9ed4a0236
   SudoEntitlements: a6234950614517b64cd1c45605469619f61e1399
-  SudoKeyManager: bf64dcce19f53de4004f4ea460fc382dd0dd012c
+  SudoKeyManager: c6362462cf28838cc7792779fba4d406d5261ba6
   SudoLogging: 93238a71338292a650804358994c67f8f3816d20
+  SudoNotification: 12d6e1095dfcf5e87e39d45c135d888cfe025a60
+  SudoNotificationExtension: c3b5ff3dc9026fc325f828bb3258f516d719b2bd
   SudoProfiles: c791410946d47cb3deace4b690a954cea6a1fc7e
   SudoUser: 61b99b0c23cf609098e42c68a56bf7873b7c6b47
 
-PODFILE CHECKSUM: 5892c2b2f269a001f35c37f5ed0c7a5e009a2bdf
+PODFILE CHECKSUM: 186ea5bcda774f44b0747c1cd2abf9b796164d85
 
-COCOAPODS: 1.14.3
+COCOAPODS: 1.15.2

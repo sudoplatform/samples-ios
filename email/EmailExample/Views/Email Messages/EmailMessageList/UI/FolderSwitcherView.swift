@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Anonyome Labs, Inc. All rights reserved.
+// Copyright © 2024 Anonyome Labs, Inc. All rights reserved.
 //
 // SPDX-License-Identifier: Apache-2.0
 //
@@ -28,7 +28,7 @@ protocol FolderSwitcherViewDelegate: AnyObject {
 
     /// Called when the user taps on the empty trash button
     func emptyTrash()
-    
+
     func unblockEmailAddresses()
 }
 
@@ -41,7 +41,7 @@ class FolderSwitcherView: UITableViewHeaderFooterView {
 
     /// Button to permanently delete email messages from the Trash folder
     let emptyTrashButton = UIButton()
-    
+
     let unblockAddressesButton = UIButton()
 
     let contentContainerView = UIStackView()
@@ -54,7 +54,7 @@ class FolderSwitcherView: UITableViewHeaderFooterView {
 
     /// The image for the empty Trash button
     let emptyTrashImage = UIImage(systemName: "trash.slash.fill")
-    
+
     let unblockAddressesImage = UIImage(systemName: "trash.slash.fill")
 
     var currentFolder: FolderType = .inbox
@@ -182,7 +182,7 @@ class FolderSwitcherView: UITableViewHeaderFooterView {
     @objc func didTapEmptyTrashButton() {
         self.delegate?.emptyTrash()
     }
-    
+
     @objc func didTapUnblockEmailAddressesButton() {
         self.delegate?.unblockEmailAddresses()
     }

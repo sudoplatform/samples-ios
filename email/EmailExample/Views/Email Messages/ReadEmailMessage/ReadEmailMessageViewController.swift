@@ -1,10 +1,11 @@
 //
-// Copyright © 2020 Anonyome Labs, Inc. All rights reserved.
+// Copyright © 2024 Anonyome Labs, Inc. All rights reserved.
 //
 // SPDX-License-Identifier: Apache-2.0
 //
 
 import UIKit
+import UniformTypeIdentifiers
 import SudoEmail
 
 class ReadEmailMessageViewController: UIViewController, ActivityAlertViewControllerDelegate {
@@ -38,8 +39,15 @@ class ReadEmailMessageViewController: UIViewController, ActivityAlertViewControl
 
     /// `EmailAddress` that was selected from a previous view.
     var emailAddress: EmailAddress!
+
     /// Message of a `EmailMessage` that was selected from the previous view.
     var emailMessage: EmailMessage!
+
+    /// Attachments belonging to the email message.
+    var attachments: [EmailAttachment] = []
+
+    /// The controller for the attachment list views.
+    var attachmentsListController: EmailAttachmentsListController?
 
     // MARK: - Properties: Computed
 
@@ -103,7 +111,7 @@ class ReadEmailMessageViewController: UIViewController, ActivityAlertViewControl
     @objc func replyToMessage(_ sender: ReadEmailMessageViewController) {
         performSegue(withIdentifier: Segue.replyToEmailMessage.rawValue, sender: self)
     }
-    
+
     /// Action associalted with blocking an email address
     ///
     /// This action will block the sender of the email being read
@@ -112,8 +120,7 @@ class ReadEmailMessageViewController: UIViewController, ActivityAlertViewControl
         Task.init {
             do {
                 let blockRes = try await emailClient.blockEmailAddresses(addresses: [address])
-                
-                switch blockRes {
+                switch blockRes.status {
                 case .success:
                     presentAlert(title: "Success", message: "\(address) has been blocked") { _ in
                         self.performSegue(withIdentifier: Segue.returnToEmailMessageList.rawValue, sender: self)
@@ -133,9 +140,9 @@ class ReadEmailMessageViewController: UIViewController, ActivityAlertViewControl
 
     // MARK: - Operations
 
-    func readEmailMessage(messageId: String) async throws -> Data {
-        let getEmailMessageInput = GetEmailMessageRfc822DataInput(id: messageId, emailAddressId: self.emailAddress.id)
-        return try await emailClient.getEmailMessageRfc822Data(withInput: getEmailMessageInput)
+    func readEmailMessage(messageId: String) async throws -> EmailMessageWithBody? {
+        let getEmailMessageInput = GetEmailMessageWithBodyInput(id: messageId, emailAddressId: self.emailAddress.id)
+        return try await emailClient.getEmailMessageWithBody(withInput: getEmailMessageInput)
     }
 
     func readDraftEmailMessage(messageId: String) async throws -> Data {
@@ -152,11 +159,11 @@ class ReadEmailMessageViewController: UIViewController, ActivityAlertViewControl
         let arrowImage = UIImage(systemName: "arrowshape.turn.up.left")
         let replyButton = UIBarButtonItem(image: arrowImage, style: .plain, target: self, action: #selector(replyToMessage))
         replyButton.accessibilityIdentifier = "replyButton"
-        
+
         let blockImage = UIImage(systemName: "nosign")
         let blockButton = UIBarButtonItem(image: blockImage, style: .plain, target: self, action: #selector(blockSenderAddress))
         blockButton.accessibilityIdentifier = "blockButton"
-        
+
         navigationItem.rightBarButtonItems = [replyButton, blockButton]
     }
 
@@ -181,6 +188,26 @@ class ReadEmailMessageViewController: UIViewController, ActivityAlertViewControl
         bodyLabel.text = nil
     }
 
+    func configureAttachmentsListView() {
+        guard let siblingView = self.bodyLabel, let containingView = siblingView.superview else { return }
+        self.attachmentsListController = EmailAttachmentsListController(
+            containingView: containingView,
+            siblingView: siblingView,
+            onListItemClickedHandler: { self.saveAttachment(attachmentName: $0) }
+        )
+        guard let attachmentsListController = self.attachmentsListController else { return }
+
+        let margin = containingView.layoutMarginsGuide
+        NSLayoutConstraint.activate([
+            siblingView.topAnchor.constraint(equalTo: attachmentsListController.attachmentsListView!.bottomAnchor, constant: 5.0),
+            siblingView.leadingAnchor.constraint(equalTo: margin.leadingAnchor),
+            siblingView.trailingAnchor.constraint(equalTo: margin.trailingAnchor),
+            siblingView.bottomAnchor.constraint(equalTo: margin.bottomAnchor)
+        ])
+
+        attachmentsListController.setAttachments(attachments: Set(self.attachments))
+    }
+
     // MARK: - Helpers
 
     /// Firstly, attempts to load the email message via a remote call.
@@ -190,9 +217,9 @@ class ReadEmailMessageViewController: UIViewController, ActivityAlertViewControl
         presentCancellableActivityAlert(message: "Loading", delegate: self) {
             Task.detached(priority: .medium) {
                 do {
-                    var rfc822Data: Data
+                    // Handle draft messages
                     if message.folderId.contains("DRAFTS") {
-                        rfc822Data = try await self.readDraftEmailMessage(messageId: message.id)
+                        let rfc822Data = try await self.readDraftEmailMessage(messageId: message.id)
                         let parsedMessage = try RFC822Util.fromPlainText(rfc822Data)
                         Task { @MainActor in
                             self.bodyLabel.text = parsedMessage.body
@@ -200,12 +227,14 @@ class ReadEmailMessageViewController: UIViewController, ActivityAlertViewControl
                             self.performSegue(withIdentifier: Segue.replyToEmailMessage.rawValue, sender: self)
                         }
                         return
-                    } else {
-                        rfc822Data = try await self.readEmailMessage(messageId: message.id)
                     }
-                    let parsedMessage: BasicRFC822Message
+                    // Handle sent messages
+                    let parsedMessage: EmailMessageWithBody
                     do {
-                        parsedMessage = try RFC822Util.fromPlainText(rfc822Data)
+                        guard let emailMessageWithBody = try await self.readEmailMessage(messageId: message.id) else {
+                            throw SudoEmailError.serviceError
+                        }
+                        parsedMessage = emailMessageWithBody
                     } catch {
                         Task { @MainActor in
                             self.dismissActivityAlert()
@@ -215,7 +244,19 @@ class ReadEmailMessageViewController: UIViewController, ActivityAlertViewControl
                         }
                         return
                     }
+                    // Get body and attachments, and verify
                     let body = parsedMessage.body
+                    let attachments = parsedMessage.attachments
+                    if message.hasAttachments && attachments.isEmpty {
+                       Task { @MainActor in
+                           self.dismissActivityAlert()
+                           self.presentErrorAlert(message: "Failed to load email attachments") { _ in
+                               self.performSegue(withIdentifier: Segue.returnToEmailMessageList.rawValue, sender: self)
+                           }
+                       }
+                       return
+                    }
+                    // Populate views with message data
                     Task { @MainActor in
                         let toLabels: [UILabel] = message.to.map {
                             let label = UILabel()
@@ -244,6 +285,8 @@ class ReadEmailMessageViewController: UIViewController, ActivityAlertViewControl
                         self.dateLabel.date = message.createdAt
                         self.subjectLabel.text = message.subject
                         self.bodyLabel.text = body
+                        self.attachments = attachments
+                        if !self.attachments.isEmpty { self.configureAttachmentsListView() }
                         self.messageLoaded = true
                     }
                     await self.dismissActivityAlert()
@@ -288,6 +331,33 @@ class ReadEmailMessageViewController: UIViewController, ActivityAlertViewControl
             )
         }
         return sendEmailInput
+    }
+
+    func saveAttachment(attachmentName: String) {
+        var errorMsg: String?
+        // iOS 16+ required for `URL.downloadsDirectory` and `.appending`
+        if #available(iOS 16.0, *) {
+            if let emailAttachment = (attachments.first { $0.filename == attachmentName }),
+               let fileData = Data(base64Encoded: emailAttachment.data) {
+                do {
+                    let url = URL.documentsDirectory.appending(path: emailAttachment.filename)
+                    try fileData.write(to: url, options: [.atomic, .completeFileProtection])
+                    Task { presentAlert(title: "Success", message: "Saved \(emailAttachment.filename) to Documents") }
+                    return
+                } catch {
+                    NSLog("Failed to save attachment: \(error.localizedDescription)")
+                    errorMsg = "Failed to save attachment"
+                }
+            } else {
+                errorMsg = "Failed to parse attachment"
+            }
+        } else {
+            errorMsg = "At least iOS 16.0 required"
+        }
+
+        if let errorMsg = errorMsg {
+            Task { presentErrorAlert(message: errorMsg) }
+        }
     }
 
     // MARK: - Conformance: ActivityAlertViewControllerDelegate

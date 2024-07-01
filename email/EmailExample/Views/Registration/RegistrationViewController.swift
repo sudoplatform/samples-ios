@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Anonyome Labs, Inc. All rights reserved.
+// Copyright © 2024 Anonyome Labs, Inc. All rights reserved.
 //
 // SPDX-License-Identifier: Apache-2.0
 //
@@ -8,6 +8,7 @@ import UIKit
 import SudoEntitlements
 import SudoUser
 import SudoProfiles
+import SudoNotification
 
 /// This View Controller presents a screen to allow the user to register or login.
 ///
@@ -42,6 +43,9 @@ class RegistrationViewController: UIViewController {
 
     /// Authenticator used to perform authentication during registration.
     var authenticator: Authenticator = AppDelegate.dependencies.authenticator
+
+    /// Notification client is used to load current notification configuration after sign in
+    var notificationClient: SudoNotificationClient = AppDelegate.dependencies.notificationClient
 
     // MARK: - Lifecycle
 

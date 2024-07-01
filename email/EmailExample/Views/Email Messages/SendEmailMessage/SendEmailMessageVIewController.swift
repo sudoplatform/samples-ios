@@ -5,6 +5,8 @@
 //
 
 import UIKit
+import MobileCoreServices
+import UniformTypeIdentifiers
 import SudoEmail
 
 class SendEmailMessageViewController: UIViewController, UITextViewDelegate, UITableViewDelegate, UITableViewDataSource, HeaderCellDelegate, BodyCellDelegate {
@@ -48,6 +50,18 @@ class SendEmailMessageViewController: UIViewController, UITextViewDelegate, UITa
 
     // MARK: - Properties
 
+    /// The native file picker controller.
+    var filePickerViewController: FilePickerViewController?
+
+    /// The controller for the attachment list views.
+    var attachmentsListController: EmailAttachmentsListController?
+
+    var bodyTableViewCell: BodyTableViewCell? {
+        didSet {
+            self.configureAttachmentsListView()
+        }
+    }
+
     /// The UI view of the indicator to be hidden/shown.
     var encryptedIndicatorView: UIView?
 
@@ -84,6 +98,9 @@ class SendEmailMessageViewController: UIViewController, UITextViewDelegate, UITa
         })
     }()
 
+    /// Email attachments that are sent with the email message.
+    var attachments: Set<EmailAttachment> = []
+
     // MARK: - Properties: Computed
 
     /// Email client used to get and create email addresses.
@@ -93,9 +110,9 @@ class SendEmailMessageViewController: UIViewController, UITextViewDelegate, UITa
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        configureEncryptedIndicatorView()
         configureTableView()
         configureNavigationBar()
+        configureEncryptedIndicatorView()
         NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
     }
@@ -161,21 +178,35 @@ class SendEmailMessageViewController: UIViewController, UITextViewDelegate, UITa
             presentErrorAlert(message: "Invalid body")
             return
         }
-        let message = BasicRFC822Message(
+
+        let emailMessageHeader = InternetMessageFormatHeader(
             from: from,
             to: addressesToArray(to),
             cc: addressesToArray(cc),
             bcc: addressesToArray(bcc),
-            subject: subject,
-            body: body
+            subject: subject
+        )
+        let sendEmailMessageInput = SendEmailMessageInput(
+            senderEmailAddressId: emailAddressId,
+            emailMessageHeader: emailMessageHeader,
+            body: body,
+            attachments: Array(attachments)
         )
 
-        guard let data = RFC822Util.fromBasicRFC822(message) else {
-            presentErrorAlert(message: "Unable to marshall email message data")
-            return
-        }
         Task.detached(priority: .medium) {
-            await self.sendEmailMessage(data, emailAddressId: emailAddressId)
+            await self.sendEmailMessage(sendEmailMessageInput)
+        }
+    }
+
+    @IBAction func didTapAttachmentButton() {
+        if filePickerViewController == nil {
+            filePickerViewController = FilePickerViewController(onFilePickedHandler: addAttachment)
+        } else {
+            filePickerViewController?.dismiss(animated: true)
+        }
+
+        if let controller = filePickerViewController {
+            present(controller, animated: true, completion: nil)
         }
     }
 
@@ -185,15 +216,14 @@ class SendEmailMessageViewController: UIViewController, UITextViewDelegate, UITa
 
     // MARK: - Utilities
 
-    func sendEmailMessage(_ data: Data, emailAddressId: String) async {
+    func sendEmailMessage(_ sendEmailMessageInput: SendEmailMessageInput) async {
         presentActivityAlert(message: "Sending Email Message")
         do {
-            let sendInput = SendEmailMessageInput(rfc822Data: data, senderEmailAddressId: emailAddressId)
-            _ = try await emailClient.sendEmailMessage(withInput: sendInput)
+            _ = try await emailClient.sendEmailMessage(withInput: sendEmailMessageInput)
             if let draftEmailMessageId = inputData?.draftEmailMessageId {
                 let input = DeleteDraftEmailMessagesInput(
                     ids: [draftEmailMessageId],
-                    emailAddressId: emailAddressId
+                    emailAddressId: sendEmailMessageInput.senderEmailAddressId
                 )
                 _ = try await emailClient.deleteDraftEmailMessages(withInput: input)
             }
@@ -211,10 +241,8 @@ class SendEmailMessageViewController: UIViewController, UITextViewDelegate, UITa
 
     func validateEmailAddressList(addresses: String) -> Bool {
         let addresses = addressesToArray(addresses)
-        for address in addresses {
-            if !validateEmail(address) {
-                return false
-            }
+        for address in addresses where !validateEmail(address) {
+            return false
         }
         return true
     }
@@ -241,7 +269,6 @@ class SendEmailMessageViewController: UIViewController, UITextViewDelegate, UITa
             return addressSpecValidator.firstMatch(in: address, options: [], range: NSRange(location: 0, length: address.count)) != nil
         }
     }
-
 
     func validateEncryptedEmailAddresses(_ addressesInput: String) async throws -> Bool {
         if !validateEmailAddressList(addresses: addressesInput) {
@@ -369,7 +396,66 @@ class SendEmailMessageViewController: UIViewController, UITextViewDelegate, UITa
 
     }
 
+    func buildAttachment(withURL fileURL: URL) -> EmailAttachment? {
+        do {
+            let filename = fileURL.lastPathComponent
+            let pathExtension = (filename as NSString).pathExtension
+            let mimetype = UTType(filenameExtension: pathExtension)?.preferredMIMEType ?? "application/octet-stream"
+            let data = try Data(contentsOf: fileURL).base64EncodedString()
+            let attachment = EmailAttachment(
+                filename: filename,
+                mimetype: mimetype,
+                inlineAttachment: false,
+                data: data
+            )
+
+            return attachment
+        } catch {
+            presentErrorAlert(message: "Failed to parse base64 data from file")
+            return nil
+        }
+    }
+
+    func removeAttachment(attachmentName: String) {
+        if let emailAttachment = (attachments.first { $0.filename == attachmentName }) {
+            self.attachments.remove(emailAttachment)
+            self.tableView.beginUpdates()
+            self.attachmentsListController?.setAttachments(attachments: self.attachments)
+            self.tableView.endUpdates()
+        }
+    }
+
+    func addAttachment(fileURL: URL) {
+        if let emailAttachment = self.buildAttachment(withURL: fileURL) {
+            self.attachments.insert(emailAttachment)
+            self.tableView.beginUpdates()
+            self.attachmentsListController?.setAttachments(attachments: self.attachments)
+            self.tableView.endUpdates()
+        }
+    }
+
     // MARK: - Helpers: Configuration
+
+    func configureAttachmentsListView() {
+        guard let containingView = self.bodyTableViewCell?.contentView,
+              let siblingView = self.bodyTableViewCell?.textView else {
+            return
+        }
+        self.attachmentsListController = EmailAttachmentsListController(
+            containingView: containingView,
+            siblingView: siblingView,
+            onListItemClickedHandler: { self.removeAttachment(attachmentName: $0) }
+        )
+        guard let attachmentsListView = self.attachmentsListController?.attachmentsListView else { return }
+
+        let margin = containingView.layoutMarginsGuide
+        NSLayoutConstraint.activate([
+            siblingView.topAnchor.constraint(equalTo: attachmentsListView.bottomAnchor, constant: 5.0),
+            siblingView.leadingAnchor.constraint(equalTo: margin.leadingAnchor),
+            siblingView.trailingAnchor.constraint(equalTo: margin.trailingAnchor),
+            siblingView.bottomAnchor.constraint(equalTo: margin.bottomAnchor)
+        ])
+    }
 
     func configureTableView() {
         let headerTableViewCellNib = UINib(nibName: "HeaderTableViewCell", bundle: .main)
@@ -389,7 +475,14 @@ class SendEmailMessageViewController: UIViewController, UITextViewDelegate, UITa
             target: self,
             action: #selector(didTapSendEmailButton)
         )
-        navigationItem.rightBarButtonItem = sendBarButton
+        let paperclipImage = UIImage(systemName: "paperclip")
+        let attachmentButton = UIBarButtonItem(
+            image: paperclipImage,
+            style: .plain,
+            target: self,
+            action: #selector(didTapAttachmentButton)
+        )
+        navigationItem.rightBarButtonItems = [sendBarButton, attachmentButton]
 
         let backImage = UIImage(systemName: "chevron.backward")
         let backButton = UIBarButtonItem(
@@ -411,13 +504,13 @@ class SendEmailMessageViewController: UIViewController, UITextViewDelegate, UITa
         label.textAlignment = .center
         label.font = UIFont.systemFont(ofSize: 14.0)
 
-        // "Encrypted" is a loose term here - the email address being returned from the
-        // `lookupEmailAddressesPublicInfo` endpoint simply means that the address and
-        // public key does exists in-network.
-        //
-        // "End-to-end encrypted" is what the MySudo application displays under the same use case.
-        label.text = "🔒 End-to-end encrypted"
+        let attributedText = NSMutableAttributedString()
+        let lockImageString = UIImage.toAttributedString(systemName: "lock.fill", withTintColor: .link)
+        let textString = NSAttributedString(string: " End-to-end encrypted")
+        attributedText.append(lockImageString)
+        attributedText.append(textString)
 
+        label.attributedText = attributedText
         encryptedIndicatorView = label
     }
 
@@ -432,6 +525,7 @@ class SendEmailMessageViewController: UIViewController, UITextViewDelegate, UITa
         if !encryptedIndicatorViewVisible {
             tableView.tableHeaderView = encryptedIndicatorView
             encryptedIndicatorViewVisible = true
+            tableView.layoutIfNeeded()
         }
     }
 
@@ -496,6 +590,7 @@ class SendEmailMessageViewController: UIViewController, UITextViewDelegate, UITa
             }
             cell.textView.text = text
             cell.delegate = self
+            self.bodyTableViewCell = cell
             return cell
         }
     }

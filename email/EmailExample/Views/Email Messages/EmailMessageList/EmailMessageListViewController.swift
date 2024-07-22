@@ -476,7 +476,7 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
             }
         } else {
             // move email message to trash folder
-            presentActivityAlert(message: "Moving Email Message to Trash")
+            presentActivityAlert(message: "Moving to Trash")
             let folderId = generateFolderId(
                 emailAddressId: emailAddress.id,
                 folderName: "TRASH"

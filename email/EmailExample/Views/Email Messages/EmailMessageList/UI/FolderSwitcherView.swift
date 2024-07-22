@@ -50,7 +50,7 @@ class FolderSwitcherView: UITableViewHeaderFooterView {
     let title = UILabel()
 
     /// The menu image
-    let image = UIImage(systemName: "questionmark.folder")
+    let image = UIImage(systemName: "folder")
 
     /// The image for the empty Trash button
     let emptyTrashImage = UIImage(systemName: "trash.slash.fill")

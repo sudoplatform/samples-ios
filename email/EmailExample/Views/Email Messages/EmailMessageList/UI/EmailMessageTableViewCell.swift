@@ -57,7 +57,10 @@ class EmailMessageTableViewCell: UITableViewCell {
         }
         switch emailMessage.direction {
         case .inbound:
-            recipientsLabel?.text = "From: " + (emailMessage.from[0].displayName ?? emailMessage.from[0].address)
+            let fromRecipient = (emailMessage.from[0].displayName != nil) ?
+            "\(emailMessage.from.first?.displayName ?? "") <\(emailMessage.from.first?.address ?? "")>"
+            : emailMessage.from.first?.address ?? ""
+            recipientsLabel?.text = "From: " + fromRecipient
         case .outbound:
             var toAddressLabel: [String] = []
             emailMessage.to.forEach {

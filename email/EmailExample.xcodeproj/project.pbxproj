@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0CB349EC2C40B3C900C31065 /* ImagePickerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB349EB2C40B3C800C31065 /* ImagePickerViewController.swift */; };
 		30000D7EB1A0833B0E3EBA3A /* Pods_EmailExampleNotificationServiceExtension_EmailExampleNotificationServiceExtensionTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6A50341AC6F24193FA5CC6C5 /* Pods_EmailExampleNotificationServiceExtension_EmailExampleNotificationServiceExtensionTests.framework */; };
 		511C50712BE0ACC5006A377E /* UIView+Clickable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 511C50702BE0ACC5006A377E /* UIView+Clickable.swift */; };
 		511C50742BE0B99E006A377E /* EmailAttachmentsListController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 511C50732BE0B99E006A377E /* EmailAttachmentsListController.swift */; };
@@ -152,6 +153,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		0CB349EB2C40B3C800C31065 /* ImagePickerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePickerViewController.swift; sourceTree = "<group>"; };
 		3AB47B97078840B41F67C6C9 /* Pods-EmailExample-EmailExampleTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-EmailExample-EmailExampleTests.release.xcconfig"; path = "Target Support Files/Pods-EmailExample-EmailExampleTests/Pods-EmailExample-EmailExampleTests.release.xcconfig"; sourceTree = "<group>"; };
 		511C50702BE0ACC5006A377E /* UIView+Clickable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+Clickable.swift"; sourceTree = "<group>"; };
 		511C50732BE0B99E006A377E /* EmailAttachmentsListController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmailAttachmentsListController.swift; sourceTree = "<group>"; };
@@ -390,6 +392,7 @@
 			children = (
 				84EC6CA324C15C70008FDED4 /* UI */,
 				51B8E1612BD8B1D4000366F4 /* FilePickerViewController.swift */,
+				0CB349EB2C40B3C800C31065 /* ImagePickerViewController.swift */,
 				9557447724A42AFE0057A845 /* SendEmailInputData.swift */,
 				8428891E249AE44F00D39E6C /* SendEmailMessageViewController.swift */,
 				8428891F249AE44F00D39E6C /* SendEmailMessageViewController.xib */,
@@ -1386,6 +1389,7 @@
 				8403256324C5213A0049C403 /* FileReadable.swift in Sources */,
 				953890802963F6E100EE81EA /* FolderSwitcherView.swift in Sources */,
 				84EC6CB124C169E3008FDED4 /* HeaderTableViewCell.swift in Sources */,
+				0CB349EC2C40B3C900C31065 /* ImagePickerViewController.swift in Sources */,
 				841252602533D7A100C98ED3 /* InputFormTableViewCell.swift in Sources */,
 				84309D5F2463FFEC00F48ECC /* LearnMoreView.swift in Sources */,
 				8470C8F2245AD0E200439F92 /* MainMenuViewController.swift in Sources */,

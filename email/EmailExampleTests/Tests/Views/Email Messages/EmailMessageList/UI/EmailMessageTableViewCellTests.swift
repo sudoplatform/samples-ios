@@ -73,7 +73,7 @@ class EmailMessageTableViewCellTests: XCTestCase {
         guard let recipientText = instanceUnderTest.recipientsLabel?.text else {
             return XCTFail("Failed to get recipient text")
         }
-        XCTAssertEqual(recipientText, "From: Testie Tester")
+        XCTAssertEqual(recipientText, "From: Testie Tester <test@example.com>")
     }
 
     func test_emailMessage_DidSet_OutboundDirectionStartsWithTo() {

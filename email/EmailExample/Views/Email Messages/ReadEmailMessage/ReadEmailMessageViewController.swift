@@ -116,23 +116,28 @@ class ReadEmailMessageViewController: UIViewController, ActivityAlertViewControl
     ///
     /// This action will block the sender of the email being read
     @objc func blockSenderAddress() {
+        presentActivityAlert(message: "Blocking Email Address")
         let address = emailMessage.from[0].address
         Task.init {
             do {
                 let blockRes = try await emailClient.blockEmailAddresses(addresses: [address])
                 switch blockRes.status {
                 case .success:
+                    self.dismissActivityAlert()
                     presentAlert(title: "Success", message: "\(address) has been blocked") { _ in
                         self.performSegue(withIdentifier: Segue.returnToEmailMessageList.rawValue, sender: self)
                     }
                 case .failure:
+                    self.dismissActivityAlert()
                     presentErrorAlert(message: "Error blocking email address")
                 default:
+                    self.dismissActivityAlert()
                     // no-op - Should never reach this as only passing one address
                     NSLog("Unexpected block result \(blockRes)")
                 }
             } catch {
                 NSLog("Error blocking email address \(error)")
+                self.dismissActivityAlert()
                 presentErrorAlert(message: "Error blocking email address")
             }
         }
@@ -261,7 +266,7 @@ class ReadEmailMessageViewController: UIViewController, ActivityAlertViewControl
                         let toLabels: [UILabel] = message.to.map {
                             let label = UILabel()
                             label.font = UIFont.systemFont(ofSize: 14.0)
-                            label.text = $0.displayName ?? $0.address
+                            label.text = ($0.displayName != nil) ? "\($0.displayName ?? "") <\($0.address)>" : $0.address
                             label.adjustsFontSizeToFitWidth = true
                             label.minimumScaleFactor = 0.7
                             return label
@@ -269,12 +274,13 @@ class ReadEmailMessageViewController: UIViewController, ActivityAlertViewControl
                         let ccLabels: [UILabel] = message.cc.map {
                             let label = UILabel()
                             label.font = UIFont.systemFont(ofSize: 14.0)
-                            label.text = $0.displayName ?? $0.address
+                            label.text = ($0.displayName != nil) ? "\($0.displayName ?? "") <\($0.address)>" : $0.address
                             label.adjustsFontSizeToFitWidth = true
                             label.minimumScaleFactor = 0.7
                             return label
                         }
-                        self.fromLabel.text = message.from.first?.displayName ?? message.from.first?.address
+                        self.fromLabel.text = (message.from.first?.displayName != nil) ?
+                        "\(message.from.first?.displayName ?? "") <\(message.from.first?.address ?? "")>" : message.from.first?.address
                         toLabels.forEach {
                             self.toMessageStackView.addArrangedSubview($0)
                         }
@@ -333,31 +339,63 @@ class ReadEmailMessageViewController: UIViewController, ActivityAlertViewControl
         return sendEmailInput
     }
 
+    enum FileContent {
+        case document(Data)
+        case image(UIImage)
+    }
+
     func saveAttachment(attachmentName: String) {
         var errorMsg: String?
-        // iOS 16+ required for `URL.downloadsDirectory` and `.appending`
-        if #available(iOS 16.0, *) {
-            if let emailAttachment = (attachments.first { $0.filename == attachmentName }),
-               let fileData = Data(base64Encoded: emailAttachment.data) {
-                do {
-                    let url = URL.documentsDirectory.appending(path: emailAttachment.filename)
-                    try fileData.write(to: url, options: [.atomic, .completeFileProtection])
-                    Task { presentAlert(title: "Success", message: "Saved \(emailAttachment.filename) to Documents") }
-                    return
-                } catch {
-                    NSLog("Failed to save attachment: \(error.localizedDescription)")
-                    errorMsg = "Failed to save attachment"
-                }
-            } else {
-                errorMsg = "Failed to parse attachment"
+        let fileManager = FileManager.default
+
+        guard let documentDirectory = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first else {
+            errorMsg = "Could not find document directory"
+            return
+        }
+
+        guard let attachment = attachments.first(where: { $0.filename == attachmentName }) else {
+            errorMsg = "Attachment not found"
+            return
+        }
+
+        let fileContent: FileContent
+        if attachment.mimetype.contains("image/") {
+            guard let imageData = Data(base64Encoded: attachment.data),
+                  let image = UIImage(data: imageData) else {
+                errorMsg = "Could not convert image data"
+                return
             }
+            fileContent = .image(image)
         } else {
-            errorMsg = "At least iOS 16.0 required"
+            guard let documentData = Data(base64Encoded: attachment.data) else {
+                errorMsg = "Could not convert document data"
+                return
+            }
+            fileContent = .document(documentData)
+        }
+
+        let fileURL = documentDirectory.appendingPathComponent(attachmentName)
+
+        do {
+            switch fileContent {
+            case .document(let content):
+                try content.write(to: fileURL, options: [.atomic, .completeFileProtection])
+                Task { presentAlert(title: "Success", message: "Saved \(attachment.filename) successfully at \(fileURL.path)") }
+            case .image(let image):
+                guard let imageData = image.jpegData(compressionQuality: 1.0) else {
+                    errorMsg = "Could not convert image to JPEG data"
+                    return
+                }
+                try imageData.write(to: fileURL)
+                Task { presentAlert(title: "Success", message: "Saved \(attachment.filename) successfully at \(fileURL.path)") }
+            }
+        } catch {
+            errorMsg = "Error saving file: \(error.localizedDescription)"
         }
 
         if let errorMsg = errorMsg {
-            Task { presentErrorAlert(message: errorMsg) }
-        }
+               Task { presentErrorAlert(message: errorMsg) }
+           }
     }
 
     // MARK: - Conformance: ActivityAlertViewControllerDelegate

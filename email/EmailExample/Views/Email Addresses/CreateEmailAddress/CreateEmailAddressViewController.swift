@@ -47,7 +47,7 @@ class CreateEmailAddressViewController: UIViewController,
             case .localPart:
                 return "Local Part"
             case .alias:
-                return "Alias"
+                return "Display Name"
             }
         }
 
@@ -64,9 +64,9 @@ class CreateEmailAddressViewController: UIViewController,
         /// Get the placeholder to display on the UI for the input.
         var placeholder: String {
             if isOptional {
-                return "Enter \(label) (Optional)"
+                return "Enter display name (Optional)"
             } else {
-                return "Enter \(label)"
+                return "Enter local part of the email address"
             }
         }
     }
@@ -209,7 +209,7 @@ class CreateEmailAddressViewController: UIViewController,
         }
         let localPart = formData[.localPart] ?? ""
         let alias = formData[.alias]
-        presentActivityAlert(message: "Creating Address")
+        presentActivityAlert(message: "Provisioning Email Address")
         let address = "\(localPart)@\(domain)"
         do {
             let ownershipProofToken = try await sudoProfilesClient.getOwnershipProof(sudo: sudo, audience: "sudoplatform.email.email-address")
@@ -282,7 +282,7 @@ class CreateEmailAddressViewController: UIViewController,
     func configureLearnMoreView() {
         learnMoreView.delegate = self
         learnMoreView.label.text = "Addresses from different configured domains can be provisioned and used to communicate with other recipients. " +
-        "The list above has been randonly generated based on the currently configured domains."
+        "Entering the local part of the email address above will perform an address availability check based on the currently configured domains."
     }
 
     // MARK: - Helpers: Keyboard

@@ -53,6 +53,9 @@ class SendEmailMessageViewController: UIViewController, UITextViewDelegate, UITa
     /// The native file picker controller.
     var filePickerViewController: FilePickerViewController?
 
+    /// The native image picker controller.
+    var imagePickerViewController: ImagePickerViewController?
+
     /// The controller for the attachment list views.
     var attachmentsListController: EmailAttachmentsListController?
 
@@ -199,15 +202,7 @@ class SendEmailMessageViewController: UIViewController, UITextViewDelegate, UITa
     }
 
     @IBAction func didTapAttachmentButton() {
-        if filePickerViewController == nil {
-            filePickerViewController = FilePickerViewController(onFilePickedHandler: addAttachment)
-        } else {
-            filePickerViewController?.dismiss(animated: true)
-        }
-
-        if let controller = filePickerViewController {
-            present(controller, animated: true, completion: nil)
-        }
+        self.showAddAttachmentAlert()
     }
 
     @objc func didTapBackButton() {
@@ -393,7 +388,36 @@ class SendEmailMessageViewController: UIViewController, UITextViewDelegate, UITa
                 self.presentErrorAlert(message: "Failed to save draft email message", error: error)
             }
         }
+    }
 
+    /// Presents a `UIAlertController` providing different file system options to select an attachment from.
+    func showAddAttachmentAlert() {
+        let alert = UIAlertController(
+            title: "Select an Attachment",
+            message: "Please select an attachment to add.",
+            preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+        alert.addAction(UIAlertAction(title: "Image", style: .default) { _ in
+            if self.imagePickerViewController == nil {
+                self.imagePickerViewController = ImagePickerViewController(onImagePickedHandler: self.addAttachment)
+            } else {
+                self.imagePickerViewController?.dismiss(animated: true)
+            }
+            if let controller = self.imagePickerViewController {
+                self.present(controller, animated: true, completion: nil)
+            }
+        })
+        alert.addAction(UIAlertAction(title: "Document", style: .default) { _ in
+            if self.filePickerViewController == nil {
+                self.filePickerViewController = FilePickerViewController(onFilePickedHandler: self.addAttachment)
+            } else {
+                self.filePickerViewController?.dismiss(animated: true)
+            }
+            if let controller = self.filePickerViewController {
+                self.present(controller, animated: true, completion: nil)
+            }
+        })
+        present(alert, animated: true, completion: nil)
     }
 
     func buildAttachment(withURL fileURL: URL) -> EmailAttachment? {
@@ -416,18 +440,18 @@ class SendEmailMessageViewController: UIViewController, UITextViewDelegate, UITa
         }
     }
 
-    func removeAttachment(attachmentName: String) {
-        if let emailAttachment = (attachments.first { $0.filename == attachmentName }) {
-            self.attachments.remove(emailAttachment)
+    func addAttachment(fileURL: URL) {
+        if let emailAttachment = self.buildAttachment(withURL: fileURL) {
+            self.attachments.insert(emailAttachment)
             self.tableView.beginUpdates()
             self.attachmentsListController?.setAttachments(attachments: self.attachments)
             self.tableView.endUpdates()
         }
     }
 
-    func addAttachment(fileURL: URL) {
-        if let emailAttachment = self.buildAttachment(withURL: fileURL) {
-            self.attachments.insert(emailAttachment)
+    func removeAttachment(attachmentName: String) {
+        if let emailAttachment = (attachments.first { $0.filename == attachmentName }) {
+            self.attachments.remove(emailAttachment)
             self.tableView.beginUpdates()
             self.attachmentsListController?.setAttachments(attachments: self.attachments)
             self.tableView.endUpdates()

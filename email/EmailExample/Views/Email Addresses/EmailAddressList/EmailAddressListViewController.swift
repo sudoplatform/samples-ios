@@ -223,14 +223,14 @@ class EmailAddressListViewController: UIViewController, UITableViewDataSource, U
         } else {
             let emailAddress = emailAddresses[indexPath.row]
             cell = tableView.dequeueReusableCell(withIdentifier: "default", for: indexPath)
-            if let alias = emailAddress.alias {
-                if alias.isEmpty {
-                    cell.textLabel?.text = "Address: \(emailAddress.emailAddress)"
+            if let displayName = emailAddress.alias {
+                if displayName.isEmpty {
+                    cell.textLabel?.text = "\(emailAddress.emailAddress)"
                 } else {
-                    cell.textLabel?.text = "Alias: \(alias)  Address: \(emailAddress.emailAddress)"
+                    cell.textLabel?.text = "\(displayName)  <\(emailAddress.emailAddress)>"
                 }
             } else {
-                cell.textLabel?.text = "Address: \(emailAddress.emailAddress)"
+                cell.textLabel?.text = "\(emailAddress.emailAddress)"
             }
             cell.textLabel?.minimumScaleFactor = 0.7
             cell.textLabel?.adjustsFontSizeToFitWidth = true
@@ -265,6 +265,7 @@ class EmailAddressListViewController: UIViewController, UITableViewDataSource, U
                     _ = try await self.deleteEmailAddressWithId(emailAddress.id)
                     Task { @MainActor in
                         self.emailAddresses.remove(at: indexPath.row)
+                        self.tableView.deleteRows(at: [indexPath], with: .automatic)
                         completion(true)
                     }
                 } catch {

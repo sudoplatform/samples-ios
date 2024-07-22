@@ -201,7 +201,7 @@ class CreateEmailAddressViewControllerTests: XCTestCase {
     func test_getInputLabel_Alias() {
         let localPart = CreateEmailAddressViewController.InputField.alias
         let index = IndexPath.init(row: localPart.rawValue, section: 0)
-        XCTAssertEqual(instanceUnderTest.getInputLabel(forIndexPath: index), "Alias")
+        XCTAssertEqual(instanceUnderTest.getInputLabel(forIndexPath: index), "Display Name")
     }
 
     func test_getInputLabel_Default() {
@@ -212,13 +212,13 @@ class CreateEmailAddressViewControllerTests: XCTestCase {
     func test_getInputPlaceholder_LocalPart() {
         let localPart = CreateEmailAddressViewController.InputField.localPart
         let index = IndexPath.init(row: localPart.rawValue, section: 0)
-        XCTAssertEqual(instanceUnderTest.getInputPlaceholder(forIndexPath: index), "Enter Local Part")
+        XCTAssertEqual(instanceUnderTest.getInputPlaceholder(forIndexPath: index), "Enter local part of the email address")
     }
 
     func test_getInputPlaceholder_Alias() {
         let localPart = CreateEmailAddressViewController.InputField.alias
         let index = IndexPath.init(row: localPart.rawValue, section: 0)
-        XCTAssertEqual(instanceUnderTest.getInputPlaceholder(forIndexPath: index), "Enter Alias (Optional)")
+        XCTAssertEqual(instanceUnderTest.getInputPlaceholder(forIndexPath: index), "Enter display name (Optional)")
     }
 
     func test_getInputPlaceholder_Default() {
@@ -265,7 +265,7 @@ class CreateEmailAddressViewControllerTests: XCTestCase {
         }
         XCTAssertTrue(cell.delegate === instanceUnderTest)
         XCTAssertEqual(cell.label.text, "Local Part")
-        XCTAssertEqual(cell.textField.placeholder, "Enter Local Part")
+        XCTAssertEqual(cell.textField.placeholder, "Enter local part of the email address")
     }
 
     func test_tableView_cellForRowAt_alias_ConfiguresCellCorrectly() {
@@ -276,8 +276,8 @@ class CreateEmailAddressViewControllerTests: XCTestCase {
             return XCTFail("Failed to get cell")
         }
         XCTAssertTrue(cell.delegate === instanceUnderTest)
-        XCTAssertEqual(cell.label.text, "Alias")
-        XCTAssertEqual(cell.textField.placeholder, "Enter Alias (Optional)")
+        XCTAssertEqual(cell.label.text, "Display Name")
+        XCTAssertEqual(cell.textField.placeholder, "Enter display name (Optional)")
     }
 
     @MainActor

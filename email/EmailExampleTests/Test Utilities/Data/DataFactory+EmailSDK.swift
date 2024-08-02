@@ -223,6 +223,7 @@ extension DataFactory {
             return EmailMessageWithBody(
                 id: id,
                 body: body,
+                isHtml: false,
                 attachments: attachments,
                 inlineAttachments: inlineAttachments
             )
@@ -234,7 +235,7 @@ extension DataFactory {
                 contentId: "dummyContentId",
                 mimetype: "dummyMimeType",
                 inlineAttachment: false,
-                data: "dummyAttachmentData"
+                data: Data("dummyAttachmentData".utf8)
             )
         }
     }

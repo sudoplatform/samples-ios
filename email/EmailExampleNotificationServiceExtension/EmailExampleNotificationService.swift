@@ -15,6 +15,10 @@ class EmailExampleNotificationService: UNNotificationServiceExtension {
     var sudoNotifiableClient: DefaultSudoNotifiableClient!
     var sudoEmailNotifiableClient: SudoNotifiableClient!
 
+    public override init() {
+        super.init()
+    }
+
     // For testing
     init(
         sudoEmailNotifiableClient: SudoNotifiableClient,

@@ -40,7 +40,7 @@ PODS:
     - AWSCore (~> 2.27.15)
     - AWSS3 (~> 2.27.15)
     - SudoLogging (~> 1.0)
-  - SudoEmail (14.4.1):
+  - SudoEmail (16.0.0):
     - AnonyomeMailCore2 (~> 0.6.4)
     - AWSAppSync (~> 3.6.1)
     - AWSCore (~> 2.27.15)
@@ -101,7 +101,7 @@ DEPENDENCIES:
   - AWSCore (~> 2.27.15)
   - AWSS3 (~> 2.27.15)
   - MimeParser (~> 0.1)
-  - SudoEmail (>= 14.4.1, ~> 14.4)
+  - SudoEmail (~> 16.0.0)
   - SudoEmailNotificationExtension (>= 14.4.1, ~> 14.4)
   - SudoEntitlements (~> 9.0)
   - SudoKeyManager (>= 2.6.1, ~> 2.6)
@@ -157,7 +157,7 @@ SPEC CHECKSUMS:
   Starscream: 5178aed56b316f13fa3bc55694e583d35dd414d9
   SudoApiClient: 312601ede90e868d8275da7e26ce90daecb6430d
   SudoConfigManager: aee20bc2d03e28342da663ae48378d0daae78f47
-  SudoEmail: ff2220b6b590e0289c36577402b28c883eeead77
+  SudoEmail: 955345311beaefb93053a774e01bb919f362ea88
   SudoEmailNotificationExtension: 3aae9f229404bfef66243840b8d615e9ed4a0236
   SudoEntitlements: a6234950614517b64cd1c45605469619f61e1399
   SudoKeyManager: c6362462cf28838cc7792779fba4d406d5261ba6
@@ -167,6 +167,6 @@ SPEC CHECKSUMS:
   SudoProfiles: c791410946d47cb3deace4b690a954cea6a1fc7e
   SudoUser: 61b99b0c23cf609098e42c68a56bf7873b7c6b47
 
-PODFILE CHECKSUM: 186ea5bcda774f44b0747c1cd2abf9b796164d85
+PODFILE CHECKSUM: 96ba3141461fe2048435631f97766ba63a913adf
 
 COCOAPODS: 1.15.2

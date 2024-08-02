@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		0CB349EC2C40B3C900C31065 /* ImagePickerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB349EB2C40B3C800C31065 /* ImagePickerViewController.swift */; };
 		30000D7EB1A0833B0E3EBA3A /* Pods_EmailExampleNotificationServiceExtension_EmailExampleNotificationServiceExtensionTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6A50341AC6F24193FA5CC6C5 /* Pods_EmailExampleNotificationServiceExtension_EmailExampleNotificationServiceExtensionTests.framework */; };
+		338C4BCFE383E7C74C66E1BA /* Pods-EmailExampleNotificationServiceExtension-EmailExampleNotificationServiceExtensionTests-metadata.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7514910D036A1D9129013ACB /* Pods-EmailExampleNotificationServiceExtension-EmailExampleNotificationServiceExtensionTests-metadata.plist */; };
 		511C50712BE0ACC5006A377E /* UIView+Clickable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 511C50702BE0ACC5006A377E /* UIView+Clickable.swift */; };
 		511C50742BE0B99E006A377E /* EmailAttachmentsListController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 511C50732BE0B99E006A377E /* EmailAttachmentsListController.swift */; };
 		511C50772BE14BF1006A377E /* UIImage+ToAttributedString.swift in Sources */ = {isa = PBXBuildFile; fileRef = 511C50762BE14BF1006A377E /* UIImage+ToAttributedString.swift */; };
@@ -82,6 +83,7 @@
 		84EC6CAE24C1652B008FDED4 /* BodyTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 84EC6CAC24C1652B008FDED4 /* BodyTableViewCell.xib */; };
 		84EC6CB124C169E3008FDED4 /* HeaderTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84EC6CAF24C169E3008FDED4 /* HeaderTableViewCell.swift */; };
 		84EC6CB224C169E3008FDED4 /* HeaderTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 84EC6CB024C169E3008FDED4 /* HeaderTableViewCell.xib */; };
+		8E3FFA99267D34ED9A6DE7DE /* Pods-EmailExample-EmailExampleTests-metadata.plist in Resources */ = {isa = PBXBuildFile; fileRef = B0A094BD2A5E8FCD3A43C188 /* Pods-EmailExample-EmailExampleTests-metadata.plist */; };
 		953890802963F6E100EE81EA /* FolderSwitcherView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9538907F2963F6E100EE81EA /* FolderSwitcherView.swift */; };
 		9557447824A42AFE0057A845 /* SendEmailInputData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9557447724A42AFE0057A845 /* SendEmailInputData.swift */; };
 		9557447E24A5C0320057A845 /* RegistrationViewControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9557447D24A5C0320057A845 /* RegistrationViewControllerTests.swift */; };
@@ -101,6 +103,8 @@
 		95C0CE0824AACE190024BFBB /* ReadEmailMessageViewControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95C0CE0724AACE190024BFBB /* ReadEmailMessageViewControllerTests.swift */; };
 		9F97B79C2B73210000384FE7 /* BlockedAddressTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F97B79B2B73210000384FE7 /* BlockedAddressTableViewCell.swift */; };
 		9F97B79E2B732FA200384FE7 /* BlockedAddressTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9F97B79D2B732FA200384FE7 /* BlockedAddressTableViewCell.xib */; };
+		A1E83EF0860A1C864A359A3A /* Pods-EmailExampleNotificationServiceExtension-metadata.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8134868063EAC2764F7C8A12 /* Pods-EmailExampleNotificationServiceExtension-metadata.plist */; };
+		A85516339AB8557BCB97C61C /* Pods-EmailExample-metadata.plist in Resources */ = {isa = PBXBuildFile; fileRef = 33D8B6CC61EA83D5A31E7383 /* Pods-EmailExample-metadata.plist */; };
 		AB5B9DB3240EC5D100E4E5D8 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB5B9DB2240EC5D100E4E5D8 /* AppDelegate.swift */; };
 		AB5B9DBA240EC5D100E4E5D8 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AB5B9DB8240EC5D100E4E5D8 /* Main.storyboard */; };
 		AB5B9DBC240EC5D300E4E5D8 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AB5B9DBB240EC5D300E4E5D8 /* Assets.xcassets */; };
@@ -154,6 +158,7 @@
 
 /* Begin PBXFileReference section */
 		0CB349EB2C40B3C800C31065 /* ImagePickerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePickerViewController.swift; sourceTree = "<group>"; };
+		33D8B6CC61EA83D5A31E7383 /* Pods-EmailExample-metadata.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-EmailExample-metadata.plist"; sourceTree = "<group>"; };
 		3AB47B97078840B41F67C6C9 /* Pods-EmailExample-EmailExampleTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-EmailExample-EmailExampleTests.release.xcconfig"; path = "Target Support Files/Pods-EmailExample-EmailExampleTests/Pods-EmailExample-EmailExampleTests.release.xcconfig"; sourceTree = "<group>"; };
 		511C50702BE0ACC5006A377E /* UIView+Clickable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+Clickable.swift"; sourceTree = "<group>"; };
 		511C50732BE0B99E006A377E /* EmailAttachmentsListController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmailAttachmentsListController.swift; sourceTree = "<group>"; };
@@ -189,6 +194,8 @@
 		67C8207F24B2AEDD00E5D113 /* SendEmailMessageViewControllerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SendEmailMessageViewControllerTests.swift; sourceTree = "<group>"; };
 		6A50341AC6F24193FA5CC6C5 /* Pods_EmailExampleNotificationServiceExtension_EmailExampleNotificationServiceExtensionTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_EmailExampleNotificationServiceExtension_EmailExampleNotificationServiceExtensionTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		6AAB4EB96C3B9D12F1D4F92C /* Pods-EmailExample-EmailExampleTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-EmailExample-EmailExampleTests.debug.xcconfig"; path = "Target Support Files/Pods-EmailExample-EmailExampleTests/Pods-EmailExample-EmailExampleTests.debug.xcconfig"; sourceTree = "<group>"; };
+		7514910D036A1D9129013ACB /* Pods-EmailExampleNotificationServiceExtension-EmailExampleNotificationServiceExtensionTests-metadata.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-EmailExampleNotificationServiceExtension-EmailExampleNotificationServiceExtensionTests-metadata.plist"; sourceTree = "<group>"; };
+		8134868063EAC2764F7C8A12 /* Pods-EmailExampleNotificationServiceExtension-metadata.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-EmailExampleNotificationServiceExtension-metadata.plist"; sourceTree = "<group>"; };
 		8403255C24C5194A0049C403 /* LearnMoreViewTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LearnMoreViewTests.swift; sourceTree = "<group>"; };
 		8403255E24C51C000049C403 /* AuthenticatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticatorTests.swift; sourceTree = "<group>"; };
 		8403256024C51CB50049C403 /* KeyManagerMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyManagerMock.swift; sourceTree = "<group>"; };
@@ -266,6 +273,7 @@
 		AB5B9DC0240EC5D300E4E5D8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		AB93CAD2240EF6FB0065AF50 /* Authenticator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Authenticator.swift; sourceTree = "<group>"; };
 		AD1228AD3A9195EA9D57B851 /* Pods-EmailExample.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-EmailExample.debug.xcconfig"; path = "Target Support Files/Pods-EmailExample/Pods-EmailExample.debug.xcconfig"; sourceTree = "<group>"; };
+		B0A094BD2A5E8FCD3A43C188 /* Pods-EmailExample-EmailExampleTests-metadata.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-EmailExample-EmailExampleTests-metadata.plist"; sourceTree = "<group>"; };
 		BCF0C519E7787126641709C2 /* Pods_EmailExample_EmailExampleTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_EmailExample_EmailExampleTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		C8B4102A90699F4F35963F6B /* Pods-EmailExample.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-EmailExample.release.xcconfig"; path = "Target Support Files/Pods-EmailExample/Pods-EmailExample.release.xcconfig"; sourceTree = "<group>"; };
 		CF2571BE2444EB7B0053334E /* RegistrationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegistrationViewController.swift; sourceTree = "<group>"; };
@@ -925,12 +933,16 @@
 		CB142D8F3C8CFF7109D665EA /* Pods */ = {
 			isa = PBXGroup;
 			children = (
+				B0A094BD2A5E8FCD3A43C188 /* Pods-EmailExample-EmailExampleTests-metadata.plist */,
 				6AAB4EB96C3B9D12F1D4F92C /* Pods-EmailExample-EmailExampleTests.debug.xcconfig */,
 				3AB47B97078840B41F67C6C9 /* Pods-EmailExample-EmailExampleTests.release.xcconfig */,
+				33D8B6CC61EA83D5A31E7383 /* Pods-EmailExample-metadata.plist */,
 				AD1228AD3A9195EA9D57B851 /* Pods-EmailExample.debug.xcconfig */,
 				C8B4102A90699F4F35963F6B /* Pods-EmailExample.release.xcconfig */,
+				7514910D036A1D9129013ACB /* Pods-EmailExampleNotificationServiceExtension-EmailExampleNotificationServiceExtensionTests-metadata.plist */,
 				FEEADC9A57062B0233D350D1 /* Pods-EmailExampleNotificationServiceExtension-EmailExampleNotificationServiceExtensionTests.debug.xcconfig */,
 				958A4E38F9BCCF8184A753E7 /* Pods-EmailExampleNotificationServiceExtension-EmailExampleNotificationServiceExtensionTests.release.xcconfig */,
+				8134868063EAC2764F7C8A12 /* Pods-EmailExampleNotificationServiceExtension-metadata.plist */,
 				DB2F94AD08BD5CD04F460ABF /* Pods-EmailExampleNotificationServiceExtension.debug.xcconfig */,
 				671C0F0DC5E4AB9A45EDC2EA /* Pods-EmailExampleNotificationServiceExtension.release.xcconfig */,
 			);
@@ -1073,6 +1085,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A1E83EF0860A1C864A359A3A /* Pods-EmailExampleNotificationServiceExtension-metadata.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1080,6 +1093,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				338C4BCFE383E7C74C66E1BA /* Pods-EmailExampleNotificationServiceExtension-EmailExampleNotificationServiceExtensionTests-metadata.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1091,6 +1105,7 @@
 				84770AC724C9127300FC8C8D /* Base64EncodedBody.txt in Resources */,
 				84770AC124C9008E00FC8C8D /* ComplexBase64Email.txt in Resources */,
 				84770AC524C9072A00FC8C8D /* ComplexDataEmail.txt in Resources */,
+				8E3FFA99267D34ED9A6DE7DE /* Pods-EmailExample-EmailExampleTests-metadata.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1116,6 +1131,7 @@
 				AB5B9DBA240EC5D100E4E5D8 /* Main.storyboard in Resources */,
 				8470C8F3245AD0E200439F92 /* MainMenuViewController.xib in Resources */,
 				5D86DB0D2C124D680061BF58 /* Podfile in Resources */,
+				A85516339AB8557BCB97C61C /* Pods-EmailExample-metadata.plist in Resources */,
 				8428891D249AE3EB00D39E6C /* ReadEmailMessageViewController.xib in Resources */,
 				8470A693245B7DC900575C26 /* RegistrationViewController.xib in Resources */,
 				84288921249AE44F00D39E6C /* SendEmailMessageViewController.xib in Resources */,

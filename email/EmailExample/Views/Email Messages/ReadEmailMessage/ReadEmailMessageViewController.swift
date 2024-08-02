@@ -250,9 +250,24 @@ class ReadEmailMessageViewController: UIViewController, ActivityAlertViewControl
                         return
                     }
                     // Get body and attachments, and verify
-                    let body = parsedMessage.body
+                    let body: String
+                    if parsedMessage.isHtml {
+                        if let data = parsedMessage.body.data(using: .utf8) {
+                            let options: [NSAttributedString.DocumentReadingOptionKey: Any] = [
+                                .documentType: NSAttributedString.DocumentType.html,
+                                .characterEncoding: String.Encoding.utf8.rawValue
+                            ]
+                            let attributedString = try? NSAttributedString(data: data, options: options, documentAttributes: nil)
+                            body = attributedString?.string ?? parsedMessage.body
+                        } else {
+                            body = parsedMessage.body
+                        }
+                    } else {
+                        body = parsedMessage.body
+                    }
                     let attachments = parsedMessage.attachments
-                    if message.hasAttachments && attachments.isEmpty {
+                    let inlineAttachments = parsedMessage.inlineAttachments
+                    if message.hasAttachments && attachments.isEmpty && inlineAttachments.isEmpty {
                        Task { @MainActor in
                            self.dismissActivityAlert()
                            self.presentErrorAlert(message: "Failed to load email attachments") { _ in
@@ -308,11 +323,11 @@ class ReadEmailMessageViewController: UIViewController, ActivityAlertViewControl
         }
         var replyTo = ""
         if !emailMessage.from.isEmpty {
-            replyTo = RFC822Util.toRfc822Address(messageAddresses: emailMessage.from)
+            replyTo = RFC822Util.toRfc822Address(messageAddresses: emailMessage.from.map { EmailAddressAndName(address: $0.address) })
         }
         var replyCc = ""
         if !emailMessage.cc.isEmpty {
-            replyCc = RFC822Util.toRfc822Address(messageAddresses: emailMessage.to)
+            replyCc = RFC822Util.toRfc822Address(messageAddresses: emailMessage.cc.map { EmailAddressAndName(address: $0.address) })
         }
         var replySubject = ""
         if let subject = emailMessage.subject {

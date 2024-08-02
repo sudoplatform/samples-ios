@@ -31,7 +31,7 @@ target 'EmailExample' do
 
     target 'EmailExampleTests'
 
-    pod 'SudoEmail', '~> 14.4', '>= 14.4.1'
+    pod 'SudoEmail', '~> 16.0.0'
 end
 
 target 'EmailExampleNotificationServiceExtension' do

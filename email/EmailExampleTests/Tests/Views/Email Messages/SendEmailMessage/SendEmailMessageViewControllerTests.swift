@@ -37,8 +37,8 @@ class SendEmailMessageViewControllerTests: XCTestCase {
         let addresses = "hi@example.com,hello@example.com"
         let addressList = instanceUnderTest.addressesToArray(addresses)
         XCTAssertEqual(2, addressList.count)
-        XCTAssertEqual("hi@example.com", addressList[0])
-        XCTAssertEqual("hello@example.com", addressList[1])
+        XCTAssertEqual(EmailAddressAndName(address: "hi@example.com"), addressList[0])
+        XCTAssertEqual(EmailAddressAndName(address: "hello@example.com"), addressList[1])
     }
 
     func test_validateEmail_valid() {
@@ -131,7 +131,7 @@ class SendEmailMessageViewControllerTests: XCTestCase {
 
     @MainActor
     func test_send() async {
-        let from = "email@address.com"
+        let from = EmailAddressAndName(address: "email@address.com")
         let addressId = "dummyId"
         let subject = "dummySubject"
         let body = "dummyBody"
@@ -159,7 +159,7 @@ class SendEmailMessageViewControllerTests: XCTestCase {
     @MainActor
     func test_send_DraftDeletesDraft() async {
         let draftId = "dummyDraftId"
-        let from = "email@address.com"
+        let from = EmailAddressAndName(address: "email@address.com")
         let addressId = "dummyId"
         let subject = "dummySubject"
         let body = "dummyBody"
@@ -304,9 +304,9 @@ class SendEmailMessageViewControllerTests: XCTestCase {
         guard let fileURL = Bundle(for: type(of: self)).url(forResource: "anonyome", withExtension: "png") else {
             return XCTFail("Failed to get file as bundle")
         }
-        var expectedFileData: String!
+        var expectedFileData: Data!
         do {
-            expectedFileData = try Data(contentsOf: fileURL).base64EncodedString()
+            expectedFileData = try Data(contentsOf: fileURL)
         } catch {
             XCTFail("Failed to parse file")
         }
@@ -322,9 +322,9 @@ class SendEmailMessageViewControllerTests: XCTestCase {
         guard let fileURL = Bundle(for: type(of: self)).url(forResource: "anonyome", withExtension: "png") else {
             return XCTFail("Failed to get file as bundle")
         }
-        var expectedFileData: String!
+        var expectedFileData: Data!
         do {
-            expectedFileData = try Data(contentsOf: fileURL).base64EncodedString()
+            expectedFileData = try Data(contentsOf: fileURL)
         } catch {
             XCTFail("Failed to parse file")
         }

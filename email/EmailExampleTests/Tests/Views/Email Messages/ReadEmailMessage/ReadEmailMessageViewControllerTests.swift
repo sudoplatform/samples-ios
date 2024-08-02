@@ -119,6 +119,7 @@ class ReadEmailMessageViewControllerTests: XCTestCase {
         testUtility.emailClient.getEmailMessageWithBodyResult = EmailMessageWithBody(
             id: "dummyMessageId",
             body: "dummyMessageBody",
+            isHtml: false,
             attachments: [dummyAttachment],
             inlineAttachments: []
         )

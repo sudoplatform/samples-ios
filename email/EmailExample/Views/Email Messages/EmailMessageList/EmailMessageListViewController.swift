@@ -701,22 +701,26 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
 
     @MainActor
     func unblockEmailAddresses() {
+        presentActivityAlert(message: "Unblocking Email Address")
         Task.init {
             do {
                 let result = try await self.emailClient.unblockEmailAddresses(addresses: selectedBlockedAddresses)
 
                 switch result.status {
                 case .success:
+                    self.dismissActivityAlert()
                     self.presentAlert(title: "Success", message: "Email address(es) unblocked")
                     blockedAddresses = blockedAddresses.filter { item in
                         !selectedBlockedAddresses.contains(item)
                     }
                 case .partial:
+                    self.dismissActivityAlert()
                     self.presentErrorAlert(message: "Unable to unblock some addresses. Please try again")
                     blockedAddresses = blockedAddresses.filter { item in
                         !result.successItems!.contains(item)
                     }
                 case .failure:
+                    self.dismissActivityAlert()
                     self.presentErrorAlert(message: "Failed to unblock email address(es). Please try again")
                 @unknown default:
                     fatalError("Unhandled unknown status \(String(describing: result.status))")
@@ -726,6 +730,7 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
                 }
             } catch {
                 Task { @MainActor in
+                    self.dismissActivityAlert()
                     self.presentErrorAlert(message: "Failed to unblock email address(es). Please try again", error: error)
                 }
             }

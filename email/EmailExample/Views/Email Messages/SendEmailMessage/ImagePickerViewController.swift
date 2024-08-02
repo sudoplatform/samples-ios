@@ -16,10 +16,6 @@ public class ImagePickerViewController: UIImagePickerController, UIImagePickerCo
 
     // MARK: - Lifecycle
 
-    override public func viewDidLoad() {
-        super.viewDidLoad()
-    }
-
     convenience init(onImagePickedHandler: ((_ imageURL: URL) -> Void)?) {
         self.init()
         delegate = self

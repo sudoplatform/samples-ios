@@ -183,7 +183,7 @@ class SendEmailMessageViewController: UIViewController, UITextViewDelegate, UITa
         }
 
         let emailMessageHeader = InternetMessageFormatHeader(
-            from: from,
+            from: EmailAddressAndName(address: from, displayName: emailAddress.alias),
             to: addressesToArray(to),
             cc: addressesToArray(cc),
             bcc: addressesToArray(bcc),
@@ -236,17 +236,17 @@ class SendEmailMessageViewController: UIViewController, UITextViewDelegate, UITa
 
     func validateEmailAddressList(addresses: String) -> Bool {
         let addresses = addressesToArray(addresses)
-        for address in addresses where !validateEmail(address) {
+        for address in addresses where !validateEmail(address.address) {
             return false
         }
         return true
     }
 
-    func addressesToArray(_ addresses: String) -> [String] {
-        var result: [String] = []
-        let split = addresses.split(separator: ",")
+    func addressesToArray(_ addresses: String) -> [EmailAddressAndName] {
+        var result: [EmailAddressAndName] = []
+        let split = addresses.split(separator: ",").map { EmailAddressAndName(address: String($0).trimmingCharacters(in: .whitespacesAndNewlines)) }
         for address in split {
-            result.append(address.trimmingCharacters(in: .whitespacesAndNewlines))
+            result.append(address)
         }
         return result
     }
@@ -270,7 +270,7 @@ class SendEmailMessageViewController: UIViewController, UITextViewDelegate, UITa
             return false
         }
 
-        let emailAddresses = addressesToArray(addressesInput)
+        let emailAddresses = addressesToArray(addressesInput).map { $0.address }
         let input = LookupEmailAddressesPublicInfoInput(emailAddresses: emailAddresses)
         let emailAddressesPublicInfo = try await emailClient.lookupEmailAddressesPublicInfo(withInput: input)
 
@@ -350,9 +350,9 @@ class SendEmailMessageViewController: UIViewController, UITextViewDelegate, UITa
         }
         let message = BasicRFC822Message(
             from: from,
-            to: addressesToArray(to),
-            cc: addressesToArray(cc),
-            bcc: addressesToArray(bcc),
+            to: addressesToArray(to).map { $0.description },
+            cc: addressesToArray(cc).map { $0.description },
+            bcc: addressesToArray(bcc).map { $0.description },
             subject: subject,
             body: body
         )
@@ -425,7 +425,7 @@ class SendEmailMessageViewController: UIViewController, UITextViewDelegate, UITa
             let filename = fileURL.lastPathComponent
             let pathExtension = (filename as NSString).pathExtension
             let mimetype = UTType(filenameExtension: pathExtension)?.preferredMIMEType ?? "application/octet-stream"
-            let data = try Data(contentsOf: fileURL).base64EncodedString()
+            let data = try Data(contentsOf: fileURL)
             let attachment = EmailAttachment(
                 filename: filename,
                 mimetype: mimetype,

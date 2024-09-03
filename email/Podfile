@@ -10,11 +10,7 @@ source 'https://github.com/CocoaPods/Specs.git'
 acknowledgementsFields = ['name', 'version', 'licenseType', 'licenseText', 'homepage']
 acknowledgementsExclude = ['SudoUser', 'SudoApiClient', 'SudoConfigManager', 'SudoEmail', 'SudoEmailNotificationExtension', 'SudoKeyManager', 'SudoLogging', 'SudoNotification', 'SudoNotificationExtension', 'SudoOperations', 'SudoProfiles']
 
-pre_install do |installer|
-	unless installer.deployment?
-		plugin 'cocoapods-acknowledgements', :fields => acknowledgementsFields, :exclude => acknowledgementsExclude
-	end
-end
+plugin 'cocoapods-acknowledgements', :fields => acknowledgementsFields, :exclude => acknowledgementsExclude
 
 target 'EmailExample' do
     pod 'SudoKeyManager', '~> 2.6', '>= 2.6.1'

@@ -286,10 +286,11 @@ class FundingSourceListViewController: UIViewController, UITableViewDelegate, UI
         switch state {
         case .inactive:
             suffix = " - Cancelled"
-        case .refresh:
-            suffix = " - Needs Refresh"
         default:
             break
+        }
+        if flags.contains(FundingSourceFlags.refresh) {
+            suffix += " - Needs Refresh"
         }
         if  flags.contains(FundingSourceFlags.unfunded) {
             suffix += " - UNFUNDED"
@@ -381,9 +382,9 @@ class FundingSourceListViewController: UIViewController, UITableViewDelegate, UI
             switch fundingSource {
             case .creditCardFundingSource(let creditCardFundingSource):
                 canCancel = creditCardFundingSource.state == .active
-                canRefresh = creditCardFundingSource.state == .refresh
+                canRefresh = creditCardFundingSource.flags.contains(FundingSourceFlags.refresh)
             case .bankAccountFundingSource(let bankAccountFundingSource):
-                canRefresh = bankAccountFundingSource.state == .refresh
+                canRefresh = bankAccountFundingSource.flags.contains(FundingSourceFlags.refresh)
                 canReview = bankAccountFundingSource.flags.contains(FundingSourceFlags.unfunded)
                 canCancel = bankAccountFundingSource.state == .active && !canReview
             }

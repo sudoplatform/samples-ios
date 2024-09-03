@@ -107,7 +107,7 @@ PODS:
     - SudoConfigManager (~> 3.0)
     - SudoKeyManager (~> 2.0)
     - SudoLogging (~> 1.0)
-  - SudoVirtualCards (23.6.0):
+  - SudoVirtualCards (24.0.0):
     - AWSAppSync (~> 3.6.1)
     - AWSCore (~> 2.27.15)
     - Starscream (= 4.0.4)
@@ -126,7 +126,7 @@ DEPENDENCIES:
   - SudoIdentityVerification (~> 14.0)
   - SudoProfiles (~> 17.0)
   - SudoUser (~> 15.0)
-  - SudoVirtualCards (~> 23.6.0)
+  - SudoVirtualCards (~> 24.0.0)
 
 SPEC REPOS:
   https://github.com/CocoaPods/Specs.git:
@@ -205,8 +205,8 @@ SPEC CHECKSUMS:
   SudoLogging: 93238a71338292a650804358994c67f8f3816d20
   SudoProfiles: c791410946d47cb3deace4b690a954cea6a1fc7e
   SudoUser: 61b99b0c23cf609098e42c68a56bf7873b7c6b47
-  SudoVirtualCards: 8cc9c5c50784eac17af75d6a7dacc4fa92d2cc8f
+  SudoVirtualCards: 69b2db98127d2c2192a7f6d7571607db47a9da57
 
-PODFILE CHECKSUM: 0888bb122a937b66b8422c37a7092a09ebde75d1
+PODFILE CHECKSUM: 684ef7c46398cb7a697da96082ea4952d4b0043e
 
 COCOAPODS: 1.15.0

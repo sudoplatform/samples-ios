@@ -10,11 +10,7 @@ inhibit_all_warnings!
 acknowledgementsFields = ['name', 'version', 'licenseType', 'licenseText', 'homepage']
 acknowledgementsExclude = ['SudoUser', 'SudoTelephony', 'SudoApiClient', 'SudoConfigManager', 'SudoKeyManager', 'SudoLogging', 'SudoOperations', 'SudoProfiles', 'SudoIdentityVerification', 'SudoVirtualCards']
 
-pre_install do |installer|
-	unless installer.deployment?
-		plugin 'cocoapods-acknowledgements', :fields => acknowledgementsFields, :exclude => acknowledgementsExclude
-	end
-end
+plugin 'cocoapods-acknowledgements', :fields => acknowledgementsFields, :exclude => acknowledgementsExclude
 
 # PhoneNumberKit has stopped publishing Cocoapods releases to Public Registry
 # This workaround enables application to get the releases straight from source repository 
@@ -30,7 +26,7 @@ target 'VirtualCardsExample' do
     pod 'SudoProfiles', '~> 17.0'
     pod 'SudoEntitlements', '~> 9.0'
     pod 'SudoIdentityVerification', '~> 14.0'
-    pod 'SudoVirtualCards', '~> 23.6.0'
+    pod 'SudoVirtualCards', '~> 24.0.0'
 
     target 'VirtualCardsExampleTests'
     target 'VirtualCardsExampleUITests'

@@ -75,7 +75,8 @@ class ServerListViewController: UIViewController, UITableViewDelegate, UITableVi
                 countriesFilter: ["AU", "US", "NL", "GB"],
                 limit: 0,
                 nextToken: nil,
-                cachePolicy: .remoteOnly)
+                cachePolicy: .remoteOnly
+            )
             updateServerList(servers.items)
             DispatchQueue.main.async { [weak self] in
                 self?.tableView.reloadData()
@@ -132,7 +133,16 @@ class ServerListViewController: UIViewController, UITableViewDelegate, UITableVi
                 }
                 return $0.country < $1.country
             })
-        self.serverList = servers
+        // Create an empty server object to represent the fastest available selection at the top of 
+        // the server list.
+        let fastestAvailable = SudoVPNServer(
+            country: Constants.FastestAvailableName,
+            region: nil,
+            coordinates: nil,
+            load: nil,
+            ipAddress: nil
+        )
+        self.serverList = [fastestAvailable] + servers
     }
 
     // MARK: - UITableView

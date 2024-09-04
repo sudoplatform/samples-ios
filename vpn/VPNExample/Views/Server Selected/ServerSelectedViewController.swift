@@ -94,8 +94,12 @@ class ServerSelectedViewController: UIViewController, SudoVPNObserving {
             Task.detached(priority: .medium) { [weak self] in
                 guard let weakSelf = self else { return }
                 await weakSelf.updateConnectionState(.connecting)
+                // Set the SudoVPNConfiguration server as 'nil' if fastest available selected.
+                // The configuration object required in `vpnClient.connect()`` requires a nil
+                // server to auto-detect user location.
+                let server = await weakSelf.server?.country == Constants.FastestAvailableName ? nil : weakSelf.server
                 let configuration = await SudoVPNConfiguration(
-                    server: weakSelf.server,
+                    server: server,
                     protocolType: weakSelf.currentProtocol,
                     onDemand: weakSelf.currentOnDemand
                 )

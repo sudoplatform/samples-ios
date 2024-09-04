@@ -11,11 +11,7 @@ source ENV['SUDOVPN_SDK_REPO']
 acknowledgementsFields = ['name', 'version', 'licenseType', 'licenseText', 'homepage']
 acknowledgementsExclude = ['SudoUser', 'SudoApiClient', 'SudoConfigManager', 'SudoKeyManager', 'SudoLogging', 'SudoOperations', 'SudoProfiles']
 
-pre_install do |installer|
-	unless installer.deployment?
-		plugin 'cocoapods-acknowledgements', :fields => acknowledgementsFields, :exclude => acknowledgementsExclude
-	end
-end
+plugin 'cocoapods-acknowledgements', :fields => acknowledgementsFields, :exclude => acknowledgementsExclude
 
 target 'VPNExample' do
     inherit! :search_paths
@@ -23,7 +19,7 @@ target 'VPNExample' do
     pod 'SudoProfiles', '~> 17.0'
     pod 'SudoEntitlements', '~> 9.0.1'
     pod 'SudoEntitlementsAdmin', '~> 4.0'
-    pod 'SudoVPN',  '~> 16.0'
+    pod 'SudoVPN', '~> 16.0.7'
 
     pod 'FlagKit'
 

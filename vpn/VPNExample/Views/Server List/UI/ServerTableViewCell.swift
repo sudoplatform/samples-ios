@@ -41,7 +41,8 @@ class ServerTableViewCell: UITableViewCell {
         if let countryImage = model.flag?.image(style: .roundedRect) {
             countryImageView.image = countryImage
         } else {
-            countryImageView.image = UIImage(systemName: "eye")
+            let iconName = server.country == Constants.FastestAvailableName ? Constants.FastestAvailableIconName : "eye"
+            countryImageView.image = UIImage(systemName: iconName)
         }
         regionLabel.text = model.region ?? model.country
         if let load = model.load {

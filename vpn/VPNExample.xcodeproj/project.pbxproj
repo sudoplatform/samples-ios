@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		0179C4306B37B1C99393F2FB /* Pods_VPNExample_VPNExampleTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 971C4F0F8048A791D41BCDB2 /* Pods_VPNExample_VPNExampleTests.framework */; };
+		517C03912AFDD3E20076DA2B /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 517C03902AFDD3E20076DA2B /* Constants.swift */; };
 		842A7A0D2565DC89002A4723 /* ServerInformationBox.swift in Sources */ = {isa = PBXBuildFile; fileRef = 842A7A0C2565DC89002A4723 /* ServerInformationBox.swift */; };
 		842A7A152565DC9B002A4723 /* ServerInformationBox.xib in Resources */ = {isa = PBXBuildFile; fileRef = 842A7A142565DC9B002A4723 /* ServerInformationBox.xib */; };
 		842EAA7D25673C8C00B4F56D /* ServerChangeBox.swift in Sources */ = {isa = PBXBuildFile; fileRef = 842EAA7C25673C8C00B4F56D /* ServerChangeBox.swift */; };
@@ -108,6 +109,7 @@
 
 /* Begin PBXFileReference section */
 		0644E5278DC0242218547CBF /* Pods-VPNExample-VPNExampleTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-VPNExample-VPNExampleTests.release.xcconfig"; path = "Target Support Files/Pods-VPNExample-VPNExampleTests/Pods-VPNExample-VPNExampleTests.release.xcconfig"; sourceTree = "<group>"; };
+		517C03902AFDD3E20076DA2B /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		51FA9A91F0A2D7FDD2471CB8 /* Pods_VPNExample.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_VPNExample.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		6FEF39355CDA88FC929A7CA9 /* Pods-VPNExample-VPNExampleTests-metadata.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-VPNExample-VPNExampleTests-metadata.plist"; sourceTree = "<group>"; };
 		842A7A0C2565DC89002A4723 /* ServerInformationBox.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServerInformationBox.swift; sourceTree = "<group>"; };
@@ -435,6 +437,7 @@
 				845883DA2574AE7C00096ACD /* Managers */,
 				84A1E19B255E48F600EF4F70 /* Protocols */,
 				84B925C2253FD2F60076259D /* UI */,
+				517C03902AFDD3E20076DA2B /* Constants.swift */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -966,6 +969,7 @@
 				847E00F4253EA9F600167D2C /* AppDelegate.swift in Sources */,
 				84A32918253EB37100EF3B7D /* AppDependencies.swift in Sources */,
 				84B9259C253FC9370076259D /* Authenticator.swift in Sources */,
+				517C03912AFDD3E20076DA2B /* Constants.swift in Sources */,
 				9537817B25C27C3300CADAFF /* EntitlementConsumptionModel.swift in Sources */,
 				9537817125C27BE500CADAFF /* EntitlementsFooterView.swift in Sources */,
 				9537817325C27BE500CADAFF /* EntitlementsTableViewCell.swift in Sources */,

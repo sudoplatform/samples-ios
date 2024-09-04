@@ -52,7 +52,10 @@ class ServerChangeBox: UIView {
             setDefaultView()
             return
         }
-        flagImageView.image = server.flag?.image(style: .roundedRect)
+        let image = server.country == Constants.FastestAvailableName
+            ? UIImage(systemName: Constants.FastestAvailableIconName)
+            : server.flag?.image(style: .roundedRect)
+        flagImageView.image = image
         countryLabel.text = server.country
     }
 

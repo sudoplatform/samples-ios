@@ -73,7 +73,7 @@ PODS:
     - SudoConfigManager (~> 3.0)
     - SudoKeyManager (~> 2.0)
     - SudoLogging (~> 1.0)
-  - SudoVPN (16.0.4):
+  - SudoVPN (16.0.7):
     - AWSAppSync (~> 3.6.1)
     - AWSCore (~> 2.27.15)
     - SudoApiClient (~> 10.0)
@@ -86,7 +86,7 @@ DEPENDENCIES:
   - SudoEntitlementsAdmin (~> 4.0)
   - SudoProfiles (~> 17.0)
   - SudoUser (~> 15.0)
-  - SudoVPN (~> 16.0)
+  - SudoVPN (~> 16.0.7)
 
 SPEC REPOS:
   https://github.com/CocoaPods/Specs.git:
@@ -112,7 +112,7 @@ SPEC REPOS:
     - SudoLogging
     - SudoProfiles
     - SudoUser
-  https://gitlab.tools.anonyome.com/anonyome/pod-repository.git:
+  https://gitlab.tools.anonyome.com/anonyome/pod-repository:
     - SudoVPN
 
 SPEC CHECKSUMS:
@@ -138,8 +138,8 @@ SPEC CHECKSUMS:
   SudoLogging: 93238a71338292a650804358994c67f8f3816d20
   SudoProfiles: c791410946d47cb3deace4b690a954cea6a1fc7e
   SudoUser: 61b99b0c23cf609098e42c68a56bf7873b7c6b47
-  SudoVPN: 4998ef952a1a5ad203561c91a8e1296a22eddc37
+  SudoVPN: aa617e9ce2437eb975b052e32ae984efab3a3fcd
 
-PODFILE CHECKSUM: ab605f361b4a2e7521194b629d2668b3e6aefa8f
+PODFILE CHECKSUM: 55866479cbcdd5ec5dfc5990dbcaa260c0595b9d
 
-COCOAPODS: 1.12.1
+COCOAPODS: 1.14.2

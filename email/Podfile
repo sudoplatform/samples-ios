@@ -14,20 +14,20 @@ plugin 'cocoapods-acknowledgements', :fields => acknowledgementsFields, :exclude
 
 target 'EmailExample' do
     pod 'SudoKeyManager', '~> 2.6', '>= 2.6.1'
-    pod 'SudoEntitlements', '~> 9.0'
-    pod 'SudoUser', '~> 15.1'
-    pod 'SudoProfiles', '~> 17.0'
-    pod 'SudoNotification', '~> 2.1'
+    pod 'SudoEntitlements', '~> 11.0'
+    pod 'SudoUser', '~> 16.0'
+    pod 'SudoProfiles', '~> 18.0'
+    pod 'SudoNotification', '~> 3.0'
     pod 'MimeParser', '~> 0.1'
-    pod 'AWSCore', '~> 2.27.15'
-    pod 'AWSAuthCore', '~> 2.27.15'
-    pod 'AWSCognitoIdentityProvider', '~> 2.27.15'
-    pod 'AWSCognitoIdentityProviderASF', '~> 2.27.15'
-    pod 'AWSS3', '~> 2.27.15'
+    pod 'AWSCore', '~> 2.36.7'
+    pod 'AWSAuthCore', '~> 2.36.7'
+    pod 'AWSCognitoIdentityProvider', '~> 2.36.7'
+    pod 'AWSCognitoIdentityProviderASF', '~> 2.36.7'
+    pod 'AWSS3', '~> 2.36.7'
 
     target 'EmailExampleTests'
 
-    pod 'SudoEmail', '~> 16.0.0'
+    pod 'SudoEmail', '~> 17.4.0'
 end
 
 target 'EmailExampleNotificationServiceExtension' do

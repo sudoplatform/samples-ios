@@ -1,114 +1,112 @@
 PODS:
   - AnonyomeMailCore2 (0.6.4)
-  - AppSyncRealTimeClient (1.10.0):
-    - Starscream (~> 4.0.4)
+  - AppSyncRealTimeClient (3.2.0):
+    - Starscream (= 4.0.8)
   - ASN1Swift (1.2.7)
-  - AWSAppSync (3.6.1):
-    - AppSyncRealTimeClient (~> 1.7)
-    - AWSCore (~> 2.27.0)
-    - ReachabilitySwift (= 5.0.0)
+  - AWSAppSync (3.7.1):
+    - AppSyncRealTimeClient (~> 3.2.0)
+    - AWSCore (~> 2.36.0)
     - SQLite.swift (~> 0.12.2)
-  - AWSAuthCore (2.27.15):
-    - AWSCore (= 2.27.15)
-  - AWSCognitoIdentityProvider (2.27.15):
-    - AWSCognitoIdentityProviderASF (= 2.27.15)
-    - AWSCore (= 2.27.15)
-  - AWSCognitoIdentityProviderASF (2.27.15):
-    - AWSCore (= 2.27.15)
-  - AWSCore (2.27.15)
-  - AWSMobileClient (2.27.15):
-    - AWSAuthCore (= 2.27.15)
-    - AWSCognitoIdentityProvider (= 2.27.15)
-    - AWSCognitoIdentityProviderASF (= 2.27.15)
-    - AWSCore (= 2.27.15)
-  - AWSS3 (2.27.15):
-    - AWSCore (= 2.27.15)
+  - AWSAuthCore (2.36.7):
+    - AWSCore (= 2.36.7)
+  - AWSCognitoIdentityProvider (2.36.7):
+    - AWSCognitoIdentityProviderASF (= 2.36.7)
+    - AWSCore (= 2.36.7)
+  - AWSCognitoIdentityProviderASF (2.36.7):
+    - AWSCore (= 2.36.7)
+  - AWSCore (2.36.7)
+  - AWSMobileClient (2.36.7):
+    - AWSAuthCore (= 2.36.7)
+    - AWSCognitoIdentityProvider (= 2.36.7)
+    - AWSCognitoIdentityProviderASF (= 2.36.7)
+    - AWSCore (= 2.36.7)
+  - AWSS3 (2.36.7):
+    - AWSCore (= 2.36.7)
   - GzipSwift (5.1.1)
   - MimeParser (0.2.5)
-  - ReachabilitySwift (5.0.0)
   - SQLite.swift (0.12.2):
     - SQLite.swift/standard (= 0.12.2)
   - SQLite.swift/standard (0.12.2)
-  - Starscream (4.0.4)
-  - SudoApiClient (10.2.0):
-    - AWSAppSync (~> 3.6.1)
-    - AWSCore (~> 2.27.15)
-    - SudoConfigManager (~> 3.0)
+  - Starscream (4.0.8)
+  - SudoApiClient (11.0.0):
+    - AWSAppSync (~> 3.7.1)
+    - AWSCore (~> 2.36.7)
+    - SudoConfigManager (~> 3.1)
     - SudoLogging (~> 1.0)
-    - SudoUser (~> 15.0)
-  - SudoConfigManager (3.0.2):
-    - AWSCore (~> 2.27.15)
-    - AWSS3 (~> 2.27.15)
+    - SudoUser (~> 16.0)
+  - SudoConfigManager (3.1.0):
+    - AWSCore (~> 2.36.7)
+    - AWSS3 (~> 2.36.7)
     - SudoLogging (~> 1.0)
-  - SudoEmail (16.0.0):
+  - SudoEmail (17.4.0):
     - AnonyomeMailCore2 (~> 0.6.4)
-    - AWSAppSync (~> 3.6.1)
-    - AWSCore (~> 2.27.15)
-    - AWSS3 (~> 2.27.15)
-    - SudoApiClient (~> 10.2)
-    - SudoConfigManager (>= 3.0.2, ~> 3.0)
+    - AWSAppSync (~> 3.7.1)
+    - AWSCore (~> 2.36.7)
+    - AWSS3 (~> 2.36.7)
+    - SudoApiClient (~> 11.0)
+    - SudoConfigManager (~> 3.1)
     - SudoKeyManager (>= 2.6.1, ~> 2.6)
     - SudoLogging (~> 1.0)
-    - SudoNotification (~> 2.1)
-    - SudoUser (~> 15.1)
-  - SudoEmailNotificationExtension (14.4.1):
+    - SudoNotification (~> 3.0)
+    - SudoUser (~> 16.0)
+  - SudoEmailNotificationExtension (14.6.0):
     - SudoKeyManager (>= 2.6.1, ~> 2.6)
     - SudoLogging (~> 1.0)
     - SudoNotificationExtension (~> 2.1)
-  - SudoEntitlements (9.0.1):
-    - AWSAppSync (~> 3.6.1)
-    - SudoApiClient (~> 10.0)
-    - SudoConfigManager (~> 3.0)
+  - SudoEntitlements (11.0.0):
+    - AWSAppSync (~> 3.7.1)
+    - SudoApiClient (~> 11.0)
+    - SudoConfigManager (~> 3.1)
     - SudoKeyManager (~> 2.0)
     - SudoLogging (~> 1.0)
-    - SudoUser (~> 15.0)
+    - SudoUser (~> 16.0)
   - SudoKeyManager (2.6.1):
     - ASN1Swift (~> 1.2)
     - GzipSwift (~> 5.0)
   - SudoLogging (1.0.0)
-  - SudoNotification (2.1.4):
-    - AWSAppSync (~> 3.6.1)
-    - SudoApiClient (~> 10.2)
-    - SudoConfigManager (>= 3.0.2, ~> 3.0)
+  - SudoNotification (3.0.0):
+    - AWSAppSync (~> 3.7.1)
+    - SudoApiClient (~> 11.0)
+    - SudoConfigManager (~> 3.1)
     - SudoKeyManager (~> 2.5)
     - SudoLogging (~> 1.0)
-    - SudoUser (~> 15.1)
+    - SudoUser (~> 16.0)
   - SudoNotificationExtension (2.1.4):
     - SudoLogging (~> 1.0)
-  - SudoProfiles (17.0.0):
-    - AWSAppSync (~> 3.6.1)
-    - AWSCore (~> 2.27.15)
-    - AWSS3 (~> 2.27.15)
-    - SudoApiClient (~> 10.0)
-    - SudoConfigManager (~> 3.0)
+  - SudoProfiles (18.0.0):
+    - AWSAppSync (~> 3.7.1)
+    - AWSCore (~> 2.36.7)
+    - AWSS3 (~> 2.36.7)
+    - SudoApiClient (~> 11.0)
+    - SudoConfigManager (~> 3.1)
     - SudoLogging (~> 1.0)
-    - SudoUser (~> 15.0)
-  - SudoUser (15.1.0):
-    - AWSAppSync (~> 3.6.1)
-    - AWSCognitoIdentityProvider (~> 2.27.15)
-    - AWSCore (~> 2.27.15)
-    - AWSMobileClient (~> 2.27.15)
-    - AWSS3 (~> 2.27.15)
-    - Starscream (= 4.0.4)
-    - SudoConfigManager (~> 3.0)
+    - SudoUser (~> 16.0)
+  - SudoUser (16.0.0):
+    - AWSAppSync (~> 3.7.1)
+    - AWSCognitoIdentityProvider (~> 2.36.7)
+    - AWSCore (~> 2.36.7)
+    - AWSMobileClient (~> 2.36.7)
+    - AWSS3 (~> 2.36.7)
+    - Starscream (~> 4.0.4)
+    - SudoConfigManager (~> 3.1)
     - SudoKeyManager (~> 2.0)
     - SudoLogging (~> 1.0)
 
 DEPENDENCIES:
-  - AWSAuthCore (~> 2.27.15)
-  - AWSCognitoIdentityProvider (~> 2.27.15)
-  - AWSCognitoIdentityProviderASF (~> 2.27.15)
-  - AWSCore (~> 2.27.15)
-  - AWSS3 (~> 2.27.15)
+  - AWSAuthCore (~> 2.36.7)
+  - AWSCognitoIdentityProvider (~> 2.36.7)
+  - AWSCognitoIdentityProviderASF (~> 2.36.7)
+  - AWSCore (~> 2.36.7)
+  - AWSS3 (~> 2.36.7)
   - MimeParser (~> 0.1)
-  - SudoEmail (~> 16.0.0)
+  - SudoEmail (~> 17.4.0)
   - SudoEmailNotificationExtension (>= 14.4.1, ~> 14.4)
-  - SudoEntitlements (~> 9.0)
+  - SudoEntitlements (~> 11.0)
   - SudoKeyManager (>= 2.6.1, ~> 2.6)
-  - SudoNotification (~> 2.1)
+  - SudoNotification (~> 3.0)
   - SudoNotificationExtension (~> 2.1)
-  - SudoProfiles (~> 17.0)
-  - SudoUser (~> 15.1)
+  - SudoProfiles (~> 18.0)
+  - SudoUser (~> 16.0)
 
 SPEC REPOS:
   https://github.com/CocoaPods/Specs.git:
@@ -124,7 +122,6 @@ SPEC REPOS:
     - AWSS3
     - GzipSwift
     - MimeParser
-    - ReachabilitySwift
     - SQLite.swift
     - Starscream
     - SudoApiClient
@@ -141,32 +138,31 @@ SPEC REPOS:
 
 SPEC CHECKSUMS:
   AnonyomeMailCore2: 385f16d32aa5c6179aff0be091ebe149243472c2
-  AppSyncRealTimeClient: 656ab4215e05f6ca47fe6d8c73f416d9984a8aac
+  AppSyncRealTimeClient: 35c0d2ae28234a9f5daba5dc31402acf45ad802f
   ASN1Swift: bbd56c299b2084ba71bd7d7769c6202451598948
-  AWSAppSync: 4ea012b003e2342499cc5b918e8a428849eaed77
-  AWSAuthCore: 0bac0e67c28d620c8f823c88bd15d552544e801a
-  AWSCognitoIdentityProvider: a8d244d0cdfeff425fe20a2fb49b7e9cb89c4748
-  AWSCognitoIdentityProviderASF: 5dccf24b43c287eb1949e83cefccb6c25cdc04b7
-  AWSCore: c67277201b6aca10e4cf24638eadaa67c85ebf03
-  AWSMobileClient: 6f60d1fb6373e21aaada443dd4d4bf087158614d
-  AWSS3: 09801b290f8818f532694cabd5d503c7474eb3df
+  AWSAppSync: b964ad73cc08b73e60f3f620740292b7307613be
+  AWSAuthCore: 72b211f6fef940b62fa4ded1cdd65cdfce45dcc3
+  AWSCognitoIdentityProvider: 55465d03c154eab4ca8c27ae6a8c7b0675c26fcf
+  AWSCognitoIdentityProviderASF: e51c08b9ecb6cd6227f4351e7fad663e6f0db54b
+  AWSCore: e822fc90f8b3a7e6202091d9ceebd26a579a5161
+  AWSMobileClient: fb15432a866b1cb3c5d13aab66131a20cc769828
+  AWSS3: 229dbf86cd5c600ebe70e374ee751051c846dc84
   GzipSwift: 893f3e48e597a1a4f62fafcb6514220fcf8287fa
   MimeParser: 3cd228548987bb9b67a014070e4cd984e51345a9
-  ReachabilitySwift: 985039c6f7b23a1da463388634119492ff86c825
   SQLite.swift: d2b4642190917051ce6bd1d49aab565fe794eea3
-  Starscream: 5178aed56b316f13fa3bc55694e583d35dd414d9
-  SudoApiClient: 312601ede90e868d8275da7e26ce90daecb6430d
-  SudoConfigManager: aee20bc2d03e28342da663ae48378d0daae78f47
-  SudoEmail: 955345311beaefb93053a774e01bb919f362ea88
-  SudoEmailNotificationExtension: 3aae9f229404bfef66243840b8d615e9ed4a0236
-  SudoEntitlements: a6234950614517b64cd1c45605469619f61e1399
+  Starscream: 19b5533ddb925208db698f0ac508a100b884a1b9
+  SudoApiClient: 504c9b1bd72b8dcf1e8d539283b06d79891d04ab
+  SudoConfigManager: 9b90a77c6c0c2740f77324474cdbe7d46da4e977
+  SudoEmail: f77e9df42829ad412d42babe99afa44e99c30c44
+  SudoEmailNotificationExtension: 01b09c0fe79d30ef2f412d5e00c4d5534bd182f6
+  SudoEntitlements: 3db8dd3c20d37814278a4cf82cfeeb21c66de0ce
   SudoKeyManager: c6362462cf28838cc7792779fba4d406d5261ba6
   SudoLogging: 93238a71338292a650804358994c67f8f3816d20
-  SudoNotification: 12d6e1095dfcf5e87e39d45c135d888cfe025a60
+  SudoNotification: f80476276c580b0617b6567423b4984e0aa59a1b
   SudoNotificationExtension: c3b5ff3dc9026fc325f828bb3258f516d719b2bd
-  SudoProfiles: c791410946d47cb3deace4b690a954cea6a1fc7e
-  SudoUser: 61b99b0c23cf609098e42c68a56bf7873b7c6b47
+  SudoProfiles: 36e05889376890715b3a7216f8099293ef0fa0a1
+  SudoUser: e7f42d2bf7fcca0c1672c18c918a2694affb2bfe
 
-PODFILE CHECKSUM: 96ba3141461fe2048435631f97766ba63a913adf
+PODFILE CHECKSUM: 2c28ab0c4ce0359de4c2f1e979af7e8e816671d6
 
 COCOAPODS: 1.15.2

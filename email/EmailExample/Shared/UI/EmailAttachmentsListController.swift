@@ -88,10 +88,10 @@ class EmailAttachmentsListController {
         if let attachmentsListView = self.attachmentsListView {
             attachmentsListView.subviews.forEach { $0.removeFromSuperview() }
             for attachment in attachments {
-                let view = attachmentListItem(attachmentName: attachment.filename)
+                let view = attachmentListItem(attachmentName: attachment.filename ?? "")
                 if let onListItemClickHandler = self.onListItemClickedHandler {
                     view.setOnClickHandler(action: {
-                        onListItemClickHandler(attachment.filename)
+                        onListItemClickHandler(attachment.filename ?? "")
                     })
                 }
                 attachmentsListView.addArrangedSubview(view)

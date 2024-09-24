@@ -312,6 +312,32 @@ class SudoEmailClientSpy: SudoEmailClient {
         return MockSubscriptionToken()
     }
 
+    var subscribeToEmailMessageDeletedCalled: Bool = false
+    var subscribeToEmailMessageDeletedParameters: (
+        id: String?, resultHandler: ClientCompletion<EmailMessage>?
+    )
+    func subscribeToEmailMessageDeleted(
+        withId id: String?,
+        resultHandler: @escaping ClientCompletion<EmailMessage>
+    ) async throws -> SubscriptionToken? {
+        subscribeToEmailMessageDeletedCalled = true
+        subscribeToEmailMessageDeletedParameters = (id: id, resultHandler: resultHandler)
+        return MockSubscriptionToken()
+    }
+
+    var subscribeToEmailMessageUpdatedCalled: Bool = false
+    var subscribeToEmailMessageUpdatedParameters: (
+        id: String?, resultHandler: ClientCompletion<EmailMessage>?
+    )
+    func subscribeToEmailMessageUpdated(
+        withId id: String?,
+        resultHandler: @escaping ClientCompletion<EmailMessage>
+    ) async throws -> (any SudoEmail.SubscriptionToken)? {
+        subscribeToEmailMessageUpdatedCalled = true
+        subscribeToEmailMessageUpdatedParameters = (id: id, resultHandler: resultHandler)
+        return MockSubscriptionToken()
+    }
+
     var checkEmailAddressAvailabilityCalled: Bool = false
     var checkEmailAddressAvailabilityParameters: (localParts: [String], domains: [String]?)?
     var checkEmailAddressAvailabilityResult: [String]?
@@ -325,19 +351,6 @@ class SudoEmailClientSpy: SudoEmailClient {
             return checkEmailAddressAvailabilityResult!
         }
         throw checkEmailAddressAvailabilityError
-    }
-
-    var subscribeToEmailMessageDeletedCalled: Bool = false
-    var subscribeToEmailMessageDeletedParameters: (
-        id: String?, resultHandler: ClientCompletion<EmailMessage>?
-    )
-    func subscribeToEmailMessageDeleted(
-        withId id: String?,
-        resultHandler: @escaping ClientCompletion<EmailMessage>
-    ) async throws -> SubscriptionToken? {
-        subscribeToEmailMessageDeletedCalled = true
-        subscribeToEmailMessageDeletedParameters = (id: id, resultHandler: resultHandler)
-        return MockSubscriptionToken()
     }
 
     var provisionEmailAddressCalled: Bool = false
@@ -421,6 +434,22 @@ class SudoEmailClientSpy: SudoEmailClient {
             return getSupportedEmailDomainsResult!
         }
         throw getSupportedEmailDomainsError
+    }
+
+    var getConfiguredEmailDomainsCalled: Bool = false
+    var getConfiguredEmailDomainsParameter: SudoEmail.CachePolicy?
+    var getConfiguredEmailDomainsResult: [String]?
+    var getConfiguredEmailDomainsError = AnyError(
+        "Please add base result to `SudoEmailClientSpy.getConfiguredEmailDomains`"
+    )
+    func getConfiguredEmailDomains(_ cachePolicy: CachePolicy) async throws -> [String] {
+        getConfiguredEmailDomainsCalled = true
+        getConfiguredEmailDomainsParameter = cachePolicy
+
+        if getConfiguredEmailDomainsResult != nil {
+            return getConfiguredEmailDomainsResult!
+        }
+        throw getConfiguredEmailDomainsError
     }
 
     var getEmailAddressCalled: Bool = false

@@ -19,6 +19,7 @@ target 'EmailExample' do
     pod 'SudoProfiles', '~> 18.0'
     pod 'SudoNotification', '~> 3.0'
     pod 'MimeParser', '~> 0.1'
+    pod 'AWSAppSync', '~> 3.7.1'
     pod 'AWSCore', '~> 2.36.7'
     pod 'AWSAuthCore', '~> 2.36.7'
     pod 'AWSCognitoIdentityProvider', '~> 2.36.7'
@@ -27,7 +28,7 @@ target 'EmailExample' do
 
     target 'EmailExampleTests'
 
-    pod 'SudoEmail', '~> 17.4.0'
+    pod 'SudoEmail', '~> 17.4.1'
 end
 
 target 'EmailExampleNotificationServiceExtension' do

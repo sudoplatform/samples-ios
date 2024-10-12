@@ -86,7 +86,7 @@ class SendEmailMessageViewController: UIViewController, UITextViewDelegate, UITa
     /// Address of a `EmailAddress` that was selected from a previous view. Used to send a message.
     var emailAddress: EmailAddress!
 
-    /// save the pre-populated information for a reply
+    /// Save the pre-populated information for replying or forwarding
     var inputData: SendEmailInputData?
 
     /// Array of input fields used on the view.
@@ -103,6 +103,10 @@ class SendEmailMessageViewController: UIViewController, UITextViewDelegate, UITa
 
     /// Email attachments that are sent with the email message.
     var attachments: Set<EmailAttachment> = []
+
+    var replyingMessageId: String?
+
+    var forwardingMessageId: String?
 
     // MARK: - Properties: Computed
 
@@ -193,7 +197,9 @@ class SendEmailMessageViewController: UIViewController, UITextViewDelegate, UITa
             senderEmailAddressId: emailAddressId,
             emailMessageHeader: emailMessageHeader,
             body: body,
-            attachments: Array(attachments)
+            attachments: Array(attachments),
+            replyingMessageId: replyingMessageId,
+            forwardingMessageId: forwardingMessageId
         )
 
         Task.detached(priority: .medium) {

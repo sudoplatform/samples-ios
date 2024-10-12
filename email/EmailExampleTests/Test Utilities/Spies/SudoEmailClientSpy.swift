@@ -17,7 +17,6 @@ class MockSubscriptionToken: SubscriptionToken {
 }
 
 class SudoEmailClientSpy: SudoEmailClient {
-
     var listEmailMessagesCalled: Bool = false
     var listEmailMessagesParameters: ListEmailMessagesInput?
     var listEmailMessagesResult: ListAPIResult<EmailMessage, PartialEmailMessage>?

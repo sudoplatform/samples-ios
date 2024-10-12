@@ -6,20 +6,28 @@
 
 import Foundation
 
-/// Message data that can be pre-populated in send, 1st use case is when replying
+/// Message data that can be pre-populated in send, ie when replying or forwarding.
 struct SendEmailInputData {
-    /// id of the draft email message this input is based on
-    var draftEmailMessageId: String?
+    /// Id of the draft email message this input is based on
+    let draftEmailMessageId: String?
 
     /// To address
-    var to: String
+    let to: String
 
-    /// cc address
-    var cc: String
+    /// Cc address
+    let cc: String
 
-    /// message subject
-    var subject: String
+    /// Message subject
+    let subject: String
 
-    /// message body
-    var body: String
+    /// Message body
+    let body: String
+
+    init(draftEmailMessageId: String? = nil, to: String = "", cc: String = "", subject: String, body: String) {
+        self.draftEmailMessageId = draftEmailMessageId
+        self.to = to
+        self.cc = cc
+        self.subject = subject
+        self.body = body
+    }
 }

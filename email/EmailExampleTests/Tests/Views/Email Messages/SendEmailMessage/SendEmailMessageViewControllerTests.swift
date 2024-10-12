@@ -154,6 +154,8 @@ class SendEmailMessageViewControllerTests: XCTestCase {
         XCTAssertEqual(testUtility.emailClient.sendEmailMessageParameters?.body, body)
         XCTAssertEqual(testUtility.emailClient.sendEmailMessageParameters?.emailMessageHeader.subject, subject)
         XCTAssertEqual(testUtility.emailClient.sendEmailMessageParameters?.emailMessageHeader.from, from)
+        XCTAssertEqual(testUtility.emailClient.sendEmailMessageParameters?.replyingMessageId, nil)
+        XCTAssertEqual(testUtility.emailClient.sendEmailMessageParameters?.forwardingMessageId, nil)
     }
 
     @MainActor
@@ -195,6 +197,66 @@ class SendEmailMessageViewControllerTests: XCTestCase {
             testUtility.emailClient.deleteDraftEmailMessagesParameter?.ids,
             [draftId]
         )
+    }
+
+    @MainActor
+    func test_send_repliesToMessageWithId() async {
+        let from = EmailAddressAndName(address: "email@address.com")
+        let addressId = "dummyId"
+        let subject = "dummySubject"
+        let body = "dummyBody"
+        let replyingMessageId = "dummyReplyingMessageId"
+        let emailMessageHeader = InternetMessageFormatHeader(
+            from: from,
+            to: [],
+            cc: [],
+            bcc: [],
+            subject: subject
+        )
+        let sendEmailMessageInput = SendEmailMessageInput(
+            senderEmailAddressId: addressId,
+            emailMessageHeader: emailMessageHeader,
+            body: body,
+            replyingMessageId: replyingMessageId
+        )
+        testUtility.emailClient.sendEmailMessageResult = SendEmailMessageResult(id: "sentEmailId", createdAt: Date.now)
+        _ = await instanceUnderTest.sendEmailMessage(sendEmailMessageInput)
+        XCTAssertTrue(testUtility.emailClient.sendEmailMessageCalled)
+        XCTAssertEqual(testUtility.emailClient.sendEmailMessageParameters?.senderEmailAddressId, addressId)
+        XCTAssertEqual(testUtility.emailClient.sendEmailMessageParameters?.body, body)
+        XCTAssertEqual(testUtility.emailClient.sendEmailMessageParameters?.emailMessageHeader.subject, subject)
+        XCTAssertEqual(testUtility.emailClient.sendEmailMessageParameters?.emailMessageHeader.from, from)
+        XCTAssertEqual(testUtility.emailClient.sendEmailMessageParameters?.replyingMessageId, replyingMessageId)
+    }
+
+    @MainActor
+    func test_send_forwardsMessageWithId() async {
+        let from = EmailAddressAndName(address: "email@address.com")
+        let addressId = "dummyId"
+        let subject = "dummySubject"
+        let body = "dummyBody"
+        let forwardingMessageId = "dummyForwardingMessageId"
+        let emailMessageHeader = InternetMessageFormatHeader(
+            from: from,
+            to: [],
+            cc: [],
+            bcc: [],
+            subject: subject
+        )
+        let sendEmailMessageInput = SendEmailMessageInput(
+            senderEmailAddressId: addressId,
+            emailMessageHeader: emailMessageHeader,
+            body: body,
+            forwardingMessageId: forwardingMessageId
+        )
+        testUtility.emailClient.sendEmailMessageResult = SendEmailMessageResult(id: "sentEmailId", createdAt: Date.now)
+        _ = await instanceUnderTest.sendEmailMessage(sendEmailMessageInput)
+        XCTAssertTrue(testUtility.emailClient.sendEmailMessageCalled)
+        XCTAssertEqual(testUtility.emailClient.sendEmailMessageParameters?.senderEmailAddressId, addressId)
+        XCTAssertEqual(testUtility.emailClient.sendEmailMessageParameters?.body, body)
+        XCTAssertEqual(testUtility.emailClient.sendEmailMessageParameters?.emailMessageHeader.subject, subject)
+        XCTAssertEqual(testUtility.emailClient.sendEmailMessageParameters?.emailMessageHeader.from, from)
+        XCTAssertEqual(testUtility.emailClient.sendEmailMessageParameters?.forwardingMessageId, forwardingMessageId)
     }
 
     @MainActor

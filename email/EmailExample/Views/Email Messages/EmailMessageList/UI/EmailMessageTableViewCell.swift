@@ -90,6 +90,16 @@ class EmailMessageTableViewCell: UITableViewCell {
             subjectLabelText.append(hasAttachmentsImageString)
             subjectLabelText.append(NSAttributedString(string: " "))
         }
+        if emailMessage.repliedTo {
+            let repliedToImageString = UIImage.toAttributedString(systemName: "arrowshape.turn.up.left", withTintColor: .systemBlue)
+            subjectLabelText.append(repliedToImageString)
+            subjectLabelText.append(NSAttributedString(string: " "))
+        }
+        if emailMessage.forwarded {
+            let forwardedImageString = UIImage.toAttributedString(systemName: "arrowshape.turn.up.right", withTintColor: .systemBlue)
+            subjectLabelText.append(forwardedImageString)
+            subjectLabelText.append(NSAttributedString(string: " "))
+        }
 
         subjectLabelText.append(NSAttributedString(string: subject))
         subjectLabel.attributedText = subjectLabelText

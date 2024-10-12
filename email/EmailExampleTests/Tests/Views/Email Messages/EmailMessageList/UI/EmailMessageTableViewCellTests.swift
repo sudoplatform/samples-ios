@@ -35,6 +35,25 @@ class EmailMessageTableViewCellTests: XCTestCase {
         XCTAssertNil(instanceUnderTest.subjectLabel.text, file: file, line: line)
     }
 
+    func attributedStringContainsIcon(in attributedString: NSAttributedString, for systemName: String) -> Bool {
+        guard let expectedImage = UIImage(systemName: systemName) else { return false }
+        var containsIcon = false
+        attributedString.enumerateAttributes(in: NSRange(location: 0, length: attributedString.length), options: []) { attributes, _, _ in
+            if let attachment = attributes[.attachment] as? NSTextAttachment,
+               let attachmentImage = attachment.image,
+               attachmentImage.cgImage == expectedImage.cgImage {
+                containsIcon = true
+            }
+        }
+
+        return containsIcon
+    }
+
+    // Get contents of a string without attributes or images
+    func plainText(from attributedString: NSAttributedString) -> String {
+        return attributedString.string
+    }
+
     // MARK: - Tests
 
     func test_awakeFromNib() throws {
@@ -152,14 +171,15 @@ class EmailMessageTableViewCellTests: XCTestCase {
             encryptionStatus: EncryptionStatus.ENCRYPTED
         )
         instanceUnderTest.emailMessage = emailMessage
-        guard let subjectText = instanceUnderTest.subjectLabel?.text else {
+        guard let subjectAttributedText = instanceUnderTest.subjectLabel?.attributedText else {
             return XCTFail("Failed to get subject text")
         }
-        // Can't string assert against a stringified system icon -
-        // but the leading " " will not be present if the icon characters aren't
+
+        let subjectText = plainText(from: subjectAttributedText)
+        let subjectContainsIcon = attributedStringContainsIcon(in: subjectAttributedText, for: "lock.fill")
         XCTAssertNotEqual(subjectText, subject)
         XCTAssertTrue(subjectText.contains(subject))
-        XCTAssertEqual(subjectText.count, subject.count + 2)
+        XCTAssertTrue(subjectContainsIcon)
     }
 
     func test_emailMessage_DidSet_SubjectLabelFormattedCorrectly_EncryptionIconNotVisible() {
@@ -169,12 +189,14 @@ class EmailMessageTableViewCellTests: XCTestCase {
             encryptionStatus: EncryptionStatus.UNENCRYPTED
         )
         instanceUnderTest.emailMessage = emailMessage
-        guard let subjectText = instanceUnderTest.subjectLabel?.text else {
+        guard let subjectAttributedText = instanceUnderTest.subjectLabel?.attributedText else {
             return XCTFail("Failed to get subject text")
         }
-        // Can't string assert against a stringified system icon -
-        // but the leading " " will not be present if the icon characters aren't
+
+        let subjectText = plainText(from: subjectAttributedText)
+        let subjectContainsIcon = attributedStringContainsIcon(in: subjectAttributedText, for: "lock.fill")
         XCTAssertEqual(subjectText, subject)
+        XCTAssertFalse(subjectContainsIcon)
     }
 
     func test_emailMessage_DidSet_SubjectLabelFormattedCorrectly_AttachmentsIconVisible() {
@@ -184,14 +206,15 @@ class EmailMessageTableViewCellTests: XCTestCase {
             hasAttachments: true
         )
         instanceUnderTest.emailMessage = emailMessage
-        guard let subjectText = instanceUnderTest.subjectLabel?.text else {
+        guard let subjectAttributedText = instanceUnderTest.subjectLabel?.attributedText else {
             return XCTFail("Failed to get subject text")
         }
-        // Can't string assert against a stringified system icon -
-        // but the leading " " will not be present if the icon characters aren't
+
+        let subjectText = plainText(from: subjectAttributedText)
+        let subjectContainsIcon = attributedStringContainsIcon(in: subjectAttributedText, for: "paperclip")
         XCTAssertNotEqual(subjectText, subject)
         XCTAssertTrue(subjectText.contains(subject))
-        XCTAssertEqual(subjectText.count, subject.count + 2)
+        XCTAssertTrue(subjectContainsIcon)
     }
 
     func test_emailMessage_DidSet_SubjectLabelFormattedCorrectly_AttachmentsIconNotVisible() {
@@ -200,11 +223,83 @@ class EmailMessageTableViewCellTests: XCTestCase {
             subject: subject
         )
         instanceUnderTest.emailMessage = emailMessage
-        guard let subjectText = instanceUnderTest.subjectLabel?.text else {
+        guard let subjectAttributedText = instanceUnderTest.subjectLabel?.attributedText else {
             return XCTFail("Failed to get subject text")
         }
-        // Can't string assert against a stringified system icon -
-        // but the leading " " will not be present if the icon characters aren't
+
+        let subjectText = plainText(from: subjectAttributedText)
+        let subjectContainsIcon = attributedStringContainsIcon(in: subjectAttributedText, for: "paperclip")
         XCTAssertEqual(subjectText, subject)
+        XCTAssertFalse(subjectContainsIcon)
+    }
+
+    func test_emailMessage_DidSet_SubjectLabelFormattedCorrectly_RepliedToIconVisible() {
+        let subject = "Message with attachment"
+        let emailMessage = DataFactory.EmailSDK.generateEmailMessage(
+            repliedTo: true,
+            subject: subject
+        )
+        instanceUnderTest.emailMessage = emailMessage
+        guard let subjectAttributedText = instanceUnderTest.subjectLabel?.attributedText else {
+            return XCTFail("Failed to get subject text")
+        }
+
+        let subjectText = plainText(from: subjectAttributedText)
+        let subjectContainsIcon = attributedStringContainsIcon(in: subjectAttributedText, for: "arrowshape.turn.up.left")
+        XCTAssertNotEqual(subjectText, subject)
+        XCTAssertTrue(subjectText.contains(subject))
+        XCTAssertTrue(subjectContainsIcon)
+    }
+
+    func test_emailMessage_DidSet_SubjectLabelFormattedCorrectly_RepliedToIconNotVisible() {
+        let subject = "Message without attachment"
+        let emailMessage = DataFactory.EmailSDK.generateEmailMessage(
+            repliedTo: false,
+            subject: subject
+        )
+        instanceUnderTest.emailMessage = emailMessage
+        guard let subjectAttributedText = instanceUnderTest.subjectLabel?.attributedText else {
+            return XCTFail("Failed to get subject text")
+        }
+
+        let subjectText = plainText(from: subjectAttributedText)
+        let subjectContainsIcon = attributedStringContainsIcon(in: subjectAttributedText, for: "arrowshape.turn.up.left")
+        XCTAssertEqual(subjectText, subject)
+        XCTAssertFalse(subjectContainsIcon)
+    }
+
+    func test_emailMessage_DidSet_SubjectLabelFormattedCorrectly_ForwardedIconVisible() {
+        let subject = "Message with attachment"
+        let emailMessage = DataFactory.EmailSDK.generateEmailMessage(
+            forwarded: true,
+            subject: subject
+        )
+        instanceUnderTest.emailMessage = emailMessage
+        guard let subjectAttributedText = instanceUnderTest.subjectLabel?.attributedText else {
+            return XCTFail("Failed to get subject text")
+        }
+
+        let subjectText = plainText(from: subjectAttributedText)
+        let subjectContainsIcon = attributedStringContainsIcon(in: subjectAttributedText, for: "arrowshape.turn.up.right")
+        XCTAssertNotEqual(subjectText, subject)
+        XCTAssertTrue(subjectText.contains(subject))
+        XCTAssertTrue(subjectContainsIcon)
+    }
+
+    func test_emailMessage_DidSet_SubjectLabelFormattedCorrectly_ForwardedIconNotVisible() {
+        let subject = "Message without attachment"
+        let emailMessage = DataFactory.EmailSDK.generateEmailMessage(
+            forwarded: false,
+            subject: subject
+        )
+        instanceUnderTest.emailMessage = emailMessage
+        guard let subjectAttributedText = instanceUnderTest.subjectLabel?.attributedText else {
+            return XCTFail("Failed to get subject text")
+        }
+
+        let subjectText = plainText(from: subjectAttributedText)
+        let subjectContainsIcon = attributedStringContainsIcon(in: subjectAttributedText, for: "arrowshape.turn.up.right")
+        XCTAssertEqual(subjectText, subject)
+        XCTAssertFalse(subjectContainsIcon)
     }
 }

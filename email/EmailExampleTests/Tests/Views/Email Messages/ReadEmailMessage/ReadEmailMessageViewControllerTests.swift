@@ -36,7 +36,7 @@ class ReadEmailMessageViewControllerTests: XCTestCase {
             owner: ownerId,
             emailAddressId: emailAddressId,
             fromAddresses: [.init(address: "from@test.org")],
-            subject: "Re: Test Message Subject"
+            subject: "Test Message Subject"
         )
         testUtility.window.rootViewController = instanceUnderTest
         testUtility.window.makeKeyAndVisible()
@@ -46,14 +46,14 @@ class ReadEmailMessageViewControllerTests: XCTestCase {
         testUtility.clearWindow()
     }
 
-    // MARK: - Tests
+    // MARK: - Tests -> Reply
 
     func test_replyButton_isPresent() throws {
-        XCTAssertEqual(instanceUnderTest.navigationItem.rightBarButtonItem?.accessibilityIdentifier, "replyButton")
+        XCTAssertEqual(instanceUnderTest.navigationItem.rightBarButtonItems?[0].accessibilityIdentifier, "replyButton")
     }
 
     func test_replyButton_willInvokeReplyToMessage() throws {
-        XCTAssertEqual(instanceUnderTest.navigationItem.rightBarButtonItem?.action?.description, "replyToMessage:")
+        XCTAssertEqual(instanceUnderTest.navigationItem.rightBarButtonItems?[0].action?.description, "replyToMessage:")
     }
 
     func test_constructReplyMessage_PreparesCorrectReply() {
@@ -69,6 +69,7 @@ class ReadEmailMessageViewControllerTests: XCTestCase {
     func test_constructReplyMessage_Drafts_PreparesCorrectReply() {
         instanceUnderTest.bodyLabel.text = "How does this look"
         instanceUnderTest.emailMessage.folderId = "01234_DRAFTS"
+        instanceUnderTest.emailMessage.subject = "Re: " + (instanceUnderTest.emailMessage.subject ?? "")
         guard let result = instanceUnderTest.constructReplyInput() else {
             return XCTFail("Failed to construct reply message")
         }
@@ -77,6 +78,39 @@ class ReadEmailMessageViewControllerTests: XCTestCase {
         XCTAssertFalse(result.body.contains("\n\n---------------\n\nHow does this look"))
         XCTAssertTrue(result.body.contains("How does this look"))
     }
+
+    // MARK: - Tests -> Forward
+
+    func test_forwardButton_isPresent() throws {
+        XCTAssertEqual(instanceUnderTest.navigationItem.rightBarButtonItems?[1].accessibilityIdentifier, "forwardButton")
+    }
+
+    func test_forwardButton_willInvokeForwardMessage() throws {
+        XCTAssertEqual(instanceUnderTest.navigationItem.rightBarButtonItems?[1].action?.description, "forwardMessage:")
+    }
+
+    func test_constructForwardMessage_PreparesCorrectForwardMessage() {
+        instanceUnderTest.bodyLabel.text = "How does THIS look"
+        guard let result = instanceUnderTest.constructForwardInput() else {
+            return XCTFail("Failed to construct forward message")
+        }
+        XCTAssertEqual(result.subject, "Fwd: Test Message Subject")
+        XCTAssertTrue(result.body.contains("\n\n---------------\n\nHow does THIS look"))
+    }
+
+    func test_constructForwardMessage_Drafts_PreparesCorrectForwardMessage() {
+        instanceUnderTest.bodyLabel.text = "How does THIS look"
+        instanceUnderTest.emailMessage.folderId = "01234_DRAFTS"
+        instanceUnderTest.emailMessage.subject = "Fwd: " + (instanceUnderTest.emailMessage.subject ?? "")
+        guard let result = instanceUnderTest.constructForwardInput() else {
+            return XCTFail("Failed to construct forward message")
+        }
+        XCTAssertEqual(result.subject, " Test Message Subject")
+        XCTAssertFalse(result.body.contains("\n\n---------------\n\nHow does THIS look"))
+        XCTAssertTrue(result.body.contains("How does THIS look"))
+    }
+
+    // MARK: - Tests -> Read
 
     func test_readDraftEmailMessage() async {
         do {

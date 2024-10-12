@@ -26,8 +26,10 @@ class ReadEmailMessageViewController: UIViewController, ActivityAlertViewControl
 
     /// Segues that are performed in `EmailMessageListViewController`.
     enum Segue: String {
-        /// Used to navigate to the `SendEmailMessageViewController`.
+        /// Used to navigate to the `SendEmailMessageViewController` for replying.
         case replyToEmailMessage
+        /// Used to navigate to the `SendEmailMessageViewController` for forwarding.
+        case forwardEmailMessage
         /// Used to navigate back to the `EmailMessageListViewController`.
         case returnToEmailMessageList
     }
@@ -94,7 +96,18 @@ class ReadEmailMessageViewController: UIViewController, ActivityAlertViewControl
                 return
             }
             sendEmailMessage.emailAddress = emailAddress
+            sendEmailMessage.replyingMessageId = emailMessage.id
             guard let inputData = constructReplyInput() else {
+                return
+            }
+            sendEmailMessage.inputData = inputData
+        case .forwardEmailMessage:
+            guard let sendEmailMessage = segue.destination as? SendEmailMessageViewController else {
+                return
+            }
+            sendEmailMessage.emailAddress = emailAddress
+            sendEmailMessage.forwardingMessageId = emailMessage.id
+            guard let inputData = constructForwardInput() else {
                 return
             }
             sendEmailMessage.inputData = inputData
@@ -110,6 +123,13 @@ class ReadEmailMessageViewController: UIViewController, ActivityAlertViewControl
     /// This action will reply to the message using the sendEmailMessage view.
     @objc func replyToMessage(_ sender: ReadEmailMessageViewController) {
         performSegue(withIdentifier: Segue.replyToEmailMessage.rawValue, sender: self)
+    }
+
+    /// Action associated with forwarding a message.
+    ///
+    /// This action will forward the message using the sendEmailMessage view.
+    @objc func forwardMessage(_ sender: ReadEmailMessageViewController) {
+        performSegue(withIdentifier: Segue.forwardEmailMessage.rawValue, sender: self)
     }
 
     /// Action associalted with blocking an email address
@@ -161,15 +181,19 @@ class ReadEmailMessageViewController: UIViewController, ActivityAlertViewControl
     // MARK: - Helpers: Configuration
 
     func configureNavigationBar() {
-        let arrowImage = UIImage(systemName: "arrowshape.turn.up.left")
-        let replyButton = UIBarButtonItem(image: arrowImage, style: .plain, target: self, action: #selector(replyToMessage))
+        let replyImage = UIImage(systemName: "arrowshape.turn.up.left")
+        let replyButton = UIBarButtonItem(image: replyImage, style: .plain, target: self, action: #selector(replyToMessage))
         replyButton.accessibilityIdentifier = "replyButton"
+
+        let forwardImage = UIImage(systemName: "arrowshape.turn.up.right")
+        let forwardButton = UIBarButtonItem(image: forwardImage, style: .plain, target: self, action: #selector(forwardMessage))
+        forwardButton.accessibilityIdentifier = "forwardButton"
 
         let blockImage = UIImage(systemName: "nosign")
         let blockButton = UIBarButtonItem(image: blockImage, style: .plain, target: self, action: #selector(blockSenderAddress))
         blockButton.accessibilityIdentifier = "blockButton"
 
-        navigationItem.rightBarButtonItems = [replyButton, blockButton]
+        navigationItem.rightBarButtonItems = [replyButton, forwardButton, blockButton]
     }
 
     func configureHeaderView() {
@@ -349,6 +373,30 @@ class ReadEmailMessageViewController: UIViewController, ActivityAlertViewControl
                 cc: replyCc,
                 subject: replySubject.replacingOccurrences(of: "Re:", with: ""),
                 body: replyBody.replacingOccurrences(of: "\n\n---------------\n\n", with: "")
+            )
+        }
+        return sendEmailInput
+    }
+
+    func constructForwardInput() -> SendEmailInputData? {
+        var forwardSubject = ""
+        if let subject = emailMessage.subject {
+            if subject.starts(with: "Fwd:") {
+                forwardSubject = subject
+            } else {
+                forwardSubject = "Fwd: \(subject)"
+            }
+        }
+        var forwardBody = ""
+        if let bodyText = bodyLabel.text {
+            forwardBody = "\n\n---------------\n\n\(bodyText)"
+        }
+        var sendEmailInput = SendEmailInputData(subject: forwardSubject, body: forwardBody)
+        if emailMessage.folderId.contains("DRAFTS") {
+            sendEmailInput = SendEmailInputData(
+                draftEmailMessageId: emailMessage.id,
+                subject: forwardSubject.replacingOccurrences(of: "Fwd:", with: ""),
+                body: forwardBody.replacingOccurrences(of: "\n\n---------------\n\n", with: "")
             )
         }
         return sendEmailInput

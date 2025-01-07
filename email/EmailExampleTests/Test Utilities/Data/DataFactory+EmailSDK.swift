@@ -144,7 +144,8 @@ extension DataFactory {
             ttl: Double? = nil,
             version: Int = 1,
             createdAt: Date = randomDate(),
-            updatedAt: Date = randomDate()
+            updatedAt: Date = randomDate(),
+            customFolderName: String? = nil
         ) -> EmailFolder {
             return EmailFolder(
                 id: id,
@@ -157,7 +158,8 @@ extension DataFactory {
                 ttl: ttl,
                 version: version,
                 createdAt: createdAt,
-                updatedAt: updatedAt
+                updatedAt: updatedAt,
+                customFolderName: customFolderName
             )
         }
 

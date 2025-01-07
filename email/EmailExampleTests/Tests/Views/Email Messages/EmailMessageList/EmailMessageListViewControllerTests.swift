@@ -106,7 +106,7 @@ class EmailMessageListViewControllerTests: XCTestCase {
 
     @MainActor
     func test_deleteEmailMessage_CallsClient() async {
-        testUtility.emailClient.deleteEmailMessageResult = "dummyId"
+        testUtility.emailClient.deleteEmailMessageResult = SudoEmail.DeleteEmailMessageSuccessResult(id: "dummyId")
         do {
             _ = try await instanceUnderTest.deleteEmailMessage("dummyId")
         } catch {
@@ -176,7 +176,7 @@ class EmailMessageListViewControllerTests: XCTestCase {
 
     @MainActor
     func test_loadCacheEmailMessagesAndFetchRemote_Drafts_CallsListDraftsOnly() async {
-        instanceUnderTest.folderNameSwitcher.currentFolder = .drafts
+        instanceUnderTest.folderNameSwitcher.currentFolder = .special(.drafts)
         let listMessagesCalledCount = testUtility.emailClient.listEmailMessagesForEmailFolderIdCalledCount
         await instanceUnderTest.loadCacheEmailMessagesAndFetchRemote()
         XCTAssertTrue(testUtility.emailClient.listDraftEmailMessageMetadataForEmailAddressIdCalled)
@@ -275,8 +275,8 @@ class EmailMessageListViewControllerTests: XCTestCase {
 
     @MainActor
     func test_deleteEmailMessage_ForIndexPath_FromTrash_DeletesMessage() async {
-        testUtility.emailClient.deleteEmailMessageResult = "dummyId"
-        instanceUnderTest.folderNameSwitcher.currentFolder = .trash
+        testUtility.emailClient.deleteEmailMessageResult = SudoEmail.DeleteEmailMessageSuccessResult(id: "dummyId")
+        instanceUnderTest.folderNameSwitcher.currentFolder = .standard(.trash)
         instanceUnderTest.configureTableView()
         let emailMessage = DataFactory.EmailSDK.generateEmailMessage()
         instanceUnderTest.emailMessages.append(emailMessage)
@@ -293,9 +293,9 @@ class EmailMessageListViewControllerTests: XCTestCase {
     @MainActor
     func test_deleteEmailMessage_ForIndexPath_FromTrash_ClientDeleteCalled() async {
         instanceUnderTest.configureTableView()
-        instanceUnderTest.folderNameSwitcher.currentFolder = .trash
+        instanceUnderTest.folderNameSwitcher.currentFolder = .standard(.trash)
         let emailMessage = DataFactory.EmailSDK.generateEmailMessage()
-        testUtility.emailClient.deleteEmailMessageResult = "dummyId"
+        testUtility.emailClient.deleteEmailMessageResult = SudoEmail.DeleteEmailMessageSuccessResult(id: "dummyId")
         instanceUnderTest.emailMessages.append(emailMessage)
         _ = await instanceUnderTest.deleteEmailMessage(
             forIndexPath: IndexPath(row: instanceUnderTest.emailMessages.count - 1, section: 0)
@@ -310,11 +310,11 @@ class EmailMessageListViewControllerTests: XCTestCase {
 
     @MainActor
     func test_deleteEmailMessage_ForIndexPath_FromTrash_OnSuccessPerformsAList() async {
-        instanceUnderTest.folderNameSwitcher.currentFolder = .trash
+        instanceUnderTest.folderNameSwitcher.currentFolder = .standard(.trash)
         instanceUnderTest.configureTableView()
         let emailMessage = DataFactory.EmailSDK.generateEmailMessage()
         instanceUnderTest.emailMessages.append(emailMessage)
-        testUtility.emailClient.deleteEmailMessageResult = "dummyId"
+        testUtility.emailClient.deleteEmailMessageResult = SudoEmail.DeleteEmailMessageSuccessResult(id: "dummyId")
         _ = await instanceUnderTest.deleteEmailMessage(forIndexPath: IndexPath(row: 0, section: 0))
         XCTAssertEqual(testUtility.emailClient.listEmailMessagesForEmailFolderIdCalledCount, 3)
         XCTAssertEqual(
@@ -325,18 +325,18 @@ class EmailMessageListViewControllerTests: XCTestCase {
 
     @MainActor
     func test_deleteEmailMessage_ForIndexPath_FromTrash_OnSuccessCompletionReturnsTrue() async {
-        instanceUnderTest.folderNameSwitcher.currentFolder = .trash
+        instanceUnderTest.folderNameSwitcher.currentFolder = .standard(.trash)
         instanceUnderTest.configureTableView()
         let emailMessage = DataFactory.EmailSDK.generateEmailMessage()
         instanceUnderTest.emailMessages.append(emailMessage)
-        testUtility.emailClient.deleteEmailMessageResult = "dummyId"
+        testUtility.emailClient.deleteEmailMessageResult = SudoEmail.DeleteEmailMessageSuccessResult(id: "dummyId")
         let result = await instanceUnderTest.deleteEmailMessage(forIndexPath: IndexPath(row: 0, section: 0))
         XCTAssertTrue(result)
     }
 
     @MainActor
     func test_deleteEmailMessage_ForIndexPath_FromTrash_OnFailureReinsertsMessage() async {
-        instanceUnderTest.folderNameSwitcher.currentFolder = .trash
+        instanceUnderTest.folderNameSwitcher.currentFolder = .standard(.trash)
         instanceUnderTest.configureTableView()
         let emailMessage = DataFactory.EmailSDK.generateEmailMessage()
         instanceUnderTest.emailMessages.append(emailMessage)
@@ -349,8 +349,8 @@ class EmailMessageListViewControllerTests: XCTestCase {
 
     @MainActor
     func test_deleteEmailMessage_ForIndexPath_FromTrash_ReloadsTableData() async {
-        testUtility.emailClient.deleteEmailMessageResult = "dummyId"
-        instanceUnderTest.folderNameSwitcher.currentFolder = .trash
+        testUtility.emailClient.deleteEmailMessageResult = SudoEmail.DeleteEmailMessageSuccessResult(id: "dummyId")
+        instanceUnderTest.folderNameSwitcher.currentFolder = .standard(.trash)
         instanceUnderTest.configureTableView()
         let emailMessage = DataFactory.EmailSDK.generateEmailMessage()
         instanceUnderTest.emailMessages.append(emailMessage)
@@ -361,7 +361,7 @@ class EmailMessageListViewControllerTests: XCTestCase {
     @MainActor
     func test_deleteEmailMessage_ForIndexPath_FromInbox_MovesMessage() async {
         testUtility.emailClient.updateEmailMessagesResult = SudoEmail.BatchOperationResult(status: .success)
-        instanceUnderTest.folderNameSwitcher.currentFolder = .inbox
+        instanceUnderTest.folderNameSwitcher.currentFolder = .standard(.inbox)
         instanceUnderTest.configureTableView()
         let emailMessage = DataFactory.EmailSDK.generateEmailMessage()
         instanceUnderTest.emailMessages.append(emailMessage)
@@ -377,7 +377,7 @@ class EmailMessageListViewControllerTests: XCTestCase {
     @MainActor
     func test_deleteEmailMessage_ForIndexPath_FromInbox_ClientUpdateCalled() async {
         instanceUnderTest.configureTableView()
-        instanceUnderTest.folderNameSwitcher.currentFolder = .inbox
+        instanceUnderTest.folderNameSwitcher.currentFolder = .standard(.inbox)
         let emailMessage = DataFactory.EmailSDK.generateEmailMessage()
         testUtility.emailClient.updateEmailMessagesResult = SudoEmail.BatchOperationResult(status: .success)
         instanceUnderTest.emailMessages.append(emailMessage)
@@ -393,7 +393,7 @@ class EmailMessageListViewControllerTests: XCTestCase {
 
     @MainActor
     func test_deleteEmailMessage_ForIndexPath_FromInbox_OnSuccessPerformsAList() async {
-        instanceUnderTest.folderNameSwitcher.currentFolder = .inbox
+        instanceUnderTest.folderNameSwitcher.currentFolder = .standard(.inbox)
         instanceUnderTest.configureTableView()
         let emailMessage = DataFactory.EmailSDK.generateEmailMessage()
         instanceUnderTest.emailMessages.append(emailMessage)
@@ -408,7 +408,7 @@ class EmailMessageListViewControllerTests: XCTestCase {
 
     @MainActor
     func test_deleteEmailMessage_ForIndexPath_FromInbox_OnSuccessCompletionReturnsTrue() async {
-        instanceUnderTest.folderNameSwitcher.currentFolder = .inbox
+        instanceUnderTest.folderNameSwitcher.currentFolder = .standard(.inbox)
         instanceUnderTest.configureTableView()
         let emailMessage = DataFactory.EmailSDK.generateEmailMessage()
         instanceUnderTest.emailMessages.append(emailMessage)
@@ -419,7 +419,7 @@ class EmailMessageListViewControllerTests: XCTestCase {
 
     @MainActor
     func test_deleteEmailMessage_ForIndexPath_FromInbox_OnExceptionReinsertsMessage() async {
-        instanceUnderTest.folderNameSwitcher.currentFolder = .inbox
+        instanceUnderTest.folderNameSwitcher.currentFolder = .standard(.inbox)
         instanceUnderTest.configureTableView()
         let emailMessage = DataFactory.EmailSDK.generateEmailMessage()
         instanceUnderTest.emailMessages.append(emailMessage)
@@ -432,7 +432,7 @@ class EmailMessageListViewControllerTests: XCTestCase {
 
     @MainActor
     func test_deleteEmailMessage_ForIndexPath_FromInbox_OnFailureReinsertsMessage() async {
-        instanceUnderTest.folderNameSwitcher.currentFolder = .inbox
+        instanceUnderTest.folderNameSwitcher.currentFolder = .standard(.inbox)
         instanceUnderTest.configureTableView()
         let emailMessage = DataFactory.EmailSDK.generateEmailMessage()
         instanceUnderTest.emailMessages.append(emailMessage)
@@ -446,7 +446,7 @@ class EmailMessageListViewControllerTests: XCTestCase {
     @MainActor
     func test_deleteEmailMessage_ForIndexPath_FromInbox_ReloadsTableData() async {
         testUtility.emailClient.updateEmailMessagesResult = SudoEmail.BatchOperationResult(status: .success)
-        instanceUnderTest.folderNameSwitcher.currentFolder = .inbox
+        instanceUnderTest.folderNameSwitcher.currentFolder = .standard(.inbox)
         instanceUnderTest.configureTableView()
         let emailMessage = DataFactory.EmailSDK.generateEmailMessage()
         instanceUnderTest.emailMessages.append(emailMessage)
@@ -548,7 +548,11 @@ class EmailMessageListViewControllerTests: XCTestCase {
 
     @MainActor
     func test_deleteEmailMessages_PresentsErrorAlertOnPartialFailure() async {
-        let partialResult = SudoEmail.BatchOperationResult(status: .partial, successItems: ["dummySuccessId"], failureItems: ["dummyFailureId"])
+        let partialResult = SudoEmail.BatchOperationResult(
+            status: .partial,
+            successItems: [SudoEmail.DeleteEmailMessageSuccessResult(id: "dummySuccessId")],
+            failureItems: [SudoEmail.EmailMessageOperationFailureResult(id: "dummyFailureId", errorType: "error")]
+        )
         testUtility.emailClient.deleteEmailMessagesResult = partialResult
         await instanceUnderTest.deleteEmailMessages()
         let emailIdsToDelete = instanceUnderTest.emailMessages.map { $0.id }
@@ -556,7 +560,10 @@ class EmailMessageListViewControllerTests: XCTestCase {
         XCTAssertEqual(testUtility.emailClient.deleteEmailMessagesParameter, emailIdsToDelete)
         let presentedViewController = await waitForAlertController()
         XCTAssertNotNil(presentedViewController)
-        XCTAssertEqual(presentedViewController?.message, "Failed to delete email messages [\"dummyFailureId\"]")
+        XCTAssertEqual(
+            presentedViewController?.message,
+            "Failed to delete email messages [SudoEmail.EmailMessageOperationFailureResult(id: \"dummyFailureId\", errorType: \"error\")]"
+        )
     }
 
     @MainActor
@@ -573,7 +580,7 @@ class EmailMessageListViewControllerTests: XCTestCase {
 
     @MainActor
     func test_deleteEmailMessage_FromDrafts_Succeeds() async {
-        instanceUnderTest.folderNameSwitcher.currentFolder = .drafts
+        instanceUnderTest.folderNameSwitcher.currentFolder = .special(.drafts)
         let emailMessage = DataFactory.EmailSDK.generateEmailMessage()
         instanceUnderTest.emailMessages.append(emailMessage)
         let numberOfMessages = instanceUnderTest.emailMessages.count
@@ -588,7 +595,7 @@ class EmailMessageListViewControllerTests: XCTestCase {
 
     @MainActor
     func test_deleteEmailMessage_FromDrafts_ReplacesMessageOnException() async {
-        instanceUnderTest.folderNameSwitcher.currentFolder = .drafts
+        instanceUnderTest.folderNameSwitcher.currentFolder = .special(.drafts)
         instanceUnderTest.emailMessages = [DataFactory.EmailSDK.generateEmailMessage()]
         testUtility.emailClient.deleteDraftEmailMessagesWillThrow = true
         let result = await instanceUnderTest.deleteEmailMessage(

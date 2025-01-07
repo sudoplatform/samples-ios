@@ -134,6 +134,8 @@
                         <segue destination="E7v-bc-vE2" kind="show" identifier="navigateToReadEmailMessage" id="pLq-UM-DFE"/>
                         <segue destination="oij-Dx-RIa" kind="show" identifier="navigateToSendEmailMessage" id="yFb-Zt-iO5"/>
                         <segue destination="zQo-F7-lRo" kind="show" identifier="navigateToEmailAddressSettings" id="tB2-24-TNg"/>
+                        <segue destination="MnW-ZM-kOj" kind="show" identifier="navigateToCreateCustomFolder" id="XTb-gZ-OWc"/>
+                        <segue destination="mDf-wc-Rsa" kind="show" identifier="navigateToUpdateCustomFolder" id="vRW-Ny-jBC"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="6Zy-8b-Wgz" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -152,7 +154,7 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="plQ-W4-6qB" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
                 <exit id="MMW-Lt-Ahs" userLabel="Exit" sceneMemberID="exit"/>
             </objects>
-            <point key="canvasLocation" x="4614" y="1026"/>
+            <point key="canvasLocation" x="4724" y="703"/>
         </scene>
         <!--Email Address Settings-->
         <scene sceneID="teu-hf-ZYV">
@@ -162,7 +164,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="icE-to-tLf" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="4614" y="1763"/>
+            <point key="canvasLocation" x="4724" y="1569"/>
         </scene>
         <!--Read Email Message View Controller-->
         <scene sceneID="JxX-kH-JRv">
@@ -177,10 +179,39 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="QuA-su-9vr" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
                 <exit id="swp-Gg-aeJ" userLabel="Exit" sceneMemberID="exit"/>
             </objects>
-            <point key="canvasLocation" x="4551" y="335"/>
+            <point key="canvasLocation" x="4724" y="-90"/>
+        </scene>
+        <!--Update Custom Folder-->
+        <scene sceneID="qow-o8-D3y">
+            <objects>
+                <viewController storyboardIdentifier="updateCustomFolder" title="Update Custom Folder" id="mDf-wc-Rsa" customClass="UpdateCustomFolderViewController" customModule="EmailExample" customModuleProvider="target" sceneMemberID="viewController">
+                    <navigationItem key="navigationItem" title="Update Custom Folder" id="rww-x4-KM0"/>
+                    <connections>
+                        <segue destination="5zl-Cd-GP6" kind="unwind" identifier="returnToEmailMessageList" unwindAction="returnToEmailMessageListWithSegue:" id="K48-as-M3d"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="i5d-W6-Wkt" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+                <exit id="5zl-Cd-GP6" userLabel="Exit" sceneMemberID="exit"/>
+            </objects>
+            <point key="canvasLocation" x="3002" y="1569"/>
+        </scene>
+        <!--Create Custom Folder-->
+        <scene sceneID="JAt-pf-6fl">
+            <objects>
+                <viewController storyboardIdentifier="createCustomFolder" title="Create Custom Folder" id="MnW-ZM-kOj" customClass="CreateCustomFolderViewController" customModule="EmailExample" customModuleProvider="target" sceneMemberID="viewController">
+                    <navigationItem key="navigationItem" title="Create Custom Folder" id="qJ1-Of-skd"/>
+                    <connections>
+                        <segue destination="Alc-eI-aBZ" kind="unwind" identifier="returnToEmailMessageList" unwindAction="returnToEmailMessageListWithSegue:" id="aEo-GQ-vnj"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Bud-2T-2u9" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+                <exit id="Alc-eI-aBZ" userLabel="Exit" sceneMemberID="exit"/>
+            </objects>
+            <point key="canvasLocation" x="3868" y="1569"/>
         </scene>
     </scenes>
     <inferredMetricsTieBreakers>
         <segue reference="yFb-Zt-iO5"/>
+        <segue reference="aEo-GQ-vnj"/>
     </inferredMetricsTieBreakers>
 </document>

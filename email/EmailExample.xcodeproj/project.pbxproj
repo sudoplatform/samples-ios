@@ -104,6 +104,11 @@
 		95C0CE0824AACE190024BFBB /* ReadEmailMessageViewControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95C0CE0724AACE190024BFBB /* ReadEmailMessageViewControllerTests.swift */; };
 		9F97B79C2B73210000384FE7 /* BlockedAddressTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F97B79B2B73210000384FE7 /* BlockedAddressTableViewCell.swift */; };
 		9F97B79E2B732FA200384FE7 /* BlockedAddressTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9F97B79D2B732FA200384FE7 /* BlockedAddressTableViewCell.xib */; };
+		9FAAE9C72D2B417700687D4C /* UpdateCustomFolderViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FAAE9C62D2B417700687D4C /* UpdateCustomFolderViewController.swift */; };
+		9FAAE9CA2D2B484D00687D4C /* UpdateCustomFolderInputData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FAAE9C92D2B484D00687D4C /* UpdateCustomFolderInputData.swift */; };
+		9FAAE9CC2D2B4E6800687D4C /* UpdateCustomFolderViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9FAAE9CB2D2B4E6700687D4C /* UpdateCustomFolderViewController.xib */; };
+		9FF172972D265CDD00C3BFF8 /* CreateCustomFolderViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FF172962D265CDD00C3BFF8 /* CreateCustomFolderViewController.swift */; };
+		9FF1729D2D273D6800C3BFF8 /* CreateCustomFolderViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9FF1729C2D273D6800C3BFF8 /* CreateCustomFolderViewController.xib */; };
 		A1E83EF0860A1C864A359A3A /* Pods-EmailExampleNotificationServiceExtension-metadata.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8134868063EAC2764F7C8A12 /* Pods-EmailExampleNotificationServiceExtension-metadata.plist */; };
 		A85516339AB8557BCB97C61C /* Pods-EmailExample-metadata.plist in Resources */ = {isa = PBXBuildFile; fileRef = 33D8B6CC61EA83D5A31E7383 /* Pods-EmailExample-metadata.plist */; };
 		A99693F7433E372F381E45C6 /* Pods_EmailExample.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CD4873EB17C3906F80A5AF1C /* Pods_EmailExample.framework */; };
@@ -263,6 +268,11 @@
 		95C0CE0724AACE190024BFBB /* ReadEmailMessageViewControllerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadEmailMessageViewControllerTests.swift; sourceTree = "<group>"; };
 		9F97B79B2B73210000384FE7 /* BlockedAddressTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockedAddressTableViewCell.swift; sourceTree = "<group>"; };
 		9F97B79D2B732FA200384FE7 /* BlockedAddressTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = BlockedAddressTableViewCell.xib; sourceTree = "<group>"; };
+		9FAAE9C62D2B417700687D4C /* UpdateCustomFolderViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateCustomFolderViewController.swift; sourceTree = "<group>"; };
+		9FAAE9C92D2B484D00687D4C /* UpdateCustomFolderInputData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateCustomFolderInputData.swift; sourceTree = "<group>"; };
+		9FAAE9CB2D2B4E6700687D4C /* UpdateCustomFolderViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = UpdateCustomFolderViewController.xib; sourceTree = "<group>"; };
+		9FF172962D265CDD00C3BFF8 /* CreateCustomFolderViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateCustomFolderViewController.swift; sourceTree = "<group>"; };
+		9FF1729C2D273D6800C3BFF8 /* CreateCustomFolderViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = CreateCustomFolderViewController.xib; sourceTree = "<group>"; };
 		AB5B9DAF240EC5D100E4E5D8 /* EmailExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = EmailExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AB5B9DB2240EC5D100E4E5D8 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		AB5B9DB9240EC5D100E4E5D8 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -400,6 +410,7 @@
 		67014B5724983E1E008733E8 /* EmailMessageList */ = {
 			isa = PBXGroup;
 			children = (
+				9FAAE9C82D2B481900687D4C /* CustomFolders */,
 				8483150E24B84A24004E89EA /* UI */,
 				67014B5C24983FC6008733E8 /* EmailMessageListViewController.swift */,
 				67014B5824983E77008733E8 /* EmailMessageListViewController.xib */,
@@ -873,6 +884,18 @@
 			path = Tests;
 			sourceTree = "<group>";
 		};
+		9FAAE9C82D2B481900687D4C /* CustomFolders */ = {
+			isa = PBXGroup;
+			children = (
+				9FF172962D265CDD00C3BFF8 /* CreateCustomFolderViewController.swift */,
+				9FF1729C2D273D6800C3BFF8 /* CreateCustomFolderViewController.xib */,
+				9FAAE9C92D2B484D00687D4C /* UpdateCustomFolderInputData.swift */,
+				9FAAE9C62D2B417700687D4C /* UpdateCustomFolderViewController.swift */,
+				9FAAE9CB2D2B4E6700687D4C /* UpdateCustomFolderViewController.xib */,
+			);
+			path = CustomFolders;
+			sourceTree = "<group>";
+		};
 		A7EB4797332B81CE5CE439FB /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -1118,6 +1141,7 @@
 				AB5B9DBC240EC5D300E4E5D8 /* Assets.xcassets in Resources */,
 				9F97B79E2B732FA200384FE7 /* BlockedAddressTableViewCell.xib in Resources */,
 				84EC6CAE24C1652B008FDED4 /* BodyTableViewCell.xib in Resources */,
+				9FF1729D2D273D6800C3BFF8 /* CreateCustomFolderViewController.xib in Resources */,
 				840D86DA24932C8A008E4BE5 /* CreateEmailAddressViewController.xib in Resources */,
 				8440400D245AB56D00B2EBF2 /* CreateSudoViewController.xib in Resources */,
 				840D86D3249315C8008E4BE5 /* EmailAddressListViewController.xib in Resources */,
@@ -1136,6 +1160,7 @@
 				8470A693245B7DC900575C26 /* RegistrationViewController.xib in Resources */,
 				84288921249AE44F00D39E6C /* SendEmailMessageViewController.xib in Resources */,
 				8470C8F5245AD55700439F92 /* SudoListViewController.xib in Resources */,
+				9FAAE9CC2D2B4E6800687D4C /* UpdateCustomFolderViewController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1390,6 +1415,7 @@
 				AB93CADA240EF6FB0065AF50 /* Authenticator.swift in Sources */,
 				9F97B79C2B73210000384FE7 /* BlockedAddressTableViewCell.swift in Sources */,
 				84EC6CAD24C1652B008FDED4 /* BodyTableViewCell.swift in Sources */,
+				9FF172972D265CDD00C3BFF8 /* CreateCustomFolderViewController.swift in Sources */,
 				840D86D924932C8A008E4BE5 /* CreateEmailAddressViewController.swift in Sources */,
 				CF2571C32444EC0B0053334E /* CreateSudoViewController.swift in Sources */,
 				5D22F4322C1AAD6A00AE54C9 /* Data+Print.swift in Sources */,
@@ -1419,6 +1445,8 @@
 				511C50712BE0ACC5006A377E /* UIView+Clickable.swift in Sources */,
 				84309D3F2463DC7600F48ECC /* UIView+NibLoadable.swift in Sources */,
 				CF2571D2245109BF0053334E /* UIViewController+AlertPresentation.swift in Sources */,
+				9FAAE9CA2D2B484D00687D4C /* UpdateCustomFolderInputData.swift in Sources */,
+				9FAAE9C72D2B417700687D4C /* UpdateCustomFolderViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

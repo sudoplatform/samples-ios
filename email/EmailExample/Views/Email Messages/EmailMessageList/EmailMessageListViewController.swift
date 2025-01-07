@@ -17,6 +17,8 @@ import SudoProfiles
 ///         user can read the email message.
 ///     - `CreateEmailMessageViewController`: If a user taps the "Create Email Message" button, the `CreateEmailMessageViewController` will be presented so the
 ///         user can send a new email message.
+///     - `CreateCustomFolderViewController`: If a user taps the "Create Custom Folder" tab in the folder drop-down, the `CreateCustomFolderController`
+///     will be presented so the user can create a custom folder.
 final class EmailMessageListViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, FolderSwitcherViewDelegate {
 
     // MARK: - Outlets
@@ -43,6 +45,10 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
         case navigateToReadEmailMessage
         /// Used to navigate to the `EmailAddressSettingsViewController`.
         case navigateToEmailAddressSettings
+        /// Used to navigate to the `CreateCustomFolderViewController`.
+        case navigateToCreateCustomFolder
+        /// Used to navigate to the `UpdateCustomFolderViewController`.
+        case navigateToUpdateCustomFolder
         /// Used to navigate back to the `EmailAddressListViewController`.
         case returnToEmailAddressList
     }
@@ -54,6 +60,9 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
 
     /// A list of `EmailMessage` that are associated with the `emailAddress`.
     var emailMessages: [EmailMessage] = []
+
+    /// A list of `EmailFolder` that are associated with the `emailAddress`.
+    var emailFolders: [EmailFolder] = []
 
     /// A list of blocked email addresses associated with the `emailAddress`
     var blockedAddresses: [String] = []
@@ -74,7 +83,7 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
     var allEmailMessagesUpdatedSubscriptionToken: SubscriptionToken?
 
     /// The currently folder that is open
-    var selectedFolder: FolderType = FolderType.inbox
+    var selectedFolderSwitcherLabel: FolderSwitcherLabels = .standard(.inbox)
 
     // MARK: - Properties: Computed
 
@@ -100,6 +109,11 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
                 }
             }
             return
+        }
+        do {
+            Task {
+                await self.loadEmailFolders()
+            }
         }
         do {
             Task.detached(priority: .medium) { [weak self] in
@@ -148,6 +162,27 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
             }
             emailAddressSettings.emailAddress = emailAddress
 
+        case .navigateToCreateCustomFolder:
+            guard let createCustomFolder = segue.destination as?
+                CreateCustomFolderViewController else {
+                break
+            }
+            createCustomFolder.emailAddress = emailAddress
+
+        case .navigateToUpdateCustomFolder:
+            guard let updateCustomFolder = segue.destination as?
+                    UpdateCustomFolderViewController else {
+                break
+            }
+            updateCustomFolder.emailAddress = emailAddress
+            let selectedFolder = self.getSelectedCustomFolder()
+            if selectedFolder != nil {
+                updateCustomFolder.customFolderName = selectedFolder!.customFolderName!
+                let inputData = UpdateCustomFolderInputData(customFolderName: selectedFolder!.customFolderName!)
+                updateCustomFolder.inputData = inputData
+                updateCustomFolder.emailFolderId = selectedFolder!.id
+            }
+
         default:
             break
         }
@@ -159,8 +194,12 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
     ///
     /// This action will ensure that the email message list is up to date when returning from views - e.g. `SendEmailMessageViewController`.
     @IBAction func returnToEmailMessageList(segue: UIStoryboardSegue) {
+        if selectedFolderSwitcherLabel == .special(.create) {
+            self.selectedFolderSwitcherLabel = .standard(.inbox)
+        }
         Task.detached(priority: .medium) {
             await self.loadCacheEmailMessagesAndFetchRemote()
+            await self.loadEmailFolders()
         }
     }
 
@@ -241,6 +280,20 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
         return draftMessages.sortedByCreatedDescending()
     }
 
+    func listEmailFolders() async throws -> [EmailFolder] {
+        guard let emailAddressId = emailAddress?.id else {
+            Task { @MainActor in
+                presentErrorAlert(message: "An error has occurred: no email address found") { _ in
+                    self.performSegue(withIdentifier: Segue.returnToEmailAddressList.rawValue, sender: self)
+                }
+            }
+            return []
+        }
+        let listEmailFoldersInput = ListEmailFoldersForEmailAddressIdInput(emailAddressId: emailAddressId)
+        let foldersResult = try await emailClient.listEmailFoldersForEmailAddressId(withInput: listEmailFoldersInput)
+        return foldersResult.items
+    }
+
     func deleteEmailMessage(_ id: String) async throws -> String {
         presentActivityAlert(message: "Deleting Email Message")
         guard let deletedMessageId = try await emailClient.deleteEmailMessage(withId: id) else {
@@ -248,7 +301,7 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
             throw SudoEmailError.emailMessageNotFound
         }
         self.dismissActivityAlert()
-        return deletedMessageId
+        return deletedMessageId.id
     }
 
     func subscribeToAllEmailMessagesCreated() async throws {
@@ -394,7 +447,7 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
     /// All email messages will be filtered using the `emailAddress` to ensure only email messages associated with the email address are listed.
     func loadCacheEmailMessagesAndFetchRemote() async {
         do {
-            if folderNameSwitcher.currentFolder == .drafts {
+            if folderNameSwitcher.currentFolder == .special(.drafts) {
                 self.emailMessages = try await listDraftEmailMessages()
                 Task { @MainActor in
                     self.tableView.reloadData()
@@ -446,6 +499,28 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
         }
     }
 
+    func loadEmailFolders() async {
+        do {
+            let result = try await self.listEmailFolders()
+            self.emailFolders = result
+            self.folderNameSwitcher.folderNames = result.map {
+                if $0.customFolderName != nil && $0.customFolderName != "" {
+                    return $0.customFolderName!
+                } else {
+                    return $0.folderName
+                }
+            }
+            Task { @MainActor in
+                self.tableView.reloadData()
+                self.folderNameSwitcher.populateMenu()
+            }
+        } catch {
+            Task { @MainActor in
+                self.presentErrorAlert(message: "Failed to list email folders", error: error)
+            }
+        }
+    }
+
     /// Validates that the input email address exists and is not empty.
     func validateViewInputEmailAddress() -> Bool {
         guard let emailAddress = emailAddress else {
@@ -483,7 +558,7 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
             return false
         }
         let emailMessage = emailMessages.remove(at: indexPath.row)
-        if folderNameSwitcher.currentFolder == .trash {
+        if folderNameSwitcher.currentFolder == .standard(.trash) {
             // permanently delete email message
             Task { @MainActor in
                 self.tableView.reloadData()
@@ -502,7 +577,7 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
                 }
                 return false
             }
-        } else if folderNameSwitcher.currentFolder == .drafts {
+        } else if folderNameSwitcher.currentFolder == .special(.drafts) {
             do {
                 let input = DeleteDraftEmailMessagesInput(ids: [emailMessage.id], emailAddressId: emailAddress.id)
                 presentActivityAlert(message: "Deleting Draft Email Message")
@@ -638,6 +713,63 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
         }
     }
 
+    func deleteCustomFolder() async {
+        var folderLabel: String = ""
+        do {
+            self.presentActivityAlert(message: "Deleting custom folder")
+            let folderToDelete = self.getSelectedCustomFolder()
+            if folderToDelete == nil {
+                Task { @MainActor in
+                    self.dismissActivityAlert()
+                    self.presentErrorAlert(message: "Could not delete folder.")
+                }
+            } else {
+                folderLabel = folderToDelete!.customFolderName!
+                _ = try await self.emailClient.deleteCustomEmailFolder(withInput: DeleteCustomEmailFolderInput(
+                    emailFolderId: folderToDelete!.id, emailAddressId: emailAddress!.id
+                ))
+                await refresh()
+                folderNameSwitcher.folderNames.removeAll(where: { $0 == folderLabel })
+                self.dismissActivityAlert()
+            }
+        } catch {
+            Task { @MainActor in
+                self.dismissActivityAlert()
+                self.presentErrorAlert(message: "Failed to delete folder. Please try again", error: error)
+            }
+        }
+    }
+    
+    func getSelectedCustomFolder() -> EmailFolder? {
+        let folder = self.emailFolders.first(where: {
+            if $0.customFolderName == nil {
+                return false
+            } else {
+                switch selectedFolderSwitcherLabel {
+                case .standard(_):
+                    return false
+                case .special(_):
+                    return false
+                case .string(let selectedFolderName):
+                    if selectedFolderName == $0.customFolderName {
+                        return true
+                    } else {
+                        return false
+                    }
+                }
+            }
+        })
+        return folder
+    }
+
+    func refresh(folder: FolderSwitcherLabels = .standard(.inbox)) async {
+        await loadEmailFolders()
+        folderNameSwitcher.currentFolder = folder
+        folderSwitcherView(folderNameSwitcher, didSelectFolderType: folder)
+        folderNameSwitcher.populateMenu()
+        await loadCacheEmailMessagesAndFetchRemote()
+    }
+
     // MARK: - Conformance: UITableViewDataSource
 
     func numberOfSections(in tableView: UITableView) -> Int {
@@ -645,7 +777,7 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
     }
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if self.selectedFolder == FolderType.blocklist {
+        if self.selectedFolderSwitcherLabel == .special(.blocklist) {
             return blockedAddresses.count
         }
         return emailMessages.count
@@ -653,7 +785,7 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         assert(indexPath.section == 0)
-        if self.selectedFolder == FolderType.blocklist {
+        if self.selectedFolderSwitcherLabel == .special(.blocklist) {
             let blockedAddress = blockedAddresses[indexPath.row]
             guard let blockedAddressCell = tableView.dequeueReusableCell(
                 withIdentifier: "blockedAddressCell", for: indexPath
@@ -680,7 +812,7 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
 
     @MainActor
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        if selectedFolder == FolderType.blocklist {
+        if selectedFolderSwitcherLabel == .special(.blocklist) {
             let address = blockedAddresses[indexPath.row]
             if selectedBlockedAddresses.contains(address) {
                 selectedBlockedAddresses.remove(at: selectedBlockedAddresses.firstIndex(of: address)!)
@@ -716,14 +848,21 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
 
     func folderSwitcherView(
         _ view: FolderSwitcherView,
-        didSelectFolderType folderType: FolderType
+        didSelectFolderType folderType: FolderSwitcherLabels
     ) {
-        self.selectedFolder = folderType
+        self.selectedFolderSwitcherLabel = folderType
         blockedAddresses = []
         emailMessages = []
-        if self.selectedFolder == FolderType.blocklist {
+        if self.selectedFolderSwitcherLabel == .special(.blocklist) {
             Task { @MainActor in
                 await self.loadBlockedAddresses()
+            }
+        } else if self.selectedFolderSwitcherLabel == .special(.create) {
+            Task { @MainActor in
+                self.performSegue(
+                    withIdentifier: Segue.navigateToCreateCustomFolder.rawValue,
+                    sender: self
+                )
             }
         } else {
             Task { @MainActor in
@@ -783,5 +922,25 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
                 }
             }
         }
+    }
+
+    @MainActor
+    func deleteCustomFolder() {
+        let alert = UIAlertController(
+            title: "Delete Custom Folder",
+            message: "Are you sure you want to delete this folder? All email messages in the folder will be moved to Trash.",
+            preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+        alert.addAction(UIAlertAction(title: "Delete", style: .default) { _ in
+            Task.detached(priority: .medium) {
+                await self.deleteCustomFolder()
+            }
+        })
+        present(alert, animated: true, completion: nil)
+    }
+    
+    @MainActor 
+    func updateCustomFolder() {
+        performSegue(withIdentifier: Segue.navigateToUpdateCustomFolder.rawValue, sender: self)
     }
 }

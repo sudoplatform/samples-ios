@@ -87,10 +87,10 @@ class SudoEmailClientSpy: SudoEmailClient {
     var deleteEmailMessagesCalled: Bool = false
     var deleteEmailMessagesParameter: [String]?
     var deleteEmailMessagesWillThrow: Bool = false
-    var deleteEmailMessagesResult: SudoEmail.BatchOperationResult<String, String>?
+    var deleteEmailMessagesResult: SudoEmail.BatchOperationResult<SudoEmail.DeleteEmailMessageSuccessResult, SudoEmail.EmailMessageOperationFailureResult>?
     func deleteEmailMessages(
         withIds ids: [String]
-    ) async throws -> SudoEmail.BatchOperationResult<String, String> {
+    ) async throws -> SudoEmail.BatchOperationResult<SudoEmail.DeleteEmailMessageSuccessResult, SudoEmail.EmailMessageOperationFailureResult> {
         deleteEmailMessagesCalled = true
         deleteEmailMessagesParameter = ids
         if deleteEmailMessagesWillThrow {
@@ -153,7 +153,7 @@ class SudoEmailClientSpy: SudoEmailClient {
     var deleteDraftEmailMessagesWillThrow: Bool = false
     func deleteDraftEmailMessages(
         withInput input: SudoEmail.DeleteDraftEmailMessagesInput
-    ) async throws -> SudoEmail.BatchOperationResult<String, EmailMessageOperationFailureResult> {
+    ) async throws -> SudoEmail.BatchOperationResult<SudoEmail.DeleteEmailMessageSuccessResult, SudoEmail.EmailMessageOperationFailureResult> {
         deleteDraftEmailMessagesCalled = true
         deleteDraftEmailMessagesParameter = input
         if deleteDraftEmailMessagesWillThrow {
@@ -405,11 +405,11 @@ class SudoEmailClientSpy: SudoEmailClient {
 
     var deleteEmailMessageCalled: Bool = false
     var deleteEmailMessageParameter: String?
-    var deleteEmailMessageResult: String?
+    var deleteEmailMessageResult: SudoEmail.DeleteEmailMessageSuccessResult?
     var deleteEmailMessageError = AnyError(
         "Please add base result to `SudoEmailClientSpy.deleteEmailMessage`"
     )
-    func deleteEmailMessage(withId id: String) async throws -> String? {
+    func deleteEmailMessage(withId id: String) async throws -> SudoEmail.DeleteEmailMessageSuccessResult? {
         deleteEmailMessageCalled = true
         deleteEmailMessageParameter = id
 
@@ -540,6 +540,54 @@ class SudoEmailClientSpy: SudoEmailClient {
             return lookupEmailAddressesPublicInfoResult
         }
         throw lookupEmailAddressesPublicInfoError
+    }
+
+    var createCustomEmailFolderCalled: Bool = false
+    var createCustomEmailFolderParameter: SudoEmail.CreateCustomEmailFolderInput?
+    var createCustomEmailFolderResult: SudoEmail.EmailFolder?
+    var createCustomEmailFolderError = AnyError(
+      "Please add base result to `SudoEmailClientSpy.createCustomEmailFolder`"
+    )
+    func createCustomEmailFolder(withInput input: SudoEmail.CreateCustomEmailFolderInput) async throws -> SudoEmail.EmailFolder {
+        createCustomEmailFolderCalled = true
+        createCustomEmailFolderParameter = input
+
+        if let createCustomEmailFolderResult = createCustomEmailFolderResult {
+          return createCustomEmailFolderResult
+        }
+        throw createCustomEmailFolderError
+    }
+
+    var deleteCustomEmailFolderCalled: Bool = false
+    var deleteCustomEmailFolderParameter: SudoEmail.DeleteCustomEmailFolderInput?
+    var deleteCustomEmailFolderResult: SudoEmail.EmailFolder?
+    var deleteCustomEmailFolderError = AnyError(
+      "Please add base result to `SudoEmailClientSpy.deleteCustomEmailFolder`"
+    )
+    func deleteCustomEmailFolder(withInput input: SudoEmail.DeleteCustomEmailFolderInput) async throws -> SudoEmail.EmailFolder? {
+        deleteCustomEmailFolderCalled = true
+        deleteCustomEmailFolderParameter = input
+
+        if let deleteCustomEmailFolderResult = deleteCustomEmailFolderResult {
+          return deleteCustomEmailFolderResult
+        }
+        throw deleteCustomEmailFolderError
+    }
+
+    var updateCustomEmailFolderCalled: Bool = false
+    var updateCustomEmailFolderParameter: SudoEmail.UpdateCustomEmailFolderInput?
+    var updateCustomEmailFolderResult: SudoEmail.EmailFolder?
+    var updateCustomEmailFolderError = AnyError(
+      "Please add base result to `SudoEmailClientSpy.updateCustomEmailFolder`"
+    )
+    func updateCustomEmailFolder(withInput input: SudoEmail.UpdateCustomEmailFolderInput) async throws -> SudoEmail.EmailFolder {
+        updateCustomEmailFolderCalled = true
+        updateCustomEmailFolderParameter = input
+
+        if let updateCustomEmailFolderResult = updateCustomEmailFolderResult {
+          return updateCustomEmailFolderResult
+        }
+        throw updateCustomEmailFolderError
     }
 
     var resetCalled: Bool = false

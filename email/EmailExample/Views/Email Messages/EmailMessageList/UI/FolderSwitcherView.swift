@@ -6,12 +6,23 @@
 
 import UIKit
 
-enum FolderType: String, CaseIterable {
+enum StandardFolders: String, CaseIterable {
     case inbox
+    case outbox
     case sent
-    case drafts
     case trash
+}
+
+enum SpecialLabels: String, CaseIterable {
+    case drafts
     case blocklist
+    case create
+}
+
+enum FolderSwitcherLabels: Equatable {
+    case standard(StandardFolders)
+    case special(SpecialLabels)
+    case string(String)
 }
 
 protocol FolderSwitcherViewDelegate: AnyObject {
@@ -20,16 +31,20 @@ protocol FolderSwitcherViewDelegate: AnyObject {
     ///
     /// - Parameters:
     ///   - view: The view sending the event
-    ///   - folderType: The selected folder type
+    ///   - folderType: The selected folder
     func folderSwitcherView(
         _ view: FolderSwitcherView,
-        didSelectFolderType folderType: FolderType
+        didSelectFolderType folderType: FolderSwitcherLabels
     )
 
     /// Called when the user taps on the empty trash button
     func emptyTrash()
 
     func unblockEmailAddresses()
+
+    func deleteCustomFolder()
+    
+    func updateCustomFolder()
 }
 
 class FolderSwitcherView: UITableViewHeaderFooterView {
@@ -42,9 +57,13 @@ class FolderSwitcherView: UITableViewHeaderFooterView {
     /// Button to permanently delete email messages from the Trash folder
     let emptyTrashButton = UIButton()
 
+    let deleteCustomFolderButton = UIButton()
+    
+    let updateCustomFolderButton = UIButton()
+
     let unblockAddressesButton = UIButton()
 
-    let contentContainerView = UIStackView()
+    var contentContainerView = UIStackView()
 
     /// The title of the currently selected Email Folder
     let title = UILabel()
@@ -55,9 +74,15 @@ class FolderSwitcherView: UITableViewHeaderFooterView {
     /// The image for the empty Trash button
     let emptyTrashImage = UIImage(systemName: "trash.slash.fill")
 
+    let deleteCustomFolderImage = UIImage(systemName: "trash.slash.fill")
+    
+    let updateCustomFolderImage = UIImage(systemName: "pencil")
+
     let unblockAddressesImage = UIImage(systemName: "trash.slash.fill")
 
-    var currentFolder: FolderType = .inbox
+    var folderNames: [String] = []
+
+    var currentFolder: FolderSwitcherLabels = .standard(.inbox)
 
     /// Optional delegate to handle mailbox selection types with
     weak var delegate: FolderSwitcherViewDelegate?
@@ -68,49 +93,122 @@ class FolderSwitcherView: UITableViewHeaderFooterView {
         super.init(reuseIdentifier: reuseIdentifier)
 
         title.translatesAutoresizingMaskIntoConstraints = false
+        populateMenu()
+    }
 
-        let inboxAction = UIAction(title: "Inbox") { _ in
-            self.currentFolder = .inbox
-            self.delegate?.folderSwitcherView(self, didSelectFolderType: .inbox)
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+    }
+
+    func populateMenu() {
+        self.contentContainerView = UIStackView()
+        var uiActions: [UIAction] = []
+
+        folderNames.forEach {
+            var action: UIAction
+            if $0.lowercased() == StandardFolders.inbox.rawValue.lowercased() {
+                action = UIAction(title: "Inbox") { _ in
+                    self.currentFolder = .standard(.inbox)
+                    self.delegate?.folderSwitcherView(self, didSelectFolderType: .standard(.inbox))
+                    self.title.text = self.titleForCurrentFolder()
+                    self.menuButton.sizeToFit()
+                    self.emptyTrashButton.isHidden = true
+                    self.unblockAddressesButton.isHidden = true
+                    self.deleteCustomFolderButton.isHidden = true
+                    self.updateCustomFolderButton.isHidden = true
+                }
+            } else if $0.lowercased() == StandardFolders.trash.rawValue.lowercased() {
+                action = UIAction(title: "Trash") { _ in
+                    self.currentFolder = .standard(.trash)
+                    self.delegate?.folderSwitcherView(self, didSelectFolderType: .standard(.trash))
+                    self.title.text = self.titleForCurrentFolder()
+                    self.menuButton.sizeToFit()
+                    self.emptyTrashButton.setImage(self.emptyTrashImage, for: .normal)
+                    self.emptyTrashButton.isHidden = false
+                    self.unblockAddressesButton.isHidden = true
+                    self.emptyTrashButton.sizeToFit()
+                    self.emptyTrashButton.addTarget(
+                        self,
+                        action: #selector(self.didTapEmptyTrashButton),
+                        for: .touchUpInside
+                    )
+                    self.deleteCustomFolderButton.isHidden = true
+                    self.updateCustomFolderButton.isHidden = true
+                }
+            } else if $0.lowercased() == StandardFolders.sent.rawValue.lowercased() {
+                action = UIAction(title: "Sent") { _ in
+                    self.currentFolder = .standard(.sent)
+                    self.delegate?.folderSwitcherView(self, didSelectFolderType: .standard(.sent))
+                    self.title.text = self.titleForCurrentFolder()
+                    self.menuButton.sizeToFit()
+                    self.emptyTrashButton.isHidden = true
+                    self.unblockAddressesButton.isHidden = true
+                    self.deleteCustomFolderButton.isHidden = true
+                    self.updateCustomFolderButton.isHidden = true
+                }
+            } else if $0.lowercased() == StandardFolders.outbox.rawValue.lowercased() {
+                action = UIAction(title: "Outbox") { _ in
+                    self.currentFolder = .standard(.sent)
+                    self.delegate?.folderSwitcherView(self, didSelectFolderType: .standard(.outbox))
+                    self.title.text = self.titleForCurrentFolder()
+                    self.menuButton.sizeToFit()
+                    self.emptyTrashButton.isHidden = true
+                    self.unblockAddressesButton.isHidden = true
+                    self.deleteCustomFolderButton.isHidden = true
+                    self.updateCustomFolderButton.isHidden = true
+                }
+            } else {
+                let label = $0
+                action = UIAction(title: $0) { _ in
+                    self.currentFolder = .string(label)
+                    self.delegate?.folderSwitcherView(self, didSelectFolderType: .string(label))
+                    self.title.text = self.titleForCurrentFolder()
+                    self.menuButton.sizeToFit()
+                    self.emptyTrashButton.isHidden = true
+                    self.unblockAddressesButton.isHidden = true
+                    self.deleteCustomFolderButton.isHidden = false
+                    self.deleteCustomFolderButton.setImage(self.deleteCustomFolderImage, for: .normal)
+                    self.deleteCustomFolderButton.sizeToFit()
+                    self.deleteCustomFolderButton.addTarget(
+                        self,
+                        action: #selector(self.didTapDeleteCustomFolderButton),
+                        for: .touchUpInside
+                    )
+                    self.updateCustomFolderButton.isHidden = false
+                    self.updateCustomFolderButton.setImage(self.updateCustomFolderImage, for: .normal)
+                    self.updateCustomFolderButton.sizeToFit()
+                    self.updateCustomFolderButton.addTarget(
+                        self,
+                        action: #selector(self.didTapUpdateCustomFolderButton),
+                        for: .touchUpInside
+                    )
+                }
+            }
+            uiActions.append(action)
+        }
+        uiActions.append(UIAction(title: "Drafts") { _ in
+            self.currentFolder = .special(.drafts)
+            self.delegate?.folderSwitcherView(self, didSelectFolderType: .special(.drafts))
             self.title.text = self.titleForCurrentFolder()
             self.menuButton.sizeToFit()
             self.emptyTrashButton.isHidden = true
             self.unblockAddressesButton.isHidden = true
-        }
-        let sentAction = UIAction(title: "Sent") { _ in
-            self.currentFolder = .sent
-            self.delegate?.folderSwitcherView(self, didSelectFolderType: .sent)
+            self.deleteCustomFolderButton.isHidden = true
+            self.updateCustomFolderButton.isHidden = true
+        })
+        uiActions.append(UIAction(title: "Create Custom Folder") { _ in
+            self.currentFolder = .special(.create)
+            self.delegate?.folderSwitcherView(self, didSelectFolderType: .special(.create))
             self.title.text = self.titleForCurrentFolder()
             self.menuButton.sizeToFit()
             self.emptyTrashButton.isHidden = true
             self.unblockAddressesButton.isHidden = true
-        }
-        let draftsAction = UIAction(title: "Drafts") { _ in
-            self.currentFolder = .drafts
-            self.delegate?.folderSwitcherView(self, didSelectFolderType: .drafts)
-            self.title.text = self.titleForCurrentFolder()
-            self.menuButton.sizeToFit()
-            self.emptyTrashButton.isHidden = true
-            self.unblockAddressesButton.isHidden = true
-        }
-        let trashAction = UIAction(title: "Trash") { _ in
-            self.currentFolder = .trash
-            self.delegate?.folderSwitcherView(self, didSelectFolderType: .trash)
-            self.title.text = self.titleForCurrentFolder()
-            self.menuButton.sizeToFit()
-            self.emptyTrashButton.setImage(self.emptyTrashImage, for: .normal)
-            self.emptyTrashButton.isHidden = false
-            self.unblockAddressesButton.isHidden = true
-            self.emptyTrashButton.sizeToFit()
-            self.emptyTrashButton.addTarget(
-                self,
-                action: #selector(self.didTapEmptyTrashButton),
-                for: .touchUpInside
-            )
-        }
-        let blocklistAction = UIAction(title: "Blocklist") { _ in
-            self.currentFolder = .blocklist
-            self.delegate?.folderSwitcherView(self, didSelectFolderType: .blocklist)
+            self.deleteCustomFolderButton.isHidden = true
+            self.updateCustomFolderButton.isHidden = true
+        })
+        uiActions.append(UIAction(title: "Blocklist") { _ in
+            self.currentFolder = .special(.blocklist)
+            self.delegate?.folderSwitcherView(self, didSelectFolderType: .special(.blocklist))
             self.title.text = self.titleForCurrentFolder()
             self.menuButton.sizeToFit()
             self.emptyTrashButton.isHidden = true
@@ -122,15 +220,11 @@ class FolderSwitcherView: UITableViewHeaderFooterView {
                 action: #selector(self.didTapUnblockEmailAddressesButton),
                 for: .touchUpInside
             )
-        }
+            self.deleteCustomFolderButton.isHidden = true
+            self.updateCustomFolderButton.isHidden = true
+        })
         let menu = UIMenu(
-            children: [
-                inboxAction,
-                sentAction,
-                draftsAction,
-                trashAction,
-                blocklistAction
-            ]
+            children: uiActions
         )
         contentContainerView.axis = .horizontal
         contentContainerView.translatesAutoresizingMaskIntoConstraints = false
@@ -149,6 +243,8 @@ class FolderSwitcherView: UITableViewHeaderFooterView {
         contentContainerView.addArrangedSubview(spacer)
         contentContainerView.addArrangedSubview(emptyTrashButton)
         contentContainerView.addArrangedSubview(unblockAddressesButton)
+        contentContainerView.addArrangedSubview(deleteCustomFolderButton)
+        contentContainerView.addArrangedSubview(updateCustomFolderButton)
 
         NSLayoutConstraint.activate([
             contentContainerView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 8),
@@ -159,22 +255,24 @@ class FolderSwitcherView: UITableViewHeaderFooterView {
         ])
     }
 
-    required init?(coder: NSCoder) {
-        super.init(coder: coder)
-    }
-
     func titleForCurrentFolder() -> String {
         switch currentFolder {
-        case .inbox:
+        case .standard(.inbox):
             return "Inbox"
-        case .sent:
+        case .standard(.sent):
             return "Sent"
-        case .drafts:
+        case .special(.drafts):
             return "Drafts"
-        case .trash:
+        case .standard(.trash):
             return "Trash"
-        case .blocklist:
+        case .standard(.outbox):
+            return "Outbox"
+        case .special(.blocklist):
             return "Blocklist"
+        case .special(.create):
+            return "Create Custom Folder"
+        case .string(let str):
+            return str
         }
     }
 
@@ -185,5 +283,13 @@ class FolderSwitcherView: UITableViewHeaderFooterView {
 
     @objc func didTapUnblockEmailAddressesButton() {
         self.delegate?.unblockEmailAddresses()
+    }
+    
+    @objc func didTapDeleteCustomFolderButton() {
+        self.delegate?.deleteCustomFolder()
+    }
+    
+    @objc func didTapUpdateCustomFolderButton() {
+        self.delegate?.updateCustomFolder()
     }
 }

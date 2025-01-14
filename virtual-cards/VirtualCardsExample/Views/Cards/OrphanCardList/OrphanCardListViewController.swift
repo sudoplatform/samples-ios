@@ -103,7 +103,12 @@ class OrphanCardListViewController: UIViewController, UITableViewDataSource, UIT
     func listOrphanCards(
         cachePolicy: SudoVirtualCards.CachePolicy
     ) async throws -> [VirtualCard] {
-        let result = try await virtualCardsClient.listVirtualCards(withLimit: Defaults.orphanCardListLimit, nextToken: nil, cachePolicy: cachePolicy)
+        let result = try await virtualCardsClient.listVirtualCards(
+            withFilter: nil,
+            sortOrder: nil,
+            withLimit: Defaults.orphanCardListLimit,
+            nextToken: nil,
+            cachePolicy: cachePolicy)
         switch result {
         case .success(let success):
             return success.items

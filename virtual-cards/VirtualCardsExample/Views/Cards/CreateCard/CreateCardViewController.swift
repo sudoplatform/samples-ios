@@ -387,6 +387,8 @@ class CreateCardViewController: UIViewController,
     func loadFirstActiveFundingSource() async {
         do {
             let fundingSources = try await self.virtualCardsClient.listFundingSources(
+                withFilter: nil,
+                sortOrder: nil,
                 withLimit: Defaults.fundingSourceLimit,
                 nextToken: nil,
                 cachePolicy: .remoteOnly

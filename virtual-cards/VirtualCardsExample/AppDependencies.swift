@@ -11,6 +11,19 @@ import SudoEntitlements
 import SudoKeyManager
 import SudoProfiles
 import SudoIdentityVerification
+import SudoNotification
+
+struct DeviceDataHolder {
+    var pushTokenRegistered: Bool = false
+    var pushToken: Data?
+    let deviceId: String
+    let bundleId: String
+
+    init(deviceId: String, bundleId: String) {
+        self.deviceId = deviceId
+        self.bundleId = bundleId
+    }
+}
 
 struct AppDependencies {
 
@@ -22,7 +35,12 @@ struct AppDependencies {
     let identityVerificationClient: SudoIdentityVerificationClient
     let keyManager: SudoKeyManager
     let authenticator: Authenticator
+    let virtualCardsNotificationFilterClient: SudoNotificationFilterClient
+    let notificationClient: SudoNotificationClient
     let virtualCardsClient: SudoVirtualCardsClient
+
+    var deviceInfo: DeviceDataHolder
+    var notificationConfiguration: NotificationConfiguration?
 
     // MARK: - Lifecycle
 
@@ -33,6 +51,8 @@ struct AppDependencies {
         identityVerificationClient: SudoIdentityVerificationClient,
         keyManager: SudoKeyManager,
         authenticator: Authenticator,
+        virtualCardsNotificationFilterClient: SudoNotificationFilterClient,
+        notificationClient: SudoNotificationClient,
         virtualCardsClient: SudoVirtualCardsClient
     ) {
         self.userClient = userClient
@@ -41,27 +61,41 @@ struct AppDependencies {
         self.identityVerificationClient = identityVerificationClient
         self.keyManager = keyManager
         self.authenticator = authenticator
+        self.virtualCardsNotificationFilterClient = virtualCardsNotificationFilterClient
+        self.notificationClient = notificationClient
         self.virtualCardsClient = virtualCardsClient
+
+        guard let deviceId = UIDevice.current.identifierForVendor?.uuidString else {
+            fatalError("Cannot get device ID")
+        }
+
+        guard let bundleId = Bundle.main.bundleIdentifier else {
+            fatalError("Cannot get bundle ID")
+        }
+
+        self.deviceInfo = DeviceDataHolder(deviceId: deviceId, bundleId: bundleId)
     }
 
     init() throws {
         // Setup UserClient
-        userClient = try DefaultSudoUserClient(keyNamespace: "ids")
-        // Setup EntitlementsClient
-        entitlementsClient = try DefaultSudoEntitlementsClient(userClient: userClient)
-        // Setup ProfilesClient
+        let userClient = try DefaultSudoUserClient(keyNamespace: "ids")
+
         let storageURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-        profilesClient = try DefaultSudoProfilesClient(sudoUserClient: userClient, blobContainerURL: storageURL)
-        // Setup IdentityVerificationClient
-        identityVerificationClient = try DefaultSudoIdentityVerificationClient(sudoUserClient: userClient)
-        // Setup KeyManager
-        keyManager = LegacySudoKeyManager(serviceName: "com.sudoplatform.appservicename", keyTag: "com.sudoplatform", namespace: "vcs")
-        // Setup Authenticator
-        authenticator = Authenticator(userClient: userClient, keyManager: keyManager)
-        // Setup VirtualCardsClient
-        virtualCardsClient = try DefaultSudoVirtualCardsClient(
-            keyNamespace: "vcs",
-            userClient: userClient
+
+        let keyManager = LegacySudoKeyManager(serviceName: "com.sudoplatform.appservicename", keyTag: "com.sudoplatform", namespace: "vcs")
+
+        let virtualCardsNotificationFilterClient = DefaultSudoVirtualCardsNotificationFilterClient()
+
+        self.init(
+            userClient: userClient,
+            entitlementsClient: try DefaultSudoEntitlementsClient(userClient: userClient),
+            profilesClient: try DefaultSudoProfilesClient(sudoUserClient: userClient, blobContainerURL: storageURL),
+            identityVerificationClient: try DefaultSudoIdentityVerificationClient(sudoUserClient: userClient),
+            keyManager: keyManager,
+            authenticator: Authenticator(userClient: userClient, keyManager: keyManager),
+            virtualCardsNotificationFilterClient: virtualCardsNotificationFilterClient,
+            notificationClient: try DefaultSudoNotificationClient(userClient: userClient, notifiableServices: [virtualCardsNotificationFilterClient]),
+            virtualCardsClient: try DefaultSudoVirtualCardsClient(keyNamespace: "vcs", userClient: userClient)
         )
     }
 }

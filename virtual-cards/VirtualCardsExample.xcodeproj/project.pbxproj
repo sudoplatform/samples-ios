@@ -22,7 +22,6 @@
 		5D463EC72A8C545A003A9C06 /* CreateCheckoutCardFundingSourceViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D463EC62A8C5459003A9C06 /* CreateCheckoutCardFundingSourceViewController.swift */; };
 		5D8AB0B126C2B0000031B9FA /* SudoEntitlementsClientMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D8AB0B026C2B0000031B9FA /* SudoEntitlementsClientMock.swift */; };
 		5D8AB0B326C2B4850031B9FA /* AnyError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D8AB0B226C2B4850031B9FA /* AnyError.swift */; };
-		757D8D82BD067EBE88B5FBFA /* Pods_VirtualCardsExample.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F74B46553AD69EA548E63345 /* Pods_VirtualCardsExample.framework */; };
 		7C7CC0E16A21AD8AA47ACC54 /* Pods_VirtualCardsExample_VirtualCardsExampleTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 66130DE501351BF23843C5B7 /* Pods_VirtualCardsExample_VirtualCardsExampleTests.framework */; };
 		839BAE971A0D7170ECAD88A0 /* Pods-VirtualCardsExample-metadata.plist in Resources */ = {isa = PBXBuildFile; fileRef = EDDA09A0D095904167270AAC /* Pods-VirtualCardsExample-metadata.plist */; };
 		84309D382462B96F00F48ECC /* TransactionTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84309D362462B96F00F48ECC /* TransactionTableViewCell.swift */; };
@@ -94,12 +93,20 @@
 		957E6097253D5D720019D33A /* MainMenuViewControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 957E6096253D5D720019D33A /* MainMenuViewControllerTests.swift */; };
 		A43ED161D04EB2D685DFF7CC /* RefreshBankAccountFundingSourceViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = A43ED88DABC0E8637F78A950 /* RefreshBankAccountFundingSourceViewController.xib */; };
 		A43ED5B22E81F99C727CF2E0 /* RefreshBankAccountFundingSourceViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A43EDF85F3F774A81A2AAA8B /* RefreshBankAccountFundingSourceViewController.swift */; };
+		A75CE0C74C48C9CB0E0B6126 /* Pods-VirtualCardsExampleNotificationServiceExtension-metadata.plist in Resources */ = {isa = PBXBuildFile; fileRef = 92491609FF0C1171E38E3F2F /* Pods-VirtualCardsExampleNotificationServiceExtension-metadata.plist */; };
 		AB5B9DB3240EC5D100E4E5D8 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB5B9DB2240EC5D100E4E5D8 /* AppDelegate.swift */; };
 		AB5B9DBA240EC5D100E4E5D8 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AB5B9DB8240EC5D100E4E5D8 /* Main.storyboard */; };
 		AB5B9DBC240EC5D300E4E5D8 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AB5B9DBB240EC5D300E4E5D8 /* Assets.xcassets */; };
 		AB5B9DBF240EC5D300E4E5D8 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AB5B9DBD240EC5D300E4E5D8 /* LaunchScreen.storyboard */; };
 		AB93CAD9240EF6FB0065AF50 /* ConfigurationProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB93CAD1240EF6FB0065AF50 /* ConfigurationProvider.swift */; };
 		AB93CADA240EF6FB0065AF50 /* Authenticator.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB93CAD2240EF6FB0065AF50 /* Authenticator.swift */; };
+		AD24FCDC2CF6EBF6008EB6F5 /* VirtualCardsExampleNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD24FCDB2CF6EBF6008EB6F5 /* VirtualCardsExampleNotificationService.swift */; };
+		AD24FCE02CF6EBF6008EB6F5 /* VirtualCardsExampleNotificationServiceExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = AD24FCD92CF6EBF6008EB6F5 /* VirtualCardsExampleNotificationServiceExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		AD24FCEF2CF8187F008EB6F5 /* AppDelegate+UNUserNotificationCenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD24FCEE2CF8187F008EB6F5 /* AppDelegate+UNUserNotificationCenter.swift */; };
+		AD24FCF12CF819D3008EB6F5 /* Data+Print.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD24FCF02CF819D3008EB6F5 /* Data+Print.swift */; };
+		ADE2B5D92D06829B007D6662 /* Pods_VirtualCardsExample.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ADE2B5D82D06829B007D6662 /* Pods_VirtualCardsExample.framework */; };
+		ADE2B5DD2D092495007D6662 /* SudoNotificationClientMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADE2B5DC2D092495007D6662 /* SudoNotificationClientMock.swift */; };
+		C4BAF45BFC62A5BF18383F06 /* Pods_VirtualCardsExampleNotificationServiceExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 08A86CB62D1FB6B13859984D /* Pods_VirtualCardsExampleNotificationServiceExtension.framework */; };
 		CF2571BF2444EB7B0053334E /* RegistrationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF2571BE2444EB7B0053334E /* RegistrationViewController.swift */; };
 		CF2571C12444EBB80053334E /* SudoListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF2571C02444EBB80053334E /* SudoListViewController.swift */; };
 		CF2571C32444EC0B0053334E /* CreateSudoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF2571C22444EC0B0053334E /* CreateSudoViewController.swift */; };
@@ -122,9 +129,31 @@
 			remoteGlobalIDString = AB5B9DAE240EC5D100E4E5D8;
 			remoteInfo = VirtualCardsExample;
 		};
+		AD24FCDE2CF6EBF6008EB6F5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = AB5B9DA7240EC5D000E4E5D8 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = AD24FCD82CF6EBF6008EB6F5;
+			remoteInfo = VirtualCardsExampleNotificationServiceExtension;
+		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		AD24FCE12CF6EBF6008EB6F5 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				AD24FCE02CF6EBF6008EB6F5 /* VirtualCardsExampleNotificationServiceExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
+		08A86CB62D1FB6B13859984D /* Pods_VirtualCardsExampleNotificationServiceExtension.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_VirtualCardsExampleNotificationServiceExtension.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		0C180F3129E4F42700E9C416 /* CreateCheckoutBankAccountFSVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateCheckoutBankAccountFSVC.swift; sourceTree = "<group>"; };
 		0C180F3329E50B1400E9C416 /* CreateCheckoutBankAccountFSVC.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = CreateCheckoutBankAccountFSVC.xib; sourceTree = "<group>"; };
 		0CA9440129D4F386003AA4AD /* CreateFundingSourceMenuViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateFundingSourceMenuViewController.swift; sourceTree = "<group>"; };
@@ -195,6 +224,7 @@
 		8470C8F4245AD55700439F92 /* SudoListViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SudoListViewController.xib; sourceTree = "<group>"; };
 		84F2FB23283C90450070077B /* VirtualCard+Metadata.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "VirtualCard+Metadata.swift"; sourceTree = "<group>"; };
 		84FE1BCA27F17EF700E7C5AB /* StripeIntentWorker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StripeIntentWorker.swift; sourceTree = "<group>"; };
+		92491609FF0C1171E38E3F2F /* Pods-VirtualCardsExampleNotificationServiceExtension-metadata.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-VirtualCardsExampleNotificationServiceExtension-metadata.plist"; sourceTree = "<group>"; };
 		9545BF1C25464D74002CDE74 /* CreateSudoViewControllerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CreateSudoViewControllerTests.swift; path = VirtualCardsExampleTests/Tests/Views/Sudos/CreateSudo/CreateSudoViewControllerTests.swift; sourceTree = SOURCE_ROOT; };
 		9545BF3E254654AB002CDE74 /* SudoListViewControllerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SudoListViewControllerTests.swift; sourceTree = "<group>"; };
 		9545BF4425465656002CDE74 /* CreateFundingSourceViewControllerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateFundingSourceViewControllerTests.swift; sourceTree = "<group>"; };
@@ -231,14 +261,24 @@
 		AB5B9DC0240EC5D300E4E5D8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		AB93CAD1240EF6FB0065AF50 /* ConfigurationProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConfigurationProvider.swift; sourceTree = "<group>"; };
 		AB93CAD2240EF6FB0065AF50 /* Authenticator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Authenticator.swift; sourceTree = "<group>"; };
+		AD24FCD92CF6EBF6008EB6F5 /* VirtualCardsExampleNotificationServiceExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = VirtualCardsExampleNotificationServiceExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		AD24FCDB2CF6EBF6008EB6F5 /* VirtualCardsExampleNotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VirtualCardsExampleNotificationService.swift; sourceTree = "<group>"; };
+		AD24FCDD2CF6EBF6008EB6F5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		AD24FCE52CF6ED2F008EB6F5 /* VirtualCardsExampleNotificationServiceExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = VirtualCardsExampleNotificationServiceExtension.entitlements; sourceTree = "<group>"; };
+		AD24FCEE2CF8187F008EB6F5 /* AppDelegate+UNUserNotificationCenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppDelegate+UNUserNotificationCenter.swift"; sourceTree = "<group>"; };
+		AD24FCF02CF819D3008EB6F5 /* Data+Print.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Data+Print.swift"; sourceTree = "<group>"; };
+		ADE2B5D82D06829B007D6662 /* Pods_VirtualCardsExample.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Pods_VirtualCardsExample.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		ADE2B5DC2D092495007D6662 /* SudoNotificationClientMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SudoNotificationClientMock.swift; sourceTree = "<group>"; };
 		AE23C8C0B79F61E0A8335B26 /* Pods-VirtualCardsExample-VirtualCardsExampleUITests-metadata.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-VirtualCardsExample-VirtualCardsExampleUITests-metadata.plist"; sourceTree = "<group>"; };
 		B4276E24E9483A63E1DA551B /* Pods-VirtualCardsExample.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-VirtualCardsExample.release.xcconfig"; path = "Target Support Files/Pods-VirtualCardsExample/Pods-VirtualCardsExample.release.xcconfig"; sourceTree = "<group>"; };
+		C86425C60044BD2C9CE226E5 /* Pods-VirtualCardsExampleNotificationServiceExtension.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-VirtualCardsExampleNotificationServiceExtension.release.xcconfig"; path = "Target Support Files/Pods-VirtualCardsExampleNotificationServiceExtension/Pods-VirtualCardsExampleNotificationServiceExtension.release.xcconfig"; sourceTree = "<group>"; };
 		CF2571BE2444EB7B0053334E /* RegistrationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegistrationViewController.swift; sourceTree = "<group>"; };
 		CF2571C02444EBB80053334E /* SudoListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SudoListViewController.swift; sourceTree = "<group>"; };
 		CF2571C22444EC0B0053334E /* CreateSudoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateSudoViewController.swift; sourceTree = "<group>"; };
 		CF2571D1245109BF0053334E /* UIViewController+AlertPresentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+AlertPresentation.swift"; sourceTree = "<group>"; };
 		D556F50ADE17A8918CD4CCBC /* Pods_VirtualCardsExample_VirtualCardsExampleUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_VirtualCardsExample_VirtualCardsExampleUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		EDDA09A0D095904167270AAC /* Pods-VirtualCardsExample-metadata.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-VirtualCardsExample-metadata.plist"; sourceTree = "<group>"; };
+		F42DC4F648E730FA63086257 /* Pods-VirtualCardsExampleNotificationServiceExtension.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-VirtualCardsExampleNotificationServiceExtension.debug.xcconfig"; path = "Target Support Files/Pods-VirtualCardsExampleNotificationServiceExtension/Pods-VirtualCardsExampleNotificationServiceExtension.debug.xcconfig"; sourceTree = "<group>"; };
 		F74B46553AD69EA548E63345 /* Pods_VirtualCardsExample.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_VirtualCardsExample.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		FB8AEDE70B4424EB94FCA1BF /* Pods-VirtualCardsExample-VirtualCardsExampleUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-VirtualCardsExample-VirtualCardsExampleUITests.release.xcconfig"; path = "Target Support Files/Pods-VirtualCardsExample-VirtualCardsExampleUITests/Pods-VirtualCardsExample-VirtualCardsExampleUITests.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -264,7 +304,15 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				757D8D82BD067EBE88B5FBFA /* Pods_VirtualCardsExample.framework in Frameworks */,
+				ADE2B5D92D06829B007D6662 /* Pods_VirtualCardsExample.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AD24FCD62CF6EBF6008EB6F5 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C4BAF45BFC62A5BF18383F06 /* Pods_VirtualCardsExampleNotificationServiceExtension.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -310,9 +358,11 @@
 		1BC21B8CAB7762B4869CE9F4 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				ADE2B5D82D06829B007D6662 /* Pods_VirtualCardsExample.framework */,
 				F74B46553AD69EA548E63345 /* Pods_VirtualCardsExample.framework */,
 				66130DE501351BF23843C5B7 /* Pods_VirtualCardsExample_VirtualCardsExampleTests.framework */,
 				D556F50ADE17A8918CD4CCBC /* Pods_VirtualCardsExample_VirtualCardsExampleUITests.framework */,
+				08A86CB62D1FB6B13859984D /* Pods_VirtualCardsExampleNotificationServiceExtension.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -350,7 +400,9 @@
 			isa = PBXGroup;
 			children = (
 				957E6090253CFF500019D33A /* AppDelegate+isUnitTestRunning.swift */,
+				AD24FCEE2CF8187F008EB6F5 /* AppDelegate+UNUserNotificationCenter.swift */,
 				84309D3A2463891200F48ECC /* CurrencyAmount+Presentable.swift */,
+				AD24FCF02CF819D3008EB6F5 /* Data+Print.swift */,
 				84309D3C24638D3F00F48ECC /* Date+TransactionPresentable.swift */,
 				5D3A5BE42531CFAA006C7B30 /* DeclineReason+CustomStringConvertible.swift */,
 				8470A69C2461061C00575C26 /* FundingSourceNetwork+Stringable.swift */,
@@ -707,6 +759,7 @@
 				957E608A253958790019D33A /* KeyManagerMock.swift */,
 				5D8AB0B026C2B0000031B9FA /* SudoEntitlementsClientMock.swift */,
 				957E608C25395F860019D33A /* SudoIdentityVerificationClientMock.swift */,
+				ADE2B5DC2D092495007D6662 /* SudoNotificationClientMock.swift */,
 				957E60802539492C0019D33A /* SudoProfileClientMock.swift */,
 				957E6082253949770019D33A /* SudoVirtualCardsClientMock.swift */,
 				957E6094253D5CC80019D33A /* UITableViewMock.swift */,
@@ -762,6 +815,7 @@
 				AB5B9DB1240EC5D100E4E5D8 /* VirtualCardsExample */,
 				84077A29245A9053004186BE /* VirtualCardsExampleTests */,
 				5D3E18F72A981BA100344D9A /* VirtualCardsExampleUITests */,
+				AD24FCDA2CF6EBF6008EB6F5 /* VirtualCardsExampleNotificationServiceExtension */,
 				AB5B9DB0240EC5D100E4E5D8 /* Products */,
 				CB142D8F3C8CFF7109D665EA /* Pods */,
 				A43EDF85F3F774A81A2AAA8B /* RefreshBankAccountFundingSourceViewController.swift */,
@@ -774,6 +828,7 @@
 			isa = PBXGroup;
 			children = (
 				AB5B9DAF240EC5D100E4E5D8 /* VirtualCardsExample.app */,
+				AD24FCD92CF6EBF6008EB6F5 /* VirtualCardsExampleNotificationServiceExtension.appex */,
 				84077A28245A9053004186BE /* VirtualCardsExampleTests.xctest */,
 				5D3E18F62A981BA100344D9A /* VirtualCardsExampleUITests.xctest */,
 			);
@@ -797,6 +852,16 @@
 			path = VirtualCardsExample;
 			sourceTree = "<group>";
 		};
+		AD24FCDA2CF6EBF6008EB6F5 /* VirtualCardsExampleNotificationServiceExtension */ = {
+			isa = PBXGroup;
+			children = (
+				AD24FCDD2CF6EBF6008EB6F5 /* Info.plist */,
+				AD24FCDB2CF6EBF6008EB6F5 /* VirtualCardsExampleNotificationService.swift */,
+				AD24FCE52CF6ED2F008EB6F5 /* VirtualCardsExampleNotificationServiceExtension.entitlements */,
+			);
+			path = VirtualCardsExampleNotificationServiceExtension;
+			sourceTree = "<group>";
+		};
 		CB142D8F3C8CFF7109D665EA /* Pods */ = {
 			isa = PBXGroup;
 			children = (
@@ -809,6 +874,9 @@
 				FB8AEDE70B4424EB94FCA1BF /* Pods-VirtualCardsExample-VirtualCardsExampleUITests.release.xcconfig */,
 				253A996A156B1F3CEC3FDAF8 /* Pods-VirtualCardsExample.debug.xcconfig */,
 				B4276E24E9483A63E1DA551B /* Pods-VirtualCardsExample.release.xcconfig */,
+				92491609FF0C1171E38E3F2F /* Pods-VirtualCardsExampleNotificationServiceExtension-metadata.plist */,
+				F42DC4F648E730FA63086257 /* Pods-VirtualCardsExampleNotificationServiceExtension.debug.xcconfig */,
+				C86425C60044BD2C9CE226E5 /* Pods-VirtualCardsExampleNotificationServiceExtension.release.xcconfig */,
 				4B32DB80AE549C765467BBCC /* Pods-VirtualCardsExampleTests.debug.xcconfig */,
 				9B5886C6984D4604D2D0C653 /* Pods-VirtualCardsExampleTests.release.xcconfig */,
 				56D7F64E0E922284F695A4B1 /* Pods-VirtualCardsExampleUITests.debug.xcconfig */,
@@ -870,16 +938,36 @@
 				AB5B9DAD240EC5D100E4E5D8 /* Resources */,
 				AB93CAE6240F006C0065AF50 /* Copy Test Keys (Debug) */,
 				84077A33245A9719004186BE /* Swift Lint */,
+				AD24FCE12CF6EBF6008EB6F5 /* Embed Foundation Extensions */,
 				90DE2ACEFD81B1AA5A552C88 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				AD24FCDF2CF6EBF6008EB6F5 /* PBXTargetDependency */,
 			);
 			name = VirtualCardsExample;
 			productName = TelephonyTestApp;
 			productReference = AB5B9DAF240EC5D100E4E5D8 /* VirtualCardsExample.app */;
 			productType = "com.apple.product-type.application";
+		};
+		AD24FCD82CF6EBF6008EB6F5 /* VirtualCardsExampleNotificationServiceExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AD24FCE42CF6EBF6008EB6F5 /* Build configuration list for PBXNativeTarget "VirtualCardsExampleNotificationServiceExtension" */;
+			buildPhases = (
+				7065F420E9A2C3F742810F88 /* [CP] Check Pods Manifest.lock */,
+				AD24FCD52CF6EBF6008EB6F5 /* Sources */,
+				AD24FCD62CF6EBF6008EB6F5 /* Frameworks */,
+				AD24FCD72CF6EBF6008EB6F5 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = VirtualCardsExampleNotificationServiceExtension;
+			productName = VirtualCardsExampleNotificationServiceExtension;
+			productReference = AD24FCD92CF6EBF6008EB6F5 /* VirtualCardsExampleNotificationServiceExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
 
@@ -888,7 +976,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
-				LastSwiftUpdateCheck = 1430;
+				LastSwiftUpdateCheck = 1540;
 				LastUpgradeCheck = 1430;
 				ORGANIZATIONNAME = "Anonyome Labs";
 				TargetAttributes = {
@@ -902,6 +990,9 @@
 					};
 					AB5B9DAE240EC5D100E4E5D8 = {
 						CreatedOnToolsVersion = 11.3.1;
+					};
+					AD24FCD82CF6EBF6008EB6F5 = {
+						CreatedOnToolsVersion = 15.4;
 					};
 				};
 			};
@@ -921,6 +1012,7 @@
 				AB5B9DAE240EC5D100E4E5D8 /* VirtualCardsExample */,
 				84077A27245A9053004186BE /* VirtualCardsExampleTests */,
 				5D3E18F52A981BA100344D9A /* VirtualCardsExampleUITests */,
+				AD24FCD82CF6EBF6008EB6F5 /* VirtualCardsExampleNotificationServiceExtension */,
 			);
 		};
 /* End PBXProject section */
@@ -976,9 +1068,39 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		AD24FCD72CF6EBF6008EB6F5 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A75CE0C74C48C9CB0E0B6126 /* Pods-VirtualCardsExampleNotificationServiceExtension-metadata.plist in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		7065F420E9A2C3F742810F88 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-VirtualCardsExampleNotificationServiceExtension-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
 		84077A33245A9719004186BE /* Swift Lint */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
@@ -1162,6 +1284,7 @@
 				957E608D25395F860019D33A /* SudoIdentityVerificationClientMock.swift in Sources */,
 				957E608F253962460019D33A /* SudoIdentityVerificationClientSpy.swift in Sources */,
 				9545BF3F254654AB002CDE74 /* SudoListViewControllerTests.swift in Sources */,
+				ADE2B5DD2D092495007D6662 /* SudoNotificationClientMock.swift in Sources */,
 				957E60812539492C0019D33A /* SudoProfileClientMock.swift in Sources */,
 				957E6083253949770019D33A /* SudoVirtualCardsClientMock.swift in Sources */,
 				957E6085253949DE0019D33A /* SudoVirtualCardsClientSpy.swift in Sources */,
@@ -1179,6 +1302,7 @@
 			files = (
 				845A8B34247204E600FAFB42 /* ActivityAlertViewController.swift in Sources */,
 				957E6091253CFF510019D33A /* AppDelegate+isUnitTestRunning.swift in Sources */,
+				AD24FCEF2CF8187F008EB6F5 /* AppDelegate+UNUserNotificationCenter.swift in Sources */,
 				AB5B9DB3240EC5D100E4E5D8 /* AppDelegate.swift in Sources */,
 				8470C8EE245ACCB400439F92 /* AppDependencies.swift in Sources */,
 				AB93CADA240EF6FB0065AF50 /* Authenticator.swift in Sources */,
@@ -1196,6 +1320,7 @@
 				84403FEE245AB07600B2EBF2 /* CreateStripeCardFundingSourceViewController.swift in Sources */,
 				CF2571C32444EC0B0053334E /* CreateSudoViewController.swift in Sources */,
 				84309D3B2463891200F48ECC /* CurrencyAmount+Presentable.swift in Sources */,
+				AD24FCF12CF819D3008EB6F5 /* Data+Print.swift in Sources */,
 				84309D3D24638D3F00F48ECC /* Date+TransactionPresentable.swift in Sources */,
 				5D3A5BE52531CFAA006C7B30 /* DeclineReason+CustomStringConvertible.swift in Sources */,
 				957E6093253D53980019D33A /* FileReadable.swift in Sources */,
@@ -1224,6 +1349,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		AD24FCD52CF6EBF6008EB6F5 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AD24FCDC2CF6EBF6008EB6F5 /* VirtualCardsExampleNotificationService.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -1236,6 +1369,11 @@
 			isa = PBXTargetDependency;
 			target = AB5B9DAE240EC5D100E4E5D8 /* VirtualCardsExample */;
 			targetProxy = 84077A2D245A9053004186BE /* PBXContainerItemProxy */;
+		};
+		AD24FCDF2CF6EBF6008EB6F5 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = AD24FCD82CF6EBF6008EB6F5 /* VirtualCardsExampleNotificationServiceExtension */;
+			targetProxy = AD24FCDE2CF6EBF6008EB6F5 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -1406,7 +1544,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -1461,7 +1599,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
@@ -1477,16 +1615,18 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = VirtualCardsExample/VirtualCardsExample.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = UU2W43R8JA;
+				DEVELOPMENT_TEAM = 33X5MJEM2D;
 				INFOPLIST_FILE = VirtualCardsExample/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.sudoplatform.virtualcardsexample;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -1498,16 +1638,92 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = VirtualCardsExample/VirtualCardsExample.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = UU2W43R8JA;
+				DEVELOPMENT_TEAM = 33X5MJEM2D;
 				INFOPLIST_FILE = VirtualCardsExample/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.sudoplatform.virtualcardsexample;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		AD24FCE22CF6EBF6008EB6F5 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = F42DC4F648E730FA63086257 /* Pods-VirtualCardsExampleNotificationServiceExtension.debug.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = "$(inherited)";
+				CODE_SIGN_ENTITLEMENTS = VirtualCardsExampleNotificationServiceExtension/VirtualCardsExampleNotificationServiceExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 33X5MJEM2D;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = VirtualCardsExampleNotificationServiceExtension/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = VirtualCardsExampleNotificationServiceExtension;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2024 Anonyome Labs. All rights reserved.";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.sudoplatform.virtualcardsexample.VirtualCardsExampleNotificationServiceExtension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = NO;
+				STRIP_INSTALLED_PRODUCT = NO;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		AD24FCE32CF6EBF6008EB6F5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = C86425C60044BD2C9CE226E5 /* Pods-VirtualCardsExampleNotificationServiceExtension.release.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = "$(inherited)";
+				CODE_SIGN_ENTITLEMENTS = VirtualCardsExampleNotificationServiceExtension/VirtualCardsExampleNotificationServiceExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 33X5MJEM2D;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = VirtualCardsExampleNotificationServiceExtension/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = VirtualCardsExampleNotificationServiceExtension;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2024 Anonyome Labs. All rights reserved.";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.sudoplatform.virtualcardsexample.VirtualCardsExampleNotificationServiceExtension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = NO;
+				STRIP_INSTALLED_PRODUCT = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -1548,6 +1764,15 @@
 			buildConfigurations = (
 				AB5B9DC4240EC5D300E4E5D8 /* Debug */,
 				AB5B9DC5240EC5D300E4E5D8 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		AD24FCE42CF6EBF6008EB6F5 /* Build configuration list for PBXNativeTarget "VirtualCardsExampleNotificationServiceExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AD24FCE22CF6EBF6008EB6F5 /* Debug */,
+				AD24FCE32CF6EBF6008EB6F5 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

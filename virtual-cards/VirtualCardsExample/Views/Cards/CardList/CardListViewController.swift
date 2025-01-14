@@ -138,7 +138,12 @@ class CardListViewController: UIViewController, UITableViewDataSource, UITableVi
     /// - Parameters:
     ///   - cachePolicy: Cache policy used to retrieve the cards.
     func listCards(cachePolicy: SudoVirtualCards.CachePolicy) async throws -> [VirtualCard] {
-        let result = try await virtualCardsClient.listVirtualCards(withLimit: Defaults.cardListLimit, nextToken: nil, cachePolicy: cachePolicy)
+        let result = try await virtualCardsClient.listVirtualCards(
+            withFilter: nil,
+            sortOrder: nil,
+            withLimit: Defaults.cardListLimit,
+            nextToken: nil,
+            cachePolicy: cachePolicy)
         switch result {
         case .success(let success):
             return success.items

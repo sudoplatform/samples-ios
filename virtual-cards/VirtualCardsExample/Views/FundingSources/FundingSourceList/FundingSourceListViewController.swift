@@ -7,6 +7,7 @@
 import UIKit
 import SudoProfiles
 import SudoVirtualCards
+import SudoNotification
 
 /// This View Controller presents a list of `FundingSources`.
 ///
@@ -59,6 +60,8 @@ class FundingSourceListViewController: UIViewController, UITableViewDelegate, UI
     var virtualCardsClient: SudoVirtualCardsClient {
         return AppDelegate.dependencies.virtualCardsClient
     }
+    /// Notification client used to manage notification configuration
+    var notificationClient: SudoNotificationClient = AppDelegate.dependencies.notificationClient
 
     // MARK: - Lifecycle
 
@@ -115,6 +118,8 @@ class FundingSourceListViewController: UIViewController, UITableViewDelegate, UI
         cachePolicy: SudoVirtualCards.CachePolicy
     ) async throws -> [FundingSource] {
         return try await virtualCardsClient.listFundingSources(
+            withFilter: nil,
+            sortOrder: nil,
             withLimit: Defaults.fundingSourceLimit,
             nextToken: nil,
             cachePolicy: cachePolicy
@@ -253,6 +258,22 @@ class FundingSourceListViewController: UIViewController, UITableViewDelegate, UI
             let remoteFundingSource = try await listFundingSources(
                 cachePolicy: .remoteOnly
             )
+            var notifConfig = AppDelegate.dependencies.notificationConfiguration!
+            for fundingSource in remoteFundingSource {
+                var fundingSourceId: String
+                switch fundingSource {
+                case .creditCardFundingSource(let creditCardFundingSource):
+                    fundingSourceId = creditCardFundingSource.id
+                case .bankAccountFundingSource(let bankAccountFundingSource):
+                    fundingSourceId = bankAccountFundingSource.id
+                }
+                notifConfig = notifConfig.setVirtualCardsNotificationsForFundingSource(fundingSourceId: fundingSourceId, enabled: true)
+            }
+
+            let finalConfig = notifConfig
+            Task.detached(priority: .medium) {
+                await self.updateNotificationConfiguration(config: finalConfig)
+            }
 
             Task {
                 self.fundingSources = remoteFundingSource
@@ -476,5 +497,22 @@ class FundingSourceListViewController: UIViewController, UITableViewDelegate, UI
             }
         }
         return nil
+    }
+
+    func updateNotificationConfiguration(config: NotificationConfiguration) async {
+        let input = NotificationSettingsInput(
+            bundleId: AppDelegate.dependencies.deviceInfo.bundleId,
+            deviceId: AppDelegate.dependencies.deviceInfo.deviceId,
+            filter: config.configs,
+            services: [AppDelegate.dependencies.virtualCardsNotificationFilterClient.getSchema()])
+
+        do {
+            let updatedConfig = try await notificationClient.setNotificationConfiguration(config: input)
+            AppDelegate.dependencies.notificationConfiguration = updatedConfig
+        } catch {
+            NSLog("Error updating notification configuration \(error)")
+
+            presentErrorAlert(message: "Unable to update notification configuration: \(error.localizedDescription)", error: error)
+        }
     }
 }

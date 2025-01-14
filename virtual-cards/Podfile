@@ -8,28 +8,35 @@ use_modular_headers!
 inhibit_all_warnings!
 
 acknowledgementsFields = ['name', 'version', 'licenseType', 'licenseText', 'homepage']
-acknowledgementsExclude = ['SudoUser', 'SudoTelephony', 'SudoApiClient', 'SudoConfigManager', 'SudoKeyManager', 'SudoLogging', 'SudoOperations', 'SudoProfiles', 'SudoIdentityVerification', 'SudoVirtualCards']
+acknowledgementsExclude = ['SudoUser', 'SudoTelephony', 'SudoApiClient', 'SudoConfigManager', 'SudoKeyManager', 'SudoLogging', 'SudoOperations', 'SudoProfiles', 'SudoIdentityVerification', 'SudoVirtualCards', 'SudoNotification', 'SudoNotificationExtension', 'SudoVirtualCardsNotificationExtension']
 
 plugin 'cocoapods-acknowledgements', :fields => acknowledgementsFields, :exclude => acknowledgementsExclude
 
 # PhoneNumberKit has stopped publishing Cocoapods releases to Public Registry
 # This workaround enables application to get the releases straight from source repository 
 #
-# Needed by Frames
-pod 'PhoneNumberKit', :git => 'https://github.com/marmelroy/PhoneNumberKit'
+# Needed by Frames at a version previous to 4.0
+pod 'PhoneNumberKit', :git => 'https://github.com/marmelroy/PhoneNumberKit', :tag => '3.7.6'
 
 target 'VirtualCardsExample' do
     pod 'Plaid', '~> 4.2'
-    pod 'Stripe', '~> 22'
+    pod 'Stripe', '~> 23'
     pod 'Frames', '~> 4'
-    pod 'SudoUser', '~> 15.0'
-    pod 'SudoProfiles', '~> 17.0'
-    pod 'SudoEntitlements', '~> 9.0'
-    pod 'SudoIdentityVerification', '~> 14.0'
-    pod 'SudoVirtualCards', '~> 24.0.0'
+    pod 'SudoUser', '~> 16.0'
+    pod 'SudoProfiles', '~> 18.0'
+    pod 'SudoEntitlements', '~> 11.0'
+    pod 'SudoIdentityVerification', '~> 16.0'
+    pod 'SudoNotification', '~> 3.0'
+    pod 'SudoVirtualCards', '~> 26.1'
 
     target 'VirtualCardsExampleTests'
     target 'VirtualCardsExampleUITests'
+end
+
+target 'VirtualCardsExampleNotificationServiceExtension' do
+    pod 'SudoNotificationExtension', '~> 3.0'
+    pod 'SudoVirtualCardsNotificationExtension', '~> 26.1'
+
 end
 
 # Fix Xcode nagging warning on pod install/update

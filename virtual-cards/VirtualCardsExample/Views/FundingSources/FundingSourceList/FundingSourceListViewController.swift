@@ -258,7 +258,7 @@ class FundingSourceListViewController: UIViewController, UITableViewDelegate, UI
             let remoteFundingSource = try await listFundingSources(
                 cachePolicy: .remoteOnly
             )
-            var notifConfig = AppDelegate.dependencies.notificationConfiguration!
+            var notifConfig = AppDelegate.dependencies.notificationConfiguration
             for fundingSource in remoteFundingSource {
                 var fundingSourceId: String
                 switch fundingSource {
@@ -267,12 +267,15 @@ class FundingSourceListViewController: UIViewController, UITableViewDelegate, UI
                 case .bankAccountFundingSource(let bankAccountFundingSource):
                     fundingSourceId = bankAccountFundingSource.id
                 }
-                notifConfig = notifConfig.setVirtualCardsNotificationsForFundingSource(fundingSourceId: fundingSourceId, enabled: true)
+                if let validConfig = notifConfig {
+                    notifConfig = validConfig.setVirtualCardsNotificationsForFundingSource(fundingSourceId: fundingSourceId, enabled: true)
+                }
             }
 
-            let finalConfig = notifConfig
-            Task.detached(priority: .medium) {
-                await self.updateNotificationConfiguration(config: finalConfig)
+            if let finalConfig = notifConfig {
+                Task.detached(priority: .medium) {
+                    await self.updateNotificationConfiguration(config: finalConfig)
+                }
             }
 
             Task {

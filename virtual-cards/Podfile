@@ -27,7 +27,7 @@ target 'VirtualCardsExample' do
     pod 'SudoEntitlements', '~> 11.0'
     pod 'SudoIdentityVerification', '~> 16.0'
     pod 'SudoNotification', '~> 3.0'
-    pod 'SudoVirtualCards', '~> 26.1'
+    pod 'SudoVirtualCards', '~> 26.2'
 
     target 'VirtualCardsExampleTests'
     target 'VirtualCardsExampleUITests'

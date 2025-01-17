@@ -77,6 +77,12 @@ class TransactionDetailViewController: UIViewController, UITableViewDataSource, 
         dateFormatter.timeStyle = .none
         return dateFormatter
     }()
+    lazy var dateTimeFormatter: DateFormatter = {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateStyle = .short
+        dateFormatter.timeStyle = .medium
+        return dateFormatter
+    }()
 
     // MARK: - Properties: Computed
 
@@ -271,7 +277,14 @@ class TransactionDetailViewController: UIViewController, UITableViewDataSource, 
             default:
                 break
             }
-
+            if let transactedAt = detail.transactedAt {
+                let detailTransactedCellData = CellData(title: "Date charged", value: dateTimeFormatter.string(from: transactedAt))
+                cells.append(detailTransactedCellData)
+            }
+            if let settledAt = detail.settledAt {
+                let detailSettledCellData = CellData(title: "Date settled", value: dateTimeFormatter.string(from: settledAt))
+                cells.append(detailSettledCellData)
+            }
             let statusCellData = CellData(title: "Charge Status", value: String(describing: detail.state))
             cells.append(statusCellData)
             sections.append(cells)

@@ -120,7 +120,7 @@ PODS:
     - SudoConfigManager (~> 3.1)
     - SudoKeyManager (~> 2.0)
     - SudoLogging (~> 1.0)
-  - SudoVirtualCards (26.1.0):
+  - SudoVirtualCards (26.2.0):
     - AWSAppSync (~> 3.7.1)
     - AWSCore (~> 2.36.7)
     - SudoApiClient (~> 11.0)
@@ -129,7 +129,7 @@ PODS:
     - SudoLogging (~> 1.0)
     - SudoNotification (~> 3.0)
     - SudoUser (~> 16.0)
-  - SudoVirtualCardsNotificationExtension (26.1.0):
+  - SudoVirtualCardsNotificationExtension (26.2.0):
     - SudoLogging (~> 1.0)
     - SudoNotificationExtension (~> 3.0)
 
@@ -144,7 +144,7 @@ DEPENDENCIES:
   - SudoNotificationExtension (~> 3.0)
   - SudoProfiles (~> 18.0)
   - SudoUser (~> 16.0)
-  - SudoVirtualCards (~> 26.1)
+  - SudoVirtualCards (~> 26.2)
   - SudoVirtualCardsNotificationExtension (~> 26.1)
 
 SPEC REPOS:
@@ -232,9 +232,9 @@ SPEC CHECKSUMS:
   SudoNotificationExtension: 072409ad20baf32ceabb6403bd80a78f8888e122
   SudoProfiles: 36e05889376890715b3a7216f8099293ef0fa0a1
   SudoUser: e7f42d2bf7fcca0c1672c18c918a2694affb2bfe
-  SudoVirtualCards: 611d1b695271fb0c4e1be876b4454f1218b82c2d
-  SudoVirtualCardsNotificationExtension: d9e6602b9728757f9e97b82e64fa5d870f2a0993
+  SudoVirtualCards: 77c38b7d29c0ca3a4631a2f16251cec0d2e83cfb
+  SudoVirtualCardsNotificationExtension: 7c9d4c1427473e7383fc7ca2e84bba8f8075164d
 
-PODFILE CHECKSUM: c3e09f2227746bdba62d66e777345f302f85a6f0
+PODFILE CHECKSUM: 2331c19c833f6bf00bbd391cd53507b764de5e4b
 
 COCOAPODS: 1.16.2

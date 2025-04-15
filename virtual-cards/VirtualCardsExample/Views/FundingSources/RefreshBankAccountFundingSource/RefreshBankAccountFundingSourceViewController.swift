@@ -4,6 +4,8 @@
 // SPDX-License-Identifier: Apache-2.0
 //
 
+// swiftlint:disable type_name
+
 import Foundation
 import LinkKit
 import SudoVirtualCards
@@ -90,10 +92,6 @@ class RefreshBankAccountFundingSourceViewController: UIViewController {
         configureNavigationBar()
         setNavigationItemsEnabled(false)
         hideAuthorizationView(true)
-    }
-
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
     }
 
     // MARK: - Actions
@@ -257,3 +255,4 @@ class RefreshBankAccountFundingSourceViewController: UIViewController {
         checkBoxTextView.isHidden = isHidden
     }
 }
+// swiftlint:enable type_name

@@ -155,10 +155,7 @@ class IdentityVerificationViewController: UIViewController,
         configureNavigationBar()
         configureTableView()
         configureLearnMoreView()
-
-        Task {
-            await setVerifyButtonEnabled(false)
-        }
+        setVerifyButtonEnabled(false)
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -167,8 +164,8 @@ class IdentityVerificationViewController: UIViewController,
 
         // Once we know we're verified we don't have to check again
         if self.statusLabel?.text != VerificationStatus.verified.rawValue {
-            Task(priority: .medium) {
-                await self.fetchVerificationStatus()
+            Task {
+                await fetchVerificationStatus()
             }
         }
     }
@@ -198,19 +195,15 @@ class IdentityVerificationViewController: UIViewController,
     // MARK: - Operations
 
     /// Validates and verifies identity based on the view's form inputs.
-    func verifyUser() async {
-        Task {
-            view.endEditing(true)
-        }
+    @MainActor func verifyUser() async {
+        view.endEditing(true)
+
         guard validateFormData() else {
-            Task {
-                presentErrorAlert(message: "Please ensure all fields are filled out")
-            }
+            presentErrorAlert(message: "Please ensure all fields are filled out")
             return
         }
-
-        await self.setVerifyButtonEnabled(false)
-        self.presentActivityAlert(message: "Verifying identity")
+        setVerifyButtonEnabled(false)
+        presentActivityAlert(message: "Verifying identity")
 
         var address: String = formData[.address] ?? ""
         if let unitNumber = formData[.unitNumber], !unitNumber.isEmpty {
@@ -225,63 +218,47 @@ class IdentityVerificationViewController: UIViewController,
                 state: nil,
                 postalCode: formData[.zip] ?? "",
                 country: formData[.country] ?? "",
-                dateOfBirth: formData[.dateOfBirth] ?? "")
-
+                dateOfBirth: formData[.dateOfBirth] ?? ""
+            )
             let verifiedIdentity = try await verificationClient.verifyIdentity(input: input)
 
-            Task {
-                self.dismissActivityAlert {
-                    Task {
-                        if verifiedIdentity.verified {
-                            await self.presentAlert(title: "Verification complete", message: "Identity verified")
-                            self.statusLabel.text = VerificationStatus.verified.rawValue
-                        } else {
-                            await self.presentAlert(title: "Verification complete", message: "Identity not verified")
-                            self.statusLabel.text = VerificationStatus.unverified.rawValue
-                        }
-                    }
-                }
-            }
-        } catch {
-            Task {
-                self.dismissActivityAlert {
-                    Task {
-                        self.presentErrorAlert(message: "Failed to verify identity", error: error)
-                    }
-                }
-            }
-        }
-
-        await self.setVerifyButtonEnabled(true)
-    }
-
-    /// Lookup the verification status of the registered user
-    func fetchVerificationStatus() async {
-        await self.setVerifyButtonEnabled(false)
-        presentActivityAlert(message: "Checking status")
-        do {
-            let verifiedIdentity = try await verificationClient.checkIdentityVerification(option: QueryOption.remoteOnly)
-            // dismiss activity alert
-            Task {
+            dismissActivityAlert { [weak self] in
+                guard let self else { return }
                 if verifiedIdentity.verified {
+                    self.presentAlert(title: "Verification complete", message: "Identity verified")
                     self.statusLabel.text = VerificationStatus.verified.rawValue
                 } else {
+                    self.presentAlert(title: "Verification complete", message: "Identity not verified")
                     self.statusLabel.text = VerificationStatus.unverified.rawValue
                 }
             }
-
-            Task {
-                self.dismissActivityAlert()
-            }
         } catch {
-            Task {
-                self.statusLabel.text = VerificationStatus.unknown.rawValue
-                self.dismissActivityAlert()
-                self.presentErrorAlert(message: "Please ensure all fields are filled out", error: error)
+            dismissActivityAlert { [weak self] in
+                self?.presentErrorAlert(message: "Failed to verify identity", error: error)
             }
         }
+        setVerifyButtonEnabled(true)
+    }
 
-        await self.setVerifyButtonEnabled(true)
+    /// Lookup the verification status of the registered user
+    @MainActor func fetchVerificationStatus() async {
+        setVerifyButtonEnabled(false)
+        presentActivityAlert(message: "Checking status")
+        do {
+            let verifiedIdentity = try await verificationClient.checkIdentityVerification()
+            // dismiss activity alert
+            if verifiedIdentity.verified {
+                statusLabel.text = VerificationStatus.verified.rawValue
+            } else {
+                statusLabel.text = VerificationStatus.unverified.rawValue
+            }
+            dismissActivityAlert()
+        } catch {
+            statusLabel.text = VerificationStatus.unknown.rawValue
+            dismissActivityAlert()
+            presentErrorAlert(message: "Please ensure all fields are filled out", error: error)
+        }
+        setVerifyButtonEnabled(true)
     }
 
     // MARK: - Helpers: Configuration
@@ -322,8 +299,8 @@ class IdentityVerificationViewController: UIViewController,
     /// Sets the verify button in the navigation bar to enabled/disabled.
     ///
     /// - Parameter isEnabled: If true, the navigation verify button will be enabled.
-    func setVerifyButtonEnabled(_ isEnabled: Bool) async {
-        self.navigationItem.rightBarButtonItem?.isEnabled = isEnabled
+    func setVerifyButtonEnabled(_ isEnabled: Bool) {
+        navigationItem.rightBarButtonItem?.isEnabled = isEnabled
     }
 
     /// Validates the form data.

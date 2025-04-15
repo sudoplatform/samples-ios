@@ -59,8 +59,8 @@ class SudoListViewController: UIViewController, UITableViewDelegate, UITableView
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        Task(priority: .medium) {
-            await self.loadCacheSudosAndFetchRemote()
+        Task {
+            await loadCacheSudosAndFetchRemote()
         }
     }
 
@@ -83,8 +83,8 @@ class SudoListViewController: UIViewController, UITableViewDelegate, UITableView
     ///
     /// This action will ensure that the Sudo list is up to date when returning from views - e.g. `CreateSudoViewController`.
     @IBAction func returnToSudoList(segue: UIStoryboardSegue) {
-        Task(priority: .medium) {
-            await self.loadCacheSudosAndFetchRemote()
+        Task {
+            await loadCacheSudosAndFetchRemote()
         }
     }
 
@@ -93,22 +93,17 @@ class SudoListViewController: UIViewController, UITableViewDelegate, UITableView
     /// Delete a selected Sudo.
     ///
     /// - Parameter sudo: The selected Sudo to delete.
-    func deleteSudo(sudo: Sudo) async -> Bool {
-        Task {
-            self.presentActivityAlert(message: "Deleting Sudo")
-        }
+    @MainActor func deleteSudo(sudo: Sudo) async -> Bool {
+        presentActivityAlert(message: "Deleting Sudo")
         var status = false
         do {
-            _ = try await profilesClient.deleteSudo(sudo: sudo)
+            let input = SudoDeleteInput(sudoId: sudo.id, version: sudo.version)
+            _ = try await profilesClient.deleteSudo(input: input)
             status = true
-            Task {
-                self.dismissActivityAlert()
-            }
+            dismissActivityAlert()
         } catch {
-            Task {
-                self.dismissActivityAlert()
-                self.presentErrorAlert(message: "Failed to delete Sudo", error: error)
-            }
+            dismissActivityAlert()
+            presentErrorAlert(message: "Failed to delete Sudo", error: error)
         }
         return status
     }
@@ -125,23 +120,15 @@ class SudoListViewController: UIViewController, UITableViewDelegate, UITableView
     // MARK: - Helpers
 
     /// Attempts to load all Sudos from the device's cache first and then update via a remote call.
-    func loadCacheSudosAndFetchRemote() async {
+    @MainActor func loadCacheSudosAndFetchRemote() async {
         do {
-            let localSudos = try await self.profilesClient.listSudos(option: .cacheOnly)
-            Task {
-                self.sudos = localSudos
-                self.tableView.reloadData()
-            }
+            sudos = try await profilesClient.listSudos(cachePolicy: .cacheOnly)
+            tableView.reloadData()
 
-            let remoteSudos = try await self.profilesClient.listSudos(option: .remoteOnly)
-            Task {
-                self.sudos = remoteSudos
-                self.tableView.reloadData()
-            }
+            sudos = try await profilesClient.listSudos(cachePolicy: .remoteOnly)
+            tableView.reloadData()
         } catch {
-            Task {
-                presentErrorAlert(message: "Failed to list Sudos", error: error)
-            }
+            presentErrorAlert(message: "Failed to list Sudos", error: error)
         }
     }
 
@@ -191,27 +178,30 @@ class SudoListViewController: UIViewController, UITableViewDelegate, UITableView
     func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         if indexPath.row != sudos.count {
             let delete = UIContextualAction(style: .destructive, title: "Delete") { _, _, completion in
-                let sudo = self.sudos[indexPath.row]
-                Task(priority: .medium) {
-                    do {
-                        self.presentActivityAlert(message: "Deleting Sudo")
-                        try await self.profilesClient.deleteSudo(sudo: sudo)
-                        self.dismissActivityAlert()
-                        Task {
-                            self.sudos.remove(at: indexPath.row)
-                            self.tableView.deleteRows(at: [indexPath], with: .automatic)
-                        }
-                        completion(true)
-                    } catch {
-                        self.dismissActivityAlert()
-                        self.presentErrorAlert(message: "Failed to delete Sudo", error: error)
-                        completion(false)
-                    }
+                Task {
+                    await self.deleteSudoTapped(indexPath: indexPath, completion: completion)
                 }
             }
             delete.backgroundColor = .red
             return UISwipeActionsConfiguration(actions: [delete])
         }
         return nil
+    }
+
+    @MainActor func deleteSudoTapped(indexPath: IndexPath, completion: @escaping (Bool) -> Void) async {
+        let sudo = sudos[indexPath.row]
+        do {
+            presentActivityAlert(message: "Deleting Sudo")
+            let input = SudoDeleteInput(sudoId: sudo.id, version: sudo.version)
+            try await profilesClient.deleteSudo(input: input)
+            dismissActivityAlert()
+            sudos.remove(at: indexPath.row)
+            tableView.deleteRows(at: [indexPath], with: .automatic)
+            completion(true)
+        } catch {
+            dismissActivityAlert()
+            presentErrorAlert(message: "Failed to delete Sudo", error: error)
+            completion(false)
+        }
     }
 }

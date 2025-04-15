@@ -4,6 +4,8 @@
 // SPDX-License-Identifier: Apache-2.0
 //
 
+// swiftlint:disable type_name
+
 import UIKit
 import SudoVirtualCards
 import Stripe
@@ -411,3 +413,4 @@ class CreateStripeCardFundingSourceViewController: UIViewController,
             self.dismiss(animated: true, completion: completion)
     }
 }
+// swiftlint:enable type_name

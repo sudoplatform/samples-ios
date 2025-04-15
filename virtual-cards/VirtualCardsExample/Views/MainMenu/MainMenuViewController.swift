@@ -106,22 +106,18 @@ class MainMenuViewController: UIViewController, UITableViewDelegate, UITableView
         configureTableView()
     }
 
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-    }
-
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        Task(priority: .medium) {
+        Task { @MainActor in
             do {
-                _ = try await self.virtualCardsClient.createKeysIfAbsent()
+                _ = try await virtualCardsClient.createKeysIfAbsent()
             } catch {
                 do {
                     _ = try await AppDelegate.dependencies.userClient.refreshTokens()
                     _ = try await AppDelegate.dependencies.userClient.signInWithKey()
-                    _ = try await self.virtualCardsClient.createKeysIfAbsent()
+                    _ = try await virtualCardsClient.createKeysIfAbsent()
                 } catch {
-                    self.presentErrorAlert(message: "Failed to create keys", error: error)
+                    presentErrorAlert(message: "Failed to create keys", error: error)
                 }
             }
         }
@@ -146,27 +142,20 @@ class MainMenuViewController: UIViewController, UITableViewDelegate, UITableView
     // MARK: - Operations
 
     /// Perform de-registration from the Sudo user client and clear all local data.
-    func deregister() async {
-        Task {
-            self.presentActivityAlert(message: "Deregistering")
-        }
-
+    @MainActor func deregister() async {
+        presentActivityAlert(message: "Deregistering")
         do {
-            _ = try await authenticator.deregister()
-            try await self.authenticator.userClient.reset()
-            try self.profilesClient.reset()
-            try self.profilesClient.generateEncryptionKey()
-            try self.virtualCardsClient.reset()
+            try await authenticator.deregister()
+            try await authenticator.userClient.reset()
+            try await profilesClient.reset()
+            try profilesClient.generateEncryptionKey()
+            try await virtualCardsClient.reset()
 
-            Task {
-                self.dismissActivityAlert()
-                self.performSegue(withIdentifier: "returnToRegistration", sender: self)
-            }
+            dismissActivityAlert()
+            performSegue(withIdentifier: "returnToRegistration", sender: self)
         } catch {
-            Task {
-                self.dismissActivityAlert()
-                self.presentErrorAlert(message: "Failed to deregister", error: error)
-            }
+            dismissActivityAlert()
+            presentErrorAlert(message: "Failed to deregister", error: error)
         }
     }
 
@@ -177,7 +166,13 @@ class MainMenuViewController: UIViewController, UITableViewDelegate, UITableView
     /// Sets the left bar to a deregister button, which will execute the de-registration operation and sets the right bar to an info button which will
     /// display an informative alert.
     func configureNavigationBar() {
-        let deregisterBarButton = UIBarButtonItem(title: "Deregister", style: .plain, target: self, action: #selector(didTapDeregisterButton))
+        let deregisterBarButton = UIBarButtonItem(
+            title: "Deregister",
+            style: .plain,
+            target: self,
+            action: #selector(didTapDeregisterButton)
+        )
+        deregisterBarButton.tintColor = .red
         navigationItem.leftBarButtonItem = deregisterBarButton
 
         let infoButton = UIButton(type: .infoLight)

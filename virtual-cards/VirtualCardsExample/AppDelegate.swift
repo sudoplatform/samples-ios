@@ -5,8 +5,6 @@
 //
 
 import UIKit
-import AWSAppSync
-import SudoKeyManager
 import SudoUser
 import SudoProfiles
 import SudoIdentityVerification
@@ -60,26 +58,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         window = UIWindow(frame: UIScreen.main.bounds)
         window!.rootViewController = UIStoryboard(name: "Main", bundle: nil).instantiateInitialViewController()!
+        let navBarAppearance = UINavigationBarAppearance()
+        navBarAppearance.configureWithOpaqueBackground()
+        navBarAppearance.backgroundColor = .systemBackground
+
+        UINavigationBar.appearance().standardAppearance = navBarAppearance
+        UINavigationBar.appearance().scrollEdgeAppearance = navBarAppearance
+        UINavigationBar.appearance().compactAppearance = navBarAppearance
         window!.makeKeyAndVisible()
-        return true
-    }
-
-    func application(
-        _ application: UIApplication,
-        open url: URL,
-        didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
-    ) -> Bool {
-        Task(priority: .medium) {
-            do {
-                let urlProcessed = try await AppDelegate.dependencies.userClient.processFederatedSignInTokens(url: url)
-                if !urlProcessed {
-                    fatalError("Unable to process federated sign in tokens. Check federated sign in configuration")
-                }
-            } catch {
-                fatalError("\(error)")
-            }
-        }
-
         return true
     }
 

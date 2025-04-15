@@ -107,88 +107,16 @@ class TransactionDetailViewController: UIViewController, UITableViewDataSource, 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         guard inputTransaction != nil else {
-            Task {
-                await presentAlert(title: "Malformed transaction", message: "The transaction could not be loaded") { _ in
-                    self.navigationController?.popViewController(animated: true)
-                }
+            presentAlert(title: "Malformed transaction", message: "The transaction could not be loaded") { [weak self] _ in
+                self?.navigationController?.popViewController(animated: true)
             }
             return
         }
-        presentCancellableActivityAlert(message: "Loading Transaction", delegate: self) {
-            let owners = self.inputCard.owners
-            Task(priority: .medium) {
-                do {
-                    let transactions = try await self.listTransactions(withSequenceId: self.inputTransaction.sequenceId, cachePolicy: .remoteOnly)
-                    guard let fundingSource = try await self.virtualCardsClient.getFundingSource(
-                        withId: self.inputCard.fundingSourceId,
-                        cachePolicy: .remoteOnly
-                    ) else {
-                        throw TransactionDetailError.fundingSourceNotFound
-                    }
-
-                    let sudos = try await self.profilesClient.listSudos(option: .remoteOnly)
-                    guard let sudo = sudos.first(where: { sudo in
-                        return owners.contains { $0.id == sudo.id }
-                    }) else {
-                        throw TransactionDetailError.sudoNotFound
-                    }
-
-                    Task {
-                            guard let tableData = self.tableDataFromTransactions(
-                                transactions,
-                                sudo: sudo,
-                                fundingSource: fundingSource,
-                                card: self.inputCard
-                            ) else {
-                                Task {
-                                    self.presentErrorAlert(message: "The transaction could not be loaded") { _ in
-                                        Task {
-                                            self.navigationController?.popViewController(animated: true)
-                                        }
-                                    }
-                                }
-                                return
-                            }
-                            self.tableData = tableData
-                            self.tableView.reloadData()
-                    }
-
-                    self.dismissActivityAlert()
-                } catch {
-                    self.presentErrorAlert(message: "The transaction could not be loaded", error: error) { _ in
-                        Task {
-                            self.navigationController?.popViewController(animated: true)
-                        }
-                    }
-                }
+        presentCancellableActivityAlert(message: "Loading Transaction", delegate: self) { [weak self] in
+            guard let self else { return }
+            Task {
+                await self.fetchTransactions()
             }
-        }
-    }
-
-    // MARK: - Operations
-
-    /// List transactions from the virtual cards client.
-    ///
-    /// - Parameters:
-    ///   - sequenceId: Sequence Id of the related transactions to return.
-    ///   - cachePolicy: Cache policy used to retrieve the transactions.
-    ///   - success: Closure that executes on a successful retrieval of transactions.
-    ///   - failure: Closure that executes on an error during the retrieval of transactions.
-    func listTransactions(
-        withSequenceId sequenceId: String?,
-        cachePolicy: SudoVirtualCards.CachePolicy
-    ) async throws -> [Transaction] {
-        let result = try await virtualCardsClient.listTransactions(
-            withLimit: Defaults.transactionLimit,
-            nextToken: nil,
-            dateRange: nil,
-            sortOrder: nil,
-            cachePolicy: cachePolicy)
-        switch result {
-        case .success(let success):
-            return success.items
-        case .partial(let partial):
-            throw AnyError("Partial receieved: \(partial)")
         }
     }
 
@@ -203,6 +131,50 @@ class TransactionDetailViewController: UIViewController, UITableViewDataSource, 
     }
 
     // MARK: - Helpers
+
+    @MainActor func fetchTransactions() async {
+        do {
+            var transactions: [Transaction] = []
+            let result = try await virtualCardsClient.listTransactions(
+                withLimit: Defaults.transactionLimit,
+                nextToken: nil,
+                dateRange: nil,
+                sortOrder: nil
+            )
+            switch result {
+            case .success(let success):
+                transactions = success.items
+            case .partial(let partial):
+                throw AnyError("Partial receieved: \(partial)")
+            }
+            guard let fundingSource = try await virtualCardsClient.getFundingSource(withId: inputCard.fundingSourceId) else {
+                throw TransactionDetailError.fundingSourceNotFound
+            }
+            let sudos = try await profilesClient.listSudos(cachePolicy: .remoteOnly)
+            guard let sudo = sudos.first(where: { sudo in
+                return inputCard.owners.contains { $0.id == sudo.id }
+            }) else {
+                throw TransactionDetailError.sudoNotFound
+            }
+            guard let data = tableDataFromTransactions(
+                transactions,
+                sudo: sudo,
+                fundingSource: fundingSource,
+                card: inputCard
+            ) else {
+                throw AnyError("The transaction could not be loaded")
+            }
+            tableData = data
+            tableView.reloadData()
+            dismissActivityAlert()
+
+        } catch {
+            dismissActivityAlert()
+            presentErrorAlert(message: "Failed to fetch transactions", error: error) { [weak self] _ in
+                self?.navigationController?.popViewController(animated: true)
+            }
+        }
+    }
 
     func tableDataFromTransactions(
         _ transactions: [Transaction],
@@ -263,8 +235,8 @@ class TransactionDetailViewController: UIViewController, UITableViewDataSource, 
         for detail in transaction.detail {
             var cells: [CellData] = []
             let amountCellData = CellData(
-                    title: "Merchant Amount",
-                    value: detail.virtualCardAmount.presentableString)
+                title: "Merchant Amount",
+                value: detail.virtualCardAmount.presentableString)
             cells.append(amountCellData)
             switch transaction.type {
             case .complete, .pending:
@@ -372,7 +344,7 @@ class TransactionDetailViewController: UIViewController, UITableViewDataSource, 
     func didTapAlertCancelButton() {
         Task {
             dismissActivityAlert()
-            self.navigationController?.popViewController(animated: true)
+            navigationController?.popViewController(animated: true)
         }
     }
 }

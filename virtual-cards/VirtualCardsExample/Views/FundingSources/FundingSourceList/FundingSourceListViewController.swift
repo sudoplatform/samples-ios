@@ -73,9 +73,8 @@ class FundingSourceListViewController: UIViewController, UITableViewDelegate, UI
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-
-        Task(priority: .medium) {
-            await self.loadCacheFundingSourcesAndFetchRemote()
+        Task {
+            await fetchFundingSources()
         }
     }
 
@@ -101,51 +100,25 @@ class FundingSourceListViewController: UIViewController, UITableViewDelegate, UI
     ///
     /// This action will ensure that the funding source list is up to date when returning from views - e.g. `CreateFundingSourceViewController`.
     @IBAction func returnToFundingSourceList(segue: UIStoryboardSegue) {
-        Task(priority: .medium) {
-            await self.loadCacheFundingSourcesAndFetchRemote()
+        Task {
+            await fetchFundingSources()
         }
     }
 
     // MARK: - Operations
 
-    /// List funding sources from the virtual cards client.
-    ///
-    /// - Parameters:
-    ///   - cachePolicy: Cache policy used to retrieve the funding sources.
-    ///   - success: Closure that executes on a successful retrieval of funding sources.
-    ///   - failure: Closure that executes on an error during the retrieval of funding sources.
-    func listFundingSources(
-        cachePolicy: SudoVirtualCards.CachePolicy
-    ) async throws -> [FundingSource] {
-        return try await virtualCardsClient.listFundingSources(
-            withFilter: nil,
-            sortOrder: nil,
-            withLimit: Defaults.fundingSourceLimit,
-            nextToken: nil,
-            cachePolicy: cachePolicy
-        ).items
-    }
-
     /// Cancel a funding source based on the input id.
     ///
     /// - Parameter id: The id of the funding source to cancel.
-    func cancelFundingSource(id: String) async throws -> FundingSource {
-        Task {
-            self.presentActivityAlert(message: "Cancelling funding source")
-        }
-
+    @MainActor func cancelFundingSource(id: String) async throws -> FundingSource {
+        presentActivityAlert(message: "Cancelling funding source")
         do {
             let fundingSource = try await virtualCardsClient.cancelFundingSource(withId: id)
-            Task {
-                self.dismissActivityAlert()
-            }
-
+            dismissActivityAlert()
             return fundingSource
         } catch {
-            Task {
-                self.dismissActivityAlert()
-                self.presentErrorAlert(message: "Failed to cancel funding source", error: error)
-            }
+            dismissActivityAlert()
+            presentErrorAlert(message: "Failed to cancel funding source", error: error)
             throw error
         }
     }
@@ -153,23 +126,16 @@ class FundingSourceListViewController: UIViewController, UITableViewDelegate, UI
     /// Review a funding source based on the input id.
     ///
     /// - Parameter id: The id of the funding source to cancel.
-    func reviewUnfundedFundingSource(id: String) async throws -> FundingSource {
-        Task {
-            self.presentActivityAlert(message: "Reviewing unfunded funding source")
-        }
+    @MainActor func reviewUnfundedFundingSource(id: String) async throws -> FundingSource {
+        presentActivityAlert(message: "Reviewing unfunded funding source")
 
         do {
             let fundingSource = try await virtualCardsClient.reviewUnfundedFundingSource(withId: id)
-            Task {
-                self.dismissActivityAlert()
-            }
-
+            dismissActivityAlert()
             return fundingSource
         } catch {
-            Task {
-                self.dismissActivityAlert()
-                self.presentErrorAlert(message: "Failed to review funding source", error: error)
-            }
+            dismissActivityAlert()
+            presentErrorAlert(message: "Failed to review funding source", error: error)
             throw error
         }
     }
@@ -177,49 +143,40 @@ class FundingSourceListViewController: UIViewController, UITableViewDelegate, UI
     /// Refresh a funding source based on the input id.
     ///
     /// - Parameter id: The id of the funding source to refresh.
-    func refreshFundingSource(id: String) async throws -> FundingSource {
-        Task {
-            self.presentActivityAlert(message: "Refreshing funding source")
-        }
+    @MainActor func refreshFundingSource(id: String) async throws -> FundingSource {
+        presentActivityAlert(message: "Refreshing funding source")
         let refreshData = CheckoutBankAccountRefreshDataInput(accountId: nil, authorizationText: nil)
         do {
             fundingSourceId = id
             let input = RefreshFundingSourceInput(
-                    id: id,
-                    refreshData: .checkoutBankAccount(refreshData),
-                    applicationData: ClientApplicationData(applicationName: "iosApplication"),
-                    language: "en-US")
+                id: id,
+                refreshData: .checkoutBankAccount(refreshData),
+                applicationData: ClientApplicationData(applicationName: "iosApplication"),
+                language: "en-US"
+            )
             let fundingSource = try await virtualCardsClient.refreshFundingSource(withInput: input)
-            Task {
-                self.dismissActivityAlert()
-            }
+            dismissActivityAlert()
             return fundingSource
         } catch {
             // We want to catch the specific UserInteractionRequired error
             // and get the information from it to pass to the refreshBankAccountFundingSourceViewController
             // which will then jump through the plaid and authorization text interactions to complete the refresh.
             guard let sudoVirtualCardsError = error as? SudoVirtualCardsError else {
-                Task {
-                    self.dismissActivityAlert()
-                    self.presentErrorAlert(message: "Failed to refresh funding source", error: error)
-                }
+                dismissActivityAlert()
+                presentErrorAlert(message: "Failed to refresh funding source", error: error)
                 throw error
             }
             var handled = false
-            if case let .fundingSourceRequiresUserInteraction(userInteractionData) = sudoVirtualCardsError {
-                if case let .checkoutBankAccount(bankAccountInteractionData) = userInteractionData {
-                    linkToken = bankAccountInteractionData.linkToken
-                    authorizationText = bankAccountInteractionData.authorizationText
-
-                    performSegue(withIdentifier: Segue.navigateToRefreshBankAccountFundingSourceView.rawValue, sender: self)
-                    handled = true
-                }
+            if case let .fundingSourceRequiresUserInteraction(userInteractionData) = sudoVirtualCardsError,
+               case let .checkoutBankAccount(bankAccountInteractionData) = userInteractionData {
+                linkToken = bankAccountInteractionData.linkToken
+                authorizationText = bankAccountInteractionData.authorizationText
+                performSegue(withIdentifier: Segue.navigateToRefreshBankAccountFundingSourceView.rawValue, sender: self)
+                handled = true
             }
-            Task {
-                self.dismissActivityAlert()
-                if !handled {
-                    self.presentErrorAlert(message: "Unexpected sudoplatform error from service", error: error)
-                }
+            dismissActivityAlert()
+            if !handled {
+                self.presentErrorAlert(message: "Unexpected sudoplatform error from service", error: error)
             }
             throw error
         }
@@ -228,8 +185,7 @@ class FundingSourceListViewController: UIViewController, UITableViewDelegate, UI
     // MARK: - Helpers: Configuration
 
     func configureNavigationBar() {
-        navigationItem.backBarButtonItem = UIBarButtonItem(
-            title: "Back", style: .plain, target: nil, action: nil)
+        navigationItem.backBarButtonItem = UIBarButtonItem(title: "Back", style: .plain, target: nil, action: nil)
     }
 
     /// Configures the table view used to display the navigation elements.
@@ -241,25 +197,21 @@ class FundingSourceListViewController: UIViewController, UITableViewDelegate, UI
 
     // MARK: - Helpers
 
-    /// Attempts to load all funding sources from the device's cache first and then update via a remote call.
+    /// Attempts to load all funding sources via a remote call.
     ///
-    /// On any failure, either by cache or remote call,  a "Failed to list funding sources" UIAlert message will be presented to the user.
-    func loadCacheFundingSourcesAndFetchRemote() async {
+    /// On any failure,  a "Failed to list funding sources" UIAlert message will be presented to the user.
+    @MainActor func fetchFundingSources() async {
         do {
-            let localFundingSource = try await listFundingSources(
-                cachePolicy: .cacheOnly
-            )
+            fundingSources = try await virtualCardsClient.listFundingSources(
+                withFilter: nil,
+                sortOrder: nil,
+                withLimit: Defaults.fundingSourceLimit,
+                nextToken: nil
+            ).items
+            tableView.reloadData()
 
-            Task {
-                self.fundingSources = localFundingSource
-                self.tableView.reloadData()
-            }
-
-            let remoteFundingSource = try await listFundingSources(
-                cachePolicy: .remoteOnly
-            )
             var notifConfig = AppDelegate.dependencies.notificationConfiguration
-            for fundingSource in remoteFundingSource {
+            for fundingSource in fundingSources {
                 var fundingSourceId: String
                 switch fundingSource {
                 case .creditCardFundingSource(let creditCardFundingSource):
@@ -271,21 +223,11 @@ class FundingSourceListViewController: UIViewController, UITableViewDelegate, UI
                     notifConfig = validConfig.setVirtualCardsNotificationsForFundingSource(fundingSourceId: fundingSourceId, enabled: true)
                 }
             }
-
             if let finalConfig = notifConfig {
-                Task.detached(priority: .medium) {
-                    await self.updateNotificationConfiguration(config: finalConfig)
-                }
-            }
-
-            Task {
-                self.fundingSources = remoteFundingSource
-                self.tableView.reloadData()
+                await updateNotificationConfiguration(config: finalConfig)
             }
         } catch {
-            Task {
-                self.presentErrorAlert(message: "Failed to list Funding Sources", error: error)
-            }
+            presentErrorAlert(message: "Failed to list Funding Sources", error: error)
         }
     }
 
@@ -327,8 +269,8 @@ class FundingSourceListViewController: UIViewController, UITableViewDelegate, UI
 
         if fundingSource .unfundedAmount != nil {
             let unfundedAmountDisplay = "\(Double(fundingSource.unfundedAmount!.amount) / 100.0) \(fundingSource.unfundedAmount!.currency)"
-                    internalSuffix += " \(unfundedAmountDisplay)"
-                }
+            internalSuffix += " \(unfundedAmountDisplay)"
+        }
         return internalSuffix
     }
 
@@ -415,27 +357,8 @@ class FundingSourceListViewController: UIViewController, UITableViewDelegate, UI
             var actions: [UIContextualAction] = []
             if canCancel {
                 let cancel = UIContextualAction(style: .destructive, title: "Cancel") { _, _, completion in
-                    let fundingSource = self.fundingSources[indexPath.row]
-
-                    Task(priority: .medium) {
-                        do {
-                            var cancelledFundingSource: FundingSource
-                            switch fundingSource {
-                            case .creditCardFundingSource(let creditCardFundingSource):
-                                cancelledFundingSource = try await self.cancelFundingSource(id: creditCardFundingSource.id)
-                            case .bankAccountFundingSource(let bankAccountFundingSource):
-                                cancelledFundingSource = try await self.cancelFundingSource(id: bankAccountFundingSource.id)
-                            }
-                            Task {
-                                self.fundingSources.remove(at: indexPath.row)
-                                self.fundingSources.insert(cancelledFundingSource, at: indexPath.row)
-                                let cell = self.tableView.cellForRow(at: indexPath)
-                                cell?.textLabel?.text = self.getDisplayTitleForFundingSource(cancelledFundingSource)
-                                completion(true)
-                            }
-                        } catch {
-                            completion(false)
-                        }
+                    Task {
+                        await self.cancelFundingSourceTapped(indexPath: indexPath, completion: completion)
                     }
                 }
                 cancel.backgroundColor = .red
@@ -443,25 +366,8 @@ class FundingSourceListViewController: UIViewController, UITableViewDelegate, UI
             }
             if canReview {
                 let review = UIContextualAction(style: .destructive, title: "Review") { _, _, completion in
-                    let fundingSource = self.fundingSources[indexPath.row]
-                    switch fundingSource {
-                    case .creditCardFundingSource:
-                        break
-                    case .bankAccountFundingSource(let bankAccountFundingSource):
-                        Task(priority: .medium) {
-                            do {
-                                let  reviewedFundingSource = try await self.reviewUnfundedFundingSource(id: bankAccountFundingSource.id)
-                                Task {
-                                    self.fundingSources.remove(at: indexPath.row)
-                                    self.fundingSources.insert(reviewedFundingSource, at: indexPath.row)
-                                    let cell = self.tableView.cellForRow(at: indexPath)
-                                    cell?.textLabel?.text = self.getDisplayTitleForFundingSource(reviewedFundingSource)
-                                    completion(true)
-                                }
-                            } catch {
-                                completion(false)
-                            }
-                        }
+                    Task {
+                        await self.cancelFundingSourceTapped(indexPath: indexPath, completion: completion)
                     }
                 }
                 review.backgroundColor = .red
@@ -469,27 +375,8 @@ class FundingSourceListViewController: UIViewController, UITableViewDelegate, UI
             }
             if canRefresh {
                 let refresh = UIContextualAction(style: .destructive, title: "Refresh") { _, _, completion in
-                    let fundingSource = self.fundingSources[indexPath.row]
-
-                    Task(priority: .medium) {
-                        do {
-                            var refreshedFundingSource: FundingSource
-                            switch fundingSource {
-                            case .creditCardFundingSource(let creditCardFundingSource):
-                                refreshedFundingSource = try await self.refreshFundingSource(id: creditCardFundingSource.id)
-                            case .bankAccountFundingSource(let bankAccountFundingSource):
-                                refreshedFundingSource = try await self.refreshFundingSource(id: bankAccountFundingSource.id)
-                            }
-                            Task {
-                                self.fundingSources.remove(at: indexPath.row)
-                                self.fundingSources.insert(refreshedFundingSource, at: indexPath.row)
-                                let cell = self.tableView.cellForRow(at: indexPath)
-                                cell?.textLabel?.text = self.getDisplayTitleForFundingSource(refreshedFundingSource)
-                                completion(true)
-                            }
-                        } catch {
-                            completion(false)
-                        }
+                    Task {
+                        await self.refreshFundingSourceTapped(indexPath: indexPath, completion: completion)
                     }
                 }
                 refresh.backgroundColor = .orange
@@ -502,7 +389,62 @@ class FundingSourceListViewController: UIViewController, UITableViewDelegate, UI
         return nil
     }
 
-    func updateNotificationConfiguration(config: NotificationConfiguration) async {
+    @MainActor func cancelFundingSourceTapped(indexPath: IndexPath, completion: @escaping (Bool) -> Void) async {
+        do {
+            var cancelledFundingSource: FundingSource
+            switch fundingSources[indexPath.row] {
+            case .creditCardFundingSource(let creditCardFundingSource):
+                cancelledFundingSource = try await cancelFundingSource(id: creditCardFundingSource.id)
+            case .bankAccountFundingSource(let bankAccountFundingSource):
+                cancelledFundingSource = try await cancelFundingSource(id: bankAccountFundingSource.id)
+            }
+            fundingSources.remove(at: indexPath.row)
+            fundingSources.insert(cancelledFundingSource, at: indexPath.row)
+            let cell = tableView.cellForRow(at: indexPath)
+            cell?.textLabel?.text = getDisplayTitleForFundingSource(cancelledFundingSource)
+            completion(true)
+        } catch {
+            completion(false)
+        }
+    }
+
+    @MainActor func reviewFundingSourceTapped(indexPath: IndexPath, completion: @escaping (Bool) -> Void) async {
+        guard case .bankAccountFundingSource(let bankAccountFundingSource) = fundingSources[indexPath.row] else {
+            completion(false)
+            return
+        }
+        do {
+            let  reviewedFundingSource = try await reviewUnfundedFundingSource(id: bankAccountFundingSource.id)
+            fundingSources.remove(at: indexPath.row)
+            fundingSources.insert(reviewedFundingSource, at: indexPath.row)
+            let cell = tableView.cellForRow(at: indexPath)
+            cell?.textLabel?.text = getDisplayTitleForFundingSource(reviewedFundingSource)
+            completion(true)
+        } catch {
+            completion(false)
+        }
+    }
+
+    @MainActor func refreshFundingSourceTapped(indexPath: IndexPath, completion: @escaping (Bool) -> Void) async {
+        do {
+            var refreshedFundingSource: FundingSource
+            switch fundingSources[indexPath.row] {
+            case .creditCardFundingSource(let creditCardFundingSource):
+                refreshedFundingSource = try await refreshFundingSource(id: creditCardFundingSource.id)
+            case .bankAccountFundingSource(let bankAccountFundingSource):
+                refreshedFundingSource = try await refreshFundingSource(id: bankAccountFundingSource.id)
+            }
+            fundingSources.remove(at: indexPath.row)
+            fundingSources.insert(refreshedFundingSource, at: indexPath.row)
+            let cell = tableView.cellForRow(at: indexPath)
+            cell?.textLabel?.text = getDisplayTitleForFundingSource(refreshedFundingSource)
+            completion(true)
+        } catch {
+            completion(false)
+        }
+    }
+
+    @MainActor func updateNotificationConfiguration(config: NotificationConfiguration) async {
         let input = NotificationSettingsInput(
             bundleId: AppDelegate.dependencies.deviceInfo.bundleId,
             deviceId: AppDelegate.dependencies.deviceInfo.deviceId,
@@ -514,7 +456,6 @@ class FundingSourceListViewController: UIViewController, UITableViewDelegate, UI
             AppDelegate.dependencies.notificationConfiguration = updatedConfig
         } catch {
             NSLog("Error updating notification configuration \(error)")
-
             presentErrorAlert(message: "Unable to update notification configuration: \(error.localizedDescription)", error: error)
         }
     }

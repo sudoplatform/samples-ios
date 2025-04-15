@@ -31,8 +31,6 @@ ${PROJECT_DIR}/config/register_key.private
 ${PROJECT_DIR}/config/register_key.id
 ```
 
-4. Run `pod install` from the project root
-
 5. Build the app
 
 ## More Documentation

@@ -47,21 +47,21 @@ class RegistrationViewController: UIViewController {
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        self.navigationController?.setNavigationBarHidden(true, animated: animated)
+        navigationController?.setNavigationBarHidden(true, animated: animated)
     }
 
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        self.navigationController?.setNavigationBarHidden(false, animated: animated)
+        navigationController?.setNavigationBarHidden(false, animated: animated)
     }
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
 
         // Sign in automatically if the user is registered.
-        Task(priority: .medium) {
-            if try await self.userClient.isRegistered() {
-                self.registerButtonTapped()
+        Task { @MainActor in
+            if try await userClient.isRegistered() {
+                registerButtonTapped()
             }
         }
     }
@@ -78,21 +78,16 @@ class RegistrationViewController: UIViewController {
     @IBAction func registerButtonTapped() {
         activityIndicator.startAnimating()
         registerButton.isEnabled = false
-
-        Task(priority: .medium) {
+        Task { @MainActor in
             do {
-                try await self.registerAndSignIn()
-                Task {
-                    self.activityIndicator.stopAnimating()
-                    self.registerButton.isEnabled = true
-                    self.navigateToMainMenu()
-                }
+                try await registerAndSignIn()
+                activityIndicator.stopAnimating()
+                registerButton.isEnabled = true
+                navigateToMainMenu()
             } catch {
-                Task {
-                    await self.showSignInFailureAlert(error: error) {
-                        self.activityIndicator.stopAnimating()
-                        self.registerButton.isEnabled = true
-                    }
+                await showSignInFailureAlert(error: error) { [weak self] in
+                    self?.activityIndicator.stopAnimating()
+                    self?.registerButton.isEnabled = true
                 }
             }
         }
@@ -102,39 +97,30 @@ class RegistrationViewController: UIViewController {
 
     /// Perform registration and sign in from the Sudo user client.
     func registerAndSignIn(retry: Bool = true) async throws {
-
-        func redeem() async throws {
-            _ = try await self.entitlementsClient.redeemEntitlements()
+        if !(try await userClient.isRegistered()) {
+            try await authenticator.register()
         }
-
-        func signIn() async throws {
-            if !(try await self.userClient.isSignedIn()) {
-                _ = try await self.userClient.signInWithKey()
-                _ = try await redeem()
+        do {
+            _ = try await signIn()
+        } catch SudoUserClientError.notAuthorized {
+            if retry {
+                try await userClient.reset()
+                try await registerAndSignIn(retry: false)
+            } else {
+                throw SudoUserClientError.notAuthorized
             }
         }
+    }
 
-        if userClient.getSupportedRegistrationChallengeType().contains(.fsso) {
-            guard let viewControllerWindow = self.view.window else {
-                return
-            }
+    func redeem() async throws {
+        _ = try await entitlementsClient.redeemEntitlements()
+    }
 
-            _ = try await userClient.presentFederatedSignInUI(presentationAnchor: viewControllerWindow)
+    func signIn() async throws {
+        if !(try await userClient.isSignedIn()) {
+            try await userClient.signOut()
+            _ = try await userClient.signInWithKey()
             _ = try await redeem()
-        } else {
-            if !(try await userClient.isRegistered()) {
-                try await authenticator.register()
-            }
-            do {
-                _ = try await signIn()
-            } catch SudoUserClientError.notAuthorized {
-                if retry {
-                    try await userClient.reset()
-                    try await registerAndSignIn(retry: false)
-                } else {
-                    throw SudoUserClientError.notAuthorized
-                }
-            }
         }
     }
 

@@ -14,7 +14,6 @@ final class VirtualCardsExampleUITests: XCTestCase {
     static var verified = false
     static var supportedFundingSourcesKnown = false
     static var stripeCardSupported = false
-    static var checkoutCardSupported = false
     static var checkoutBankAccountSupported = false
 
     class func deregister() {
@@ -143,13 +142,11 @@ final class VirtualCardsExampleUITests: XCTestCase {
             
             let finishedLoadingFundingSourceConfigration = NSPredicate { _, _ in !self.app.alerts.staticTexts["Loading funding source configuration"].exists}
             let addStripeCardAppeared = NSPredicate { _, _ in self.app.staticTexts["Add Stripe Credit Card"].exists}
-            let addCheckoutCardAppeared = NSPredicate { _, _ in self.app.staticTexts["Add Checkout Credit Card"].exists}
             let addCheckoutBankAccountAppeared = NSPredicate { _, _ in self.app.staticTexts["Add Checkout Bank Account"].exists}
             
             let fundingSourceTypesDisplayed = NSCompoundPredicate(
                 orPredicateWithSubpredicates: [
                     addStripeCardAppeared,
-                    addCheckoutCardAppeared,
                     addCheckoutBankAccountAppeared
                 ]
             )
@@ -160,7 +157,6 @@ final class VirtualCardsExampleUITests: XCTestCase {
                  timeout: 25)
             
             VirtualCardsExampleUITests.stripeCardSupported = self.app.staticTexts["Add Stripe Credit Card"].exists
-            VirtualCardsExampleUITests.checkoutCardSupported = self.app.staticTexts["Add Checkout Credit Card"].exists
             VirtualCardsExampleUITests.checkoutBankAccountSupported = self.app.staticTexts["Add Checkout Bank Account"].exists
 
             VirtualCardsExampleUITests.supportedFundingSourcesKnown = true
@@ -170,53 +166,7 @@ final class VirtualCardsExampleUITests: XCTestCase {
 
         XCTAssertTrue(VirtualCardsExampleUITests.supportedFundingSourcesKnown, "support funding sources must be known on exit from here")
 
-        XCTAssertTrue(VirtualCardsExampleUITests.stripeCardSupported || VirtualCardsExampleUITests.checkoutCardSupported || VirtualCardsExampleUITests.checkoutBankAccountSupported, "At least one of stripe card (\(VirtualCardsExampleUITests.stripeCardSupported)), checkout card (\(VirtualCardsExampleUITests.checkoutCardSupported)) or checkout bank account (\(VirtualCardsExampleUITests.checkoutBankAccountSupported)) must be supported")
-    }
-
-    /// Fill Checkout.com payment form with specified card details. Expiry is entered as 4 years from current month
-    func enterCheckoutCardDetails(cardNumber: String, securityCode: String) {
-        // Element hierarchy determined by recording
-
-        let cardNumberInput = app.scrollViews.otherElements.otherElements["CardNumberInput"].children(matching: .other).element.children(matching: .other).element(boundBy: 2).children(matching: .other).element(boundBy: 1).children(matching: .other).element
-
-        let expiryDateInput = app.scrollViews.otherElements.otherElements["ExpiryDateInput"].children(matching: .other).element.children(matching: .other).element(boundBy: 2).children(matching: .other).element.children(matching: .other).element
-
-        let securityCodeInput = app.scrollViews.otherElements.otherElements["CardSecurityCodeInput"].children(matching: .other).element.children(matching: .other).element(boundBy: 2).children(matching: .other).element.children(matching: .other).element
-
-        let doneButton = app.toolbars["Toolbar"].buttons["Done"]
-
-        // When entering the card details, we type on the key board
-        // since the input fields are addressable as the text fields
-        // and cannot be filled
-
-        cardNumberInput.tap()
-        typeOnKeyboard(cardNumber)
-        doneButton.tap()
-        
-        let calendar = Calendar(identifier: .gregorian)
-        let expiry = Date(timeIntervalSinceNow: 3600*24*365*4)
-        let expiryComponents = calendar.dateComponents([.year,.month], from: expiry)
-        
-        expiryDateInput.tap()
-        typeOnKeyboard(String(format: "%02d", expiryComponents.month!))
-        typeOnKeyboard(String(format: "%02d", expiryComponents.year! % 100))
-        doneButton.tap()
-
-        securityCodeInput.tap()
-        typeOnKeyboard(securityCode)
-        doneButton.tap()
-    }
-
-    /// Complete Checkout.com 3DS authentication challenge
-    func performCheckout3DSAuthentication() {
-        // Element hierarchy determined by recording
-        let webViewsQuery = app.webViews.webViews.webViews
-        let hintCheckout1SecureTextField = webViewsQuery/*@START_MENU_TOKEN@*/.secureTextFields["Hint: Checkout1!"]/*[[".otherElements[\"3DS2 Challenge\"]",".otherElements[\"cko-3ds2-iframe\"].secureTextFields[\"Hint: Checkout1!\"]",".secureTextFields[\"Hint: Checkout1!\"]"],[[[-1,2],[-1,1],[-1,0,1]],[[-1,2],[-1,1]]],[0]]@END_MENU_TOKEN@*/
-        XCTAssertTrue(hintCheckout1SecureTextField.waitForExistence(timeout: 30))
-        hintCheckout1SecureTextField.tap()
-        hintCheckout1SecureTextField.tap()
-        hintCheckout1SecureTextField.typeText("Checkout1!")
-        webViewsQuery/*@START_MENU_TOKEN@*/.buttons["Continue"]/*[[".otherElements[\"3DS2 Challenge\"]",".otherElements[\"cko-3ds2-iframe\"].buttons[\"Continue\"]",".buttons[\"Continue\"]"],[[[-1,2],[-1,1],[-1,0,1]],[[-1,2],[-1,1]]],[0]]@END_MENU_TOKEN@*/.tap()
+        XCTAssertTrue(VirtualCardsExampleUITests.stripeCardSupported || VirtualCardsExampleUITests.checkoutBankAccountSupported, "At least one of stripe card (\(VirtualCardsExampleUITests.stripeCardSupported)) or checkout bank account (\(VirtualCardsExampleUITests.checkoutBankAccountSupported)) must be supported")
     }
 
     func test_registrationSucceeds() throws {
@@ -226,56 +176,5 @@ final class VirtualCardsExampleUITests: XCTestCase {
     func test_verificationSucceeds() throws {
         try register()
         try verify()
-    }
-    
-    func test_createCheckoutCardNo3DSFundingSource() throws {
-        try register()
-        try verify()
-
-        try discoverSupportedFundingSources()
-        try XCTSkipIf(!VirtualCardsExampleUITests.checkoutCardSupported, "Checkout card not supported")
-
-        app/*@START_MENU_TOKEN@*/.staticTexts["Funding Sources"]/*[[".cells.staticTexts[\"Funding Sources\"]",".staticTexts[\"Funding Sources\"]"],[[[-1,1],[-1,0]]],[0]]@END_MENU_TOKEN@*/.tap()
-        app/*@START_MENU_TOKEN@*/.staticTexts["Create Funding Source"]/*[[".cells.staticTexts[\"Create Funding Source\"]",".staticTexts[\"Create Funding Source\"]"],[[[-1,1],[-1,0]]],[0]]@END_MENU_TOKEN@*/.tap()
-
-        let checkingStatusWaiter = XCTWaiter()
-        checkingStatusWaiter.wait(for: [XCTNSPredicateExpectation(predicate: NSPredicate(format: "exists == 0"), object: app.alerts.staticTexts["Loading funding source configuration"])], timeout: 25)
-
-        app/*@START_MENU_TOKEN@*/.staticTexts["Add Checkout Credit Card"]/*[[".cells.staticTexts[\"Add Checkout Credit Card\"]",".staticTexts[\"Add Checkout Credit Card\"]"],[[[-1,1],[-1,0]]],[0]]@END_MENU_TOKEN@*/.tap()
-        
-        enterCheckoutCardDetails(
-            cardNumber: "4532432452900131",
-            securityCode: "257"
-        )
-
-        app.buttons["Create funding source"].tap()
-        XCTAssertTrue(app.staticTexts["••••0131 (CREDIT)"].waitForExistence(timeout: 60))
-    }
-
-    func test_createCheckoutCard3DSFundingSource() throws {
-        try register()
-        try verify()
-
-        try discoverSupportedFundingSources()
-        try XCTSkipIf(!VirtualCardsExampleUITests.checkoutCardSupported, "Checkout card not supported")
-
-        app/*@START_MENU_TOKEN@*/.staticTexts["Funding Sources"]/*[[".cells.staticTexts[\"Funding Sources\"]",".staticTexts[\"Funding Sources\"]"],[[[-1,1],[-1,0]]],[0]]@END_MENU_TOKEN@*/.tap()
-        app/*@START_MENU_TOKEN@*/.staticTexts["Create Funding Source"]/*[[".cells.staticTexts[\"Create Funding Source\"]",".staticTexts[\"Create Funding Source\"]"],[[[-1,1],[-1,0]]],[0]]@END_MENU_TOKEN@*/.tap()
-
-        let checkingStatusWaiter = XCTWaiter()
-        checkingStatusWaiter.wait(for: [XCTNSPredicateExpectation(predicate: NSPredicate(format: "exists == 0"), object: app.alerts.staticTexts["Loading funding source configuration"])], timeout: 25)
-
-        app/*@START_MENU_TOKEN@*/.staticTexts["Add Checkout Credit Card"]/*[[".cells.staticTexts[\"Add Checkout Credit Card\"]",".staticTexts[\"Add Checkout Credit Card\"]"],[[[-1,1],[-1,0]]],[0]]@END_MENU_TOKEN@*/.tap()
-        
-        enterCheckoutCardDetails(
-            cardNumber: "4242424242424242",
-            securityCode: "100"
-        )
-
-        app.buttons["Create funding source"].tap()
-
-        performCheckout3DSAuthentication()
-        
-        XCTAssertTrue(app.staticTexts["••••4242 (CREDIT)"].waitForExistence(timeout: 60))
     }
 }

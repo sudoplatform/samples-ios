@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="21701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="jCt-oS-cEr">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="32700.99.1234" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="jCt-oS-cEr">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21679"/>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22685"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -155,7 +156,6 @@
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="RgK-zb-fRH" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
-                <exit id="nAD-Mi-VZb" userLabel="Exit" sceneMemberID="exit"/>
             </objects>
             <point key="canvasLocation" x="2300" y="1095.5357142857142"/>
         </scene>
@@ -181,11 +181,9 @@
                     <connections>
                         <segue destination="MZg-xF-Kw9" kind="show" identifier="navigateToAddStripeCreditCard" id="ZwU-Pm-3ls"/>
                         <segue destination="PnC-NQ-vo8" kind="show" identifier="navigateToAddCheckoutBankAccount" id="SaE-3X-HWz"/>
-                        <segue destination="xg0-z6-vJ6" kind="show" identifier="navigateToAddCheckoutCreditCard" id="x5T-7V-tDC"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Fac-41-0bj" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
-                <exit id="h1x-dq-ij1" userLabel="Exit" sceneMemberID="exit"/>
             </objects>
             <point key="canvasLocation" x="3133" y="1096"/>
         </scene>
@@ -217,9 +215,11 @@
             <objects>
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="jCt-oS-cEr" sceneMemberID="viewController">
                     <toolbarItems/>
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="PKp-ut-No9">
+                    <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" translucent="NO" prompted="NO"/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translucent="NO" id="PKp-ut-No9">
                         <rect key="frame" x="0.0" y="48" width="414" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
+                        <navigationBarAppearance key="standardAppearance"/>
                     </navigationBar>
                     <nil name="viewControllers"/>
                     <connections>
@@ -243,20 +243,6 @@
                 <exit id="YV3-tI-iQk" userLabel="Exit" sceneMemberID="exit"/>
             </objects>
             <point key="canvasLocation" x="3919" y="1821"/>
-        </scene>
-        <!--Create Checkout Card Funding Source-->
-        <scene sceneID="fsD-lp-bms">
-            <objects>
-                <viewController storyboardIdentifier="createCheckoutCardFundingSource" id="xg0-z6-vJ6" userLabel="Create Checkout Card Funding Source" customClass="CreateCheckoutCardFundingSourceViewController" customModule="VirtualCardsExample" customModuleProvider="target" sceneMemberID="viewController">
-                    <navigationItem key="navigationItem" title="Title" id="o5a-HU-8ug" userLabel="Create Funding Source"/>
-                    <connections>
-                        <segue destination="h1x-dq-ij1" kind="unwind" identifier="returnToCreateFundingSourceMenu" unwindAction="returnToCreateFundingSourceMenuWithSegue:" id="VTR-tH-kG0"/>
-                        <segue destination="nAD-Mi-VZb" kind="unwind" identifier="returnToFundingSourceList" unwindAction="returnToFundingSourceListWithSegue:" id="HOb-Aw-4vQ"/>
-                    </connections>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="sd6-zY-LFJ" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="3910" y="2516"/>
         </scene>
         <!--Refresh Bank Account Funding Source-->
         <scene sceneID="nYS-jm-fV6">

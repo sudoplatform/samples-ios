@@ -56,7 +56,7 @@ extension UIViewController {
     }
 
     /// Presents a `UIAlertController` presenting with the `title` and `message`.
-    func presentAlert(title: String, message: String, confirm: UIAlertActionHandler? = nil) async {
+    func presentAlert(title: String, message: String, confirm: UIAlertActionHandler? = nil) {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
         let okAction = UIAlertAction(title: "OK", style: .default, handler: confirm)
         alert.addAction(okAction)

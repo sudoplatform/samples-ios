@@ -89,10 +89,6 @@ class CreateCheckoutBankAccountFSVC: UIViewController {
         hideAuthorizationView(true)
     }
 
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-    }
-
     // MARK: - Actions
 
     /// Action associated with tapping the "Launch Plaid Link" button.

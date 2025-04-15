@@ -5,6 +5,7 @@
 //
 
 import Foundation
+import UIKit
 import SudoVirtualCards
 import SudoUser
 import SudoEntitlements
@@ -79,17 +80,13 @@ struct AppDependencies {
     init() throws {
         // Setup UserClient
         let userClient = try DefaultSudoUserClient(keyNamespace: "ids")
-
-        let storageURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-
         let keyManager = LegacySudoKeyManager(serviceName: "com.sudoplatform.appservicename", keyTag: "com.sudoplatform", namespace: "vcs")
-
         let virtualCardsNotificationFilterClient = DefaultSudoVirtualCardsNotificationFilterClient()
 
         self.init(
             userClient: userClient,
             entitlementsClient: try DefaultSudoEntitlementsClient(userClient: userClient),
-            profilesClient: try DefaultSudoProfilesClient(sudoUserClient: userClient, blobContainerURL: storageURL),
+            profilesClient: try DefaultSudoProfilesClient(sudoUserClient: userClient),
             identityVerificationClient: try DefaultSudoIdentityVerificationClient(sudoUserClient: userClient),
             keyManager: keyManager,
             authenticator: Authenticator(userClient: userClient, keyManager: keyManager),

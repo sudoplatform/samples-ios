@@ -6,7 +6,6 @@
 
 import Foundation
 import UserNotifications
-import SudoNotification
 
 extension AppDelegate: UNUserNotificationCenterDelegate {
     // MARK: - UNUserNotificationCenterDelegate methods

@@ -48,16 +48,8 @@ class CreateSudoViewController: UIViewController, LearnMoreViewDelegate {
         super.viewDidLoad()
         configureNavigationBar()
         configureLearnMoreView()
-
-        Task {
-            await createButtonShouldBeEnabled(self.labelTextField)
-        }
-
+        createButtonShouldBeEnabled(labelTextField)
         labelTextField.addTarget(self, action: #selector(textFieldDidChange(_:)), for: UIControl.Event.editingChanged)
-    }
-
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
     }
 
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -80,43 +72,31 @@ class CreateSudoViewController: UIViewController, LearnMoreViewDelegate {
     /// This action will enable the "Create" button on the navigation bar.
     @objc func textFieldDidChange(_ textField: UITextField) {
         // enable create button when textfield is not empty
-        Task {
-            await createButtonShouldBeEnabled(textField)
-        }
+        createButtonShouldBeEnabled(textField)
     }
 
     /// Action associated with tapping the "Create" button on the navigation bar.
     ///
     /// This action will initiate the sequence of  creating a Sudo via the `profilesClient`.
     @objc func didTapCreateSudoButton() {
-        Task(priority: .medium) {
-            await self.createSudo()
+        Task {
+            await createSudo()
         }
     }
 
     // MARK: - Operations
 
     /// Creates a Sudo based on the view's form inputs.
-    func createSudo() async {
-        Task {
-            self.presentActivityAlert(message: "Creating sudo")
-        }
+    @MainActor func createSudo() async {
+        presentActivityAlert(message: "Creating sudo")
         do {
-            let sudo = Sudo(title: nil, firstName: nil, lastName: nil, label: labelTextField.text, notes: nil, avatar: nil)
-            let createdSudo = try await profilesClient.createSudo(sudo: sudo)
-
-            Task {
-                self.sudo = createdSudo
-                self.dismissActivityAlert()
-                self.performSegue(
-                    withIdentifier: Segue.navigateToCardList.rawValue,
-                    sender: self)
-            }
+            let input = SudoCreateInput(label: labelTextField.text)
+            sudo = try await profilesClient.createSudo(input: input)
+            dismissActivityAlert()
+            performSegue(withIdentifier: Segue.navigateToCardList.rawValue, sender: self)
         } catch {
-            Task {
-                self.dismiss(animated: true)
-                self.presentErrorAlert(message: "Failed to create sudo", error: error)
-            }
+            dismissActivityAlert()
+            presentErrorAlert(message: "Failed to create sudo", error: error)
         }
     }
 
@@ -141,7 +121,7 @@ class CreateSudoViewController: UIViewController, LearnMoreViewDelegate {
     // MARK: - Helpers
 
     /// Sets the create button in the navigation bar to enabled/disabled.
-    func createButtonShouldBeEnabled(_ textField: UITextField) async {
+    func createButtonShouldBeEnabled(_ textField: UITextField) {
         let isEnabled = !(textField.text?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ?? true)
         navigationItem.rightBarButtonItem?.isEnabled = isEnabled
     }

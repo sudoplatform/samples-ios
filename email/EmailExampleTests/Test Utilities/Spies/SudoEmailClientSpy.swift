@@ -102,6 +102,22 @@ class SudoEmailClientSpy: SudoEmailClient {
         return deleteEmailMessagesResult!
     }
 
+    var deleteMessagesForFolderIdCalled: Bool = false
+    var deleteMessagesForFolderIdParameter: SudoEmail.DeleteMessagesForFolderIdInput?
+    var deleteMessagesForFolderIdWillThrow: Bool = false
+    var deleteMessagesForFolderIdResult: String?
+    func deleteMessagesForFolderId(withInput input: SudoEmail.DeleteMessagesForFolderIdInput) async throws -> String {
+        deleteMessagesForFolderIdCalled = true
+        deleteMessagesForFolderIdParameter = input
+        if deleteMessagesForFolderIdWillThrow {
+            throw AnyError("Test generated error")
+        }
+        if deleteMessagesForFolderIdResult == nil {
+            throw AnyError("Please add base result to `SudoEmailClientSpy.deleteMessagesForFolderId`")
+        }
+        return deleteMessagesForFolderIdResult!
+    }
+
     var updateEmailMessagesCalled: Bool = false
     var updateEmailMessagesParameter: SudoEmail.UpdateEmailMessagesInput?
     var updateEmailMessagesWillThrow: Bool = false
@@ -293,48 +309,27 @@ class SudoEmailClientSpy: SudoEmailClient {
         return DataFactory.EmailSDK.generateConfigurationData()
     }
 
+    var subscribeCalledTimes = 0
+    var subscribeParameters: [(id: String, notificationType: SudoEmail.SubscriptionNotificationType, subscriber: any SudoEmail.Subscriber)] = []
+    var subscribeShouldConnect: Bool = true
+    func subscribe(id: String, notificationType: SudoEmail.SubscriptionNotificationType, subscriber: any SudoEmail.Subscriber) async throws {
+        subscribeCalledTimes += 1
+        subscribeParameters.append((id: id, notificationType: notificationType, subscriber: subscriber))
+        if subscribeShouldConnect == true {
+            subscriber.connectionStatusChanged(state: .connected)
+        }
+    }
+
+    var unsubscribeCalled: Bool = false
+    var unsubscribeIdParameter: String?
+    func unsubscribe(id: String) async {
+        unsubscribeIdParameter = id
+        unsubscribeCalled = true
+    }
+
     var unsubscribeAllCalled: Bool = false
     func unsubscribeAll() {
         unsubscribeAllCalled = true
-    }
-
-    var subscribeToEmailMessageCreatedCalled: Bool = false
-    var subscribeToEmailMessageCreatedParameters: (
-        withDirection: EmailMessage.Direction?, resultHandler: ClientCompletion<EmailMessage>
-    )?
-    func subscribeToEmailMessageCreated(
-        withDirection direction: EmailMessage.Direction?,
-        resultHandler: @escaping ClientCompletion<EmailMessage>
-    ) async throws -> SubscriptionToken? {
-        subscribeToEmailMessageCreatedCalled = true
-        subscribeToEmailMessageCreatedParameters = (direction, resultHandler)
-        return MockSubscriptionToken()
-    }
-
-    var subscribeToEmailMessageDeletedCalled: Bool = false
-    var subscribeToEmailMessageDeletedParameters: (
-        id: String?, resultHandler: ClientCompletion<EmailMessage>?
-    )
-    func subscribeToEmailMessageDeleted(
-        withId id: String?,
-        resultHandler: @escaping ClientCompletion<EmailMessage>
-    ) async throws -> SubscriptionToken? {
-        subscribeToEmailMessageDeletedCalled = true
-        subscribeToEmailMessageDeletedParameters = (id: id, resultHandler: resultHandler)
-        return MockSubscriptionToken()
-    }
-
-    var subscribeToEmailMessageUpdatedCalled: Bool = false
-    var subscribeToEmailMessageUpdatedParameters: (
-        id: String?, resultHandler: ClientCompletion<EmailMessage>?
-    )
-    func subscribeToEmailMessageUpdated(
-        withId id: String?,
-        resultHandler: @escaping ClientCompletion<EmailMessage>
-    ) async throws -> (any SudoEmail.SubscriptionToken)? {
-        subscribeToEmailMessageUpdatedCalled = true
-        subscribeToEmailMessageUpdatedParameters = (id: id, resultHandler: resultHandler)
-        return MockSubscriptionToken()
     }
 
     var checkEmailAddressAvailabilityCalled: Bool = false
@@ -420,14 +415,12 @@ class SudoEmailClientSpy: SudoEmailClient {
     }
 
     var getSupportedEmailDomainsCalled: Bool = false
-    var getSupportedEmailDomainsParameter: SudoEmail.CachePolicy?
     var getSupportedEmailDomainsResult: [String]?
     var getSupportedEmailDomainsError = AnyError(
         "Please add base result to `SudoEmailClientSpy.getSupportedEmailDomains`"
     )
-    func getSupportedEmailDomains(_ cachePolicy: CachePolicy) async throws -> [String] {
+    func getSupportedEmailDomains() async throws -> [String] {
         getSupportedEmailDomainsCalled = true
-        getSupportedEmailDomainsParameter = cachePolicy
 
         if getSupportedEmailDomainsResult != nil {
             return getSupportedEmailDomainsResult!
@@ -436,14 +429,12 @@ class SudoEmailClientSpy: SudoEmailClient {
     }
 
     var getConfiguredEmailDomainsCalled: Bool = false
-    var getConfiguredEmailDomainsParameter: SudoEmail.CachePolicy?
     var getConfiguredEmailDomainsResult: [String]?
     var getConfiguredEmailDomainsError = AnyError(
         "Please add base result to `SudoEmailClientSpy.getConfiguredEmailDomains`"
     )
-    func getConfiguredEmailDomains(_ cachePolicy: CachePolicy) async throws -> [String] {
+    func getConfiguredEmailDomains() async throws -> [String] {
         getConfiguredEmailDomainsCalled = true
-        getConfiguredEmailDomainsParameter = cachePolicy
 
         if getConfiguredEmailDomainsResult != nil {
             return getConfiguredEmailDomainsResult!
@@ -452,14 +443,14 @@ class SudoEmailClientSpy: SudoEmailClient {
     }
 
     var getEmailAddressCalled: Bool = false
-    var getEmailAddressParameters: (id: String, cachePolicy: SudoEmail.CachePolicy?)?
+    var getEmailAddressIdParameter: String?
     var getEmailAddressResult: EmailAddress?
     var getEmailAddressError = AnyError(
         "Please add base result to `SudoEmailClientSpy.getEmailAddress`"
     )
     func getEmailAddress(withInput input: GetEmailAddressInput) async throws -> EmailAddress? {
         getEmailAddressCalled = true
-        getEmailAddressParameters = (id: input.id, cachePolicy: input.cachePolicy)
+        getEmailAddressIdParameter = input.id
 
         if getEmailAddressResult != nil {
             return getEmailAddressResult!
@@ -487,7 +478,7 @@ class SudoEmailClientSpy: SudoEmailClient {
 
     var getEmailMessageCalled: Bool = false
     var getEmailMessageCallCount = 0
-    var getEmailMessageParameters: [(id: String, cachePolicy: SudoEmail.CachePolicy?)]? = []
+    var getEmailMessageIdParameter: String?
     var getEmailMessageResult: EmailMessage?
     var getEmailMessageError = AnyError(
         "Please add base result to `SudoEmailClientSpy.getEmailMessage`"
@@ -497,7 +488,7 @@ class SudoEmailClientSpy: SudoEmailClient {
     func getEmailMessage(withInput input: GetEmailMessageInput) async throws -> EmailMessage? {
         getEmailMessageCalled = true
         getEmailMessageCallCount += 1
-        getEmailMessageParameters?.append((id: input.id, cachePolicy: input.cachePolicy))
+        getEmailMessageIdParameter = input.id
 
         if getEmailMessageResult != nil {
             return getEmailMessageResult!
@@ -589,6 +580,57 @@ class SudoEmailClientSpy: SudoEmailClient {
         }
         throw updateCustomEmailFolderError
     }
+
+    var scheduleSendDraftMessageCalled: Bool = false
+    var scheduleSendDraftMessageParameter: SudoEmail.ScheduleSendDraftMessageInput?
+    var scheduleSendDraftMessageResult: SudoEmail.ScheduledDraftMessage?
+    var scheduleSendDraftMessageError = AnyError(
+        "Please add base result to `SudoEmailClientSpy.scheduleSendDraftMessage`"
+    )
+    func scheduleSendDraftMessage(withInput input: SudoEmail.ScheduleSendDraftMessageInput) async throws -> SudoEmail.ScheduledDraftMessage {
+        scheduleSendDraftMessageCalled = true
+        scheduleSendDraftMessageParameter = input
+
+        if let scheduleSendDraftMessageResult = scheduleSendDraftMessageResult {
+            return scheduleSendDraftMessageResult
+        }
+        throw scheduleSendDraftMessageError
+    }
+    
+    var cancelScheduledDraftMessageCalled: Bool = false
+    var cancelScheduledDraftMessageParameter: SudoEmail.CancelScheduledDraftMessageInput?
+    var cancelScheduledDraftMessageResult: String?
+    var cancelScheduledDraftMessageError = AnyError(
+        "Please add base result to `SudoEmailClientSpy.cancelScheduledDraftMessage`"
+    )
+    func cancelScheduledDraftMessage(withInput input: SudoEmail.CancelScheduledDraftMessageInput) async throws -> String {
+        cancelScheduledDraftMessageCalled = true
+        cancelScheduledDraftMessageParameter = input
+
+        if let cancelScheduledDraftMessageResult = cancelScheduledDraftMessageResult {
+            return cancelScheduledDraftMessageResult
+        }
+        throw cancelScheduledDraftMessageError
+    }
+    
+    var listScheduledDraftMessagesForEmailAddressIdCalled: Bool = false
+    var listScheduledDraftMessagesForEmailAddressIdParameter: SudoEmail.ListScheduledDraftMessagesForEmailAddressIdInput?
+    var listScheduledDraftMessagesForEmailAddressIdResult: SudoEmail.ListOutput<SudoEmail.ScheduledDraftMessage>?
+    var listScheduledDraftMessagesForEmailAddressIdError = AnyError(
+        "Please add base result to `SudoEmailClientSpy.listScheduledDraftMessagesForEmailAddressId`"
+    ) 
+    func listScheduledDraftMessagesForEmailAddressId(
+        withInput input: SudoEmail.ListScheduledDraftMessagesForEmailAddressIdInput
+    ) async throws -> SudoEmail.ListOutput<SudoEmail.ScheduledDraftMessage> {
+        listScheduledDraftMessagesForEmailAddressIdCalled = true
+        listScheduledDraftMessagesForEmailAddressIdParameter = input
+
+        if let listScheduledDraftMessagesForEmailAddressIdResult = listScheduledDraftMessagesForEmailAddressIdResult {
+            return listScheduledDraftMessagesForEmailAddressIdResult
+        }
+        throw listScheduledDraftMessagesForEmailAddressIdError
+    }
+    
 
     var resetCalled: Bool = false
     func reset() throws {

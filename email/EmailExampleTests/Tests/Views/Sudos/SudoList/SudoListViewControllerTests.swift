@@ -7,7 +7,7 @@
 import XCTest
 import UIKit
 import SudoEmail
-import SudoProfiles
+@testable import SudoProfiles
 @testable import EmailExample
 
 class SudoListViewControllerTests: XCTestCase {
@@ -22,16 +22,6 @@ class SudoListViewControllerTests: XCTestCase {
     @MainActor
     override func setUp() async throws {
         testUtility = EmailExampleTestUtility()
-        testUtility.profilesClient.listSudosResult = [
-            .init(
-            title: "dummySudo",
-            firstName: "first",
-            lastName: "last",
-            label: SudoProfilesClientMock.sudoLabel,
-            notes: nil,
-            avatar: nil
-        )
-        ]
         instanceUnderTest = testUtility.storyBoard.instantiateViewController(identifier: "sudoList")
         instanceUnderTest.loadViewIfNeeded()
         testUtility.window.rootViewController = instanceUnderTest
@@ -70,11 +60,11 @@ class SudoListViewControllerTests: XCTestCase {
     }
 
     @MainActor
-    func test_SudoListViewDeleteSudoPropagatesError() async {
+    func test_SudoListViewDeleteSudoPropagatesError() async throws {
         instanceUnderTest.viewWillAppear(true)
-        let testSudo = Sudo()
-        let result = await instanceUnderTest.deleteSudo(sudo: testSudo)
-        XCTAssertFalse(result, "expected delete sudo to fail")
+        let testSudo = Sudo(id: "id", claims: [], metadata: [:], createdAt: Date(), updatedAt: Date(), version: 0)
+        let status = await instanceUnderTest.deleteSudo(sudo: testSudo)
+        XCTAssertFalse(status)
     }
 
     @MainActor
@@ -82,7 +72,7 @@ class SudoListViewControllerTests: XCTestCase {
         testUtility.profilesClient.deleteSudoFailure = false
         instanceUnderTest.viewWillAppear(true)
         await waitForAsyncNoFail()
-        let testSudo = Sudo()
+        let testSudo = Sudo(id: "id", claims: [], metadata: [:], createdAt: Date(), updatedAt: Date(), version: 0)
         let result = await instanceUnderTest.deleteSudo(sudo: testSudo)
         XCTAssertTrue(result, "expected delete sudo to succeed")
     }

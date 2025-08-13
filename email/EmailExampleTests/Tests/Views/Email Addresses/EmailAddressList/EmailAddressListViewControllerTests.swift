@@ -7,7 +7,7 @@
 import XCTest
 import UIKit
 import SudoEmail
-import SudoProfiles
+@testable import SudoProfiles
 @testable import EmailExample
 
 class EmailAddressListViewControllerTests: XCTestCase {
@@ -17,15 +17,26 @@ class EmailAddressListViewControllerTests: XCTestCase {
     var testUtility: EmailExampleTestUtility!
     var instanceUnderTest: EmailAddressListViewController!
 
+    var sudo = Sudo(id: "UnitTestSudoId", claims: [
+        Claim(
+         name: Sudo.ClaimName.label,
+         value: .string(value: "UnitTestSudoLabel"),
+         sudoId: "UnitTestSudoId",
+         version: 1,
+         algorithm: .aesCBCPKCS7Padding,
+         keyId: UUID().uuidString
+        )
+     ], metadata: [:], createdAt: Date(), updatedAt: Date(), version: 0)
+
+    var sudoWithNoLabel = Sudo(id: "UnitTestSudoId", claims: [], metadata: [:], createdAt: Date(), updatedAt: Date(), version: 0)
+
     // MARK: - Lifecycle
 
     @MainActor
     override func setUp() {
         testUtility = EmailExampleTestUtility()
         instanceUnderTest = testUtility.storyBoard.instantiateViewController(identifier: "emailAddressList")
-        instanceUnderTest.sudo = Sudo()
-        instanceUnderTest.sudo.label = "UnitTestSudoLabel"
-        instanceUnderTest.sudo.id = testUtility.emailClient.sudoId
+        instanceUnderTest.sudo = sudo
         instanceUnderTest.loadViewIfNeeded()
         testUtility.window.rootViewController = instanceUnderTest
         testUtility.window.makeKeyAndVisible()
@@ -49,24 +60,13 @@ class EmailAddressListViewControllerTests: XCTestCase {
 
     @MainActor
     func test_viewWillAppear_ErrorIsDisplayedForNoSudoLabel() async throws {
-        instanceUnderTest.sudo.label = nil
+        instanceUnderTest.sudo = sudoWithNoLabel
         instanceUnderTest.viewWillAppear(false)
         try await waitForAsync()
         let presentedAlert = instanceUnderTest.presentedViewController as? UIAlertController
         XCTAssertEqual(presentedAlert?.title, "Error")
         XCTAssertEqual(presentedAlert?.actions.first?.title, "OK")
         XCTAssertEqual(presentedAlert?.message, "An error has occurred: no sudo label found")
-    }
-
-    @MainActor
-    func test_viewWillAppear_ErrorIsDisplayedForNoSudoId() async throws {
-        instanceUnderTest.sudo.id = nil
-        instanceUnderTest.viewWillAppear(false)
-        try await waitForAsync()
-        let presentedAlert = instanceUnderTest.presentedViewController as? UIAlertController
-        XCTAssertEqual(presentedAlert?.title, "Error")
-        XCTAssertEqual(presentedAlert?.actions.first?.title, "OK")
-        XCTAssertEqual(presentedAlert?.message, "An error has occurred: no sudo id found")
     }
 
     @MainActor

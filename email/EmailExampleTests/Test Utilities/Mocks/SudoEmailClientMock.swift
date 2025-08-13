@@ -5,7 +5,6 @@
 //
 
 import Foundation
-import AWSAppSync
 import SudoUser
 import SudoProfiles
 import SudoEmail

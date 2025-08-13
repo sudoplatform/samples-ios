@@ -51,7 +51,7 @@ class EmailAddressListViewController: UIViewController, UITableViewDataSource, U
     var sudoLabelText: String = ""
 
     /// `Sudo` that was selected from the previous view. Used to filter email addresses and provision a new email address.
-    var sudo: Sudo = Sudo()
+    var sudo: Sudo?
 
     /// A list of `EmailAddresses` that are associated with the `sudoId`.
     var emailAddresses: [EmailAddress] = []
@@ -72,7 +72,7 @@ class EmailAddressListViewController: UIViewController, UITableViewDataSource, U
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        guard let sudoLabel = sudo.label, !sudoLabel.isEmpty else {
+        guard let sudoLabel = sudo?.label, !sudoLabel.isEmpty else {
             presentErrorAlert(
                 message: "An error has occurred: no sudo label found",
                 okHandler: { _ in
@@ -81,7 +81,7 @@ class EmailAddressListViewController: UIViewController, UITableViewDataSource, U
             )
             return
         }
-        guard let sudoId = sudo.id, !sudoId.isEmpty else {
+        guard let sudoId = sudo?.id, !sudoId.isEmpty else {
             presentErrorAlert(
                 message: "An error has occurred: no sudo id found",
                 okHandler: { _ in
@@ -127,11 +127,8 @@ class EmailAddressListViewController: UIViewController, UITableViewDataSource, U
 
     // MARK: - Operations
 
-    func listEmailAddresses(
-        cachePolicy: SudoEmail.CachePolicy
-    ) async throws -> [EmailAddress] {
+    func listEmailAddresses() async throws -> [EmailAddress] {
         let listEmailAddressesInput = ListEmailAddressesInput(
-            cachePolicy: cachePolicy,
             limit: Defaults.emailListLimit,
             nextToken: nil
         )
@@ -169,18 +166,17 @@ class EmailAddressListViewController: UIViewController, UITableViewDataSource, U
     ///
     /// All email addresses will be filtered using the `sudoId` to ensure only email addresses associated with the sudo are listed.
     func loadCacheEmailAddressesAndFetchRemote() async {
-        do {
-            let localAddresses = try await listEmailAddresses(cachePolicy: .cacheOnly)
-
+        guard let sudo = sudo else {
             Task { @MainActor in
-                self.emailAddresses = self.filterEmailAddresses(localAddresses, withSudoId: self.sudo.id ?? "")
-                self.tableView.reloadData()
+                presentErrorAlert(message: "Sudo not found")
             }
-
-            let remoteAddresses = try await listEmailAddresses(cachePolicy: .remoteOnly)
+            return
+        }
+        do {
+            let addresses = try await listEmailAddresses()
 
             Task { @MainActor in
-                self.emailAddresses = self.filterEmailAddresses(remoteAddresses, withSudoId: self.sudo.id ?? "")
+                self.emailAddresses = self.filterEmailAddresses(addresses, withSudoId: sudo.id)
                 self.tableView.reloadData()
             }
         } catch {

@@ -74,7 +74,7 @@ class RegistrationViewControllerTests: XCTestCase {
 
     @MainActor
     func test_registerButtonTapped_signInSuccessful_willNavigateToMainMenu() throws {
-        let resultTokens = AuthenticationTokens(idToken: "", accessToken: "", refreshToken: "", lifetime: 0, username: "")
+        let resultTokens = AuthenticationTokens(idToken: "", accessToken: "", refreshToken: "")
         testUtility.userClient.isSignedInReturn = false
         testUtility.userClient.signInWithKeyResult = resultTokens
         testUtility.entitlementsClient.redeemEntitlementsResult = DataFactory.EntitlementsSDK.generateEntitlementsSet()

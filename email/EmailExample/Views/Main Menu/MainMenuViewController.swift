@@ -97,7 +97,7 @@ class MainMenuViewController: UIViewController, UITableViewDelegate, UITableView
         do {
             _ = try await authenticator.deregister()
             try await self.authenticator.reset()
-            try self.profilesClient.reset()
+            try await self.profilesClient.reset()
             try self.profilesClient.generateEncryptionKey()
             try await self.userClient.reset()
 

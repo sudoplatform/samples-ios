@@ -8,7 +8,6 @@
 import Foundation
 import SudoUser
 import SudoKeyManager
-import AWSAppSync
 
 enum AuthenticatorError: LocalizedError {
     case registerFailed
@@ -34,7 +33,7 @@ protocol Authenticator {
 
     func register() async throws
 
-    func deregister() async throws -> String
+    func deregister() async throws
 
     func reset() async throws
 
@@ -78,39 +77,13 @@ class DefaultAuthenticator: Authenticator {
         )
     }
 
-    func deregister() async throws -> String {
-        do {
-            return try await userClient.deregister()
-        } catch SudoUserClientError.graphQLError(let cause) {
-            guard let err = cause.first else {
-                fatalError("No Error in cause")
-            }
-            guard let appSyncError = err as? AWSAppSyncClientError else {
-                throw err
-            }
-            let error: GraphQLAuthProviderError
-            switch appSyncError {
-            case .authenticationError(let authError):
-                guard let gqlError = authError as? GraphQLAuthProviderError else {
-                    fallthrough
-                }
-                error = gqlError
-            default:
-                throw appSyncError
-            }
-            switch error {
-            case .notAuthorized:
-                // refresh tokens and try again
-                do {
-                    _ = try await userClient.refreshTokens()
-                } catch {
-                    _ = try await userClient.signInWithKey()
-                }
-                return try await userClient.deregister()
-            default:
-                throw error
-            }
+    func deregister() async throws {
+        let isSignedIn = try await userClient.isSignedIn()
+        if !isSignedIn {
+            try await userClient.signOut()
+            _ = try await userClient.signInWithKey()
         }
+        try await userClient.deregister()
     }
 
     func reset() async throws {

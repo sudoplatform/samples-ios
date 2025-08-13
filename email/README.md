@@ -31,9 +31,7 @@ ${PROJECT_DIR}/config/register_key.private
 ${PROJECT_DIR}/config/register_key.id
 ```
 
-4. Run `pod install` from the project root
-
-5. Build the app
+4. Build the app
 
 ## More Documentation
 
@@ -48,5 +46,3 @@ Refer to the following documents for more information:
 File issues you find with this sample app in this Github repository. Ensure that you do not include any Personally Identifiable Information (PII), API keys, custom endpoints, etc. when reporting an issue.
 
 For general questions about the Sudo Platform please contact [partners@sudoplatform.com](mailto:partners@sudoplatform.com)
-
-

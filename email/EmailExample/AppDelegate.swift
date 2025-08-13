@@ -5,7 +5,6 @@
 //
 
 import UIKit
-import AWSAppSync
 import SudoKeyManager
 import SudoUser
 import SudoProfiles

@@ -5,7 +5,7 @@
 //
 
 import Foundation
-import SudoKeyManager
+@testable import SudoKeyManager
 
 class KeyManagerMock: SudoKeyManager {
 

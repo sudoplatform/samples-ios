@@ -6,6 +6,7 @@
 
 import UIKit
 import SudoProfiles
+import SudoLogging
 
 /// This View Controller presents a list of `Sudos`.
 ///
@@ -42,6 +43,8 @@ class SudoListViewController: UIViewController, UITableViewDelegate, UITableView
     /// A list of `Sudos`
     private var sudos: [Sudo] = []
 
+    private var logger = Logger.emailSDKLogger
+
     // MARK: - Properties: Computed
 
     /// Sudo profiles client used to perform get and create Sudos.
@@ -59,7 +62,7 @@ class SudoListViewController: UIViewController, UITableViewDelegate, UITableView
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         Task.detached(priority: .medium) {
-            await self.loadCacheSudosAndFetchRemote()
+            await self.loadSudos()
         }
     }
 
@@ -83,26 +86,11 @@ class SudoListViewController: UIViewController, UITableViewDelegate, UITableView
     /// This action will ensure that the Sudo list is up to date when returning from views - e.g. `CreateSudoViewController`.
     @IBAction func returnToSudoList(segue: UIStoryboardSegue) {
         Task.detached(priority: .medium) {
-            await self.loadCacheSudosAndFetchRemote()
+            await self.loadSudos()
         }
     }
 
     // MARK: - Operations
-
-    /// List Sudos from the Sudo profiles client.
-    ///
-    /// - Parameters:
-    ///   - option: Option of either cache only or remote only when retrieving Sudos.
-    func listSudos(option: SudoProfiles.ListOption) async -> [Sudo] {
-        do {
-            return try await profilesClient.listSudos(option: option)
-        } catch {
-            Task { @MainActor in
-                presentErrorAlert(message: "Failed to list Sudos", error: error)
-            }
-            return []
-        }
-    }
 
     /// Delete a selected Sudo.
     ///
@@ -110,7 +98,8 @@ class SudoListViewController: UIViewController, UITableViewDelegate, UITableView
     func deleteSudo(sudo: Sudo) async -> Bool {
         do {
             presentActivityAlert(message: "Deleting Sudo")
-            _ = try await profilesClient.deleteSudo(sudo: sudo)
+            let input = SudoDeleteInput(sudoId: sudo.id, version: sudo.version)
+            _ = try await profilesClient.deleteSudo(input: input)
             self.dismissActivityAlert()
             return true
         } catch {
@@ -132,18 +121,14 @@ class SudoListViewController: UIViewController, UITableViewDelegate, UITableView
 
     // MARK: - Helpers
 
-    /// Attempts to load all Sudos from the device's cache first and then update via a remote call.
-    func loadCacheSudosAndFetchRemote() async {
-        let localSudos = await listSudos(option: .cacheOnly)
-        Task { @MainActor in
-            self.sudos = localSudos
-            self.tableView.reloadData()
-        }
-
-        let remoteSudos = await listSudos(option: .remoteOnly)
-        Task { @MainActor in
-            self.sudos = remoteSudos
-            self.tableView.reloadData()
+    /// Loads all Sudos via a remote call.
+    func loadSudos() async {
+        do {
+            sudos = try await profilesClient.listSudos(cachePolicy: .remoteOnly)
+            tableView.reloadData()
+        } catch {
+            logger.error(error.localizedDescription)
+            presentErrorAlert(message: "Failed to list Sudos", error: error)
         }
     }
 

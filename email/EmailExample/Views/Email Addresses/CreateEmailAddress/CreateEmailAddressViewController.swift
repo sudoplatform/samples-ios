@@ -77,7 +77,7 @@ class CreateEmailAddressViewController: UIViewController,
     var sudoLabelText: String = ""
 
     /// `Sudo` that was selected from the previous view. Used to filter email addresses and provision a new email address.
-    var sudo: Sudo = Sudo()
+    var sudo: Sudo?
 
     /// Domain to provision. Retrieved on diplay of view from the email service.
     var domain: String = ""
@@ -124,7 +124,7 @@ class CreateEmailAddressViewController: UIViewController,
         startListeningForKeyboardNotifications()
         presentCancellableActivityAlert(message: "Loading", delegate: self) {
             Task.detached(priority: .medium) {
-                guard let domain = try await self.getSupportedEmailDomains(cachePolicy: .remoteOnly).first else {
+                guard let domain = try await self.getSupportedEmailDomains().first else {
                     await self.dismissActivityAlert {
                         Task { @MainActor in
                             self.presentErrorAlert(message: "Failed to get supported domain") {_ in
@@ -199,6 +199,12 @@ class CreateEmailAddressViewController: UIViewController,
 
     /// Create the email address on the email service.
     func createEmailAddress() async {
+        guard let sudo = sudo else {
+            Task { @MainActor in
+                presentErrorAlert(message: "Sudo not found")
+            }
+            return
+        }
         view.endEditing(true)
         setCreateButtonEnabled(false)
         guard validateFormData() else {
@@ -232,8 +238,8 @@ class CreateEmailAddressViewController: UIViewController,
         }
     }
 
-    func getSupportedEmailDomains(cachePolicy: CachePolicy) async throws -> [String] {
-        return try await emailClient.getSupportedEmailDomains(cachePolicy)
+    func getSupportedEmailDomains() async throws -> [String] {
+        return try await emailClient.getSupportedEmailDomains()
     }
 
     // MARK: - Helpers: Configuration
@@ -258,7 +264,7 @@ class CreateEmailAddressViewController: UIViewController,
     ///
     /// If a valid sudo is not found, an error will be presented to the user, which results in a segue back to the `EmailAddressListViewController`.
     func configureFooterValues() {
-        guard let sudoLabelText = sudo.label, !sudoLabelText.isEmpty else {
+        guard let sudoLabelText = sudo?.label, !sudoLabelText.isEmpty else {
             presentErrorAlert(
                 message: "An error has occurred: no sudo label found",
                 okHandler: { _ in
@@ -267,7 +273,7 @@ class CreateEmailAddressViewController: UIViewController,
             )
             return
         }
-        guard let sudoId = sudo.id, !sudoId.isEmpty else {
+        guard let sudoId = sudo?.id, !sudoId.isEmpty else {
             presentErrorAlert(
                 message: "An error has occurred: no sudo id found",
                 okHandler: { _ in

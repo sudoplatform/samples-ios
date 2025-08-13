@@ -25,14 +25,13 @@ class AuthenticatorMockSpy: Authenticator {
     }
 
     var deregisterCalled = false
-    var deregisterResult: String?
+    var deregisterFail = false
     var deregisterError = defaultError
-    func deregister() async throws -> String {
+    func deregister() async throws {
         deregisterCalled = true
-        if deregisterResult != nil {
-            return deregisterResult!
+        if deregisterFail {
+            throw deregisterError
         }
-        throw deregisterError
     }
 
     var resetCalled = false

@@ -36,7 +36,7 @@ class EmailMessageListViewControllerTests: XCTestCase {
         instanceUnderTest.loadViewIfNeeded()
         testUtility.window.rootViewController = instanceUnderTest
         testUtility.window.makeKeyAndVisible()
-        await waitForAsyncNoFail()
+        await waitForAsyncNoFail(5)
         // Setup mocks and inject into instance.
         tableView = UITableViewMockSpy()
         instanceUnderTest.tableView = tableView
@@ -54,7 +54,7 @@ class EmailMessageListViewControllerTests: XCTestCase {
 
     func waitForAlertController() async -> UIAlertController? {
         for _ in 0...5 {
-            await waitForAsyncNoFail()
+            await waitForAsyncNoFail(5)
             guard let presentedAlertController = await instanceUnderTest.presentedViewController as? UIAlertController else {
                 continue
             }
@@ -77,12 +77,17 @@ class EmailMessageListViewControllerTests: XCTestCase {
     }
 
     @MainActor
-    func test_viewWillAppear_SubscribesToEmailCreatedAndDeleted() async {
+    func test_viewWillAppear_SubscribesToEmailCreatedDeletedAndUpdated() async {
         instanceUnderTest.emailAddress = DataFactory.EmailSDK.generateEmailAddress()
+        // Three calls from original rendering
+        XCTAssertEqual(testUtility.emailClient.subscribeCalledTimes, 3)
         instanceUnderTest.viewWillAppear(true)
         await waitForAsyncNoFail()
-        XCTAssertTrue(testUtility.emailClient.subscribeToEmailMessageCreatedCalled)
-        XCTAssertTrue(testUtility.emailClient.subscribeToEmailMessageDeletedCalled)
+        // Three more from above call
+        XCTAssertEqual(testUtility.emailClient.subscribeCalledTimes, 6)
+        XCTAssertEqual(testUtility.emailClient.subscribeParameters[3].notificationType, .messageCreated)
+        XCTAssertEqual(testUtility.emailClient.subscribeParameters[4].notificationType, .messageDeleted)
+        XCTAssertEqual(testUtility.emailClient.subscribeParameters[5].notificationType, .messageUpdated)
     }
 
     @MainActor
@@ -92,14 +97,11 @@ class EmailMessageListViewControllerTests: XCTestCase {
         XCTAssertTrue(testUtility.emailClient.listEmailMessagesForEmailFolderIdCalled)
     }
 
-    func test_viewWillDisappear_UnsubscribesToAllSubscriptions() {
-        let createdToken = MockSubscriptionToken()
-        let deletedToken = MockSubscriptionToken()
-        instanceUnderTest.allEmailMessagesCreatedSubscriptionToken = createdToken
-        instanceUnderTest.allEmailMessagesDeletedSubscriptionToken = deletedToken
+    @MainActor
+    func test_viewWillDisappear_UnsubscribesToAllSubscriptions() async {
         instanceUnderTest.viewWillDisappear(true)
-        XCTAssertEqual(createdToken.cancelCallCount, 1)
-        XCTAssertEqual(deletedToken.cancelCallCount, 1)
+        await waitForAsyncNoFail()
+        XCTAssertTrue(testUtility.emailClient.unsubscribeAllCalled)
     }
 
     // MARK: - Tests: Operations
@@ -118,30 +120,27 @@ class EmailMessageListViewControllerTests: XCTestCase {
 
     @MainActor
     func test_subscribeToAllEmailMessagesCreated() async throws {
+        // Three calls from original rendering
+        XCTAssertEqual(testUtility.emailClient.subscribeCalledTimes, 3)
         try await instanceUnderTest.subscribeToAllEmailMessagesCreated()
-        XCTAssertTrue(testUtility.emailClient.subscribeToEmailMessageCreatedCalled)
-        XCTAssertNotNil(instanceUnderTest.allEmailMessagesCreatedSubscriptionToken)
+        XCTAssertEqual(testUtility.emailClient.subscribeCalledTimes, 4)
+        XCTAssertEqual(testUtility.emailClient.subscribeParameters[3].notificationType, .messageCreated)
     }
 
     @MainActor
     func test_subscribeToAllEmailMessagesDeleted() async throws {
+        // Three calls from original rendering
+        XCTAssertEqual(testUtility.emailClient.subscribeCalledTimes, 3)
         try await instanceUnderTest.subscribeToAllEmailMessagesDeleted()
-        XCTAssertTrue(testUtility.emailClient.subscribeToEmailMessageDeletedCalled)
-        XCTAssertNotNil(instanceUnderTest.allEmailMessagesDeletedSubscriptionToken)
+        XCTAssertEqual(testUtility.emailClient.subscribeCalledTimes, 4)
+        XCTAssertEqual(testUtility.emailClient.subscribeParameters[3].notificationType, .messageDeleted)
     }
 
-    func test_unsubscribeToAllSubscriptions_UnsubscribesFromEmailMessageCreated() {
-        let token = MockSubscriptionToken()
-        instanceUnderTest.allEmailMessagesCreatedSubscriptionToken = token
-        instanceUnderTest.unsubscribeToAllSubscriptions()
-        XCTAssertEqual(token.cancelCallCount, 1)
-    }
-
-    func test_unsubscribeToAllSubscriptions_UnsubscribesFromEmailMessageDeleted() {
-        let token = MockSubscriptionToken()
-            instanceUnderTest.allEmailMessagesDeletedSubscriptionToken = token
-            instanceUnderTest.unsubscribeToAllSubscriptions()
-            XCTAssertEqual(token.cancelCallCount, 1)
+    @MainActor
+    func test_unsubscribeToAllSubscriptions_Unsubscribes() async {
+        await instanceUnderTest.unsubscribeToAllSubscriptions()
+        await waitForAsyncNoFail()
+        XCTAssertTrue(testUtility.emailClient.unsubscribeAllCalled)
     }
 
     // MARK: - Tests: Helpers
@@ -158,27 +157,24 @@ class EmailMessageListViewControllerTests: XCTestCase {
         }
     }
 
+    @MainActor
     func test_configureTableView_SetsUIViewForFooter() {
         instanceUnderTest.configureTableView()
         XCTAssertNotNil(tableView.tableFooterView)
     }
 
-    func test_loadCacheEmailMessagesAndFetchRemote_CallsCacheAndRemote() async {
+    func test_fetchEmailMessages_CallsRemote() async {
         await waitForAsyncNoFail()
-        await instanceUnderTest.loadCacheEmailMessagesAndFetchRemote()
+        await instanceUnderTest.fetchEmailMessages()
         await waitForAsyncNoFail()
-        let parameterCount = testUtility.emailClient.listEmailMessagesForEmailFolderIdParameters.count
-        // 2nd last parameter
-        XCTAssertEqual(testUtility.emailClient.listEmailMessagesForEmailFolderIdParameters[parameterCount - 2].cachePolicy, .cacheOnly)
-        // last parameter
-        XCTAssertEqual(testUtility.emailClient.listEmailMessagesForEmailFolderIdParameters[parameterCount - 1].cachePolicy, .remoteOnly)
+        XCTAssertEqual(testUtility.emailClient.listEmailMessagesForEmailFolderIdCalledCount, 2)
     }
 
     @MainActor
-    func test_loadCacheEmailMessagesAndFetchRemote_Drafts_CallsListDraftsOnly() async {
+    func test_fetchEmailMessages_Drafts_CallsListDraftsOnly() async {
         instanceUnderTest.folderNameSwitcher.currentFolder = .special(.drafts)
         let listMessagesCalledCount = testUtility.emailClient.listEmailMessagesForEmailFolderIdCalledCount
-        await instanceUnderTest.loadCacheEmailMessagesAndFetchRemote()
+        await instanceUnderTest.fetchEmailMessages()
         XCTAssertTrue(testUtility.emailClient.listDraftEmailMessageMetadataForEmailAddressIdCalled)
         XCTAssertTrue(testUtility.emailClient.getDraftEmailMessageCalled)
         XCTAssertEqual(
@@ -316,11 +312,8 @@ class EmailMessageListViewControllerTests: XCTestCase {
         instanceUnderTest.emailMessages.append(emailMessage)
         testUtility.emailClient.deleteEmailMessageResult = SudoEmail.DeleteEmailMessageSuccessResult(id: "dummyId")
         _ = await instanceUnderTest.deleteEmailMessage(forIndexPath: IndexPath(row: 0, section: 0))
-        XCTAssertEqual(testUtility.emailClient.listEmailMessagesForEmailFolderIdCalledCount, 3)
-        XCTAssertEqual(
-            testUtility.emailClient.listEmailMessagesForEmailFolderIdParameters.first?.cachePolicy,
-            .cacheOnly
-        )
+        await waitForAsyncNoFail()
+        XCTAssertEqual(testUtility.emailClient.listEmailMessagesForEmailFolderIdCalledCount, 2)
     }
 
     @MainActor
@@ -399,11 +392,7 @@ class EmailMessageListViewControllerTests: XCTestCase {
         instanceUnderTest.emailMessages.append(emailMessage)
         testUtility.emailClient.updateEmailMessagesResult = SudoEmail.BatchOperationResult(status: .success)
         _ = await instanceUnderTest.deleteEmailMessage(forIndexPath: IndexPath(row: 0, section: 0))
-        XCTAssertEqual(testUtility.emailClient.listEmailMessagesForEmailFolderIdCalledCount, 3)
-        XCTAssertEqual(
-            testUtility.emailClient.listEmailMessagesForEmailFolderIdParameters.first?.cachePolicy,
-            .cacheOnly
-        )
+        XCTAssertEqual(testUtility.emailClient.listEmailMessagesForEmailFolderIdCalledCount, 2)
     }
 
     @MainActor
@@ -456,10 +445,12 @@ class EmailMessageListViewControllerTests: XCTestCase {
 
     // MARK: - Tests: UITableViewDataSource
 
+    @MainActor
     func test_numberOfSections() {
         XCTAssertEqual(instanceUnderTest.numberOfSections(in: tableView), 1)
     }
 
+    @MainActor
     func test_tableView_numberOfRowsInSection_ReturnsEmailMessageLength() {
         instanceUnderTest.emailMessages = []
         // Generate and inject 3 random email messages.
@@ -471,6 +462,7 @@ class EmailMessageListViewControllerTests: XCTestCase {
         XCTAssertEqual(instanceUnderTest.tableView(tableView, numberOfRowsInSection: 0), 3)
     }
 
+    @MainActor
     func test_tableView_cellForRowAt_EmailCell_DequeuesEmailMessageCell() {
         instanceUnderTest.configureTableView()
         let emailMessage = DataFactory.EmailSDK.generateEmailMessage()
@@ -481,6 +473,7 @@ class EmailMessageListViewControllerTests: XCTestCase {
         XCTAssertTrue(cell is EmailMessageTableViewCell, "Cell is not EmailMessageCell.")
     }
 
+    @MainActor
     func test_tableView_cellForRowAt_EmailCell_UpdatesCellWithCorrectEmailMessage() {
         instanceUnderTest.emailMessages = []
         instanceUnderTest.configureTableView()
@@ -493,6 +486,7 @@ class EmailMessageListViewControllerTests: XCTestCase {
         XCTAssertEqual(cell.emailMessage?.emailAddressId, emailMessage2.emailAddressId)
     }
 
+    @MainActor
     func test_tableView_cellForRowAt_EmailCell_SetsCorrectAccessoryType() {
         instanceUnderTest.configureTableView()
         let emailMessage = DataFactory.EmailSDK.generateEmailMessage()

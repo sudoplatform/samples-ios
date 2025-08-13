@@ -7,7 +7,7 @@
 import UIKit
 import SudoEmail
 import SudoUser
-import SudoKeyManager
+@testable import SudoKeyManager
 import SudoProfiles
 @testable import EmailExample
 

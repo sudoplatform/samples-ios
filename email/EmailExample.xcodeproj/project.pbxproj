@@ -8,9 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		0CB349EC2C40B3C900C31065 /* ImagePickerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB349EB2C40B3C800C31065 /* ImagePickerViewController.swift */; };
-		338C4BCFE383E7C74C66E1BA /* Pods-EmailExampleNotificationServiceExtension-EmailExampleNotificationServiceExtensionTests-metadata.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7514910D036A1D9129013ACB /* Pods-EmailExampleNotificationServiceExtension-EmailExampleNotificationServiceExtensionTests-metadata.plist */; };
-		3EE73B2985203E9C1BD19E5C /* Pods_EmailExample_EmailExampleTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 073A1D6C6F5995B7E81C764E /* Pods_EmailExample_EmailExampleTests.framework */; };
-		4C19194035E8860FD701DDDD /* Pods_EmailExampleNotificationServiceExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C76FE7300318E5297C56994 /* Pods_EmailExampleNotificationServiceExtension.framework */; };
 		511C50712BE0ACC5006A377E /* UIView+Clickable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 511C50702BE0ACC5006A377E /* UIView+Clickable.swift */; };
 		511C50742BE0B99E006A377E /* EmailAttachmentsListController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 511C50732BE0B99E006A377E /* EmailAttachmentsListController.swift */; };
 		511C50772BE14BF1006A377E /* UIImage+ToAttributedString.swift in Sources */ = {isa = PBXBuildFile; fileRef = 511C50762BE14BF1006A377E /* UIImage+ToAttributedString.swift */; };
@@ -22,7 +19,6 @@
 		5D22F4342C1AAE9D00AE54C9 /* AppDelegate+UNUserNotificationCenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D22F4332C1AAE9D00AE54C9 /* AppDelegate+UNUserNotificationCenter.swift */; };
 		5D327CBE2C321D850010D1BA /* SudoEmailNotifiableClientMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D327CBD2C321D850010D1BA /* SudoEmailNotifiableClientMock.swift */; };
 		5D327CC42C322B5A0010D1BA /* EmailExampleNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D86DB142C12692E0061BF58 /* EmailExampleNotificationService.swift */; };
-		5D86DB0D2C124D680061BF58 /* Podfile in Resources */ = {isa = PBXBuildFile; fileRef = 5D86DB0C2C124D680061BF58 /* Podfile */; };
 		5D86DB152C12692E0061BF58 /* EmailExampleNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D86DB142C12692E0061BF58 /* EmailExampleNotificationService.swift */; };
 		5D86DB192C12692E0061BF58 /* EmailExampleNotificationServiceExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 5D86DB122C12692E0061BF58 /* EmailExampleNotificationServiceExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		5D86DB242C1269450061BF58 /* EmailExampleNotificationServiceExtensionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D86DB232C1269450061BF58 /* EmailExampleNotificationServiceExtensionTests.swift */; };
@@ -36,7 +32,6 @@
 		67C8207C24A9ABC400E5D113 /* RFC822Util.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67C8207B24A9ABC400E5D113 /* RFC822Util.swift */; };
 		67C8207E24AAA1FA00E5D113 /* RFC822UtilTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67C8207D24AAA1FA00E5D113 /* RFC822UtilTest.swift */; };
 		67C8208024B2AEDD00E5D113 /* SendEmailMessageViewControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67C8207F24B2AEDD00E5D113 /* SendEmailMessageViewControllerTests.swift */; };
-		7F2E9CBBEE6A66753CA0A834 /* Pods_EmailExampleNotificationServiceExtension_EmailExampleNotificationServiceExtensionTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E18CBFECB669D77531BF6080 /* Pods_EmailExampleNotificationServiceExtension_EmailExampleNotificationServiceExtensionTests.framework */; };
 		8403255D24C5194A0049C403 /* LearnMoreViewTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8403255C24C5194A0049C403 /* LearnMoreViewTests.swift */; };
 		8403255F24C51C000049C403 /* AuthenticatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8403255E24C51C000049C403 /* AuthenticatorTests.swift */; };
 		8403256124C51CB50049C403 /* KeyManagerMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8403256024C51CB50049C403 /* KeyManagerMock.swift */; };
@@ -84,7 +79,6 @@
 		84EC6CAE24C1652B008FDED4 /* BodyTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 84EC6CAC24C1652B008FDED4 /* BodyTableViewCell.xib */; };
 		84EC6CB124C169E3008FDED4 /* HeaderTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84EC6CAF24C169E3008FDED4 /* HeaderTableViewCell.swift */; };
 		84EC6CB224C169E3008FDED4 /* HeaderTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 84EC6CB024C169E3008FDED4 /* HeaderTableViewCell.xib */; };
-		8E3FFA99267D34ED9A6DE7DE /* Pods-EmailExample-EmailExampleTests-metadata.plist in Resources */ = {isa = PBXBuildFile; fileRef = B0A094BD2A5E8FCD3A43C188 /* Pods-EmailExample-EmailExampleTests-metadata.plist */; };
 		953890802963F6E100EE81EA /* FolderSwitcherView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9538907F2963F6E100EE81EA /* FolderSwitcherView.swift */; };
 		9557447824A42AFE0057A845 /* SendEmailInputData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9557447724A42AFE0057A845 /* SendEmailInputData.swift */; };
 		9557447E24A5C0320057A845 /* RegistrationViewControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9557447D24A5C0320057A845 /* RegistrationViewControllerTests.swift */; };
@@ -102,6 +96,16 @@
 		95C0CE0424AAC8AB0024BFBB /* XCTestCase+Utility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95C0CE0324AAC8AB0024BFBB /* XCTestCase+Utility.swift */; };
 		95C0CE0624AAC90E0024BFBB /* XCTestCaseExpectation+Convenience.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95C0CE0524AAC90E0024BFBB /* XCTestCaseExpectation+Convenience.swift */; };
 		95C0CE0824AACE190024BFBB /* ReadEmailMessageViewControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95C0CE0724AACE190024BFBB /* ReadEmailMessageViewControllerTests.swift */; };
+		9F4A78882E446B0C00F64B7D /* SubscriptionUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F4A78872E446B0C00F64B7D /* SubscriptionUtilities.swift */; };
+		9F528F042E444C0E00A77C5F /* SudoEmail in Frameworks */ = {isa = PBXBuildFile; productRef = 9F528F032E444C0E00A77C5F /* SudoEmail */; };
+		9F528F062E444C0E00A77C5F /* SudoEmailNotificationExtension in Frameworks */ = {isa = PBXBuildFile; productRef = 9F528F052E444C0E00A77C5F /* SudoEmailNotificationExtension */; };
+		9F528F092E444C3600A77C5F /* SudoProfiles in Frameworks */ = {isa = PBXBuildFile; productRef = 9F528F082E444C3600A77C5F /* SudoProfiles */; };
+		9F528F0C2E444C4F00A77C5F /* SudoEntitlements in Frameworks */ = {isa = PBXBuildFile; productRef = 9F528F0B2E444C4F00A77C5F /* SudoEntitlements */; };
+		9F528F0F2E444C5D00A77C5F /* MimeParser in Frameworks */ = {isa = PBXBuildFile; productRef = 9F528F0E2E444C5D00A77C5F /* MimeParser */; };
+		9F64D4142E45C37A005DDC55 /* SudoNotification in Frameworks */ = {isa = PBXBuildFile; productRef = 9F64D4132E45C37A005DDC55 /* SudoNotification */; };
+		9F64D4162E45C37A005DDC55 /* SudoNotificationExtension in Frameworks */ = {isa = PBXBuildFile; productRef = 9F64D4152E45C37A005DDC55 /* SudoNotificationExtension */; };
+		9F64D41B2E45D212005DDC55 /* SudoEmailNotificationExtension in Frameworks */ = {isa = PBXBuildFile; productRef = 9F64D41A2E45D212005DDC55 /* SudoEmailNotificationExtension */; };
+		9F6821FB2E4981BB00D3D0F9 /* SudoKeyManager in Frameworks */ = {isa = PBXBuildFile; productRef = 9F6821FA2E4981BB00D3D0F9 /* SudoKeyManager */; };
 		9F97B79C2B73210000384FE7 /* BlockedAddressTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F97B79B2B73210000384FE7 /* BlockedAddressTableViewCell.swift */; };
 		9F97B79E2B732FA200384FE7 /* BlockedAddressTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9F97B79D2B732FA200384FE7 /* BlockedAddressTableViewCell.xib */; };
 		9FAAE9C72D2B417700687D4C /* UpdateCustomFolderViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FAAE9C62D2B417700687D4C /* UpdateCustomFolderViewController.swift */; };
@@ -109,9 +113,6 @@
 		9FAAE9CC2D2B4E6800687D4C /* UpdateCustomFolderViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9FAAE9CB2D2B4E6700687D4C /* UpdateCustomFolderViewController.xib */; };
 		9FF172972D265CDD00C3BFF8 /* CreateCustomFolderViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FF172962D265CDD00C3BFF8 /* CreateCustomFolderViewController.swift */; };
 		9FF1729D2D273D6800C3BFF8 /* CreateCustomFolderViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9FF1729C2D273D6800C3BFF8 /* CreateCustomFolderViewController.xib */; };
-		A1E83EF0860A1C864A359A3A /* Pods-EmailExampleNotificationServiceExtension-metadata.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8134868063EAC2764F7C8A12 /* Pods-EmailExampleNotificationServiceExtension-metadata.plist */; };
-		A85516339AB8557BCB97C61C /* Pods-EmailExample-metadata.plist in Resources */ = {isa = PBXBuildFile; fileRef = 33D8B6CC61EA83D5A31E7383 /* Pods-EmailExample-metadata.plist */; };
-		A99693F7433E372F381E45C6 /* Pods_EmailExample.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CD4873EB17C3906F80A5AF1C /* Pods_EmailExample.framework */; };
 		AB5B9DB3240EC5D100E4E5D8 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB5B9DB2240EC5D100E4E5D8 /* AppDelegate.swift */; };
 		AB5B9DBA240EC5D100E4E5D8 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AB5B9DB8240EC5D100E4E5D8 /* Main.storyboard */; };
 		AB5B9DBC240EC5D300E4E5D8 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AB5B9DBB240EC5D300E4E5D8 /* Assets.xcassets */; };
@@ -162,12 +163,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		073A1D6C6F5995B7E81C764E /* Pods_EmailExample_EmailExampleTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_EmailExample_EmailExampleTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		0874395C781083BFDEE8153A /* Pods-EmailExampleNotificationServiceExtension.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-EmailExampleNotificationServiceExtension.debug.xcconfig"; path = "Target Support Files/Pods-EmailExampleNotificationServiceExtension/Pods-EmailExampleNotificationServiceExtension.debug.xcconfig"; sourceTree = "<group>"; };
 		0CB349EB2C40B3C800C31065 /* ImagePickerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePickerViewController.swift; sourceTree = "<group>"; };
-		1C76FE7300318E5297C56994 /* Pods_EmailExampleNotificationServiceExtension.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_EmailExampleNotificationServiceExtension.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		2A2E8CEFF99FC8CC55C3B734 /* Pods-EmailExample-EmailExampleTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-EmailExample-EmailExampleTests.release.xcconfig"; path = "Target Support Files/Pods-EmailExample-EmailExampleTests/Pods-EmailExample-EmailExampleTests.release.xcconfig"; sourceTree = "<group>"; };
-		33D8B6CC61EA83D5A31E7383 /* Pods-EmailExample-metadata.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-EmailExample-metadata.plist"; sourceTree = "<group>"; };
 		511C50702BE0ACC5006A377E /* UIView+Clickable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+Clickable.swift"; sourceTree = "<group>"; };
 		511C50732BE0B99E006A377E /* EmailAttachmentsListController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmailAttachmentsListController.swift; sourceTree = "<group>"; };
 		511C50762BE14BF1006A377E /* UIImage+ToAttributedString.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIImage+ToAttributedString.swift"; sourceTree = "<group>"; };
@@ -181,7 +177,6 @@
 		5D22F4332C1AAE9D00AE54C9 /* AppDelegate+UNUserNotificationCenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppDelegate+UNUserNotificationCenter.swift"; sourceTree = "<group>"; };
 		5D22F4352C1BC09300AE54C9 /* EmailExampleNotificationServiceExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = EmailExampleNotificationServiceExtension.entitlements; sourceTree = "<group>"; };
 		5D327CBD2C321D850010D1BA /* SudoEmailNotifiableClientMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SudoEmailNotifiableClientMock.swift; sourceTree = "<group>"; };
-		5D86DB0C2C124D680061BF58 /* Podfile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Podfile; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
 		5D86DB122C12692E0061BF58 /* EmailExampleNotificationServiceExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = EmailExampleNotificationServiceExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		5D86DB142C12692E0061BF58 /* EmailExampleNotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmailExampleNotificationService.swift; sourceTree = "<group>"; };
 		5D86DB162C12692E0061BF58 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -198,8 +193,6 @@
 		67C8207B24A9ABC400E5D113 /* RFC822Util.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RFC822Util.swift; sourceTree = "<group>"; };
 		67C8207D24AAA1FA00E5D113 /* RFC822UtilTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RFC822UtilTest.swift; sourceTree = "<group>"; };
 		67C8207F24B2AEDD00E5D113 /* SendEmailMessageViewControllerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SendEmailMessageViewControllerTests.swift; sourceTree = "<group>"; };
-		7514910D036A1D9129013ACB /* Pods-EmailExampleNotificationServiceExtension-EmailExampleNotificationServiceExtensionTests-metadata.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-EmailExampleNotificationServiceExtension-EmailExampleNotificationServiceExtensionTests-metadata.plist"; sourceTree = "<group>"; };
-		8134868063EAC2764F7C8A12 /* Pods-EmailExampleNotificationServiceExtension-metadata.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-EmailExampleNotificationServiceExtension-metadata.plist"; sourceTree = "<group>"; };
 		8403255C24C5194A0049C403 /* LearnMoreViewTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LearnMoreViewTests.swift; sourceTree = "<group>"; };
 		8403255E24C51C000049C403 /* AuthenticatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticatorTests.swift; sourceTree = "<group>"; };
 		8403256024C51CB50049C403 /* KeyManagerMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyManagerMock.swift; sourceTree = "<group>"; };
@@ -266,6 +259,7 @@
 		95C0CE0324AAC8AB0024BFBB /* XCTestCase+Utility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "XCTestCase+Utility.swift"; sourceTree = "<group>"; };
 		95C0CE0524AAC90E0024BFBB /* XCTestCaseExpectation+Convenience.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "XCTestCaseExpectation+Convenience.swift"; sourceTree = "<group>"; };
 		95C0CE0724AACE190024BFBB /* ReadEmailMessageViewControllerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadEmailMessageViewControllerTests.swift; sourceTree = "<group>"; };
+		9F4A78872E446B0C00F64B7D /* SubscriptionUtilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionUtilities.swift; sourceTree = "<group>"; };
 		9F97B79B2B73210000384FE7 /* BlockedAddressTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockedAddressTableViewCell.swift; sourceTree = "<group>"; };
 		9F97B79D2B732FA200384FE7 /* BlockedAddressTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = BlockedAddressTableViewCell.xib; sourceTree = "<group>"; };
 		9FAAE9C62D2B417700687D4C /* UpdateCustomFolderViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateCustomFolderViewController.swift; sourceTree = "<group>"; };
@@ -280,19 +274,10 @@
 		AB5B9DBE240EC5D300E4E5D8 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		AB5B9DC0240EC5D300E4E5D8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		AB93CAD2240EF6FB0065AF50 /* Authenticator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Authenticator.swift; sourceTree = "<group>"; };
-		B0A094BD2A5E8FCD3A43C188 /* Pods-EmailExample-EmailExampleTests-metadata.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-EmailExample-EmailExampleTests-metadata.plist"; sourceTree = "<group>"; };
-		B73BC49D69D64011BED5580B /* Pods-EmailExampleNotificationServiceExtension.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-EmailExampleNotificationServiceExtension.release.xcconfig"; path = "Target Support Files/Pods-EmailExampleNotificationServiceExtension/Pods-EmailExampleNotificationServiceExtension.release.xcconfig"; sourceTree = "<group>"; };
-		CD34F4D4232DE37053D5B272 /* Pods-EmailExample.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-EmailExample.release.xcconfig"; path = "Target Support Files/Pods-EmailExample/Pods-EmailExample.release.xcconfig"; sourceTree = "<group>"; };
-		CD4873EB17C3906F80A5AF1C /* Pods_EmailExample.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_EmailExample.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		CF2571BE2444EB7B0053334E /* RegistrationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegistrationViewController.swift; sourceTree = "<group>"; };
 		CF2571C02444EBB80053334E /* SudoListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SudoListViewController.swift; sourceTree = "<group>"; };
 		CF2571C22444EC0B0053334E /* CreateSudoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateSudoViewController.swift; sourceTree = "<group>"; };
 		CF2571D1245109BF0053334E /* UIViewController+AlertPresentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+AlertPresentation.swift"; sourceTree = "<group>"; };
-		D3B18D398A66F9C87C98BCEC /* Pods-EmailExampleNotificationServiceExtension-EmailExampleNotificationServiceExtensionTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-EmailExampleNotificationServiceExtension-EmailExampleNotificationServiceExtensionTests.debug.xcconfig"; path = "Target Support Files/Pods-EmailExampleNotificationServiceExtension-EmailExampleNotificationServiceExtensionTests/Pods-EmailExampleNotificationServiceExtension-EmailExampleNotificationServiceExtensionTests.debug.xcconfig"; sourceTree = "<group>"; };
-		D4E1EC821469812544F6B460 /* Pods-EmailExample-EmailExampleTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-EmailExample-EmailExampleTests.debug.xcconfig"; path = "Target Support Files/Pods-EmailExample-EmailExampleTests/Pods-EmailExample-EmailExampleTests.debug.xcconfig"; sourceTree = "<group>"; };
-		E13AA7ED4DBD1964249DFF9E /* Pods-EmailExample.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-EmailExample.debug.xcconfig"; path = "Target Support Files/Pods-EmailExample/Pods-EmailExample.debug.xcconfig"; sourceTree = "<group>"; };
-		E18CBFECB669D77531BF6080 /* Pods_EmailExampleNotificationServiceExtension_EmailExampleNotificationServiceExtensionTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_EmailExampleNotificationServiceExtension_EmailExampleNotificationServiceExtensionTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		EEA23B49462DD81EEBD51D25 /* Pods-EmailExampleNotificationServiceExtension-EmailExampleNotificationServiceExtensionTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-EmailExampleNotificationServiceExtension-EmailExampleNotificationServiceExtensionTests.release.xcconfig"; path = "Target Support Files/Pods-EmailExampleNotificationServiceExtension-EmailExampleNotificationServiceExtensionTests/Pods-EmailExampleNotificationServiceExtension-EmailExampleNotificationServiceExtensionTests.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -300,7 +285,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4C19194035E8860FD701DDDD /* Pods_EmailExampleNotificationServiceExtension.framework in Frameworks */,
+				9F528F062E444C0E00A77C5F /* SudoEmailNotificationExtension in Frameworks */,
+				9F64D4162E45C37A005DDC55 /* SudoNotificationExtension in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -308,7 +294,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7F2E9CBBEE6A66753CA0A834 /* Pods_EmailExampleNotificationServiceExtension_EmailExampleNotificationServiceExtensionTests.framework in Frameworks */,
+				9F64D41B2E45D212005DDC55 /* SudoEmailNotificationExtension in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -316,7 +302,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3EE73B2985203E9C1BD19E5C /* Pods_EmailExample_EmailExampleTests.framework in Frameworks */,
+				9F6821FB2E4981BB00D3D0F9 /* SudoKeyManager in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -324,7 +310,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A99693F7433E372F381E45C6 /* Pods_EmailExample.framework in Frameworks */,
+				9F528F0F2E444C5D00A77C5F /* MimeParser in Frameworks */,
+				9F528F042E444C0E00A77C5F /* SudoEmail in Frameworks */,
+				9F528F0C2E444C4F00A77C5F /* SudoEntitlements in Frameworks */,
+				9F64D4142E45C37A005DDC55 /* SudoNotification in Frameworks */,
+				9F528F092E444C3600A77C5F /* SudoProfiles in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -350,7 +340,6 @@
 		5D86DB0B2C124D450061BF58 /* Other Files */ = {
 			isa = PBXGroup;
 			children = (
-				5D86DB0C2C124D680061BF58 /* Podfile */,
 			);
 			name = "Other Files";
 			sourceTree = "<group>";
@@ -480,6 +469,7 @@
 				AB93CAD2240EF6FB0065AF50 /* Authenticator.swift */,
 				8403256224C5213A0049C403 /* FileReadable.swift */,
 				67C8207B24A9ABC400E5D113 /* RFC822Util.swift */,
+				9F4A78872E446B0C00F64B7D /* SubscriptionUtilities.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -899,10 +889,6 @@
 		A7EB4797332B81CE5CE439FB /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				CD4873EB17C3906F80A5AF1C /* Pods_EmailExample.framework */,
-				073A1D6C6F5995B7E81C764E /* Pods_EmailExample_EmailExampleTests.framework */,
-				1C76FE7300318E5297C56994 /* Pods_EmailExampleNotificationServiceExtension.framework */,
-				E18CBFECB669D77531BF6080 /* Pods_EmailExampleNotificationServiceExtension_EmailExampleNotificationServiceExtensionTests.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -919,7 +905,6 @@
 				5D86DB132C12692E0061BF58 /* EmailExampleNotificationServiceExtension */,
 				5D86DB222C1269450061BF58 /* EmailExampleNotificationServiceExtensionTests */,
 				AB5B9DB0240EC5D100E4E5D8 /* Products */,
-				CB142D8F3C8CFF7109D665EA /* Pods */,
 				A7EB4797332B81CE5CE439FB /* Frameworks */,
 			);
 			sourceTree = "<group>";
@@ -953,25 +938,6 @@
 			path = EmailExample;
 			sourceTree = "<group>";
 		};
-		CB142D8F3C8CFF7109D665EA /* Pods */ = {
-			isa = PBXGroup;
-			children = (
-				B0A094BD2A5E8FCD3A43C188 /* Pods-EmailExample-EmailExampleTests-metadata.plist */,
-				D4E1EC821469812544F6B460 /* Pods-EmailExample-EmailExampleTests.debug.xcconfig */,
-				2A2E8CEFF99FC8CC55C3B734 /* Pods-EmailExample-EmailExampleTests.release.xcconfig */,
-				33D8B6CC61EA83D5A31E7383 /* Pods-EmailExample-metadata.plist */,
-				E13AA7ED4DBD1964249DFF9E /* Pods-EmailExample.debug.xcconfig */,
-				CD34F4D4232DE37053D5B272 /* Pods-EmailExample.release.xcconfig */,
-				7514910D036A1D9129013ACB /* Pods-EmailExampleNotificationServiceExtension-EmailExampleNotificationServiceExtensionTests-metadata.plist */,
-				D3B18D398A66F9C87C98BCEC /* Pods-EmailExampleNotificationServiceExtension-EmailExampleNotificationServiceExtensionTests.debug.xcconfig */,
-				EEA23B49462DD81EEBD51D25 /* Pods-EmailExampleNotificationServiceExtension-EmailExampleNotificationServiceExtensionTests.release.xcconfig */,
-				8134868063EAC2764F7C8A12 /* Pods-EmailExampleNotificationServiceExtension-metadata.plist */,
-				0874395C781083BFDEE8153A /* Pods-EmailExampleNotificationServiceExtension.debug.xcconfig */,
-				B73BC49D69D64011BED5580B /* Pods-EmailExampleNotificationServiceExtension.release.xcconfig */,
-			);
-			path = Pods;
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -979,7 +945,6 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 5D86DB1A2C12692E0061BF58 /* Build configuration list for PBXNativeTarget "EmailExampleNotificationServiceExtension" */;
 			buildPhases = (
-				220D0CB0E973BD6C00749438 /* [CP] Check Pods Manifest.lock */,
 				5D86DB0E2C12692E0061BF58 /* Sources */,
 				5D86DB0F2C12692E0061BF58 /* Frameworks */,
 				5D86DB102C12692E0061BF58 /* Resources */,
@@ -997,11 +962,9 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 5D86DB272C1269450061BF58 /* Build configuration list for PBXNativeTarget "EmailExampleNotificationServiceExtensionTests" */;
 			buildPhases = (
-				E919D51F127CCF6C89C86553 /* [CP] Check Pods Manifest.lock */,
 				5D86DB1D2C1269450061BF58 /* Sources */,
 				5D86DB1E2C1269450061BF58 /* Frameworks */,
 				5D86DB1F2C1269450061BF58 /* Resources */,
-				B805CD9C262662D36228D3FD /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -1017,11 +980,9 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 84077A31245A9053004186BE /* Build configuration list for PBXNativeTarget "EmailExampleTests" */;
 			buildPhases = (
-				5F9B09CC5CB547EA11D25D29 /* [CP] Check Pods Manifest.lock */,
 				84077A24245A9053004186BE /* Sources */,
 				84077A25245A9053004186BE /* Frameworks */,
 				84077A26245A9053004186BE /* Resources */,
-				7BEE54D610953DAAE5A82F16 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -1037,14 +998,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = AB5B9DC3240EC5D300E4E5D8 /* Build configuration list for PBXNativeTarget "EmailExample" */;
 			buildPhases = (
-				14DABBCE0F09625E026FC2A3 /* [CP] Check Pods Manifest.lock */,
 				AB5B9DAB240EC5D100E4E5D8 /* Sources */,
 				AB5B9DAC240EC5D100E4E5D8 /* Frameworks */,
 				AB5B9DAD240EC5D100E4E5D8 /* Resources */,
 				AB93CAE6240F006C0065AF50 /* Copy Test Keys (Debug) */,
 				84077A33245A9719004186BE /* Swift Lint */,
 				5D86DB062C124CE60061BF58 /* Embed Foundation Extensions */,
-				8B021A3270CD44DB321B175F /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -1091,6 +1050,14 @@
 				Base,
 			);
 			mainGroup = AB5B9DA6240EC5D000E4E5D8;
+			packageReferences = (
+				9F528F022E444C0E00A77C5F /* XCRemoteSwiftPackageReference "sudo-email-ios" */,
+				9F528F072E444C3600A77C5F /* XCRemoteSwiftPackageReference "sudo-profiles-ios" */,
+				9F528F0A2E444C4F00A77C5F /* XCRemoteSwiftPackageReference "sudo-entitlements-ios" */,
+				9F528F0D2E444C5D00A77C5F /* XCRemoteSwiftPackageReference "MimeParser" */,
+				9F64D4122E45C37A005DDC55 /* XCRemoteSwiftPackageReference "sudo-notification-ios" */,
+				9F6821F92E4981BB00D3D0F9 /* XCRemoteSwiftPackageReference "sudo-key-manager-ios" */,
+			);
 			productRefGroup = AB5B9DB0240EC5D100E4E5D8 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -1108,7 +1075,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A1E83EF0860A1C864A359A3A /* Pods-EmailExampleNotificationServiceExtension-metadata.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1116,7 +1082,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				338C4BCFE383E7C74C66E1BA /* Pods-EmailExampleNotificationServiceExtension-EmailExampleNotificationServiceExtensionTests-metadata.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1128,7 +1093,6 @@
 				84770AC724C9127300FC8C8D /* Base64EncodedBody.txt in Resources */,
 				84770AC124C9008E00FC8C8D /* ComplexBase64Email.txt in Resources */,
 				84770AC524C9072A00FC8C8D /* ComplexDataEmail.txt in Resources */,
-				8E3FFA99267D34ED9A6DE7DE /* Pods-EmailExample-EmailExampleTests-metadata.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1154,8 +1118,6 @@
 				84309D612463FFF900F48ECC /* LearnMoreView.xib in Resources */,
 				AB5B9DBA240EC5D100E4E5D8 /* Main.storyboard in Resources */,
 				8470C8F3245AD0E200439F92 /* MainMenuViewController.xib in Resources */,
-				5D86DB0D2C124D680061BF58 /* Podfile in Resources */,
-				A85516339AB8557BCB97C61C /* Pods-EmailExample-metadata.plist in Resources */,
 				8428891D249AE3EB00D39E6C /* ReadEmailMessageViewController.xib in Resources */,
 				8470A693245B7DC900575C26 /* RegistrationViewController.xib in Resources */,
 				84288921249AE44F00D39E6C /* SendEmailMessageViewController.xib in Resources */,
@@ -1167,89 +1129,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		14DABBCE0F09625E026FC2A3 /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-EmailExample-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-		220D0CB0E973BD6C00749438 /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-EmailExampleNotificationServiceExtension-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-		5F9B09CC5CB547EA11D25D29 /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-EmailExample-EmailExampleTests-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-		7BEE54D610953DAAE5A82F16 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-EmailExample-EmailExampleTests/Pods-EmailExample-EmailExampleTests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-EmailExample-EmailExampleTests/Pods-EmailExample-EmailExampleTests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-EmailExample-EmailExampleTests/Pods-EmailExample-EmailExampleTests-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
 		84077A33245A9719004186BE /* Swift Lint */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -1268,23 +1147,6 @@
 			shellPath = /bin/sh;
 			shellScript = "if which swiftlint > /dev/null; then\n    swiftlint --path ${PROJECT_DIR}\nelif [ -x /usr/local/bin/swiftlint ]; then\n    /usr/local/bin/swiftlint --path ${PROJECT_DIR}\nelif [ -x /usr/homebrew/bin/swiftlint ]; then\n    /usr/homebrew/bin/swiftlint --path ${PROJECT_DIR}\nelif [ -x /opt/homebrew/bin/swiftlint ]; then\n    /opt/homebrew/bin/swiftlint --path ${PROJECT_DIR}\nelse\n    echo \"Warning: SwiftLint not installed, run 'brew install swiftlint'\"\n    exit 1\nfi\n";
 		};
-		8B021A3270CD44DB321B175F /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-EmailExample/Pods-EmailExample-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-EmailExample/Pods-EmailExample-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-EmailExample/Pods-EmailExample-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
 		AB93CAE6240F006C0065AF50 /* Copy Test Keys (Debug) */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -1302,45 +1164,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "returncode=0\n\necho \"Copy test key to bundle\"\nSOURCE=${PROJECT_DIR}/config/register_key.private\ncp -f ${SOURCE} \"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/\"\nif [ $? -ne 0 ]\nthen\n    echo \"error: Failed to copy test registration key. Make sure the file config/register_key.private exists in the project directory (see README.md).\"\nfi\n\necho \"Copy test key ID to bundle\"\nSOURCE=${PROJECT_DIR}/config/register_key.id \ncp -f ${SOURCE} \"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/\"\nif [ $? -ne 0 ]\nthen\n    echo \"error: Failed to copy test registration key ID. Make sure the file config/register_key.id exists in the project directory (see README.md).\"\nfi\n\necho \"Copy Sudo Platform config to bundle\"\nSOURCE=${PROJECT_DIR}/config/sudoplatformconfig.json\ncp -f ${SOURCE} \"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/\"\nif [ $? -ne 0 ]\nthen\n    echo \"error: Failed to copy sudoplatformconfig.json. Make sure the file config/sudoplatformconfig.json exists in the project directory (see README.md).\"\nfi\n\nexit ${returncode}\n";
-		};
-		B805CD9C262662D36228D3FD /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-EmailExampleNotificationServiceExtension-EmailExampleNotificationServiceExtensionTests/Pods-EmailExampleNotificationServiceExtension-EmailExampleNotificationServiceExtensionTests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-EmailExampleNotificationServiceExtension-EmailExampleNotificationServiceExtensionTests/Pods-EmailExampleNotificationServiceExtension-EmailExampleNotificationServiceExtensionTests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-EmailExampleNotificationServiceExtension-EmailExampleNotificationServiceExtensionTests/Pods-EmailExampleNotificationServiceExtension-EmailExampleNotificationServiceExtensionTests-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		E919D51F127CCF6C89C86553 /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-EmailExampleNotificationServiceExtension-EmailExampleNotificationServiceExtensionTests-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -1440,6 +1263,7 @@
 				67C8207C24A9ABC400E5D113 /* RFC822Util.swift in Sources */,
 				9557447824A42AFE0057A845 /* SendEmailInputData.swift in Sources */,
 				84288920249AE44F00D39E6C /* SendEmailMessageViewController.swift in Sources */,
+				9F4A78882E446B0C00F64B7D /* SubscriptionUtilities.swift in Sources */,
 				CF2571C12444EBB80053334E /* SudoListViewController.swift in Sources */,
 				511C50772BE14BF1006A377E /* UIImage+ToAttributedString.swift in Sources */,
 				511C50712BE0ACC5006A377E /* UIView+Clickable.swift in Sources */,
@@ -1492,7 +1316,6 @@
 /* Begin XCBuildConfiguration section */
 		5D86DB1B2C12692E0061BF58 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 0874395C781083BFDEE8153A /* Pods-EmailExampleNotificationServiceExtension.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
@@ -1526,7 +1349,6 @@
 		};
 		5D86DB1C2C12692E0061BF58 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = B73BC49D69D64011BED5580B /* Pods-EmailExampleNotificationServiceExtension.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
@@ -1559,7 +1381,6 @@
 		};
 		5D86DB282C1269450061BF58 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = D3B18D398A66F9C87C98BCEC /* Pods-EmailExampleNotificationServiceExtension-EmailExampleNotificationServiceExtensionTests.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -1587,7 +1408,6 @@
 		};
 		5D86DB292C1269450061BF58 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = EEA23B49462DD81EEBD51D25 /* Pods-EmailExampleNotificationServiceExtension-EmailExampleNotificationServiceExtensionTests.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -1614,14 +1434,13 @@
 		};
 		84077A2F245A9053004186BE /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = D4E1EC821469812544F6B460 /* Pods-EmailExample-EmailExampleTests.debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 33X5MJEM2D;
 				INFOPLIST_FILE = EmailExampleTests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1637,14 +1456,13 @@
 		};
 		84077A30245A9053004186BE /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 2A2E8CEFF99FC8CC55C3B734 /* Pods-EmailExample-EmailExampleTests.release.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 33X5MJEM2D;
 				INFOPLIST_FILE = EmailExampleTests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1662,7 +1480,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
+				BUILD_LIBRARY_FOR_DISTRIBUTION = NO;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -1724,7 +1542,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
+				BUILD_LIBRARY_FOR_DISTRIBUTION = NO;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -1778,7 +1596,6 @@
 		};
 		AB5B9DC4240EC5D300E4E5D8 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = E13AA7ED4DBD1964249DFF9E /* Pods-EmailExample.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = EmailExample/EmailExample.entitlements;
@@ -1799,7 +1616,6 @@
 		};
 		AB5B9DC5240EC5D300E4E5D8 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = CD34F4D4232DE37053D5B272 /* Pods-EmailExample.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = EmailExample/EmailExample.entitlements;
@@ -1867,6 +1683,105 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		9F528F022E444C0E00A77C5F /* XCRemoteSwiftPackageReference "sudo-email-ios" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sudoplatform/sudo-email-ios";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 20.2.1;
+			};
+		};
+		9F528F072E444C3600A77C5F /* XCRemoteSwiftPackageReference "sudo-profiles-ios" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sudoplatform/sudo-profiles-ios";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 20.1.0;
+			};
+		};
+		9F528F0A2E444C4F00A77C5F /* XCRemoteSwiftPackageReference "sudo-entitlements-ios" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sudoplatform/sudo-entitlements-ios";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 13.0.0;
+			};
+		};
+		9F528F0D2E444C5D00A77C5F /* XCRemoteSwiftPackageReference "MimeParser" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/miximka/MimeParser";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.2.5;
+			};
+		};
+		9F64D4122E45C37A005DDC55 /* XCRemoteSwiftPackageReference "sudo-notification-ios" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sudoplatform/sudo-notification-ios";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.1.0;
+			};
+		};
+		9F6821F92E4981BB00D3D0F9 /* XCRemoteSwiftPackageReference "sudo-key-manager-ios" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sudoplatform/sudo-key-manager-ios";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.1.3;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		9F528F032E444C0E00A77C5F /* SudoEmail */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9F528F022E444C0E00A77C5F /* XCRemoteSwiftPackageReference "sudo-email-ios" */;
+			productName = SudoEmail;
+		};
+		9F528F052E444C0E00A77C5F /* SudoEmailNotificationExtension */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9F528F022E444C0E00A77C5F /* XCRemoteSwiftPackageReference "sudo-email-ios" */;
+			productName = SudoEmailNotificationExtension;
+		};
+		9F528F082E444C3600A77C5F /* SudoProfiles */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9F528F072E444C3600A77C5F /* XCRemoteSwiftPackageReference "sudo-profiles-ios" */;
+			productName = SudoProfiles;
+		};
+		9F528F0B2E444C4F00A77C5F /* SudoEntitlements */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9F528F0A2E444C4F00A77C5F /* XCRemoteSwiftPackageReference "sudo-entitlements-ios" */;
+			productName = SudoEntitlements;
+		};
+		9F528F0E2E444C5D00A77C5F /* MimeParser */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9F528F0D2E444C5D00A77C5F /* XCRemoteSwiftPackageReference "MimeParser" */;
+			productName = MimeParser;
+		};
+		9F64D4132E45C37A005DDC55 /* SudoNotification */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9F64D4122E45C37A005DDC55 /* XCRemoteSwiftPackageReference "sudo-notification-ios" */;
+			productName = SudoNotification;
+		};
+		9F64D4152E45C37A005DDC55 /* SudoNotificationExtension */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9F64D4122E45C37A005DDC55 /* XCRemoteSwiftPackageReference "sudo-notification-ios" */;
+			productName = SudoNotificationExtension;
+		};
+		9F64D41A2E45D212005DDC55 /* SudoEmailNotificationExtension */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9F528F022E444C0E00A77C5F /* XCRemoteSwiftPackageReference "sudo-email-ios" */;
+			productName = SudoEmailNotificationExtension;
+		};
+		9F6821FA2E4981BB00D3D0F9 /* SudoKeyManager */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9F6821F92E4981BB00D3D0F9 /* XCRemoteSwiftPackageReference "sudo-key-manager-ios" */;
+			productName = SudoKeyManager;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = AB5B9DA7240EC5D000E4E5D8 /* Project object */;
 }

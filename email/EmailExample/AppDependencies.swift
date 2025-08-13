@@ -5,6 +5,7 @@
 //
 
 import Foundation
+import UIKit
 import SudoEmail
 import SudoKeyManager
 import SudoProfiles
@@ -70,8 +71,6 @@ struct AppDependencies {
     }
 
     init() throws {
-        let storageURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-
         let keyManager = LegacySudoKeyManager(serviceName: "com.sudoplatform.appservicename", keyTag: "com.sudoplatform", namespace: "eml")
 
         let newUserClient = try DefaultSudoUserClient(keyNamespace: "ids")
@@ -80,7 +79,7 @@ struct AppDependencies {
 
         self.init(
             userClient: newUserClient,
-            profilesClient: try DefaultSudoProfilesClient(sudoUserClient: newUserClient, blobContainerURL: storageURL),
+            profilesClient: try DefaultSudoProfilesClient(sudoUserClient: newUserClient),
             emailClient: try DefaultSudoEmailClient(keyNamespace: "eml", userClient: newUserClient),
             entitlementsClient: try DefaultSudoEntitlementsClient(userClient: newUserClient),
             emailNotificationFilterClient: emailNotificationFilterClient,

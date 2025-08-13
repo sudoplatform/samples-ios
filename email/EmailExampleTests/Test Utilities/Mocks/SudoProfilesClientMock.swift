@@ -9,84 +9,120 @@ import SudoProfiles
 
 class SudoProfilesClientMock: SudoProfilesClient {
 
-    func unsubscribe(id: String) {
+    var config: SudoProfilesClientConfig {
+        fatalError("Not implemented")
     }
 
-    func generateEncryptionKey() throws -> String {
-        return ""
-    }
+    // MARK: - Mocked Methods
 
-    func getSymmetricKeyId() throws -> String? {
-        return nil
-    }
-
-    func importEncryptionKeys(keys: [EncryptionKey], currentKeyId: String) throws {
-    }
-
-    func exportEncryptionKeys() throws -> [EncryptionKey] {
-        return []
-    }
-
-    static var defaultError: Error {
-        return NSError(domain: "unit-test", code: 0, userInfo: nil) as Error
-    }
-
-    static var sudoLabel = "UnitTestSudoLabel"
-
-    func subscribe(id: String, subscriber: SudoSubscriber) throws {
-
-    }
-
+    // createSudo
     var createSudoResult: Sudo?
-    var createSudoError = defaultError
+    var createSudoError = SudoProfilesClientMock.defaultError
     var createSudoCalled: Bool = false
-    func createSudo(sudo: Sudo) async throws -> Sudo {
+    func createSudo(input: SudoProfiles.SudoCreateInput) async throws -> SudoProfiles.Sudo {
         createSudoCalled = true
-        if createSudoResult != nil {
-            return createSudoResult!
+        if let result = createSudoResult {
+            return result
         }
         throw createSudoError
     }
 
+    // updateSudo
     var updateSudoResult: Sudo?
-    var updateSudoError = defaultError
-    func updateSudo(sudo: Sudo) async throws -> Sudo {
-        if updateSudoResult != nil {
-            return updateSudoResult!
+    var updateSudoError = SudoProfilesClientMock.defaultError
+    func updateSudo(input: SudoProfiles.SudoUpdateInput) async throws -> SudoProfiles.Sudo {
+        if let result = updateSudoResult {
+            return result
         }
         throw updateSudoError
     }
 
+    // deleteSudo
     var deleteSudoFailure = true
-    var deleteSudoError = defaultError
-    func deleteSudo(sudo: Sudo) async throws {
+    var deleteSudoError = SudoProfilesClientMock.defaultError
+    func deleteSudo(input: SudoProfiles.SudoDeleteInput) async throws {
         if deleteSudoFailure {
             throw deleteSudoError
         }
     }
 
+    // listSudos
     var listSudosResult: [Sudo]?
-    var listSudosError = defaultError
-    func listSudos(option: ListOption) async throws -> [Sudo] {
-        if listSudosResult != nil {
-            if option == .cacheOnly {
-                return listSudosResult!
-            } else {
-                var testSudo = Sudo()
-                testSudo.label = SudoProfilesClientMock.sudoLabel
-                testSudo.id = "UnitTestSudoId"
-                return [testSudo]
-            }
+    var listSudosError = SudoProfilesClientMock.defaultError
+    func listSudos(cachePolicy: SudoProfiles.CachePolicy) async throws -> [SudoProfiles.Sudo] {
+        if let result = listSudosResult {
+            return result
         }
         throw listSudosError
     }
 
-    var getOutstandingRequestsCountResult: Int = 0
-    func getOutstandingRequestsCount() -> Int {
-        return getOutstandingRequestsCountResult
+    // getBlob
+    var getBlobResult: Data?
+    var getBlobError = SudoProfilesClientMock.defaultError
+    func getBlob(forClaim claim: SudoProfiles.Claim, cachePolicy: SudoProfiles.CachePolicy) async throws -> Data {
+        if let result = getBlobResult {
+            return result
+        }
+        throw getBlobError
     }
 
-    func reset() throws {
+    // clearCache
+    func clearCache() throws {
+        // no-op
+    }
+
+    // getOwnershipProof (by Sudo)
+    var getOwnershipProofResult: String?
+    var getOwnershipProofError = SudoProfilesClientMock.defaultError
+    func getOwnershipProof(sudo: SudoProfiles.Sudo, audience: String) async throws -> String {
+        if let result = getOwnershipProofResult {
+            return result
+        }
+        throw getOwnershipProofError
+    }
+
+    // getOwnershipProof (by sudoId)
+    func getOwnershipProof(sudoId: String, audience: String) async throws -> String {
+        if let result = getOwnershipProofResult {
+            return result
+        }
+        throw getOwnershipProofError
+    }
+
+    // unsubscribe
+    func unsubscribe(id: String) {
+        // no-op
+    }
+
+    // generateEncryptionKey
+    func generateEncryptionKey() throws -> String {
+        return ""
+    }
+
+    // getSymmetricKeyId
+    func getSymmetricKeyId() throws -> String? {
+        return nil
+    }
+
+    // importEncryptionKeys
+    func importEncryptionKeys(keys: [EncryptionKey], currentKeyId: String) throws {
+        // no-op
+    }
+
+    // exportEncryptionKeys
+    func exportEncryptionKeys() throws -> [EncryptionKey] {
+        return []
+    }
+
+    // MARK: - Static Defaults
+    static var defaultError: Error {
+        return NSError(domain: "unit-test", code: 0, userInfo: nil) as Error
+    }
+
+    static var sudoLabel = "Create Sudo"
+
+    // subscribe
+    func subscribe(id: String, subscriber: SudoSubscriber) throws {
         // no-op
     }
 
@@ -94,24 +130,29 @@ class SudoProfilesClientMock: SudoProfilesClient {
         // no-op
     }
 
+    // unsubscribe (changeType)
     func unsubscribe(id: String, changeType: SudoChangeType) {
         // no-op
     }
 
+    // unsubscribeAll
     func unsubscribeAll() {
         // no-op
     }
 
-    var getOwnershipProofResult: String?
-    var getOwnershipProofError = defaultError
-    func getOwnershipProof(sudo: Sudo, audience: String) async throws -> String {
-        if getOwnershipProofResult != nil {
-            return getOwnershipProofResult!
-        }
-        throw getOwnershipProofError
+    // getOutstandingRequestsCount
+    var getOutstandingRequestsCountResult: Int = 0
+    func getOutstandingRequestsCount() -> Int {
+        return getOutstandingRequestsCountResult
     }
 
-    var redeemResult: Swift.Result<[Entitlement], Error> = .failure(defaultError)
+    // reset
+    func reset() throws {
+        // no-op
+    }
+
+    // redeem
+    var redeemResult: Swift.Result<[Entitlement], Error> = .failure(SudoProfilesClientMock.defaultError)
     func redeem(token: String, type: String, completion: @escaping (Swift.Result<[Entitlement], Error>) -> Void) throws {
         completion(redeemResult)
     }

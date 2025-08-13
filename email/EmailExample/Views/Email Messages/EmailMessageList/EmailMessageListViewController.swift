@@ -73,14 +73,14 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
     /// View to allow user selection of Email Folder
     var folderNameSwitcher: FolderSwitcherView!
 
-    /// EmailMessage subscription token. Used to cancel the subscription when the user navigates away from the view
-    var allEmailMessagesCreatedSubscriptionToken: SubscriptionToken?
+    /// EmailMessage subscription instance. Used to cancel the subscription when the user navigates away from the view
+    var allEmailMessagesCreatedSubscription: Subscription?
 
-    /// EmailMessage subscription token. Used to cancel the subscription when the user navigates away from the view
-    var allEmailMessagesDeletedSubscriptionToken: SubscriptionToken?
+    /// EmailMessage subscription instance. Used to cancel the subscription when the user navigates away from the view
+    var allEmailMessagesDeletedSubscription: Subscription?
 
-    /// EmailMessage subscription token. Used to cancel the subscription when the user navigates away from the view
-    var allEmailMessagesUpdatedSubscriptionToken: SubscriptionToken?
+    /// EmailMessage subscription instance. Used to cancel the subscription when the user navigates away from the view
+    var allEmailMessagesUpdatedSubscription: Subscription?
 
     /// The currently folder that is open
     var selectedFolderSwitcherLabel: FolderSwitcherLabels = .standard(.inbox)
@@ -130,13 +130,15 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
             }
         }
         Task.detached(priority: .medium) {
-            await self.loadCacheEmailMessagesAndFetchRemote()
+            await self.fetchEmailMessages()
         }
     }
 
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        unsubscribeToAllSubscriptions()
+        Task {
+            await unsubscribeToAllSubscriptions()
+        }
     }
 
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -198,7 +200,7 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
             self.selectedFolderSwitcherLabel = .standard(.inbox)
         }
         Task.detached(priority: .medium) {
-            await self.loadCacheEmailMessagesAndFetchRemote()
+            await self.fetchEmailMessages()
             await self.loadEmailFolders()
         }
     }
@@ -213,7 +215,7 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
 
     // MARK: - Operations
 
-    func listEmailMessages(cachePolicy: SudoEmail.CachePolicy) async throws -> [EmailMessage] {
+    func listEmailMessages() async throws -> [EmailMessage] {
         guard let emailAddress = emailAddress else {
             Task { @MainActor in
                 presentErrorAlert(message: "An error has occurred: no email address found") { _ in
@@ -228,7 +230,6 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
         )
         let listEmailMessagesInput = ListEmailMessagesForEmailFolderIdInput(
             emailFolderId: folderId,
-            cachePolicy: cachePolicy
         )
         let messagesResult = try await emailClient.listEmailMessagesForEmailFolderId(
             withInput: listEmailMessagesInput
@@ -305,16 +306,26 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
     }
 
     func subscribeToAllEmailMessagesCreated() async throws {
-        allEmailMessagesCreatedSubscriptionToken = try await emailClient.subscribeToEmailMessageCreated(withDirection: nil) { [weak self] result in
-            guard let weakSelf = self else { return }
-            switch result {
-            case .success:
+        let createSubscription = try await Subscription(client: emailClient, notificationType: .messageCreated)
+        allEmailMessagesCreatedSubscription = createSubscription
+
+        // Listen for new messages
+        createSubscription.messageCancellable = createSubscription.messagesSubject
+            .sink(receiveCompletion: { [weak self] completion in
+                if case .failure(let error) = completion {
+                    Task { @MainActor in
+                        self?.presentErrorAlert(message: "Email message created subscription failure", error: error)
+                    }
+                }
+            }, receiveValue: { [weak self] messages in
+                guard let weakSelf = self else { return }
+                // Only act on the latest message
+                guard let latestMessage = messages.last else { return }
                 Task.detached(priority: .medium) {
                     do {
                         NSLog("Created subscription callback")
-                        let createdId = try result.get().id
-                        NSLog(createdId)
-                        let messages = try await weakSelf.listEmailMessages(cachePolicy: .remoteOnly)
+                        NSLog(latestMessage.id)
+                        let messages = try await weakSelf.listEmailMessages()
                         Task { @MainActor in
                             let emailAddress = weakSelf.emailAddress?.emailAddress ?? ""
                             let sortedMessages = weakSelf
@@ -327,86 +338,79 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
                         NSLog("ignoring listEmailMessages failure")
                     }
                 }
-            case let .failure(error):
-                Task { @MainActor in
-                    weakSelf.presentErrorAlert(message: "Email message created subscription failure", error: error)
-                }
-            }
-        }
+            })
     }
 
     func subscribeToAllEmailMessagesDeleted() async throws {
-        allEmailMessagesDeletedSubscriptionToken = try await emailClient.subscribeToEmailMessageDeleted(
-            withId: nil,
-            resultHandler: { [weak self] result in
-                guard let weakSelf = self else { return }
-                switch result {
-                case .success:
-                    Task.detached(priority: .medium) {
-                        do {
-                            NSLog("Deleted subscription callback")
-                            let deletedId = try result.get().id
-                            NSLog(deletedId)
-                            let messages = try await weakSelf.listEmailMessages(cachePolicy: .remoteOnly)
-                            Task { @MainActor in
-                                let emailAddress = weakSelf.emailAddress?.emailAddress ?? ""
-                                let sortedMessages = weakSelf
-                                    .filterEmailMessages(messages, withEmailAddress: emailAddress)
-                                    .sortedByCreatedDescending()
-                                weakSelf.emailMessages = sortedMessages
-                                weakSelf.tableView.reloadData()
-                            }
-                        } catch {
-                            NSLog("ignoring listEmailMessages failure")
-                        }
-                    }
-                case let .failure(error):
+        let deleteSubscription = try await Subscription(client: emailClient, notificationType: .messageDeleted)
+        allEmailMessagesDeletedSubscription = deleteSubscription
+
+        deleteSubscription.messageCancellable = deleteSubscription.messagesSubject
+            .sink(receiveCompletion: { [weak self] completion in
+                if case .failure(let error) = completion {
                     Task { @MainActor in
-                        weakSelf.presentErrorAlert(message: "Email message deleted subscription failure", error: error)
+                        self?.presentErrorAlert(message: "Email message deleted subscription failure", error: error)
                     }
                 }
-            }
-        )
+            }, receiveValue: { [weak self] messages in
+                guard let weakSelf = self else { return }
+                guard let latestMessage = messages.last else { return }
+                Task.detached(priority: .medium) {
+                    do {
+                        NSLog("Deleted subscription callback")
+                        NSLog(latestMessage.id)
+                        let messages = try await weakSelf.listEmailMessages()
+                        Task { @MainActor in
+                            let emailAddress = weakSelf.emailAddress?.emailAddress ?? ""
+                            let sortedMessages = weakSelf
+                                .filterEmailMessages(messages, withEmailAddress: emailAddress)
+                                .sortedByCreatedDescending()
+                            weakSelf.emailMessages = sortedMessages
+                            weakSelf.tableView.reloadData()
+                        }
+                    } catch {
+                        NSLog("ignoring listEmailMessages failure")
+                    }
+                }
+            })
     }
 
     func subscribeToAllEmailMessagesUpdated() async throws {
-        allEmailMessagesUpdatedSubscriptionToken = try await emailClient.subscribeToEmailMessageUpdated(
-            withId: nil,
-            resultHandler: { [weak self] result in
-                guard let weakSelf = self else { return }
-                switch result {
-                case .success:
-                    Task.detached(priority: .medium) {
-                        do {
-                            NSLog("Updated subscription callback")
-                            let updatedId = try result.get().id
-                            NSLog(updatedId)
-                            let messages = try await weakSelf.listEmailMessages(cachePolicy: .remoteOnly)
-                            Task { @MainActor in
-                                let emailAddress = weakSelf.emailAddress?.emailAddress ?? ""
-                                let sortedMessages = weakSelf
-                                    .filterEmailMessages(messages, withEmailAddress: emailAddress)
-                                    .sortedByCreatedDescending()
-                                weakSelf.emailMessages = sortedMessages
-                                weakSelf.tableView.reloadData()
-                            }
-                        } catch {
-                            NSLog("ignoring listEmailMessages failure")
-                        }
-                    }
-                case let .failure(error):
+        let updateSubscription = try await Subscription(client: emailClient, notificationType: .messageUpdated)
+        allEmailMessagesUpdatedSubscription = updateSubscription
+
+        updateSubscription.messageCancellable = updateSubscription.messagesSubject
+            .sink(receiveCompletion: { [weak self] completion in
+                if case .failure(let error) = completion {
                     Task { @MainActor in
-                        weakSelf.presentErrorAlert(message: "Email message updated subscription failure", error: error)
+                        self?.presentErrorAlert(message: "Email message updated subscription failure", error: error)
                     }
                 }
-            }
-        )
+            }, receiveValue: { [weak self] messages in
+                guard let weakSelf = self else { return }
+                guard let latestMessage = messages.last else { return }
+                Task.detached(priority: .medium) {
+                    do {
+                        NSLog("Updated subscription callback")
+                        NSLog(latestMessage.id)
+                        let messages = try await weakSelf.listEmailMessages()
+                        Task { @MainActor in
+                            let emailAddress = weakSelf.emailAddress?.emailAddress ?? ""
+                            let sortedMessages = weakSelf
+                                .filterEmailMessages(messages, withEmailAddress: emailAddress)
+                                .sortedByCreatedDescending()
+                            weakSelf.emailMessages = sortedMessages
+                            weakSelf.tableView.reloadData()
+                        }
+                    } catch {
+                        NSLog("ignoring listEmailMessages failure")
+                    }
+                }
+            })
     }
 
-    func unsubscribeToAllSubscriptions() {
-        allEmailMessagesCreatedSubscriptionToken?.cancel()
-        allEmailMessagesDeletedSubscriptionToken?.cancel()
-        allEmailMessagesUpdatedSubscriptionToken?.cancel()
+    func  unsubscribeToAllSubscriptions() async {
+        await emailClient.unsubscribeAll()
     }
 
     // MARK: - Helpers: Configuration
@@ -440,12 +444,12 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
 
     // MARK: - Helpers
 
-    /// Firstly, attempts to load all the email addresses from the device's cache, and then update via a remote call.
+    /// Attempts to load all the email addresses via a remote call.
     ///
-    /// On any failure, either by cache or remote call, a "Failed to list email messages" UIAlert message will be presented to the user.
+    /// On any failure, a "Failed to list email messages" UIAlert message will be presented to the user.
     ///
     /// All email messages will be filtered using the `emailAddress` to ensure only email messages associated with the email address are listed.
-    func loadCacheEmailMessagesAndFetchRemote() async {
+    func fetchEmailMessages() async {
         do {
             if folderNameSwitcher.currentFolder == .special(.drafts) {
                 self.emailMessages = try await listDraftEmailMessages()
@@ -454,16 +458,10 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
                 }
                 return
             }
-            let localMessages = try await listEmailMessages(cachePolicy: .cacheOnly)
 
-            self.emailMessages = localMessages.sortedByCreatedDescending()
-            Task { @MainActor in
-                self.tableView.reloadData()
-            }
+            let messages = try await listEmailMessages()
 
-            let remoteMessages = try await listEmailMessages(cachePolicy: .remoteOnly)
-
-            self.emailMessages = remoteMessages.sortedByCreatedDescending()
+            self.emailMessages = messages.sortedByCreatedDescending()
             Task { @MainActor in
                 self.tableView.reloadData()
             }
@@ -566,7 +564,7 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
             do {
                 _ = try await deleteEmailMessage(emailMessage.id)
                 // Do a call to service to update cache.
-                _ = try await self.listEmailMessages(cachePolicy: .remoteOnly)
+                _ = try await self.listEmailMessages()
                 self.dismissActivityAlert()
                 return true
             } catch {
@@ -615,7 +613,7 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
                 case .success:
                     self.tableView.reloadData()
                     // Do a call to service to update cache.
-                    _ = try await self.listEmailMessages(cachePolicy: .remoteOnly)
+                    _ = try await self.listEmailMessages()
                     self.dismissActivityAlert()
                     return true
                 default:
@@ -695,6 +693,7 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
             let result = try await self.emailClient.deleteEmailMessages(
                 withIds: emailMessageIds
             )
+            print(result.status)
             switch result.status {
             case .success:
                 self.dismissActivityAlert()
@@ -767,7 +766,7 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
         folderNameSwitcher.currentFolder = folder
         folderSwitcherView(folderNameSwitcher, didSelectFolderType: folder)
         folderNameSwitcher.populateMenu()
-        await loadCacheEmailMessagesAndFetchRemote()
+        await fetchEmailMessages()
     }
 
     // MARK: - Conformance: UITableViewDataSource
@@ -866,7 +865,7 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
             }
         } else {
             Task { @MainActor in
-                await self.loadCacheEmailMessagesAndFetchRemote()
+                await self.fetchEmailMessages()
             }
         }
     }

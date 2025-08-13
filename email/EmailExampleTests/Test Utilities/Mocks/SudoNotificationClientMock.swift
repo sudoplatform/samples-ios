@@ -59,4 +59,36 @@ class SudoNotificationClientMock: SudoNotificationClient {
         }
         throw updateNotificationRegistrationError
     }
+
+    var getUserNotificationConfigurationResult: SudoNotification.NotificationConfiguration?
+    var getUserNotificationConfigurationError = AnyError("Please add base result to `SudoNotificationClientMock.getUserNotificationConfiguration`")
+    func getUserNotificationConfiguration(bundleId: String) async throws -> SudoNotification.NotificationConfiguration? {
+        if getUserNotificationConfigurationResult != nil {
+            return getUserNotificationConfigurationResult!
+        }
+        throw getUserNotificationConfigurationError
+    }
+
+    var getUserAndDeviceNotificationConfigurationResult: SudoNotification.UserAndDeviceNotificationConfiguration?
+    var getUserAndDeviceNotificationConfigurationError = AnyError(
+        "Please add base result to `SudoNotificationClientMock.getUserAndDeviceNotificationConfiguration`"
+    )
+    func getUserAndDeviceNotificationConfiguration(
+        device: any SudoNotification.NotificationDeviceInputProvider
+    ) async throws -> SudoNotification.UserAndDeviceNotificationConfiguration {
+        if getUserAndDeviceNotificationConfigurationResult != nil {
+            return getUserAndDeviceNotificationConfigurationResult!
+        }
+        throw getUserAndDeviceNotificationConfigurationError
+    }
+
+    var setUserNotificationConfigurationResult: SudoNotification.NotificationConfiguration?
+    var setUserNotificationConfigurationError = AnyError("Please add base result to `SudoNotificationClientMock.setUserNotificationConfiguration`")
+    func setUserNotificationConfiguration(config: SudoNotification.UserNotificationSettingsInput) async throws -> SudoNotification.NotificationConfiguration {
+        if setUserNotificationConfigurationResult != nil {
+            return setUserNotificationConfigurationResult!
+        }
+        throw setUserNotificationConfigurationError
+    }
+
 }

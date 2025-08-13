@@ -7,6 +7,7 @@
 import XCTest
 import UIKit
 import SudoEmail
+@testable import SudoProfiles
 @testable import EmailExample
 
 class CreateEmailAddressViewControllerTests: XCTestCase {
@@ -20,12 +21,48 @@ class CreateEmailAddressViewControllerTests: XCTestCase {
     var mockTimer: Timer?
     var isEnabled: Bool?
 
+    var sudo = Sudo(id: "UnitTestSudoId", claims: [
+        Claim(
+         name: Sudo.ClaimName.label,
+         value: .string(value: "UnitTestSudoLabel"),
+         sudoId: "UnitTestSudoId",
+         version: 1,
+         algorithm: .aesCBCPKCS7Padding,
+         keyId: UUID().uuidString
+        )
+     ], metadata: [:], createdAt: Date(), updatedAt: Date(), version: 0)
+
+    var sudoWithNoLabel = Sudo(id: "UnitTestSudoId", claims: [], metadata: [:], createdAt: Date(), updatedAt: Date(), version: 0)
+
+    var sudoWithEmptyLabel = Sudo(id: "UnitTestSudoId", claims: [
+        Claim(
+         name: Sudo.ClaimName.label,
+         value: .string(value: ""),
+         sudoId: "UnitTestSudoId",
+         version: 1,
+         algorithm: .aesCBCPKCS7Padding,
+         keyId: UUID().uuidString
+        )
+     ], metadata: [:], createdAt: Date(), updatedAt: Date(), version: 0)
+
+    var sudoWithEmptySudoId = Sudo(id: "", claims: [
+        Claim(
+         name: Sudo.ClaimName.label,
+         value: .string(value: "UnitTestSudoLabel"),
+         sudoId: "",
+         version: 1,
+         algorithm: .aesCBCPKCS7Padding,
+         keyId: UUID().uuidString
+        )
+     ], metadata: [:], createdAt: Date(), updatedAt: Date(), version: 0)
+
     // MARK: - Lifecycle
 
     @MainActor
     override func setUp() async throws {
         testUtility = EmailExampleTestUtility()
         instanceUnderTest = testUtility.storyBoard.instantiateViewController(identifier: "createEmailAddressList")
+        instanceUnderTest.sudo = sudo
         instanceUnderTest.loadViewIfNeeded()
         testUtility.window.rootViewController = instanceUnderTest
         testUtility.window.makeKeyAndVisible()
@@ -114,7 +151,7 @@ class CreateEmailAddressViewControllerTests: XCTestCase {
 
     @MainActor
     func test_configureFooterValues_NilSudoLabel_willPresentsError() async throws {
-        instanceUnderTest.sudo.label = nil
+        instanceUnderTest.sudo = sudoWithNoLabel
         instanceUnderTest.configureFooterValues()
         try await waitForAsync()
         guard let presentedAlert = instanceUnderTest.presentedViewController as? UIAlertController else {
@@ -127,7 +164,7 @@ class CreateEmailAddressViewControllerTests: XCTestCase {
 
     @MainActor
     func test_configureFooterValues_EmptySudoLabel_willPresentsError() async throws {
-        instanceUnderTest.sudo.label = ""
+        instanceUnderTest.sudo = sudoWithEmptyLabel
         instanceUnderTest.configureFooterValues()
         try await waitForAsync()
         guard let presentedAlert = instanceUnderTest.presentedViewController as? UIAlertController else {
@@ -139,23 +176,8 @@ class CreateEmailAddressViewControllerTests: XCTestCase {
     }
 
     @MainActor
-    func test_configureFooterValues_NilSudoId_willPresentsError() async throws {
-        instanceUnderTest.sudo.label = "label"
-        instanceUnderTest.sudo.id = nil
-        instanceUnderTest.configureFooterValues()
-        try await waitForAsync()
-        guard let presentedAlert = instanceUnderTest.presentedViewController as? UIAlertController else {
-            return XCTFail("No presented alert")
-        }
-        XCTAssertEqual(presentedAlert.title, "Error")
-        XCTAssertEqual(presentedAlert.message, "An error has occurred: no sudo id found")
-        XCTAssertEqual(presentedAlert.actions.first?.title, "OK")
-    }
-
-    @MainActor
     func test_configureFooterValues_EmptySudoId_willPresentsError() async throws {
-        instanceUnderTest.sudo.label = "label"
-        instanceUnderTest.sudo.id = ""
+        instanceUnderTest.sudo = sudoWithEmptySudoId
         instanceUnderTest.configureFooterValues()
         try await waitForAsync()
         guard let presentedAlert = instanceUnderTest.presentedViewController as? UIAlertController else {
@@ -168,12 +190,10 @@ class CreateEmailAddressViewControllerTests: XCTestCase {
 
     @MainActor
     func test_configureFooterValues_SetsSudoLabel() async throws {
-        instanceUnderTest.sudo.label = "label"
-        instanceUnderTest.sudo.id = "id"
         instanceUnderTest.configureFooterValues()
         try await waitForAsync()
         XCTAssertNil(instanceUnderTest.presentedViewController)
-        XCTAssertEqual(instanceUnderTest.sudoLabel.text, "label")
+        XCTAssertEqual(instanceUnderTest.sudoLabel.text, "UnitTestSudoLabel")
     }
 
     func test_setCreateButtonEnabled_True() {

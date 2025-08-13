@@ -2,11 +2,11 @@
 # Defines the deviations from the out-of-box ruleset that swiftlint applies
 #
 
-# Disabled Rule identifiers 
+# Disabled Rule identifiers
 disabled_rules:
   - identifier_name
 
-# Opt-In Rule identifiers 
+# Opt-In Rule identifiers
 opt_in_rules:
   - control_statement
   - empty_count
@@ -19,12 +19,9 @@ opt_in_rules:
   - multiline_literal_brackets
 
 # Linting paths (excluded overrides included)
-included: 
-    - EmailExample
-    - EmailExampleTests
-
-excluded:
-  - Pods
+included:
+  - EmailExample
+  - EmailExampleTests
 
 #
 # Customized rules
@@ -34,50 +31,49 @@ excluded:
 # This limit can be relaxed further if the project contains many violations.
 # appropriate
 line_length:
-    warning: 160
-    error: 180
+  warning: 160
+  error: 180
 
 # Tuples rules
-large_tuple: 
-   - 3
-   - 4
+large_tuple:
+  - 3
+  - 4
 
 # Naming rules - can be relax if required
 type_name:
-    min_length:
-        error: 2
-    max_length:
-        warning: 40
-        error: 50
+  min_length:
+    error: 2
+  max_length:
+    warning: 40
+    error: 50
 
 # The following 3 customizations are likely to trigger violations across our
-# projects. They can be relaxed per project with the aspiration of tending 
+# projects. They can be relaxed per project with the aspiration of tending
 # towards these limits in a reasonable timeframe. In some cases, a code based
 # exception might be appropriate e.g. a test module
 type_body_length:
-    - 1200
-    - 1600
+  - 1200
+  - 1600
 
 file_length:
-    - 1500
-    - 2000
+  - 1500
+  - 2000
 
 cyclomatic_complexity:
-    warning: 20
-    error: 30
+  warning: 20
+  error: 30
 
 # The following 2 customizations are likely to trigger violations across our
-# projects. They can be relaxed per project with the aspiration of tending 
+# projects. They can be relaxed per project with the aspiration of tending
 # towards these limits in a reasonable time frame.
 function_body_length:
-    warning: 300
-    error: 500
+  warning: 300
+  error: 500
 
 function_parameter_count:
-    warning: 6
-    error: 8
+  warning: 6
+  error: 8
 
 # Determines that Xode will show violations at runtime provided the build
 # settings are appropriate
 reporter: "xcode"
-

@@ -104,8 +104,10 @@ class SendEmailMessageViewController: UIViewController, UITextViewDelegate, UITa
     /// Email attachments that are sent with the email message.
     var attachments: Set<EmailAttachment> = []
 
+    /// ID of message that this message is replying to
     var replyingMessageId: String?
 
+    /// ID of message that this message is forwarding
     var forwardingMessageId: String?
 
     // MARK: - Properties: Computed
@@ -207,6 +209,119 @@ class SendEmailMessageViewController: UIViewController, UITextViewDelegate, UITa
         }
     }
 
+    @objc func didTapDeleteDraftButton() {
+        let alert = UIAlertController(
+            title: "Delete draft",
+            message: "Delete this draft message? This cannot be undone.",
+            preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+        alert.addAction(UIAlertAction(title: "Delete", style: .default) { _ in
+            Task { @MainActor in
+                self.presentActivityAlert(message: "Deleting...")
+                await self.deleteDraft()
+                self.dismissActivityAlert {
+                    self.performSegue(withIdentifier: Segue.returnToEmailMessageList.rawValue, sender: self)
+                }
+            }
+        })
+        present(alert, animated: true)
+    }
+
+    @objc func didTapScheduleButton() {
+        guard let draftId = inputData?.draftEmailMessageId else {
+            self.presentErrorAlert(message: "No draft id found")
+            return
+        }
+
+        let alert = UIAlertController(title: "Schedule Send", message: "Select a date and time to send this message.", preferredStyle: .alert)
+
+        let datePicker = UIDatePicker()
+        datePicker.datePickerMode = .dateAndTime
+        datePicker.minimumDate = Date().addingTimeInterval(60) // at least 1 minute in the future
+        datePicker.preferredDatePickerStyle = .wheels
+        datePicker.translatesAutoresizingMaskIntoConstraints = false
+
+        alert.view.addSubview(datePicker)
+        NSLayoutConstraint.activate([
+            datePicker.topAnchor.constraint(equalTo: alert.view.topAnchor, constant: 60),
+            datePicker.leadingAnchor.constraint(equalTo: alert.view.leadingAnchor, constant: 16),
+            datePicker.trailingAnchor.constraint(equalTo: alert.view.trailingAnchor, constant: -16),
+            datePicker.heightAnchor.constraint(equalToConstant: 160)
+        ])
+
+        // Resize alert to fit date picker
+        let height = NSLayoutConstraint(
+          item: alert.view!, 
+          attribute: .height, 
+          relatedBy: .equal, 
+          toItem: nil, 
+          attribute: .notAnAttribute, 
+          multiplier: 1, 
+          constant: 320
+        )
+        alert.view.addConstraint(height)
+
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        alert.addAction(UIAlertAction(title: "Schedule", style: .default) { [weak self] _ in
+            guard let self = self else { return }
+            let sendAt = datePicker.date
+            if sendAt <= Date() {
+                self.presentErrorAlert(message: "Please select a future date and time.")
+                return
+            }
+            Task { @MainActor in
+                self.presentActivityAlert(message: "Scheduling...")
+                let input = ScheduleSendDraftMessageInput(
+                    id: draftId,
+                    emailAddressId: self.emailAddress.id,
+                    sendAt: sendAt
+                )
+                do {
+                    _ = try await self.emailClient.scheduleSendDraftMessage(withInput: input)
+                    self.dismissActivityAlert {
+                        self.performSegue(withIdentifier: Segue.returnToEmailMessageList.rawValue, sender: self)
+                    }
+                } catch {
+                    self.dismissActivityAlert {
+                        self.presentErrorAlert(message: "Failed to schedule message", error: error)
+                    }
+                }
+            }
+        })
+        self.present(alert, animated: true)
+    }
+
+    @objc func didTapCancelScheduleSendButton() {
+        guard let draftId = inputData?.draftEmailMessageId else {
+            self.presentErrorAlert(message: "No draft id found")
+            return
+        }
+        let alert = UIAlertController(
+            title: "Cancel Schedule Send",
+            message: "Cancel sending this message?",
+            preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(title: "Cancel", style: .default) { _ in
+            Task { @MainActor in
+                self.presentActivityAlert(message: "Cancelling...")
+                let input = CancelScheduledDraftMessageInput(id: draftId, emailAddressId: self.emailAddress.id)
+                do {
+                    let _ = try await self.emailClient.cancelScheduledDraftMessage(withInput: input)
+                    self.dismissActivityAlert {
+                        self.performSegue(withIdentifier: Segue.returnToEmailMessageList.rawValue, sender: self)
+                    }
+                } catch {
+                    self.dismissActivityAlert {
+                        self.presentErrorAlert(message: "Failed to cancel sending", error: error)
+                    }
+
+                }
+            }
+        })
+        present(alert, animated: true)
+    }
+
     @IBAction func didTapAttachmentButton() {
         self.showAddAttachmentAlert()
     }
@@ -221,13 +336,7 @@ class SendEmailMessageViewController: UIViewController, UITextViewDelegate, UITa
         presentActivityAlert(message: "Sending Email Message")
         do {
             _ = try await emailClient.sendEmailMessage(withInput: sendEmailMessageInput)
-            if let draftEmailMessageId = inputData?.draftEmailMessageId {
-                let input = DeleteDraftEmailMessagesInput(
-                    ids: [draftEmailMessageId],
-                    emailAddressId: sendEmailMessageInput.senderEmailAddressId
-                )
-                _ = try await emailClient.deleteDraftEmailMessages(withInput: input)
-            }
+                await self.deleteDraft()
             Task { @MainActor in
                 self.dismissActivityAlert {
                     self.performSegue(withIdentifier: Segue.returnToEmailMessageList.rawValue, sender: self)
@@ -396,6 +505,22 @@ class SendEmailMessageViewController: UIViewController, UITextViewDelegate, UITa
         }
     }
 
+    func deleteDraft() async {
+        do {
+            if let draftEmailMessageId = inputData?.draftEmailMessageId {
+                let input = DeleteDraftEmailMessagesInput(
+                    ids: [draftEmailMessageId],
+                    emailAddressId: emailAddress.id
+                )
+                _ = try await emailClient.deleteDraftEmailMessages(withInput: input)
+            }
+        } catch {
+            self.dismissActivityAlert {
+                self.presentErrorAlert(message: "Failed to delete draft email message", error: error)
+            }
+        }
+    }
+
     /// Presents a `UIAlertController` providing different file system options to select an attachment from.
     func showAddAttachmentAlert() {
         let alert = UIAlertController(
@@ -478,12 +603,17 @@ class SendEmailMessageViewController: UIViewController, UITextViewDelegate, UITa
         )
         guard let attachmentsListView = self.attachmentsListController?.attachmentsListView else { return }
 
+        // Only add constraints to the attachmentsListView, not the textView, to avoid conflicts
+        attachmentsListView.translatesAutoresizingMaskIntoConstraints = false
+        containingView.addSubview(attachmentsListView)
+
         let margin = containingView.layoutMarginsGuide
         NSLayoutConstraint.activate([
-            siblingView.topAnchor.constraint(equalTo: attachmentsListView.bottomAnchor, constant: 5.0),
-            siblingView.leadingAnchor.constraint(equalTo: margin.leadingAnchor),
-            siblingView.trailingAnchor.constraint(equalTo: margin.trailingAnchor),
-            siblingView.bottomAnchor.constraint(equalTo: margin.bottomAnchor)
+            attachmentsListView.topAnchor.constraint(equalTo: margin.topAnchor),
+            attachmentsListView.leadingAnchor.constraint(equalTo: margin.leadingAnchor),
+            attachmentsListView.trailingAnchor.constraint(equalTo: margin.trailingAnchor),
+            // Attach the attachmentsListView to the top, and let the textView be laid out as per IB
+            attachmentsListView.heightAnchor.constraint(greaterThanOrEqualToConstant: 0)
         ])
     }
 
@@ -513,6 +643,37 @@ class SendEmailMessageViewController: UIViewController, UITextViewDelegate, UITa
             action: #selector(didTapAttachmentButton)
         )
         navigationItem.rightBarButtonItems = [sendBarButton, attachmentButton]
+
+        if inputData?.draftEmailMessageId != nil {
+            let deleteImage = UIImage(systemName: "trash")
+            let deleteDraftBarButton = UIBarButtonItem(
+                image:  deleteImage,
+                style: .plain,
+                target: self,
+                action: #selector(didTapDeleteDraftButton)
+            )
+            navigationItem.rightBarButtonItems?.append(deleteDraftBarButton)
+
+            if inputData?.scheduledAt == nil {
+                let scheduleImage = UIImage(systemName: "clock")
+                let scheduleSendBarButton = UIBarButtonItem(
+                    image: scheduleImage,
+                    style: .plain,
+                    target: self,
+                    action: #selector(didTapScheduleButton)
+                )
+                navigationItem.rightBarButtonItems?.append(scheduleSendBarButton)
+            } else {
+                let cancelScheduleImage = UIImage(systemName: "clock.badge.xmark")
+                let cancelScheduleSendButton = UIBarButtonItem(
+                    image: cancelScheduleImage,
+                    style: .plain,
+                    target: self,
+                    action: #selector(didTapCancelScheduleSendButton)
+                )
+                navigationItem.rightBarButtonItems?.append(cancelScheduleSendButton)
+            }
+        }
 
         let backImage = UIImage(systemName: "chevron.backward")
         let backButton = UIBarButtonItem(

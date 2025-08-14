@@ -45,6 +45,8 @@ class ReadEmailMessageViewController: UIViewController, ActivityAlertViewControl
     /// Message of a `EmailMessage` that was selected from the previous view.
     var emailMessage: EmailMessage!
 
+    var scheduledAt: Date?
+
     /// Attachments belonging to the email message.
     var attachments: [EmailAttachment] = []
 
@@ -372,7 +374,8 @@ class ReadEmailMessageViewController: UIViewController, ActivityAlertViewControl
                 to: to,
                 cc: replyCc,
                 subject: replySubject.replacingOccurrences(of: "Re:", with: ""),
-                body: replyBody.replacingOccurrences(of: "\n\n---------------\n\n", with: "")
+                body: replyBody.replacingOccurrences(of: "\n\n---------------\n\n", with: ""),
+                scheduledAt: self.scheduledAt
             )
         }
         return sendEmailInput

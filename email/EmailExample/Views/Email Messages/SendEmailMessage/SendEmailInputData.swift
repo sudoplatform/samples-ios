@@ -23,11 +23,22 @@ struct SendEmailInputData {
     /// Message body
     let body: String
 
-    init(draftEmailMessageId: String? = nil, to: String = "", cc: String = "", subject: String, body: String) {
+    /// The datetime of when the message is scheduled to be sent
+    let scheduledAt: Date?
+
+    init(
+        draftEmailMessageId: String? = nil,
+        to: String = "",
+        cc: String = "",
+        subject: String,
+        body: String,
+        scheduledAt: Date? = nil
+    ) {
         self.draftEmailMessageId = draftEmailMessageId
         self.to = to
         self.cc = cc
         self.subject = subject
         self.body = body
+        self.scheduledAt = scheduledAt
     }
 }

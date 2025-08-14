@@ -70,6 +70,9 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
     /// Blocked addresses that have been selected for unblocking
     var selectedBlockedAddresses: [String] = []
 
+    /// Messages that have been scheduled to be send
+    var scheduledDraftMessages: [ScheduledDraftMessage] = []
+
     /// View to allow user selection of Email Folder
     var folderNameSwitcher: FolderSwitcherView!
 
@@ -155,8 +158,10 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
                   let row = tableView.indexPathForSelectedRow?.row else {
                 break
             }
-            readEmailMessage.emailMessage = emailMessages[row]
+            let emailMessage = emailMessages[row]
+            readEmailMessage.emailMessage = emailMessage
             readEmailMessage.emailAddress = emailAddress
+            readEmailMessage.scheduledAt = self.scheduledDraftMessages.first(where: { $0.id == emailMessage.id })?.sendAt
 
         case .navigateToEmailAddressSettings:
             guard let emailAddressSettings = segue.destination as? EmailAddressSettingsViewController else {
@@ -279,6 +284,31 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
         }
         dismissActivityAlert()
         return draftMessages.sortedByCreatedDescending()
+    }
+
+    func listScheduledDraftMessages() async throws -> [ScheduledDraftMessage] {
+        guard let emailAddressId = emailAddress?.id else {
+            Task { @MainActor in
+                presentErrorAlert(message: "An error has occurred: no email address found") { _ in
+                    self.performSegue(withIdentifier: Segue.returnToEmailAddressList.rawValue, sender: self)
+                }
+            }
+            return []
+        }
+        var allItems: [ScheduledDraftMessage] = []
+        var nextToken: String?
+        repeat {
+            let input = ListScheduledDraftMessagesForEmailAddressIdInput(
+                emailAddressId: emailAddressId,
+                limit: 10,
+                nextToken: nextToken,
+                filter: ScheduledDraftMessageFilter(state: .notEqual(.cancelled))
+            )
+            let result = try await emailClient.listScheduledDraftMessagesForEmailAddressId(withInput: input)
+            allItems.append(contentsOf: result.items)
+            nextToken = result.nextToken
+        } while nextToken != nil
+        return allItems
     }
 
     func listEmailFolders() async throws -> [EmailFolder] {
@@ -452,7 +482,11 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
     func fetchEmailMessages() async {
         do {
             if folderNameSwitcher.currentFolder == .special(.drafts) {
-                self.emailMessages = try await listDraftEmailMessages()
+                let draftMessages = try await listDraftEmailMessages()
+                self.emailMessages = draftMessages
+                if !draftMessages.isEmpty {
+                    self.scheduledDraftMessages = try await listScheduledDraftMessages()
+                }
                 Task { @MainActor in
                     self.tableView.reloadData()
                 }
@@ -803,6 +837,16 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
             }
             emailMessageCell.emailMessage = emailMessage
             emailMessageCell.accessoryType = .disclosureIndicator
+            if self.selectedFolderSwitcherLabel == .special(.drafts) && !self.scheduledDraftMessages.isEmpty {
+                let scheduledMessage = self.scheduledDraftMessages.first(where: { $0.id == emailMessage.id && $0.state == .scheduled })
+                if scheduledMessage != nil {
+                    emailMessageCell.scheduledAt = scheduledMessage!.sendAt
+                } else {
+                    emailMessageCell.scheduledAt = nil
+                }
+            } else {
+                emailMessageCell.scheduledAt = nil
+            }
             return emailMessageCell
         }
     }

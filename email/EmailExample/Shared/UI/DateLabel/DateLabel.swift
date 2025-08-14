@@ -31,6 +31,7 @@ class DateLabel: UILabel {
             updateText()
         }
     }
+    var prefix: String?
 
     // MARK: - Methods
 
@@ -42,7 +43,11 @@ class DateLabel: UILabel {
             text = nil
             return
         }
-        text = getFormattedStringForDate(date)
+        text = if prefix != nil {
+            prefix! + getFormattedStringForDate(date)
+        } else {
+            getFormattedStringForDate(date)
+        }
     }
 
     /// Get the formatted string for the input date.

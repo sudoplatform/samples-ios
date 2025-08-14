@@ -21,10 +21,16 @@ class EmailMessageTableViewCell: UITableViewCell {
     @IBOutlet var recipientsLabel: UILabel!
     @IBOutlet var dateLabel: DateLabel!
     @IBOutlet var subjectLabel: UILabel!
+    @IBOutlet var scheduledLabel: DateLabel!
 
     // MARK: - Properties
 
     var emailMessage: EmailMessage? {
+        didSet {
+            updateLabels()
+        }
+    }
+    var scheduledAt: Date? {
         didSet {
             updateLabels()
         }
@@ -37,6 +43,7 @@ class EmailMessageTableViewCell: UITableViewCell {
         recipientsLabel?.text = nil
         dateLabel?.text = nil
         subjectLabel?.text = nil
+        scheduledLabel?.text = nil
     }
 
     /// Update the labels of the view.
@@ -53,6 +60,7 @@ class EmailMessageTableViewCell: UITableViewCell {
             recipientsLabel.text = nil
             dateLabel.text = nil
             subjectLabel.text = nil
+            scheduledLabel.text = nil
             return
         }
         switch emailMessage.direction {
@@ -75,6 +83,14 @@ class EmailMessageTableViewCell: UITableViewCell {
             fatalError("Unknown message direction \(emailMessage.direction)")
         }
         dateLabel.date = emailMessage.createdAt
+
+        if scheduledAt != nil {
+            scheduledLabel.isHidden = false
+            scheduledLabel.prefix = "Scheduled at: "
+            scheduledLabel.date = scheduledAt
+        } else {
+            scheduledLabel.isHidden = true
+        }
 
         let subject = emailMessage.subject ?? Defaults.subject
         let subjectLabelText = NSMutableAttributedString()

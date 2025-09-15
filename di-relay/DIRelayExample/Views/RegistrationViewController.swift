@@ -106,20 +106,17 @@ class RegistrationViewController: UIViewController {
 
         let supportedChallengeTypes = userClient.getSupportedRegistrationChallengeType()
         do {
-            if supportedChallengeTypes.contains(.fsso) {
+            if supportedChallengeTypes.contains(.test) {
+                RegistrationMode.setRegistrationMode(.test)
+                try await registerWithTEST()
+            } else if supportedChallengeTypes.contains(.deviceCheck) {
+                RegistrationMode.setRegistrationMode(.deviceCheck)
+                try await registerWithDeviceCheck()
+            } else if supportedChallengeTypes.contains(.fsso) {
                 RegistrationMode.setRegistrationMode(.fsso)
                 _ = try await signInWithFsso()
                 /// Do not need to do anything further with FSSO, so return now.
                 return
-            }
-
-            /// Register with DeviceCheck, or TEST if DeviceCheck is not enabled.
-            if supportedChallengeTypes.contains(.deviceCheck) {
-                RegistrationMode.setRegistrationMode(.deviceCheck)
-                try await registerWithDeviceCheck()
-            } else if supportedChallengeTypes.contains(.test) {
-                RegistrationMode.setRegistrationMode(.test)
-                try await registerWithTEST()
             }
         } catch {
             showRegistrationFailureAlert(error: error)
@@ -130,7 +127,7 @@ class RegistrationViewController: UIViewController {
         _ = await signIn()
     }
 
-    /// If the access tokens have expired, will refresh tokens.
+    /// Manually refresh the tokens
     ///
     /// Must be signed in to refresh tokens.
     /// - Returns: true if tokens have successfully refreshed or if tokens are still valid.
@@ -142,21 +139,8 @@ class RegistrationViewController: UIViewController {
             return false
         }
 
-        guard let tokenExpiry = try userClient.getRefreshTokenExpiry() else {
-            return false
-        }
-
-        // No need to refresh if token has not expired yet
-        if Date() < tokenExpiry {
-            return true
-        }
-
-        guard let refreshToken = try userClient.getRefreshToken() else {
-            return false
-        }
-
         // Apply refreshed tokens
-        _ = try await userClient.refreshTokens(refreshToken: refreshToken)
+        _ = try await userClient.refreshTokens()
 
         return true
     }

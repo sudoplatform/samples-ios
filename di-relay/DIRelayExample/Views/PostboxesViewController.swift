@@ -158,7 +158,7 @@ class PostboxesViewController: UIViewController, UITableViewDelegate, UITableVie
         let connectionId = UUID().uuidString
 
         do {
-            guard let proof = ownershipProofs[sudo.id ?? ""] else {
+            guard let proof = ownershipProofs[sudo.id] else {
                 await presentErrorAlertOnMain("Still fetching ownership proof. Try creating a postbox again. ", error: nil)
                 return
             }
@@ -226,10 +226,8 @@ class PostboxesViewController: UIViewController, UITableViewDelegate, UITableVie
 
     /// Get ownership proof of the Sudo.
     @MainActor func fetchOwnershipProof(_ sudo: Sudo) async {
-        guard let sudoId = sudo.id else {
-            await presentErrorAlertOnMain("Could not fetch sudo id.", error: nil)
-            return
-        }
+        let sudoId = sudo.id
+
         if ownershipProofs[sudoId] != nil {
             return
         }

@@ -9,7 +9,7 @@ import SudoDIRelay
 import SudoUser
 import SudoProfiles
 
-class PostboxViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, ExitHandling {
+class PostboxViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, ExitHandling, SudoDIRelay.Subscriber {
 
     // MARK: - Supplementary
 
@@ -30,7 +30,7 @@ class PostboxViewController: UIViewController, UITableViewDelegate, UITableViewD
 
     var postbox: Postbox!
     var messageIds: [String] = []
-    var subscriptionToken: SubscriptionToken?
+    var subscriptionId: String?
     private var presentedActivityAlert: UIAlertController?
 
     // MARK: - Properties: Computed
@@ -136,7 +136,11 @@ class PostboxViewController: UIViewController, UITableViewDelegate, UITableViewD
     ///
     /// - Parameter sender: Exit button.
     @IBAction func didTapExitButton(_ sender: Any) {
-        subscriptionToken?.cancel()
+        if let subId = subscriptionId {
+            Task { @MainActor in
+                await relayClient.unsubscribe(id: subId)
+            }
+        }
         self.doExitButtonAction(sender)
     }
 
@@ -177,6 +181,25 @@ class PostboxViewController: UIViewController, UITableViewDelegate, UITableViewD
             }
         }
     }
+    
+    // MARK: - Relay Subscription
+    func notify(notification: SudoDIRelay.SubscriptionNotification) {
+        switch notification {
+        case .messageCreated(_):
+            Task(priority: .medium) {
+                if let fetchedMessageIds = await self.fetchMessageIdsOrAlert() {
+                    self.messageIds = fetchedMessageIds
+                }
+                self.tableView.reloadData()
+            }
+        }
+    }
+
+    func connectionStatusChanged(state: SudoDIRelay.SubscriptionConnectionState) {
+        Task { @MainActor in
+            await presentActivityAlert(message: "Subscription status changed \(state)")
+        }
+    }
 
     // MARK: - Helpers
 
@@ -195,25 +218,14 @@ class PostboxViewController: UIViewController, UITableViewDelegate, UITableViewD
         }
         // Set up message subscription - we are not actually using the retrieved message
         // but instead fire another round-trip
-        // We must store the token in order for the subscription to be created successfully, otherwise
-        // the out of scope returned value will cause the subscription to be terminated.
         do {
-            subscriptionToken = try await relayClient.subscribeToMessageCreated(
-                statusChangeHandler: nil,
-                resultHandler: { result in
-                    switch result {
-                    case .success:
-                        Task(priority: .medium) {
-                            if let fetchedMessageIds = await self.fetchMessageIdsOrAlert() {
-                                self.messageIds = fetchedMessageIds
-                            }
-                            self.tableView.reloadData()
-                        }
-
-                    default:
-                        return
-                    }
-                })
+            let subId = UUID().uuidString
+            try await relayClient.subscribe(
+                id: subId,
+                notificationType: .messageCreated,
+                subscriber: self
+            )
+            subscriptionId = subId
         } catch {
             await presentErrorAlertOnMain("Could not set up message subscription.", error: error)
         }

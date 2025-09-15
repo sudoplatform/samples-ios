@@ -60,7 +60,7 @@ class Authenticator {
         )
     }
 
-    func deregister() async throws -> String {
+    func deregister() async throws {
         try await userClient.deregister()
     }
 

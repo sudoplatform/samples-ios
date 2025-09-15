@@ -69,7 +69,7 @@ class SudoListViewController: UIViewController, UITableViewDelegate, UITableView
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         Task(priority: .medium) {
-            await loadCacheSudosAndFetchRemote()
+            await loadSudos()
         }
     }
 
@@ -108,7 +108,7 @@ class SudoListViewController: UIViewController, UITableViewDelegate, UITableView
     @MainActor func deleteSudo(sudo: Sudo) async -> Bool {
         do {
             await presentActivityAlertOnMain("Deleting Sudo")
-            try await profilesClient.deleteSudo(sudo: sudo)
+            try await profilesClient.deleteSudo(input: .init(sudoId: sudo.id, version: sudo.version))
             await dismissActivityAlert()
             return true
         } catch {
@@ -119,11 +119,10 @@ class SudoListViewController: UIViewController, UITableViewDelegate, UITableView
 
     // MARK: - Helpers
 
-    /// Attempts to load all Sudos from the device's cache first and then update via a remote call.
-    @MainActor func loadCacheSudosAndFetchRemote() async {
+    /// Attempts to load all Sudos via a remote call.
+    @MainActor func loadSudos() async {
         do {
-            sudos = try await profilesClient.listSudos(option: .cacheOnly)
-            sudos = try await profilesClient.listSudos(option: .remoteOnly)
+            sudos = try await profilesClient.listSudos(cachePolicy: .remoteOnly)
         } catch {
             await presentErrorAlert(message: "Failed to list Sudos", error: error)
         }

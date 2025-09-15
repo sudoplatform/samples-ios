@@ -12,7 +12,6 @@ class SendMessage {
         let url = URL(string: serviceEndpoint)!
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
-        request.httpBody = messageContents
 
         let session = URLSession.shared
 

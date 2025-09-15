@@ -3,11 +3,15 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXBuildFile section */
-		1293274A5F2F70F37B2A59AC /* Pods_DIRelayExampleTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 28533FCACA7B74F31081AE43 /* Pods_DIRelayExampleTests.framework */; };
+		2F2D58E12E77972900C7024E /* SudoDIRelay in Frameworks */ = {isa = PBXBuildFile; productRef = 2F2D58E02E77972900C7024E /* SudoDIRelay */; };
+		2F8A7FEF2E73B69D00766537 /* SudoEntitlements in Frameworks */ = {isa = PBXBuildFile; productRef = 2F8A7FEE2E73B69D00766537 /* SudoEntitlements */; };
+		2F8A7FF22E73B7CB00766537 /* SudoUser in Frameworks */ = {isa = PBXBuildFile; productRef = 2F8A7FF12E73B7CB00766537 /* SudoUser */; };
+		2F8A7FF52E73B81300766537 /* SudoProfiles in Frameworks */ = {isa = PBXBuildFile; productRef = 2F8A7FF42E73B81300766537 /* SudoProfiles */; };
+		2F8A7FF72E73BF2400766537 /* RelaySubscriber.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F8A7FF62E73BF2400766537 /* RelaySubscriber.swift */; };
 		4600B3EB282B46AC00351F86 /* ExitHandling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4600B3EA282B46AC00351F86 /* ExitHandling.swift */; };
 		461E2D4A26A7AD97000A887B /* Invitation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 461E2D4926A7AD97000A887B /* Invitation.swift */; };
 		464A509D269D22FD0062D9CA /* PostBoxIdStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 464A509C269D22FD0062D9CA /* PostBoxIdStorage.swift */; };
@@ -17,7 +21,6 @@
 		4660C8B82820B79000FE3805 /* CreateSudoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4660C8B42820B79000FE3805 /* CreateSudoViewController.swift */; };
 		4664EA3627A8C45600002075 /* Authenticator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4664EA3527A8C45600002075 /* Authenticator.swift */; };
 		4664EA3827A8C7C400002075 /* FileReadable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4664EA3727A8C7C400002075 /* FileReadable.swift */; };
-		4664EA3B27A913B800002075 /* RegistrationMethod.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4664EA3A27A913B800002075 /* RegistrationMethod.swift */; };
 		4679EBF1282BA2FC00DF1E32 /* RegistrationMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4679EBF0282BA2FC00DF1E32 /* RegistrationMode.swift */; };
 		467BC24227B0966700956605 /* AuthenticatorMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 467BC23D27B0966700956605 /* AuthenticatorMock.swift */; };
 		467BC24327B0966700956605 /* UITableViewMockSpy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 467BC23E27B0966700956605 /* UITableViewMockSpy.swift */; };
@@ -33,7 +36,6 @@
 		46F53859282897AA00C361F5 /* MockSudoProfilesClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46F53858282897AA00C361F5 /* MockSudoProfilesClient.swift */; };
 		46F5385B282898CB00C361F5 /* MockKeyManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46F5385A282898CB00C361F5 /* MockKeyManager.swift */; };
 		46F5385D2828E50E00C361F5 /* Logger+Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46F5385C2828E50E00C361F5 /* Logger+Tests.swift */; };
-		4A7D7AD4652C9056C6543271 /* Pods_DIRelayExample.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 907BB649FC6345AD10D66CB2 /* Pods_DIRelayExample.framework */; };
 		ADFCBF732A135F8900C1341E /* PostboxViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADFCBF722A135F8900C1341E /* PostboxViewController.swift */; };
 		ADFCBF752A14403900C1341E /* SendMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADFCBF742A14403900C1341E /* SendMessage.swift */; };
 		ADFCBF772A16E06700C1341E /* FileReadableMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADFCBF762A16E06700C1341E /* FileReadableMock.swift */; };
@@ -53,8 +55,6 @@
 		ED00FDB526F8456500311702 /* XCTestCaseExpectation+Convenience.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED00FDB026F8456500311702 /* XCTestCaseExpectation+Convenience.swift */; };
 		ED00FDB626F8456500311702 /* XCTestCase+CustomAssertions.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED00FDB126F8456500311702 /* XCTestCase+CustomAssertions.swift */; };
 		ED00FDC826F8457800311702 /* SudoDIRelayClientMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED00FDB926F8457700311702 /* SudoDIRelayClientMock.swift */; };
-		ED00FDC926F8457800311702 /* MockAWSNetworkTransport.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED00FDBA26F8457700311702 /* MockAWSNetworkTransport.swift */; };
-		ED00FDCA26F8457800311702 /* MockAppSyncClientHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED00FDBB26F8457700311702 /* MockAppSyncClientHelper.swift */; };
 		ED00FDCB26F8457800311702 /* SudoDlRelayClientSpy.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED00FDBD26F8457700311702 /* SudoDlRelayClientSpy.swift */; };
 		ED00FDCC26F8457800311702 /* AnyError.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED00FDBE26F8457700311702 /* AnyError.swift */; };
 		ED00FDCD26F8457800311702 /* DataFactoryNamespace.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED00FDC026F8457700311702 /* DataFactoryNamespace.swift */; };
@@ -78,7 +78,7 @@
 
 /* Begin PBXFileReference section */
 		28533FCACA7B74F31081AE43 /* Pods_DIRelayExampleTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_DIRelayExampleTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		334ADB3D43533097A70CD13F /* Pods-DIRelayExampleTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DIRelayExampleTests.debug.xcconfig"; path = "Target Support Files/Pods-DIRelayExampleTests/Pods-DIRelayExampleTests.debug.xcconfig"; sourceTree = "<group>"; };
+		2F8A7FF62E73BF2400766537 /* RelaySubscriber.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RelaySubscriber.swift; sourceTree = "<group>"; };
 		4600B3EA282B46AC00351F86 /* ExitHandling.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExitHandling.swift; sourceTree = "<group>"; };
 		461E2D4926A7AD97000A887B /* Invitation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Invitation.swift; sourceTree = "<group>"; };
 		464A509C269D22FD0062D9CA /* PostBoxIdStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostBoxIdStorage.swift; sourceTree = "<group>"; };
@@ -87,7 +87,6 @@
 		4660C8B42820B79000FE3805 /* CreateSudoViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CreateSudoViewController.swift; sourceTree = "<group>"; };
 		4664EA3527A8C45600002075 /* Authenticator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Authenticator.swift; sourceTree = "<group>"; };
 		4664EA3727A8C7C400002075 /* FileReadable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FileReadable.swift; sourceTree = "<group>"; };
-		4664EA3A27A913B800002075 /* RegistrationMethod.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegistrationMethod.swift; sourceTree = "<group>"; };
 		4679EBF0282BA2FC00DF1E32 /* RegistrationMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegistrationMode.swift; sourceTree = "<group>"; };
 		467BC23D27B0966700956605 /* AuthenticatorMock.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AuthenticatorMock.swift; sourceTree = "<group>"; };
 		467BC23E27B0966700956605 /* UITableViewMockSpy.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UITableViewMockSpy.swift; sourceTree = "<group>"; };
@@ -103,10 +102,7 @@
 		46F53858282897AA00C361F5 /* MockSudoProfilesClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockSudoProfilesClient.swift; sourceTree = "<group>"; };
 		46F5385A282898CB00C361F5 /* MockKeyManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockKeyManager.swift; sourceTree = "<group>"; };
 		46F5385C2828E50E00C361F5 /* Logger+Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Logger+Tests.swift"; sourceTree = "<group>"; };
-		4C695A525D051217FF089051 /* Pods-DIRelayExampleTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DIRelayExampleTests.release.xcconfig"; path = "Target Support Files/Pods-DIRelayExampleTests/Pods-DIRelayExampleTests.release.xcconfig"; sourceTree = "<group>"; };
-		795962014CB32B90A5280898 /* Pods-DIRelayExampleTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DIRelayExampleTests.release.xcconfig"; path = "Target Support Files/Pods-DIRelayExampleTests/Pods-DIRelayExampleTests.release.xcconfig"; sourceTree = "<group>"; };
 		907BB649FC6345AD10D66CB2 /* Pods_DIRelayExample.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_DIRelayExample.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		9577457D65F50497B6E0378C /* Pods-DIRelayExampleTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DIRelayExampleTests.debug.xcconfig"; path = "Target Support Files/Pods-DIRelayExampleTests/Pods-DIRelayExampleTests.debug.xcconfig"; sourceTree = "<group>"; };
 		ADFCBF722A135F8900C1341E /* PostboxViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostboxViewController.swift; sourceTree = "<group>"; };
 		ADFCBF742A14403900C1341E /* SendMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SendMessage.swift; sourceTree = "<group>"; };
 		ADFCBF762A16E06700C1341E /* FileReadableMock.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FileReadableMock.swift; sourceTree = "<group>"; };
@@ -124,10 +120,6 @@
 		CFD59916245A47C100230C6F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		CFD5991C245A4E7800230C6F /* PostboxesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostboxesViewController.swift; sourceTree = "<group>"; };
 		CFD59920245A7C8000230C6F /* UIViewController+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+Extensions.swift"; sourceTree = "<group>"; };
-		CFD59922245A7F5900230C6F /* Podfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; path = Podfile; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
-		D63CA33F9B4069387E1D2FFF /* Pods-DIRelayExample.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DIRelayExample.debug.xcconfig"; path = "Target Support Files/Pods-DIRelayExample/Pods-DIRelayExample.debug.xcconfig"; sourceTree = "<group>"; };
-		D9DA29EC4AED3245ECF09445 /* Pods-DIRelayExample.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DIRelayExample.release.xcconfig"; path = "Target Support Files/Pods-DIRelayExample/Pods-DIRelayExample.release.xcconfig"; sourceTree = "<group>"; };
-		DB906E826D707FD8AFACA846 /* Pods-DIRelayExample.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DIRelayExample.debug.xcconfig"; path = "Target Support Files/Pods-DIRelayExample/Pods-DIRelayExample.debug.xcconfig"; sourceTree = "<group>"; };
 		ED00FD9D26F8453300311702 /* DIRelayExampleTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DIRelayExampleTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		ED00FDA926F8454000311702 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		ED00FDAD26F8456500311702 /* XCTestCase+Utility.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "XCTestCase+Utility.swift"; sourceTree = "<group>"; };
@@ -135,8 +127,6 @@
 		ED00FDB026F8456500311702 /* XCTestCaseExpectation+Convenience.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "XCTestCaseExpectation+Convenience.swift"; sourceTree = "<group>"; };
 		ED00FDB126F8456500311702 /* XCTestCase+CustomAssertions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "XCTestCase+CustomAssertions.swift"; sourceTree = "<group>"; };
 		ED00FDB926F8457700311702 /* SudoDIRelayClientMock.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SudoDIRelayClientMock.swift; sourceTree = "<group>"; };
-		ED00FDBA26F8457700311702 /* MockAWSNetworkTransport.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockAWSNetworkTransport.swift; sourceTree = "<group>"; };
-		ED00FDBB26F8457700311702 /* MockAppSyncClientHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockAppSyncClientHelper.swift; sourceTree = "<group>"; };
 		ED00FDBD26F8457700311702 /* SudoDlRelayClientSpy.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SudoDlRelayClientSpy.swift; sourceTree = "<group>"; };
 		ED00FDBE26F8457700311702 /* AnyError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnyError.swift; sourceTree = "<group>"; };
 		ED00FDC026F8457700311702 /* DataFactoryNamespace.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataFactoryNamespace.swift; sourceTree = "<group>"; };
@@ -146,7 +136,6 @@
 		ED00FDD626F845B700311702 /* UIViewController+ExtensionsTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIViewController+ExtensionsTests.swift"; sourceTree = "<group>"; };
 		ED00FDDA26F845D100311702 /* MessageDetailsViewControllerTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MessageDetailsViewControllerTests.swift; sourceTree = "<group>"; };
 		ED00FDE326F845F100311702 /* PostboxesViewControllerTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PostboxesViewControllerTests.swift; sourceTree = "<group>"; };
-		ED61B621A8A205DD5BDFDFF7 /* Pods-DIRelayExample.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DIRelayExample.release.xcconfig"; path = "Target Support Files/Pods-DIRelayExample/Pods-DIRelayExample.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -154,7 +143,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4A7D7AD4652C9056C6543271 /* Pods_DIRelayExample.framework in Frameworks */,
+				2F2D58E12E77972900C7024E /* SudoDIRelay in Frameworks */,
+				2F8A7FEF2E73B69D00766537 /* SudoEntitlements in Frameworks */,
+				2F8A7FF52E73B81300766537 /* SudoProfiles in Frameworks */,
+				2F8A7FF22E73B7CB00766537 /* SudoUser in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -162,7 +154,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1293274A5F2F70F37B2A59AC /* Pods_DIRelayExampleTests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -215,17 +206,10 @@
 				4664EA3527A8C45600002075 /* Authenticator.swift */,
 				4664EA3727A8C7C400002075 /* FileReadable.swift */,
 				4679EBF0282BA2FC00DF1E32 /* RegistrationMode.swift */,
+				2F8A7FF62E73BF2400766537 /* RelaySubscriber.swift */,
 				ADFCBF742A14403900C1341E /* SendMessage.swift */,
 			);
 			name = Utilities;
-			sourceTree = "<group>";
-		};
-		4664EA3927A913A700002075 /* Data */ = {
-			isa = PBXGroup;
-			children = (
-				4664EA3A27A913B800002075 /* RegistrationMethod.swift */,
-			);
-			name = Data;
 			sourceTree = "<group>";
 		};
 		467BC24927B1DFC000956605 /* Tests */ = {
@@ -279,21 +263,6 @@
 			path = Shared;
 			sourceTree = "<group>";
 		};
-		98F881170680D02B7D57DD4A /* Pods */ = {
-			isa = PBXGroup;
-			children = (
-				DB906E826D707FD8AFACA846 /* Pods-DIRelayExample.debug.xcconfig */,
-				D63CA33F9B4069387E1D2FFF /* Pods-DIRelayExample.debug.xcconfig */,
-				D9DA29EC4AED3245ECF09445 /* Pods-DIRelayExample.release.xcconfig */,
-				ED61B621A8A205DD5BDFDFF7 /* Pods-DIRelayExample.release.xcconfig */,
-				334ADB3D43533097A70CD13F /* Pods-DIRelayExampleTests.debug.xcconfig */,
-				9577457D65F50497B6E0378C /* Pods-DIRelayExampleTests.debug.xcconfig */,
-				4C695A525D051217FF089051 /* Pods-DIRelayExampleTests.release.xcconfig */,
-				795962014CB32B90A5280898 /* Pods-DIRelayExampleTests.release.xcconfig */,
-			);
-			path = Pods;
-			sourceTree = "<group>";
-		};
 		ADFCBF782A16F1D400C1341E /* Postbox */ = {
 			isa = PBXGroup;
 			children = (
@@ -316,11 +285,9 @@
 		CFD598FC245A47BF00230C6F = {
 			isa = PBXGroup;
 			children = (
-				CFD59922245A7F5900230C6F /* Podfile */,
 				CFD59907245A47BF00230C6F /* DIRelayExample */,
 				ED00FDA726F8454000311702 /* DIRelayExampleTests */,
 				CFD59906245A47BF00230C6F /* Products */,
-				98F881170680D02B7D57DD4A /* Pods */,
 				3DCE7EC395A25A2AF9F7B37C /* Frameworks */,
 			);
 			sourceTree = "<group>";
@@ -337,7 +304,6 @@
 		CFD59907245A47BF00230C6F /* DIRelayExample */ = {
 			isa = PBXGroup;
 			children = (
-				4664EA3927A913A700002075 /* Data */,
 				461E2D4626A646D9000A887B /* Extensions */,
 				4600B3E9282B469400351F86 /* Shared */,
 				CF51068D2465C90C00B69629 /* Storage */,
@@ -410,8 +376,6 @@
 			children = (
 				467BC23D27B0966700956605 /* AuthenticatorMock.swift */,
 				ADFCBF762A16E06700C1341E /* FileReadableMock.swift */,
-				ED00FDBB26F8457700311702 /* MockAppSyncClientHelper.swift */,
-				ED00FDBA26F8457700311702 /* MockAWSNetworkTransport.swift */,
 				46F5385A282898CB00C361F5 /* MockKeyManager.swift */,
 				46F538562828968F00C361F5 /* MockSudoEntitlementsClient.swift */,
 				46F53858282897AA00C361F5 /* MockSudoProfilesClient.swift */,
@@ -484,7 +448,6 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = CFD59919245A47C100230C6F /* Build configuration list for PBXNativeTarget "DIRelayExample" */;
 			buildPhases = (
-				56D654CF615B2D91C0696B1C /* [CP] Check Pods Manifest.lock */,
 				CFD59901245A47BF00230C6F /* Sources */,
 				CFD59902245A47BF00230C6F /* Frameworks */,
 				CFD59903245A47BF00230C6F /* Resources */,
@@ -503,7 +466,6 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = ED00FDA426F8453300311702 /* Build configuration list for PBXNativeTarget "DIRelayExampleTests" */;
 			buildPhases = (
-				256292BA186BBC04B1F7ABDC /* [CP] Check Pods Manifest.lock */,
 				ED00FD9926F8453300311702 /* Sources */,
 				ED00FD9A26F8453300311702 /* Frameworks */,
 				ED00FD9B26F8453300311702 /* Resources */,
@@ -546,6 +508,12 @@
 				Base,
 			);
 			mainGroup = CFD598FC245A47BF00230C6F;
+			packageReferences = (
+				2F8A7FED2E73B69D00766537 /* XCRemoteSwiftPackageReference "sudo-entitlements-ios" */,
+				2F8A7FF02E73B7CB00766537 /* XCRemoteSwiftPackageReference "sudo-user-ios" */,
+				2F8A7FF32E73B81300766537 /* XCRemoteSwiftPackageReference "sudo-profiles-ios" */,
+				2F2D58DF2E77972900C7024E /* XCRemoteSwiftPackageReference "sudo-di-relay-ios" */,
+			);
 			productRefGroup = CFD59906245A47BF00230C6F /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -577,28 +545,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		256292BA186BBC04B1F7ABDC /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-DIRelayExampleTests-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
 		46A8B34026A14A9100807237 /* Copy Test Keys (Debug) */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -616,28 +562,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "returncode=0\n\necho \"Copy test key to bundle\"\nSOURCE=${PROJECT_DIR}/config/register_key.private\ncp -f ${SOURCE} \"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/\"\nif [ $? -ne 0 ]\nthen\n    echo \"error: Failed to copy test registration key. Make sure the file config/register_key.private exists in the project directory (see README.md).\"\nfi\n\necho \"Copy test key ID to bundle\"\nSOURCE=${PROJECT_DIR}/config/register_key.id \ncp -f ${SOURCE} \"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/\"\nif [ $? -ne 0 ]\nthen\n    echo \"error: Failed to copy test registration key ID. Make sure the file config/register_key.id exists in the project directory (see README.md).\"\nfi\n\necho \"Copy Sudo Platform config to bundle\"\nSOURCE=${PROJECT_DIR}/config/sudoplatformconfig.json\ncp -f ${SOURCE} \"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/\"\nif [ $? -ne 0 ]\nthen\n    echo \"error: Failed to copy sudoplatformconfig.json. Make sure the file config/sudoplatformconfig.json exists in the project directory (see README.md).\"\nfi\n\nexit ${returncode}\n";
-		};
-		56D654CF615B2D91C0696B1C /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-DIRelayExample-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -662,9 +586,9 @@
 				CFD5991D245A4E7800230C6F /* PostboxesViewController.swift in Sources */,
 				464A509D269D22FD0062D9CA /* PostBoxIdStorage.swift in Sources */,
 				ADFCBF732A135F8900C1341E /* PostboxViewController.swift in Sources */,
-				4664EA3B27A913B800002075 /* RegistrationMethod.swift in Sources */,
 				4679EBF1282BA2FC00DF1E32 /* RegistrationMode.swift in Sources */,
 				CFD5990D245A47BF00230C6F /* RegistrationViewController.swift in Sources */,
+				2F8A7FF72E73BF2400766537 /* RelaySubscriber.swift in Sources */,
 				ADFCBF752A14403900C1341E /* SendMessage.swift in Sources */,
 				4660C8B52820B79000FE3805 /* SudoListViewController.swift in Sources */,
 				CFD59921245A7C8000230C6F /* UIViewController+Extensions.swift in Sources */,
@@ -687,8 +611,6 @@
 				ADFCBF772A16E06700C1341E /* FileReadableMock.swift in Sources */,
 				46F5385D2828E50E00C361F5 /* Logger+Tests.swift in Sources */,
 				ED00FDDB26F845D100311702 /* MessageDetailsViewControllerTests.swift in Sources */,
-				ED00FDCA26F8457800311702 /* MockAppSyncClientHelper.swift in Sources */,
-				ED00FDC926F8457800311702 /* MockAWSNetworkTransport.swift in Sources */,
 				46F5385B282898CB00C361F5 /* MockKeyManager.swift in Sources */,
 				46F538572828968F00C361F5 /* MockSudoEntitlementsClient.swift in Sources */,
 				46F53859282897AA00C361F5 /* MockSudoProfilesClient.swift in Sources */,
@@ -856,12 +778,11 @@
 		};
 		CFD5991A245A47C100230C6F /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = D63CA33F9B4069387E1D2FFF /* Pods-DIRelayExample.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 33X5MJEM2D;
+				DEVELOPMENT_TEAM = UU2W43R8JA;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = DIRelayExample/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
@@ -878,12 +799,11 @@
 		};
 		CFD5991B245A47C100230C6F /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = ED61B621A8A205DD5BDFDFF7 /* Pods-DIRelayExample.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 33X5MJEM2D;
+				DEVELOPMENT_TEAM = UU2W43R8JA;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = DIRelayExample/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
@@ -900,7 +820,6 @@
 		};
 		ED00FDA526F8453300311702 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 9577457D65F50497B6E0378C /* Pods-DIRelayExampleTests.debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
@@ -922,7 +841,6 @@
 		};
 		ED00FDA626F8453300311702 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 795962014CB32B90A5280898 /* Pods-DIRelayExampleTests.release.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
@@ -973,6 +891,64 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		2F2D58DF2E77972900C7024E /* XCRemoteSwiftPackageReference "sudo-di-relay-ios" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sudoplatform/sudo-di-relay-ios.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.0.0;
+			};
+		};
+		2F8A7FED2E73B69D00766537 /* XCRemoteSwiftPackageReference "sudo-entitlements-ios" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sudoplatform/sudo-entitlements-ios.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 13.0.0;
+			};
+		};
+		2F8A7FF02E73B7CB00766537 /* XCRemoteSwiftPackageReference "sudo-user-ios" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sudoplatform/sudo-user-ios.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 18.0.0;
+			};
+		};
+		2F8A7FF32E73B81300766537 /* XCRemoteSwiftPackageReference "sudo-profiles-ios" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sudoplatform/sudo-profiles-ios.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 20.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		2F2D58E02E77972900C7024E /* SudoDIRelay */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 2F2D58DF2E77972900C7024E /* XCRemoteSwiftPackageReference "sudo-di-relay-ios" */;
+			productName = SudoDIRelay;
+		};
+		2F8A7FEE2E73B69D00766537 /* SudoEntitlements */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 2F8A7FED2E73B69D00766537 /* XCRemoteSwiftPackageReference "sudo-entitlements-ios" */;
+			productName = SudoEntitlements;
+		};
+		2F8A7FF12E73B7CB00766537 /* SudoUser */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 2F8A7FF02E73B7CB00766537 /* XCRemoteSwiftPackageReference "sudo-user-ios" */;
+			productName = SudoUser;
+		};
+		2F8A7FF42E73B81300766537 /* SudoProfiles */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 2F8A7FF32E73B81300766537 /* XCRemoteSwiftPackageReference "sudo-profiles-ios" */;
+			productName = SudoProfiles;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = CFD598FD245A47BF00230C6F /* Project object */;
 }

@@ -74,10 +74,16 @@ class CreateSudoViewController: UIViewController {
 
     /// Creates a Sudo based on the view's form inputs.
     @MainActor func createSudo() async {
-        let sudo = Sudo(title: nil, firstName: nil, lastName: nil, label: labelTextField.text, notes: nil, avatar: nil)
         await presentActivityAlert(message: "Creating sudo")
         do {
-            let createdSudo = try await profilesClient.createSudo(sudo: sudo)
+            let createdSudo = try await profilesClient.createSudo(input: .init(
+                title: nil,
+                firstName: nil,
+                lastName: nil,
+                label: labelTextField.text,
+                notes: nil,
+                avatar: nil
+            ))
             await dismissActivityAlert()
             self.sudo = createdSudo
         } catch {

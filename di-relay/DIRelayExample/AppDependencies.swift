@@ -45,8 +45,7 @@ struct AppDependencies {
         // Setup EntitlementsClient
         let entitlementsClient = try DefaultSudoEntitlementsClient(userClient: sudoUserClient)
         // Setup ProfilesClient
-        let storageURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-        let profilesClient = try DefaultSudoProfilesClient(sudoUserClient: sudoUserClient, blobContainerURL: storageURL)
+        let profilesClient = try DefaultSudoProfilesClient(sudoUserClient: sudoUserClient)
         let authenticator = Authenticator(userClient: sudoUserClient, keyManager: testRegistrationKeyManager)
         self.init(
             sudoUserClient: sudoUserClient,
@@ -66,8 +65,7 @@ struct AppDependencies {
         // Setup EntitlementsClient
         entitlementsClient = try DefaultSudoEntitlementsClient(userClient: sudoUserClient)
         // Setup ProfilesClient
-        let storageURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-        profilesClient = try DefaultSudoProfilesClient(sudoUserClient: sudoUserClient, blobContainerURL: storageURL)
+        profilesClient = try DefaultSudoProfilesClient(sudoUserClient: sudoUserClient)
         // If this fails, check the config is set up
         sudoDIRelayClient = try DefaultSudoDIRelayClient(sudoUserClient: sudoUserClient)
 

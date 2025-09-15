@@ -104,7 +104,7 @@ extension ExitHandling where Self: UIViewController {
                 do {
                     _ = try await deleteAllSudos()
                     try await sudoUserClient.reset()
-                    try profilesClient.reset()
+                    try await profilesClient.reset()
                     // try self.profilesClient.generateEncryptionKey()
                     await self.dismissActivityAlert()
 
@@ -145,11 +145,11 @@ extension ExitHandling where Self: UIViewController {
     ///
     /// - Returns: A list of errors that occured when deleting the sudos.
     private func deleteAllSudos() async throws {
-        let sudos = try await profilesClient.listSudos(option: .remoteOnly)
+        let sudos = try await profilesClient.listSudos(cachePolicy: .remoteOnly)
         try await withThrowingTaskGroup(of: Void.self) { group in
             for sudo in sudos {
                 group.addTask {
-                    try await self.profilesClient.deleteSudo(sudo: sudo)
+                    try await self.profilesClient.deleteSudo(input: .init(sudoId: sudo.id, version: sudo.version))
                 }
             }
             try await group.waitForAll()

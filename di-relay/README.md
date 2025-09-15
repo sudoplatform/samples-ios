@@ -7,7 +7,7 @@ This project provides examples for interacting with the Sudo DI Relay iOS SDK on
 
 | Technology             | Supported version |
 | ---------------------- |-------------------|
-| iOS Deployment Target  | 15.0+             |
+| iOS Deployment Target  | 16.0+             |
 | Swift language version | 5.0               |
 | Xcode version          | 14.1+             |
 
@@ -30,17 +30,15 @@ ${PROJECT_DIR}/config/register_key.private
 ${PROJECT_DIR}/config/register_key.id
 ```
 
-4. Run `pod install` from the project root
-
-5. Build the app
+4. Build the app
 
 ## More Documentation
 
 Refer to the following documents for more information:
 
-- [Sudo Decentralized Identity Relay Docs](https://docs.sudoplatform.com/sudo-labs/decentralized-identity/relay-sdk)
+- [Sudo Decentralized Identity Relay Docs](https://docs.sudoplatform.com/guides/decentralized-identity/decentralized-identity/relay-sdk)
 - [Getting Started on Sudo Platform](https://docs.sudoplatform.com/guides/getting-started)
-- [Understanding Decentralized Identity on Sudo Platform](https://docs.sudoplatform.com/sudo-labs/decentralized-identity)
+- [Understanding Decentralized Identity on Sudo Platform](https://docs.sudoplatform.com/guides/decentralized-identity)
 
 ## Issues and Support
 

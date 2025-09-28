@@ -52,6 +52,7 @@
                         <segue destination="Hjk-9I-wy4" kind="unwind" identifier="returnToRegistration" unwindAction="returnToRegistrationWithSegue:" id="rOt-bm-ziO"/>
                         <segue destination="bZa-Hg-rSq" kind="show" identifier="navigateToIdentityVerification" id="nRB-9g-sfJ"/>
                         <segue destination="XUj-or-Byn" kind="show" identifier="navigateToOrphanCardList" id="n86-3d-YOZ"/>
+                        <segue destination="nEE-o8-aYl" kind="show" identifier="navigateToIdentityVerificationConsent" id="hJ2-3A-7ik"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="eqV-vH-cjW" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -197,6 +198,19 @@
             </objects>
             <point key="canvasLocation" x="1142" y="1821"/>
         </scene>
+        <!--Secure ID Verification Consent-->
+        <scene sceneID="Rgf-aT-ORC">
+            <objects>
+                <viewController storyboardIdentifier="identityVerificationConsent" id="nEE-o8-aYl" customClass="IdentityVerificationConsentViewController" customModule="VirtualCardsExample" customModuleProvider="target" sceneMemberID="viewController">
+                    <navigationItem key="navigationItem" title="Secure ID Verification Consent" id="7Z2-7s-mcK"/>
+                    <connections>
+                        <segue destination="bZa-Hg-rSq" kind="show" identifier="navigateToIdentityVerification" id="Aoc-9n-7fH"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Pif-JD-dT4" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1881" y="1821"/>
+        </scene>
         <!--Orphan Cards-->
         <scene sceneID="rRL-62-ocd">
             <objects>
@@ -268,6 +282,7 @@
     <inferredMetricsTieBreakers>
         <segue reference="uot-6s-QM3"/>
         <segue reference="F5j-Gl-9C0"/>
+        <segue reference="Aoc-9n-7fH"/>
     </inferredMetricsTieBreakers>
     <resources>
         <systemColor name="systemBackgroundColor">

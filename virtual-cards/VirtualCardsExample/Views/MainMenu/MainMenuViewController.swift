@@ -37,6 +37,8 @@ class MainMenuViewController: UIViewController, UITableViewDelegate, UITableView
     enum Segue: String {
         /// Used to navigate to the `IdentityVerificationViewController`.
         case navigateToIdentityVerification
+        /// Used to navigate to the `IdentityVerificationConsentViewController`.
+        case navigateToIdentityVerificationConsent
         /// Used to navigate to the `FundingSourceListViewController`.
         case navigateToFundingSourceList
         /// Used to navigate to the `SudoListViewController`.
@@ -49,6 +51,8 @@ class MainMenuViewController: UIViewController, UITableViewDelegate, UITableView
     enum MenuItem: Int, CaseIterable {
         /// Identity verification table view item.
         case identityVerification
+        /// Identity verification consent table view item.
+        case identityVerificationConsent
         /// Funding sources table view item.
         case fundingSources
         /// Sudos table view item.
@@ -61,6 +65,8 @@ class MainMenuViewController: UIViewController, UITableViewDelegate, UITableView
             switch self {
             case .identityVerification:
                 return "Secure ID Verification"
+            case .identityVerificationConsent:
+                return "Secure ID Verification Consent"
             case .fundingSources:
                 return "Funding Sources"
             case .sudos:
@@ -250,6 +256,10 @@ class MainMenuViewController: UIViewController, UITableViewDelegate, UITableView
         case .identityVerification:
             performSegue(
                 withIdentifier: Segue.navigateToIdentityVerification.rawValue,
+                sender: self)
+        case .identityVerificationConsent:
+            performSegue(
+                withIdentifier: Segue.navigateToIdentityVerificationConsent.rawValue,
                 sender: self)
         case .fundingSources:
             performSegue(

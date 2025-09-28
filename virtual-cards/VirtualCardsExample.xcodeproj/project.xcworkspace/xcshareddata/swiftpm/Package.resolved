@@ -186,8 +186,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/sudoplatform/sudo-secure-id-verification-ios.git",
       "state" : {
-        "revision" : "7fbc8687670123b7525293714636897e96a10444",
-        "version" : "18.1.0"
+        "revision" : "41039572f8c0f7a9a7b1916d9751272501218ebb",
+        "version" : "21.0.0"
       }
     },
     {

@@ -98,6 +98,8 @@
 		AD24FCE02CF6EBF6008EB6F5 /* VirtualCardsExampleNotificationServiceExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = AD24FCD92CF6EBF6008EB6F5 /* VirtualCardsExampleNotificationServiceExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		AD24FCEF2CF8187F008EB6F5 /* AppDelegate+UNUserNotificationCenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD24FCEE2CF8187F008EB6F5 /* AppDelegate+UNUserNotificationCenter.swift */; };
 		AD24FCF12CF819D3008EB6F5 /* Data+Print.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD24FCF02CF819D3008EB6F5 /* Data+Print.swift */; };
+		AD57E2CF2E73F5EB0036F624 /* IdentityVerificationConsentViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD57E2CD2E73F5EB0036F624 /* IdentityVerificationConsentViewController.swift */; };
+		AD57E2D02E73F5EB0036F624 /* IdentityVerificationConsentViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = AD57E2CE2E73F5EB0036F624 /* IdentityVerificationConsentViewController.xib */; };
 		ADE2B5DD2D092495007D6662 /* SudoNotificationClientMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADE2B5DC2D092495007D6662 /* SudoNotificationClientMock.swift */; };
 		CF2571BF2444EB7B0053334E /* RegistrationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF2571BE2444EB7B0053334E /* RegistrationViewController.swift */; };
 		CF2571C12444EBB80053334E /* SudoListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF2571C02444EBB80053334E /* SudoListViewController.swift */; };
@@ -254,6 +256,8 @@
 		AD24FCE52CF6ED2F008EB6F5 /* VirtualCardsExampleNotificationServiceExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = VirtualCardsExampleNotificationServiceExtension.entitlements; sourceTree = "<group>"; };
 		AD24FCEE2CF8187F008EB6F5 /* AppDelegate+UNUserNotificationCenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppDelegate+UNUserNotificationCenter.swift"; sourceTree = "<group>"; };
 		AD24FCF02CF819D3008EB6F5 /* Data+Print.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Data+Print.swift"; sourceTree = "<group>"; };
+		AD57E2CD2E73F5EB0036F624 /* IdentityVerificationConsentViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdentityVerificationConsentViewController.swift; sourceTree = "<group>"; };
+		AD57E2CE2E73F5EB0036F624 /* IdentityVerificationConsentViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = IdentityVerificationConsentViewController.xib; sourceTree = "<group>"; };
 		ADE2B5DC2D092495007D6662 /* SudoNotificationClientMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SudoNotificationClientMock.swift; sourceTree = "<group>"; };
 		CF2571BE2444EB7B0053334E /* RegistrationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegistrationViewController.swift; sourceTree = "<group>"; };
 		CF2571C02444EBB80053334E /* SudoListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SudoListViewController.swift; sourceTree = "<group>"; };
@@ -476,6 +480,8 @@
 		84403FDD245AAF8600B2EBF2 /* IdentityVerification */ = {
 			isa = PBXGroup;
 			children = (
+				AD57E2CD2E73F5EB0036F624 /* IdentityVerificationConsentViewController.swift */,
+				AD57E2CE2E73F5EB0036F624 /* IdentityVerificationConsentViewController.xib */,
 				84403FE8245AB02F00B2EBF2 /* IdentityVerificationViewController.swift */,
 				84403FE9245AB02F00B2EBF2 /* IdentityVerificationViewController.xib */,
 			);
@@ -997,6 +1003,7 @@
 				8440400D245AB56D00B2EBF2 /* CreateSudoViewController.xib in Resources */,
 				84403FF3245AB0C200B2EBF2 /* FundingSourceListViewController.xib in Resources */,
 				0CABCD5129E95E6C00F8BEDB /* FundingSourceTableViewCell.xib in Resources */,
+				AD57E2D02E73F5EB0036F624 /* IdentityVerificationConsentViewController.xib in Resources */,
 				84403FEB245AB02F00B2EBF2 /* IdentityVerificationViewController.xib in Resources */,
 				8470A6A524612ECC00575C26 /* InputFormTableViewCell.xib in Resources */,
 				AB5B9DBF240EC5D300E4E5D8 /* LaunchScreen.storyboard in Resources */,
@@ -1130,6 +1137,7 @@
 				84403FF1245AB09900B2EBF2 /* FundingSourceListViewController.swift in Sources */,
 				8470A69D2461061C00575C26 /* FundingSourceNetwork+Stringable.swift in Sources */,
 				0CABCD4F29E95DFE00F8BEDB /* FundingSourceTableViewCell.swift in Sources */,
+				AD57E2CF2E73F5EB0036F624 /* IdentityVerificationConsentViewController.swift in Sources */,
 				84403FEA245AB02F00B2EBF2 /* IdentityVerificationViewController.swift in Sources */,
 				8470A6A424612ECC00575C26 /* InputFormTableViewCell.swift in Sources */,
 				84309D5F2463FFEC00F48ECC /* LearnMoreView.swift in Sources */,
@@ -1630,7 +1638,7 @@
 			repositoryURL = "https://github.com/sudoplatform/sudo-secure-id-verification-ios.git";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 18.0.0;
+				minimumVersion = 21.0.0;
 			};
 		};
 		E22371B82D8E084C0059E8E2 /* XCRemoteSwiftPackageReference "sudo-user-ios" */ = {

@@ -1,0 +1,4 @@
+[allowlist]
+  description = "the following .xib files contain a media key= string which triggers a false positive"
+  paths = [ '''(.*?)/RefreshBankAccountFundingSourceViewController.xib''', '''(.*?)/CreateCheckoutBankAccountFSVC.xib''']
+

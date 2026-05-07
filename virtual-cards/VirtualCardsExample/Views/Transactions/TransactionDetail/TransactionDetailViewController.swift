@@ -292,8 +292,6 @@ class TransactionDetailViewController: UIViewController, UITableViewDataSource, 
         switch details.fundingSource {
         case .creditCardFundingSource(let creditCardFundingSource):
             fundingSourceText = "\(creditCardFundingSource.network.string) ••••\(creditCardFundingSource.last4)"
-        case .bankAccountFundingSource(let bankAccountFundingSource):
-            fundingSourceText = "\(bankAccountFundingSource.institutionName) ••••\(bankAccountFundingSource.last4)"
         }
         let fundedByCell = CellData(title: "Funded by", value: fundingSourceText)
         return [sudoCell, cardCell, fundedByCell]

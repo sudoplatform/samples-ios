@@ -286,8 +286,6 @@ class CreateCardViewController: UIViewController,
             switch fundingSource {
             case .creditCardFundingSource(let creditCardFundingSource):
                 fundingSourceId = creditCardFundingSource.id
-            case .bankAccountFundingSource(let bankAccountFundingSource):
-                fundingSourceId = bankAccountFundingSource.id
             }
             let input = ProvisionVirtualCardInput(
                 fundingSourceId: fundingSourceId,
@@ -371,26 +369,16 @@ class CreateCardViewController: UIViewController,
             ).items
 
             var creditCardFundingSources: [CreditCardFundingSource] = []
-            var bankAccountFundingSources: [BankAccountFundingSource] = []
             for fundingSource in fundingSources {
                 switch fundingSource {
                 case .creditCardFundingSource(let creditCardFundingSource):
                     creditCardFundingSources.append(creditCardFundingSource)
-                case .bankAccountFundingSource(let bankAccountFundingSource):
-                    bankAccountFundingSources.append(bankAccountFundingSource)
                 }
             }
 
             var fundingSource: FundingSource?
             let creditCardFundingSource = creditCardFundingSources.first(where: { $0.state == .active})
-            if creditCardFundingSource == nil {
-                let bankAccountFundingSource = bankAccountFundingSources.first(where: { $0.state == .active})
-                if bankAccountFundingSource != nil {
-                    fundingSource = FundingSource.bankAccountFundingSource(bankAccountFundingSource!)
-                } else {
-                    fundingSource = nil
-                }
-            } else {
+            if creditCardFundingSource != nil {
                 fundingSource = FundingSource.creditCardFundingSource(creditCardFundingSource!)
             }
 
@@ -399,9 +387,6 @@ class CreateCardViewController: UIViewController,
                 switch fundingSource {
                 case .creditCardFundingSource(let creditCardFundingSource):
                     let fundingSourceText = "\(creditCardFundingSource.network.string) ••••\(creditCardFundingSource.last4)"
-                    fundingSourceLabel.text = fundingSourceText
-                case .bankAccountFundingSource(let bankAccountFundingSource):
-                    let fundingSourceText = "\(bankAccountFundingSource.institutionName) ••••\(bankAccountFundingSource.last4)"
                     fundingSourceLabel.text = fundingSourceText
                 default:
                     setErrorLabelHidden(false)

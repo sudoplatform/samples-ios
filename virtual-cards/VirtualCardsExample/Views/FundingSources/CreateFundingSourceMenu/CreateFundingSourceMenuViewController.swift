@@ -16,9 +16,6 @@ import SudoVirtualCards
 /// - Links To:
 ///     - `CreateStripeCardFundingSourceViewController`: If a user taps the "Add Stripe Credit Card" button, the `CreateStripeCardFundingSourceViewController`
 ///         will be presented so the user can create a Stripe credit card based funding source.
-///     - `CreateCheckoutBankAccountFundingSourceViewController`: If a user taps the
-///     "Add Checkout Bank Account" button, the `CreateCheckoutBankAccountFundingSourceViewController`
-///         will be presented so the user can create a Checkout bank account based funding source.
 class CreateFundingSourceMenuViewController: UIViewController,
                                              UITableViewDelegate,
                                              UITableViewDataSource {
@@ -34,24 +31,18 @@ class CreateFundingSourceMenuViewController: UIViewController,
     enum Segue: String {
         /// Used to navigate to the `CreateStripeCardFundingSourceViewController`.
         case navigateToAddStripeCreditCard
-        /// Used to navigate to the `CreateCheckoutBankAccountFundingSourceViewController`.
-        case navigateToAddCheckoutBankAccount
     }
 
     /// Menu items shown on the table view.
     enum MenuItem: Int, CaseIterable {
         /// Add Stripe credit card table view item.
         case addStripeCreditCard
-        /// Add Checkout bank account table view item.
-        case addCheckoutBankAccount
 
         /// Title label of the table view item shown to the user.
         var displayTitle: String {
             switch self {
             case .addStripeCreditCard:
                 return "Add Stripe Credit Card"
-            case .addCheckoutBankAccount:
-                return "Add Checkout Bank Account"
             }
         }
     }
@@ -66,7 +57,6 @@ class CreateFundingSourceMenuViewController: UIViewController,
     ///  funding source configuration data
     var haveConfig: Bool = false
     var stripeCardConfig: StripeCardClientConfiguration!
-    var checkoutBankAccountConfig: CheckoutBankAccountClientConfiguration!
 
     /// Array of table view menu items used on the view.
     var tableData: [MenuItem] = []
@@ -88,10 +78,6 @@ class CreateFundingSourceMenuViewController: UIViewController,
                 let configs = virtualCardsConfig.fundingSourceClientConfiguration
                 for config in configs {
                     switch config {
-                    case .checkoutBankAccount(let config):
-                        tableData.append(.addCheckoutBankAccount)
-                        checkoutBankAccountConfig = config
-
                     case .stripeCard(let config):
                         tableData.append(.addStripeCreditCard)
                         stripeCardConfig = config
@@ -155,7 +141,7 @@ class CreateFundingSourceMenuViewController: UIViewController,
     func showInfoAlert() {
         let alert = UIAlertController(
             title: "What is a Funding Source?",
-            message: "A Funding source is required to link a real credit card, debit card or bank account to a virtual card."
+            message: "A Funding source is required to link a real credit or debit card to a virtual card."
             + " This funding source is used to fund a transaction performed on the virtual card.",
             preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Learn More", style: .default) { _ in
@@ -198,10 +184,6 @@ class CreateFundingSourceMenuViewController: UIViewController,
         case .addStripeCreditCard:
             performSegue(
                 withIdentifier: Segue.navigateToAddStripeCreditCard.rawValue,
-                sender: self)
-        case .addCheckoutBankAccount:
-            performSegue(
-                withIdentifier: Segue.navigateToAddCheckoutBankAccount.rawValue,
                 sender: self)
         }
     }

@@ -1,11 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="32700.99.1234" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="jCt-oS-cEr">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="24506" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="jCt-oS-cEr">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
-        <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22685"/>
-        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
-        <capability name="System colors in document resources" minToolsVersion="11.0"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="24504"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -27,7 +24,7 @@
             <objects>
                 <navigationController id="9Ja-Y6-Yga" sceneMemberID="viewController">
                     <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translucent="NO" id="FRn-Dv-2Re">
-                        <rect key="frame" x="0.0" y="0.0" width="414" height="44"/>
+                        <rect key="frame" x="0.0" y="48" width="414" height="54"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <toolbar key="toolbar" opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="RuM-pU-aIi">
@@ -153,7 +150,6 @@
                     <navigationItem key="navigationItem" title="Funding Sources" id="Tma-QY-k9c"/>
                     <connections>
                         <segue destination="Z1P-lg-sHq" kind="show" identifier="navigateToCreateFundingSourceMenu" id="d4X-WP-xqX"/>
-                        <segue destination="2b7-eb-oMX" kind="show" identifier="navigateToRefreshBankAccountFundingSourceView" id="xta-EE-fEc"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="RgK-zb-fRH" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -181,7 +177,6 @@
                     <navigationItem key="navigationItem" title="Create Funding Source Menu" id="9wB-g8-GWt"/>
                     <connections>
                         <segue destination="MZg-xF-Kw9" kind="show" identifier="navigateToAddStripeCreditCard" id="ZwU-Pm-3ls"/>
-                        <segue destination="PnC-NQ-vo8" kind="show" identifier="navigateToAddCheckoutBankAccount" id="SaE-3X-HWz"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Fac-41-0bj" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -231,7 +226,7 @@
                     <toolbarItems/>
                     <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" translucent="NO" prompted="NO"/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translucent="NO" id="PKp-ut-No9">
-                        <rect key="frame" x="0.0" y="48" width="414" height="44"/>
+                        <rect key="frame" x="0.0" y="96" width="414" height="54"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <navigationBarAppearance key="standardAppearance"/>
                     </navigationBar>
@@ -244,49 +239,10 @@
             </objects>
             <point key="canvasLocation" x="-1688.4057971014495" y="1038.6160714285713"/>
         </scene>
-        <!--Create Checkout Bank Account Funding Source-->
-        <scene sceneID="Fjn-Sb-boK">
-            <objects>
-                <viewController storyboardIdentifier="createCheckoutBankAccountFundingSource" id="PnC-NQ-vo8" userLabel="Create Checkout Bank Account Funding Source" customClass="CreateCheckoutBankAccountFSVC" customModule="VirtualCardsExample" customModuleProvider="target" sceneMemberID="viewController">
-                    <navigationItem key="navigationItem" title="Create Funding Source" id="QIT-lH-zCE"/>
-                    <connections>
-                        <segue destination="YV3-tI-iQk" kind="unwind" identifier="returnToFundingSourceList" unwindAction="returnToFundingSourceListWithSegue:" id="ARA-ey-kZo"/>
-                    </connections>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="NO2-6J-bIH" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
-                <exit id="YV3-tI-iQk" userLabel="Exit" sceneMemberID="exit"/>
-            </objects>
-            <point key="canvasLocation" x="3919" y="1821"/>
-        </scene>
-        <!--Refresh Bank Account Funding Source-->
-        <scene sceneID="nYS-jm-fV6">
-            <objects>
-                <viewController storyboardIdentifier="refreshBankAccountFundingSource" id="2b7-eb-oMX" userLabel="Refresh Bank Account Funding Source" customClass="RefreshBankAccountFundingSourceViewController" customModule="VirtualCardsExample" customModuleProvider="target" sceneMemberID="viewController">
-                    <navigationItem key="navigationItem" title="Refresh Funding Source" id="oM4-AF-FMY" userLabel="Refresh Bank Account Funding Source"/>
-                    <connections>
-                        <segue destination="h4N-d9-len" kind="unwind" identifier="returnToFundingSourceList" unwindAction="returnToFundingSourceListWithSegue:" id="OfY-xz-OG8"/>
-                    </connections>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="a2f-Qi-R8x" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
-                <exit id="h4N-d9-len" userLabel="Exit" sceneMemberID="exit"/>
-                <view contentMode="scaleToFill" id="Om0-nX-g0l">
-                    <rect key="frame" x="0.0" y="0.0" width="240" height="128"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                    <viewLayoutGuide key="safeArea" id="gwJ-NP-rLL"/>
-                    <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                </view>
-            </objects>
-            <point key="canvasLocation" x="2299" y="1821"/>
-        </scene>
     </scenes>
     <inferredMetricsTieBreakers>
+        <segue reference="Aoc-9n-7fH"/>
         <segue reference="uot-6s-QM3"/>
         <segue reference="F5j-Gl-9C0"/>
-        <segue reference="Aoc-9n-7fH"/>
     </inferredMetricsTieBreakers>
-    <resources>
-        <systemColor name="systemBackgroundColor">
-            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-        </systemColor>
-    </resources>
 </document>

@@ -14,7 +14,6 @@ final class VirtualCardsExampleUITests: XCTestCase {
     static var verified = false
     static var supportedFundingSourcesKnown = false
     static var stripeCardSupported = false
-    static var checkoutBankAccountSupported = false
 
     class func deregister() {
         if (staticApp.navigationBars.buttons["Deregister"].exists) {
@@ -142,12 +141,10 @@ final class VirtualCardsExampleUITests: XCTestCase {
             
             let finishedLoadingFundingSourceConfigration = NSPredicate { _, _ in !self.app.alerts.staticTexts["Loading funding source configuration"].exists}
             let addStripeCardAppeared = NSPredicate { _, _ in self.app.staticTexts["Add Stripe Credit Card"].exists}
-            let addCheckoutBankAccountAppeared = NSPredicate { _, _ in self.app.staticTexts["Add Checkout Bank Account"].exists}
             
             let fundingSourceTypesDisplayed = NSCompoundPredicate(
                 orPredicateWithSubpredicates: [
                     addStripeCardAppeared,
-                    addCheckoutBankAccountAppeared
                 ]
             )
             
@@ -157,7 +154,6 @@ final class VirtualCardsExampleUITests: XCTestCase {
                  timeout: 25)
             
             VirtualCardsExampleUITests.stripeCardSupported = self.app.staticTexts["Add Stripe Credit Card"].exists
-            VirtualCardsExampleUITests.checkoutBankAccountSupported = self.app.staticTexts["Add Checkout Bank Account"].exists
 
             VirtualCardsExampleUITests.supportedFundingSourcesKnown = true
             
@@ -166,7 +162,7 @@ final class VirtualCardsExampleUITests: XCTestCase {
 
         XCTAssertTrue(VirtualCardsExampleUITests.supportedFundingSourcesKnown, "support funding sources must be known on exit from here")
 
-        XCTAssertTrue(VirtualCardsExampleUITests.stripeCardSupported || VirtualCardsExampleUITests.checkoutBankAccountSupported, "At least one of stripe card (\(VirtualCardsExampleUITests.stripeCardSupported)) or checkout bank account (\(VirtualCardsExampleUITests.checkoutBankAccountSupported)) must be supported")
+        XCTAssertTrue(VirtualCardsExampleUITests.stripeCardSupported, "At least one of stripe card (\(VirtualCardsExampleUITests.stripeCardSupported)) must be supported")
     }
 
     func test_registrationSucceeds() throws {

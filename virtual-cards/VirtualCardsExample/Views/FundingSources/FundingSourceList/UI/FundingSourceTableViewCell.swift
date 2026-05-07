@@ -33,11 +33,6 @@ class FundingSourceTableViewCell: UITableViewCell {
             let cardNetwork = creditCardFundingSource.network.string.capitalized
             titleLabel.text = "Card: \(cardNetwork)\(suffix)"
             subtitleLabel.text = "••••\(creditCardFundingSource.last4) (\(creditCardFundingSource.cardType))"
-        case .bankAccountFundingSource(let bankAccountFundingSource):
-            let suffix = (bankAccountFundingSource.state == .inactive) ? " - Cancelled" : ""
-            let institutionName = bankAccountFundingSource.institutionName
-            titleLabel.text = "Bank Account: \(institutionName)\(suffix)"
-            subtitleLabel.text = "••••\(bankAccountFundingSource.last4) (\(bankAccountFundingSource.bankAccountType))"
         }
     }
 }

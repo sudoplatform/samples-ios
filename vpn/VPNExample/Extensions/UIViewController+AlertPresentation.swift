@@ -29,10 +29,10 @@ extension UIViewController {
     }
 
     /// Presents a `UIAlertController` containing a `UIActivityIndicatorView` and the given message.
-    func presentActivityAlert(message: String, completion: UIAlertPresentationCompletion? = nil) {
+    func presentActivityAlert(message: String, animated: Bool = true, completion: UIAlertPresentationCompletion? = nil) {
         let alert = ActivityAlertViewController(message: message)
         alert.view.accessibilityIdentifier = activityIdentifier
-        present(alert, animated: false, completion: completion)
+        present(alert, animated: animated, completion: completion)
     }
 
     func presentCancellableActivityAlert(message: String, delegate: ActivityAlertViewControllerDelegate, completion: UIAlertPresentationCompletion? = nil) {
@@ -54,6 +54,23 @@ extension UIViewController {
             return
         }
         dismiss(animated: false, completion: completion)
+    }
+
+    /// Dismisses an activity alert spawned using `presentActivityAlert(message:)` and returns once dismissed.
+    /// - Parameter animated: Whether the dismissal should be animated.
+    func dismissActivityAlert(animated: Bool) async {
+        guard
+            let presentedAlert = presentedViewController as? ActivityAlertViewController,
+            presentedAlert.view.accessibilityIdentifier == activityIdentifier
+        else {
+            print("No activity indicator found")
+            return
+        }
+        return await withCheckedContinuation { continuation in
+            dismiss(animated: animated) {
+                continuation.resume()
+            }
+        }
     }
 
     /// Presents a `UIAlertController` presenting with the `title` and `message`.

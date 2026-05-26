@@ -16,7 +16,7 @@ class DefaultFileReadable: FileReadable {
 
     // MARK: - Properties
 
-    var bundle = Bundle.main
+    let bundle = Bundle.main
 
     // MARK: - Methods
 

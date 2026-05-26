@@ -7,6 +7,7 @@
 import UIKit
 import SudoUser
 
+@MainActor
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 

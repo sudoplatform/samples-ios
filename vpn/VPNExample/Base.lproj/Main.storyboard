@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="21701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="hpv-vn-s81">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="23727" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="hpv-vn-s81">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21679"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23721"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -21,7 +21,7 @@
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="c8K-zd-YFo" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-1257" y="119"/>
+            <point key="canvasLocation" x="-968" y="119"/>
         </scene>
         <!--Registration View Controller-->
         <scene sceneID="tne-QT-ifu">
@@ -29,28 +29,12 @@
                 <viewController storyboardIdentifier="registration" id="BYZ-38-t0r" customClass="RegistrationViewController" customModule="VPNExample" customModuleProvider="target" sceneMemberID="viewController">
                     <navigationItem key="navigationItem" id="fr4-1A-DtU"/>
                     <connections>
-                        <segue destination="wtL-Kh-KAX" kind="presentation" identifier="navigateToMainMenu" modalPresentationStyle="fullScreen" modalTransitionStyle="crossDissolve" id="Z9a-Q5-JJL"/>
+                        <segue destination="fNZ-SF-Vp8" kind="presentation" identifier="navigateToDashboard" modalPresentationStyle="fullScreen" modalTransitionStyle="crossDissolve" id="4aL-Xe-8zO"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="-201" y="119"/>
-        </scene>
-        <!--Navigation Controller-->
-        <scene sceneID="Onb-Qy-eSc">
-            <objects>
-                <navigationController id="wtL-Kh-KAX" sceneMemberID="viewController">
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="Q7t-KT-c1b">
-                        <rect key="frame" x="0.0" y="0.0" width="414" height="44"/>
-                        <autoresizingMask key="autoresizingMask"/>
-                    </navigationBar>
-                    <connections>
-                        <segue destination="EoN-i9-awH" kind="relationship" relationship="rootViewController" id="x50-GV-LBS"/>
-                    </connections>
-                </navigationController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="505-g5-d09" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="809" y="119"/>
         </scene>
         <!--Server List-->
         <scene sceneID="hpQ-QX-Nec">
@@ -58,43 +42,29 @@
                 <viewController storyboardIdentifier="server-list" id="icV-qC-Is0" customClass="ServerListViewController" customModule="VPNExample" customModuleProvider="target" sceneMemberID="viewController">
                     <navigationItem key="navigationItem" title="Server List" id="TBh-37-1dG"/>
                     <connections>
-                        <segue destination="XBp-Gu-9TI" kind="show" identifier="navigateToServerSelected" id="VCz-RD-uRe"/>
-                        <segue destination="N92-lm-3nE" kind="unwind" identifier="returnToMainMenu" unwindAction="returnToMainMenuWithSegue:" id="dj4-U1-Foy"/>
+                        <segue destination="Mpx-5p-bhr" kind="unwind" identifier="returnToDashboard" unwindAction="returnToDashboardWithSegue:" id="b4A-rD-jBO"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="vKq-LJ-Q99" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+                <exit id="Mpx-5p-bhr" userLabel="Exit" sceneMemberID="exit"/>
             </objects>
-            <point key="canvasLocation" x="2867" y="119"/>
+            <point key="canvasLocation" x="2842" y="-587"/>
         </scene>
-        <!--Server Selected View Controller-->
+        <!--Dashboard View Controller-->
         <scene sceneID="uxh-Xs-Apf">
             <objects>
-                <viewController storyboardIdentifier="server-selected" id="XBp-Gu-9TI" customClass="ServerSelectedViewController" customModule="VPNExample" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="server-selected" id="XBp-Gu-9TI" customClass="DashboardViewController" customModule="VPNExample" customModuleProvider="target" sceneMemberID="viewController">
                     <navigationItem key="navigationItem" id="sat-JZ-s3a"/>
                     <connections>
-                        <segue destination="oKr-XR-jDT" kind="unwind" identifier="returnToServerList" unwindAction="returnToServerListWithSegue:" id="gs8-lt-Qhl"/>
+                        <segue destination="oKr-XR-jDT" kind="unwind" identifier="returnToRegistration" unwindAction="returnToRegistrationWithSegue:" id="gs8-lt-Qhl"/>
+                        <segue destination="9cq-in-Hta" kind="show" identifier="navigateToSettings" id="nCi-Ph-9WD"/>
+                        <segue destination="icV-qC-Is0" kind="show" identifier="navigateToServerList" id="59a-rn-UZv"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="ynf-YB-rqb" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
                 <exit id="oKr-XR-jDT" userLabel="Exit" sceneMemberID="exit"/>
             </objects>
-            <point key="canvasLocation" x="3772" y="119"/>
-        </scene>
-        <!--Main Menu-->
-        <scene sceneID="9bT-jV-whh">
-            <objects>
-                <viewController storyboardIdentifier="main-menu" id="EoN-i9-awH" userLabel="Main Menu" customClass="MainMenuViewController" customModule="VPNExample" customModuleProvider="target" sceneMemberID="viewController">
-                    <navigationItem key="navigationItem" title="VPN Sample App" id="ntt-uR-rQX" userLabel="VPN Sample App"/>
-                    <connections>
-                        <segue destination="icV-qC-Is0" kind="show" identifier="navigateToServerList" id="O8w-CA-1oK"/>
-                        <segue destination="9cq-in-Hta" kind="show" identifier="navigateToSettings" id="k42-up-M0j"/>
-                        <segue destination="N92-lm-3nE" kind="unwind" identifier="returnToRegistration" unwindAction="returnToRegistrationWithSegue:" id="FV2-68-JKL"/>
-                    </connections>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="g7R-vG-BiV" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
-                <exit id="N92-lm-3nE" userLabel="Exit" sceneMemberID="exit"/>
-            </objects>
-            <point key="canvasLocation" x="1801" y="439"/>
+            <point key="canvasLocation" x="2041" y="119"/>
         </scene>
         <!--Settings-->
         <scene sceneID="n0j-3t-p6z">
@@ -109,21 +79,22 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="0Br-qV-jcS" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2796" y="788"/>
+            <point key="canvasLocation" x="2841" y="119"/>
         </scene>
         <!--Profiles View Controller-->
         <scene sceneID="m7E-9O-ifQ">
             <objects>
                 <tableViewController id="use-u6-Bhv" customClass="ProfilesViewController" customModule="VPNExample" customModuleProvider="target" sceneMemberID="viewController">
-                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="static" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" id="YSp-cR-itN">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="static" style="grouped" separatorStyle="default" allowsSelection="NO" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="18" estimatedSectionHeaderHeight="-1" sectionFooterHeight="18" estimatedSectionFooterHeight="-1" id="YSp-cR-itN">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <sections>
                             <tableViewSection id="Udq-Dp-SV6">
+                                <string key="footerTitle">Manually disconnecting from a VPN server will automatically set this configuration to 'off'. This setting can only be updated when the VPN is disconnected. </string>
                                 <cells>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" id="ziG-vK-k4p">
-                                        <rect key="frame" x="0.0" y="50" width="414" height="43.5"/>
+                                        <rect key="frame" x="0.0" y="18" width="414" height="43.5"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="ziG-vK-k4p" id="PRj-Jo-OTS">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="43.5"/>
@@ -154,21 +125,41 @@
                                             </constraints>
                                         </tableViewCellContentView>
                                     </tableViewCell>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" id="GHv-Q4-yYh">
-                                        <rect key="frame" x="0.0" y="93.5" width="414" height="43.5"/>
+                                </cells>
+                            </tableViewSection>
+                            <tableViewSection id="LML-Qe-iMH">
+                                <string key="footerTitle">This enables a passive kill switch which blocks network traffic while the VPN is reeconnecting.  This setting can only be updated when the VPN is disconnected.</string>
+                                <cells>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" id="F3S-v4-juO">
+                                        <rect key="frame" x="0.0" y="141.5" width="414" height="43.5"/>
                                         <autoresizingMask key="autoresizingMask"/>
-                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="GHv-Q4-yYh" id="hZt-88-Q4j">
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="F3S-v4-juO" id="y8S-Kt-Rcu">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="43.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Manually disconnecting from a VPN server will automatically set this configuration to 'off'." lineBreakMode="wordWrap" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="WTS-6c-Ay3">
-                                                    <rect key="frame" x="31" y="-2" width="363" height="46"/>
-                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                                    <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Kill Switch" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="cbV-jb-TQM">
+                                                    <rect key="frame" x="30" y="13" width="78" height="17.5"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
+                                                <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="xRe-jz-ewe">
+                                                    <rect key="frame" x="345" y="6" width="51" height="31.5"/>
+                                                    <connections>
+                                                        <action selector="killSwitchValueChanged:" destination="use-u6-Bhv" eventType="valueChanged" id="DLE-Wm-hS9"/>
+                                                    </connections>
+                                                </switch>
                                             </subviews>
+                                            <constraints>
+                                                <constraint firstAttribute="bottomMargin" secondItem="cbV-jb-TQM" secondAttribute="bottom" constant="2" id="Esl-tu-JRc"/>
+                                                <constraint firstItem="cbV-jb-TQM" firstAttribute="centerY" secondItem="y8S-Kt-Rcu" secondAttribute="centerY" id="G2H-vT-ZEk"/>
+                                                <constraint firstItem="xRe-jz-ewe" firstAttribute="top" secondItem="y8S-Kt-Rcu" secondAttribute="topMargin" constant="-5" id="cqZ-w8-YaV"/>
+                                                <constraint firstItem="cbV-jb-TQM" firstAttribute="leading" secondItem="y8S-Kt-Rcu" secondAttribute="leadingMargin" constant="10" id="kO5-gd-DbR"/>
+                                                <constraint firstItem="xRe-jz-ewe" firstAttribute="trailing" secondItem="y8S-Kt-Rcu" secondAttribute="trailingMargin" id="xqF-gw-rGV"/>
+                                                <constraint firstItem="cbV-jb-TQM" firstAttribute="centerY" secondItem="xRe-jz-ewe" secondAttribute="centerY" id="xzR-8H-Tn7"/>
+                                                <constraint firstItem="cbV-jb-TQM" firstAttribute="top" secondItem="y8S-Kt-Rcu" secondAttribute="topMargin" constant="2" id="ydS-Zj-Xwl"/>
+                                                <constraint firstItem="xRe-jz-ewe" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="cbV-jb-TQM" secondAttribute="trailing" constant="8" symbolic="YES" id="zPV-ZP-qHx"/>
+                                            </constraints>
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                 </cells>
@@ -182,11 +173,12 @@
                     <navigationItem key="navigationItem" id="LQQ-YH-ze9"/>
                     <connections>
                         <outlet property="connectOnDemandSwitch" destination="IGL-Lr-wr5" id="6Yi-3Q-Mp2"/>
+                        <outlet property="killSwitch" destination="xRe-jz-ewe" id="X99-sM-wYj"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="qtv-sP-C6i" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2147.826086956522" y="1510.7142857142856"/>
+            <point key="canvasLocation" x="3751" y="860"/>
         </scene>
         <!--Entitlements-->
         <scene sceneID="aVC-kh-RZZ">
@@ -196,7 +188,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="J34-3H-kdO" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="3812" y="1491"/>
+            <point key="canvasLocation" x="3752" y="-586"/>
         </scene>
         <!--Protocols View Controller-->
         <scene sceneID="kBb-n7-uJC">
@@ -206,7 +198,25 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="QfE-ax-CLl" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="3784" y="795"/>
+            <point key="canvasLocation" x="3751" y="119"/>
+        </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="0GG-IS-8yE">
+            <objects>
+                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="fNZ-SF-Vp8" sceneMemberID="viewController">
+                    <toolbarItems/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="aWL-Ei-pOj">
+                        <rect key="frame" x="0.0" y="48" width="414" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <nil name="viewControllers"/>
+                    <connections>
+                        <segue destination="XBp-Gu-9TI" kind="relationship" relationship="rootViewController" id="fBT-6l-12o"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Jgi-Mq-Zhe" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1283" y="119"/>
         </scene>
     </scenes>
     <resources>

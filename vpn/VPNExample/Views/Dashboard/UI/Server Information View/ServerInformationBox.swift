@@ -9,14 +9,61 @@ import SudoVPN
 
 class ServerInformationBox: UIView {
 
+    // MARK: - Supplementary
+
+    struct DisplayModel: Equatable {
+
+        /// The currently selected server.  If `nil`, the fastest available server will be used.
+        let server: SudoVPNServer?
+
+        /// The current public IP address of the local user.
+        let publicIpAddress: String?
+
+        /// The timestamp when the VPN connected.
+        let dateConnected: Date?
+    }
+
     // MARK: - Outlets
 
     @IBOutlet var timeLabel: UILabel!
     @IBOutlet var regionLabel: UILabel!
     @IBOutlet var loadLabel: UILabel!
-    @IBOutlet var ipAddressLabel: UILabel!
+    @IBOutlet var serverIpAddressLabel: UILabel!
+    @IBOutlet var publicIpAddressLabel: UILabel!
 
     // MARK: - Properties
+
+    var displayModel: DisplayModel? {
+        didSet {
+            // Update server info
+            if let server = displayModel?.server {
+                let model = ServerModel(vpnServer: server)
+                updateViewWithServer(model)
+            } else {
+                updateViewWithServer(nil)
+            }
+            publicIpAddressLabel.text = displayModel?.publicIpAddress ?? "??"
+
+            // Update connected timestamp info
+            guard displayModel?.dateConnected != nil else {
+                uptimeTimer?.invalidate()
+                uptimeTimer = nil
+                updateViewWithTimeConnected(0)
+                return
+            }
+            Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
+                guard let self = self else { return }
+                guard let dateConnected = self.displayModel?.dateConnected else {
+                    self.uptimeTimer?.invalidate()
+                    self.updateViewWithTimeConnected(0)
+                    self.uptimeTimer = nil
+                    return
+                }
+                let difference = Int(Date().timeIntervalSince(dateConnected))
+                self.updateViewWithTimeConnected(difference)
+            }
+        }
+    }
 
     var cornerRadius: CGFloat = 0 {
         didSet {
@@ -37,40 +84,7 @@ class ServerInformationBox: UIView {
         }
     }
 
-    var server: SudoVPNServer? {
-        didSet {
-            if let server = server {
-                let model = ServerModel(vpnServer: server)
-                updateViewWithServer(model)
-            } else {
-                updateViewWithServer(nil)
-            }
-        }
-    }
-
     var uptimeTimer: Timer?
-
-    var dateConnected: Date? {
-        didSet {
-            guard dateConnected != nil else {
-                uptimeTimer?.invalidate()
-                uptimeTimer = nil
-                updateViewWithTimeConnected(0)
-                return
-            }
-            Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
-                guard let self = self else { return }
-                guard let dateConnected = self.dateConnected else {
-                    self.uptimeTimer?.invalidate()
-                    self.updateViewWithTimeConnected(0)
-                    self.uptimeTimer = nil
-                    return
-                }
-                let difference = Int(Date().timeIntervalSince(dateConnected))
-                self.updateViewWithTimeConnected(difference)
-            }
-        }
-    }
 
     // MARK: - Lifecycle
 
@@ -86,19 +100,15 @@ class ServerInformationBox: UIView {
         return super.awakeAfter(using: aDecoder)
     }
 
-    override func awakeFromNib() {
-        super.awakeFromNib()
-    }
-
     // MARK: - Methods
 
     private func updateViewWithServer(_ server: ServerModel?) {
-        guard let server = server else {
+        guard let server else {
             setDefaultView()
             return
         }
         regionLabel.text = server.region ?? "Unknown"
-        ipAddressLabel.text = server.ipAddress ?? "??"
+        serverIpAddressLabel.text = server.ipAddress ?? "??"
         if let load = server.load {
             loadLabel.text = "\(load)%"
         } else {
@@ -123,7 +133,7 @@ class ServerInformationBox: UIView {
         timeLabel.text = "0:00:00"
         regionLabel.text = "Unknown"
         loadLabel.text = "?? %"
-        ipAddressLabel.text = "??"
+        serverIpAddressLabel.text = "??"
+        publicIpAddressLabel.text = "??"
     }
-
 }

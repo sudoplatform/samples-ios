@@ -39,16 +39,6 @@
          </BuildableReference>
       </CodeCoverageTargets>
       <Testables>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "847E0105253EA9F800167D2C"
-               BuildableName = "VPNExampleTests.xctest"
-               BlueprintName = "VPNExampleTests"
-               ReferencedContainer = "container:VPNExample.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction

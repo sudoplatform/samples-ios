@@ -17,6 +17,7 @@ import SudoUser
 ///     -  `SettingsViewController`: If a user taps the "Settings" button, the `SettingsViewController`will be presented.
 ///     - `RegistrationViewController`: If a user taps the "Deregister" button, the`RegistrationViewController` will
 ///         be presented so the user can perform registration again.
+@MainActor
 class MainMenuViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
 
     // MARK: - Outlets
@@ -128,7 +129,7 @@ class MainMenuViewController: UIViewController, UITableViewDelegate, UITableView
             preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
         alert.addAction(UIAlertAction(title: "Deregister", style: .default) { _ in
-            Task.detached(priority: .medium) { [weak self] in
+            Task { [weak self] in
                 await self?.deregister()
             }
         })

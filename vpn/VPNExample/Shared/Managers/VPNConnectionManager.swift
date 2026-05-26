@@ -6,12 +6,13 @@
 
 import Foundation
 
-protocol VPNConnectionManager: AnyObject {
+protocol VPNConnectionManager: AnyObject, Sendable {
 
     var isConnected: Bool { get }
 
 }
 
+@MainActor
 class DefaultVPNConnectionManager: VPNConnectionManager {
 
     var isConnected: Bool = false

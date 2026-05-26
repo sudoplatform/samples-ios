@@ -7,6 +7,7 @@
 import UIKit
 import SudoVPN
 
+@MainActor
 class ServerListViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
 
     // MARK: - Outlets
@@ -16,8 +17,7 @@ class ServerListViewController: UIViewController, UITableViewDelegate, UITableVi
     // MARK: - Supplementary
 
     enum Segue: String, Segueable {
-        case navigateToServerSelected
-        case returnToMainMenu
+        case returnToDashboard
     }
 
     // MARK: - Properties
@@ -25,6 +25,14 @@ class ServerListViewController: UIViewController, UITableViewDelegate, UITableVi
     var vpnClient = AppDelegate.dependencies.vpnClient
 
     var serverList: [SudoVPNServer] = []
+
+    var selectedServer: SudoVPNServer? {
+        if let selectedIndexPath = tableView.indexPathForSelectedRow {
+            serverList[selectedIndexPath.row]
+        } else {
+            nil
+        }
+    }
 
     // MARK: - Lifecycle
 
@@ -34,60 +42,26 @@ class ServerListViewController: UIViewController, UITableViewDelegate, UITableVi
     }
 
     override func viewWillAppear(_ animated: Bool) {
-        presentActivityAlert(message: "Loading Servers") { [weak self] in
-            Task.detached(priority: .medium) { [weak self] in
-                await self?.loadServerList()
-            }
-        }
         super.viewWillAppear(animated)
-    }
-
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        let segueType = Segue(rawValue: segue.identifier ?? "")
-        switch segueType {
-        case .navigateToServerSelected:
-            guard
-                let serverSelected = segue.destination as? ServerSelectedViewController,
-                let row = tableView.indexPathForSelectedRow?.row
-            else {
-                break
-            }
-            Task.detached(priority: .medium) { [weak self] in
-                guard let self = self else { return }
-                let server = await self.serverList[row]
-                await serverSelected.setServer(server)
-            }
-        default:
-            break
+        presentActivityAlert(message: "Loading Servers")
+        Task {
+            await loadServerList()
         }
     }
-
-    // MARK: - Actions
-
-    /// Action associated with returning to this view from a segue.
-    @IBAction func returnToServerList(segue: UIStoryboardSegue) {}
 
     // MARK: - Operations
 
     func loadServerList() async {
         do {
-            let servers = try await vpnClient.listServers(
-                countriesFilter: ["AU", "US", "NL", "GB"],
-                limit: 0,
-                nextToken: nil,
-                cachePolicy: .remoteOnly
-            )
+            let servers = try await vpnClient.listServers(countriesFilter: ["AU", "US", "NL", "GB"], limit: 0)
             updateServerList(servers.items)
-            DispatchQueue.main.async { [weak self] in
-                self?.tableView.reloadData()
-                self?.dismissActivityAlert()
-            }
+            tableView.reloadData()
+            dismissActivityAlert()
         } catch {
-            DispatchQueue.main.async { [weak self] in
-                self?.dismissActivityAlert()
-                self?.presentErrorAlert(message: "Failure", error: error) { _ in
-                    self?.performSegue(withSegue: Segue.returnToMainMenu, sender: self)
-                }
+            dismissActivityAlert()
+            presentErrorAlert(message: "Failure", error: error) { [weak self] _ in
+                guard let self else { return }
+                self.performSegue(withSegue: Segue.returnToDashboard, sender: self)
             }
         }
     }
@@ -148,7 +122,7 @@ class ServerListViewController: UIViewController, UITableViewDelegate, UITableVi
     // MARK: - UITableView
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return serverList.count
+        serverList.count
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -162,9 +136,18 @@ class ServerListViewController: UIViewController, UITableViewDelegate, UITableVi
     }
 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        assert(indexPath.section == 0)
-        performSegue(withSegue: Segue.navigateToServerSelected, sender: self)
-        tableView.deselectRow(at: indexPath, animated: true)
+        Task {
+            presentActivityAlert(message: "Updating server...")
+            let server = selectedServer?.country == Constants.FastestAvailableName ? nil : selectedServer
+            let updateInput = SudoVPNConfigurationUpdateInput(server: .newValue(server))
+            do {
+                try await vpnClient.updateConfiguration(input: updateInput)
+                await dismissActivityAlert(animated: true)
+                performSegue(withSegue: Segue.returnToDashboard, sender: self)
+            } catch {
+                await dismissActivityAlert(animated: true)
+                presentAlert(title: "Failed to update server", message: error.localizedDescription)
+            }
+        }
     }
-
 }

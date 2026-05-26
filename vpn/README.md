@@ -7,14 +7,14 @@ This project provides examples for interacting with the Sudo VPN iOS SDK on the 
 ## Version Support
 
 | Technology             | Supported version |
-| ---------------------- | ----------------- |
-| iOS Deployment Target  | 13.0+             |
+| ---------------------- |-------------------|
+| iOS Deployment Target  | 18.0+             |
 | Swift language version | 5.0               |
-| Xcode version          | 12.0+             |
+| Xcode version          | 26.0+             |
 
 ## Getting Started
 
-The Sudo VPN SDK that this sample demonstrates is only available from a private Pod repository. Before proceeding you will need to obtain access to this repository by contacting [partners@sudoplatform.com](mailto:partners@sudoplatform.com).
+The Sudo VPN SDK that this sample demonstrates is only available from a private Gitlab repository. Before proceeding you will need to obtain access to this repository by contacting [partners@sudoplatform.com](mailto:partners@sudoplatform.com).
 
 To build this app you first need to obtain test keys and a client config file and add them to the project. 
 
@@ -33,11 +33,7 @@ ${PROJECT_DIR}/config/register_key.private
 ${PROJECT_DIR}/config/register_key.id
 ```
 
-4. Set the SUDOVPN_SDK_REPO environment variable to the Sudo VPN for iOS SDK private Pod repository location
-
-5. Run `pod install` from the project root
-
-6. Build the app
+4. Build the app
 
 ## More Documentation
 

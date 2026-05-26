@@ -16,13 +16,13 @@ import SudoEntitlements
 ///     - `EntitlementsViewController`: If a user taps the "Entitlements" button, the`EntitlementsViewController` will
 ///         be presented so the user can view current status of Entitlements.
 ///     -  `ProtocolsController`: If a user taps the "Protocols" button, the `ProtocolsViewController`will be presented.
+@MainActor
 class SettingsViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UITextFieldDelegate {
 
     // MARK: - Outlets
 
     /// Table view that lists the menu items.
     @IBOutlet var tableView: UITableView!
-
     @IBOutlet var settingsFooter: UIStackView!
     @IBOutlet var usernameLabel: UILabel!
     @IBOutlet var usernameTextView: ImmutableTextView!
@@ -37,6 +37,8 @@ class SettingsViewController: UIViewController, UITableViewDelegate, UITableView
         case navigateToProtocols
         /// Used to navigate to the `ProfilesViewController`.
         case navigateToProfiles
+        /// Used to navigate back to the `RegistrationViewController`.
+        case returnToRegistration
     }
 
     /// Menu items shown on the table view.
@@ -45,6 +47,7 @@ class SettingsViewController: UIViewController, UITableViewDelegate, UITableView
         case entitlements
         case protocols
         case profiles
+        case deregister
 
         /// Title label of the table view item shown to the user.
         var displayTitle: String {
@@ -55,6 +58,28 @@ class SettingsViewController: UIViewController, UITableViewDelegate, UITableView
                 return "Protocols"
             case .profiles:
                 return "Profiles"
+            case .deregister:
+                return "Deregister"
+            }
+        }
+
+        /// The accessory type to display in the cell.
+        var accessoryType: UITableViewCell.AccessoryType {
+            switch self {
+            case .entitlements, .protocols, .profiles:
+                return .disclosureIndicator
+            case .deregister:
+                return .none
+            }
+        }
+
+        /// The foreground color for the text in the cell's primary label.
+        var textColor: UIColor {
+            switch self {
+            case .entitlements, .protocols, .profiles:
+                return .label
+            case .deregister:
+                return .red
             }
         }
     }
@@ -68,17 +93,17 @@ class SettingsViewController: UIViewController, UITableViewDelegate, UITableView
 
     /// Sudo user client used to perform de-registration operations.
     var userClient: SudoUserClient {
-        return AppDelegate.dependencies.userClient
+        AppDelegate.dependencies.userClient
     }
 
     /// Sudo entitlements client used to determine user entitlements.
     var userEntitlementsClient: SudoEntitlementsClient {
-        return AppDelegate.dependencies.entitlementsClient
+        AppDelegate.dependencies.entitlementsClient
     }
 
     /// Authenticator used to perform authentication during de-registration.
     var authenticator: Authenticator {
-        return AppDelegate.dependencies.authenticator
+        AppDelegate.dependencies.authenticator
     }
 
     // MARK: - Lifecycle
@@ -89,36 +114,7 @@ class SettingsViewController: UIViewController, UITableViewDelegate, UITableView
         configureTableView()
     }
 
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-    }
-
-    // MARK: - Helpers: Configuration
-
-    /// Configures the table view.
-    func configureTableView() {
-        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "default")
-        tableView.tableFooterView = UIView()
-    }
-
-    /// Configures the user name stack section
-    func configureStackView() {
-        usernameLabel.text = "Username:"
-
-        Task {
-            do {
-                var externalUserId = try await userEntitlementsClient.getExternalId()
-                usernameTextView.text = externalUserId
-                usernameTextView.inputView = UIView()
-            }
-        }
-    }
-
     // MARK: - Conformance: UITableViewDataSource
-
-    func numberOfSections(in tableView: UITableView) -> Int {
-        return 1
-    }
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return tableData.count
@@ -128,7 +124,8 @@ class SettingsViewController: UIViewController, UITableViewDelegate, UITableView
         let menuItem = tableData[indexPath.row]
         let cell = tableView.dequeueReusableCell(withIdentifier: "default", for: indexPath)
         cell.textLabel?.text = menuItem.displayTitle
-        cell.accessoryType = .disclosureIndicator
+        cell.textLabel?.textColor = menuItem.textColor
+        cell.accessoryType = menuItem.accessoryType
         return cell
     }
 
@@ -150,7 +147,55 @@ class SettingsViewController: UIViewController, UITableViewDelegate, UITableView
         case .profiles:
             performSegue(withSegue: Segue.navigateToProfiles,
                 sender: self)
+        case .deregister:
+            let alert = UIAlertController(
+                title: "Deregister",
+                message: "Are you sure you want to deregister? All user data will be deleted.",
+                preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+            alert.addAction(UIAlertAction(title: "Deregister", style: .default) { _ in
+                Task { [weak self] in
+                    await self?.deregister()
+                }
+            })
+            present(alert, animated: true, completion: nil)
         }
     }
 
+    // MARK: - Helpers: Configuration
+
+    /// Configures the table view.
+    func configureTableView() {
+        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "default")
+        tableView.tableFooterView = UIView()
+    }
+
+    /// Configures the user name stack section
+    func configureStackView() {
+        usernameLabel.text = "Username:"
+        Task {
+            do {
+                let externalUserId = try await userEntitlementsClient.getExternalId()
+                usernameTextView.text = externalUserId
+                usernameTextView.inputView = UIView()
+            }
+        }
+    }
+
+    // MARK: - Helpers
+
+    /// Perform de-registration from the Sudo user client and clear all local data.
+   func deregister() async {
+       presentActivityAlert(message: "Deregistering")
+       do {
+           _ = try await AppDelegate.dependencies.authenticator.deregister()
+           try await AppDelegate.dependencies.reset()
+           dismissActivityAlert()
+           // unwind back to registration view controller
+           performSegue(withSegue: Segue.returnToRegistration, sender: self)
+       } catch {
+           dismissActivityAlert()
+           presentErrorAlert(message: "Failed to deregister", error: error)
+       }
+   }
 }

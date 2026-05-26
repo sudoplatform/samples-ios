@@ -13,6 +13,7 @@ import SudoEntitlementsAdmin
 ///
 /// - Links From:
 ///     - `SettingsViewController`: A user taps the "Entitlements" button.
+@MainActor
 class EntitlementsViewController:
     UIViewController,
     UITableViewDelegate,
@@ -78,16 +79,12 @@ class EntitlementsViewController:
                     available: entitlement.value
                 )
             }
-            self.entitlementsList = self.filterVpnEntitlementConsumptionModels(models)
-            DispatchQueue.main.async { [weak self] in
-                self?.tableView.reloadData()
-                self?.dismissActivityAlert()
-            }
+            entitlementsList = filterVpnEntitlementConsumptionModels(models)
+            tableView.reloadData()
+            dismissActivityAlert()
         } catch {
-            DispatchQueue.main.async { [weak self] in
-                self?.dismissActivityAlert()
-                self?.presentErrorAlert(message: "Failure", error: error)
-            }
+            dismissActivityAlert()
+            presentErrorAlert(message: "Failure", error: error)
         }
     }
 
@@ -236,9 +233,7 @@ class EntitlementsViewController:
     }
 
     func handleEntitlementsUpdateFailure(error: Error?) {
-        DispatchQueue.main.async { [weak self] in
-            self?.dismissActivityAlert()
-            self?.presentErrorAlert(message: "Failure", error: error)
-        }
+        dismissActivityAlert()
+        presentErrorAlert(message: "Failure", error: error)
     }
 }

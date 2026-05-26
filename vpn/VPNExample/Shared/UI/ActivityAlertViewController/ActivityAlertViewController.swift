@@ -63,6 +63,7 @@ class ActivityAlertViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         modalPresentationStyle = .overCurrentContext
+        modalTransitionStyle = .crossDissolve
         view.backgroundColor = .clear
         activityBoxView.layer.cornerRadius = 10
         label.text = message

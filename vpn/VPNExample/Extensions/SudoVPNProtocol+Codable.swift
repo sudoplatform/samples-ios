@@ -16,10 +16,6 @@ extension SudoVPNProtocol: RawRepresentable, Codable {
             self = .ipsec
         case "ikev2":
             self = .ikev2
-        case "openVpnUdp":
-            self = .openVpnUdp
-        case "openVpnTcp":
-            self = .openVpnTcp
         case "wireGuard":
             self = .wireGuard
         default:
@@ -33,10 +29,6 @@ extension SudoVPNProtocol: RawRepresentable, Codable {
             return "ipsec"
         case .ikev2:
             return "ikev2"
-        case .openVpnUdp:
-            return "openVpnUdp"
-        case .openVpnTcp:
-            return "openVpnTcp"
         case .wireGuard:
             return "wireGuard"
         case .unknown(let string):

@@ -42,10 +42,6 @@ class RadialButton: UIButton {
         return super.awakeAfter(using: aDecoder)
     }
 
-    override func awakeFromNib() {
-        super.awakeFromNib()
-    }
-
     func setupView() {
         self.powerImageView.image = UIImage(systemName: "power")
     }

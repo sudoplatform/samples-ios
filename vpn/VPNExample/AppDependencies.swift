@@ -50,7 +50,7 @@ struct AppDependencies {
     }
 
     func reset() async throws {
-        try vpnClient.reset()
+        try await vpnClient.reset()
         try entitlementsClient.reset()
         try await userClient.reset()
     }

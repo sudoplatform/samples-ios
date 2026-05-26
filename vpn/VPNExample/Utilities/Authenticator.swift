@@ -28,15 +28,15 @@ enum AuthenticatorError: LocalizedError {
     }
 }
 
-protocol Authenticator {
+protocol Authenticator: Sendable {
 
     func register() async throws
 
-    func deregister() async throws -> String
+    func deregister() async throws
 
 }
 
-class DefaultAuthenticator: Authenticator {
+final class DefaultAuthenticator: Authenticator, @unchecked Sendable {
 
     // MARK: - Properties
 
@@ -73,7 +73,7 @@ class DefaultAuthenticator: Authenticator {
         _ = try await userClient.registerWithAuthenticationProvider(authenticationProvider: provider, registrationId: UUID().uuidString)
     }
 
-    func deregister() async throws -> String {
+    func deregister() async throws {
         return try await userClient.deregister()
     }
 }

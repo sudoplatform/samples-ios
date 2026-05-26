@@ -7,6 +7,7 @@
 import UIKit
 import SudoUser
 
+@MainActor
 class RegistrationViewController: UIViewController {
 
     // MARK: - Outlets
@@ -20,9 +21,9 @@ class RegistrationViewController: UIViewController {
     // MARK: - Supplementary
 
     /// Segues that are performed in `RegistrationViewController`.
-    enum Segue: String {
-        /// Used to navigate to the `ServerListViewController`.
-        case navigateToMainMenu
+    enum Segue: String, Segueable {
+        /// Used to navigate to the `DashboardViewController`.
+        case navigateToDashboard
     }
 
     enum RegistrationError: Error, Equatable {
@@ -47,15 +48,12 @@ class RegistrationViewController: UIViewController {
         super.viewDidAppear(animated)
 
         // Sign in automatically if the user is registered.
-        Task.detached(priority: .medium) { [weak self] in
-            guard let weakSelf = self else { return }
-            guard let isRegistered = try? await weakSelf.userClient.isRegistered() else {
+        Task {
+            guard let isRegistered = try? await userClient.isRegistered() else {
                 return
             }
             if isRegistered {
-                DispatchQueue.main.async {
-                    weakSelf.registerButtonTapped()
-                }
+                registerButtonTapped()
             }
         }
     }
@@ -72,50 +70,40 @@ class RegistrationViewController: UIViewController {
     @IBAction func registerButtonTapped() {
         activityIndicator.startAnimating()
         registerButton.isEnabled = false
-        Task.detached(priority: .medium) {
+        Task {
             do {
-                try await self.register()
-                try await self.signIn()
-                try await self.redeemEntitlements()
-                try await self.vpnClient.prepare()
-                Task { @MainActor [weak self] in
-                    self?.activityIndicator.stopAnimating()
-                    self?.registerButton.isEnabled = true
-                    self?.navigateToMainMenu()
+                try await register()
+                try await signIn()
+                try await redeemEntitlements()
+                if try await vpnClient.isProfileInstalled() {
+                    print("Profile installed")
+                } else {
+                    print("Profile not installed")
                 }
+                activityIndicator.stopAnimating()
+                registerButton.isEnabled = true
+                navigateToDashboard()
             } catch {
-                await self.showRegistrationFailureAlert(error: error)
+                showRegistrationFailureAlert(error: error)
             }
         }
     }
 
     // MARK: - Operations
 
-    @MainActor
     func register() async throws {
-        if userClient.getSupportedRegistrationChallengeType().contains(.fsso) {
-            guard let presentationAnchor = self.view?.window else {
-                fatalError("No window for \(String(describing: self))")
-            }
-            _ = try await userClient.presentFederatedSignInUI(presentationAnchor: presentationAnchor)
-        } else {
-            if try await userClient.isRegistered() {
-                return
-            }
-            try await authenticator.register()
+        if try await userClient.isRegistered() {
+            return
         }
+        try await authenticator.register()
     }
 
     func signIn() async throws {
         if try await userClient.isSignedIn() {
-            guard let refreshToken = try? userClient.getRefreshToken() else {
-                throw AuthenticatorError.unableToRefreshTokens
-            }
-            _ = try await userClient.refreshTokens(refreshToken: refreshToken)
-            return
+            _ = try await userClient.refreshTokens()
+        } else {
+            _ = try await userClient.signInWithKey()
         }
-        _ = try await userClient.signInWithKey()
-        return
     }
 
     func redeemEntitlements() async throws {
@@ -134,7 +122,6 @@ class RegistrationViewController: UIViewController {
     ///
     /// - Parameters:
     ///     - error: Contains the given `Error`.
-    @MainActor
     private func showRegistrationFailureAlert(error: Error) {
         let alert = UIAlertController(title: "Error", message: "Failed to register:\n\(error.localizedDescription)", preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
@@ -142,7 +129,7 @@ class RegistrationViewController: UIViewController {
     }
 
     /// Navigates to the `ServerListViewController` via a segue.
-    private func navigateToMainMenu() {
-        performSegue(withIdentifier: Segue.navigateToMainMenu.rawValue, sender: self)
+    private func navigateToDashboard() {
+        performSegue(withSegue: Segue.navigateToDashboard, sender: self)
     }
 }

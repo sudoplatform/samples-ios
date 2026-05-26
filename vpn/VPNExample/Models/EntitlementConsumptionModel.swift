@@ -12,8 +12,8 @@ struct EntitlementConsumptionModel: Equatable {
     // MARK: Properties
 
     var name: String
-    var value: Int
-    var consumed: Int
-    var available: Int
+    var value: Int64
+    var consumed: Int64
+    var available: Int64
 
 }

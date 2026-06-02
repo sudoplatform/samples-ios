@@ -8,6 +8,7 @@ import UIKit
 import UniformTypeIdentifiers
 import SudoEmail
 
+@MainActor
 class ReadEmailMessageViewController: UIViewController, ActivityAlertViewControllerDelegate {
 
     // MARK: - Outlets
@@ -70,7 +71,7 @@ class ReadEmailMessageViewController: UIViewController, ActivityAlertViewControl
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         guard let emailMessage = emailMessage else {
-            Task { @MainActor in
+            Task {
                 presentErrorAlert(message: "An error has occurred: no email message found") { _ in
                     self.performSegue(withIdentifier: Segue.returnToEmailMessageList.rawValue, sender: self)
                 }
@@ -78,7 +79,7 @@ class ReadEmailMessageViewController: UIViewController, ActivityAlertViewControl
             return
         }
         guard let emailAddress = emailAddress, !emailAddress.emailAddress.isEmpty else {
-            Task { @MainActor in
+            Task {
                 presentErrorAlert(message: "An error has occurred: no email address found") { _ in
                     self.performSegue(withIdentifier: Segue.returnToEmailMessageList.rawValue, sender: self)
                 }
@@ -172,8 +173,8 @@ class ReadEmailMessageViewController: UIViewController, ActivityAlertViewControl
         return try await emailClient.getEmailMessageWithBody(withInput: getEmailMessageInput)
     }
 
-    func readDraftEmailMessage(messageId: String) async throws -> Data {
-        let getDraftInput = GetDraftEmailMessageInput(id: messageId, emailAddressId: self.emailAddress.id)
+    func readDraftEmailMessage(messageId: String, emailMaskId: String? = nil) async throws -> Data {
+        let getDraftInput = GetDraftEmailMessageInput(id: messageId, emailAddressId: self.emailAddress.id, emailMaskId: emailMaskId)
         guard let draftEmailMessage = try await emailClient.getDraftEmailMessage(withInput: getDraftInput) else {
             throw SudoEmailError.emailMessageNotFound
         }
@@ -246,13 +247,13 @@ class ReadEmailMessageViewController: UIViewController, ActivityAlertViewControl
     /// On any failure, a "Failed to get Email Message" UIAlert message will be presented to the user.
     func loadEmailMessage(_ message: EmailMessage) {
         presentCancellableActivityAlert(message: "Loading", delegate: self) {
-            Task.detached(priority: .medium) {
+            Task {
                 do {
                     // Handle draft messages
                     if message.folderId.contains("DRAFTS") {
-                        let rfc822Data = try await self.readDraftEmailMessage(messageId: message.id)
+                        let rfc822Data = try await self.readDraftEmailMessage(messageId: message.id, emailMaskId: message.emailMaskId)
                         let parsedMessage = try RFC822Util.fromPlainText(rfc822Data)
-                        Task { @MainActor in
+                        Task {
                             self.bodyLabel.text = parsedMessage.body
                             self.dismissActivityAlert()
                             self.performSegue(withIdentifier: Segue.replyToEmailMessage.rawValue, sender: self)
@@ -267,7 +268,7 @@ class ReadEmailMessageViewController: UIViewController, ActivityAlertViewControl
                         }
                         parsedMessage = emailMessageWithBody
                     } catch {
-                        Task { @MainActor in
+                        Task {
                             self.dismissActivityAlert()
                             self.presentErrorAlert(message: "Failed load email message", error: error) { _ in
                                 self.performSegue(withIdentifier: Segue.returnToEmailMessageList.rawValue, sender: self)
@@ -294,7 +295,7 @@ class ReadEmailMessageViewController: UIViewController, ActivityAlertViewControl
                     let attachments = parsedMessage.attachments
                     let inlineAttachments = parsedMessage.inlineAttachments
                     if message.hasAttachments && attachments.isEmpty && inlineAttachments.isEmpty {
-                       Task { @MainActor in
+                       Task {
                            self.dismissActivityAlert()
                            self.presentErrorAlert(message: "Failed to load email attachments") { _ in
                                self.performSegue(withIdentifier: Segue.returnToEmailMessageList.rawValue, sender: self)
@@ -303,8 +304,20 @@ class ReadEmailMessageViewController: UIViewController, ActivityAlertViewControl
                        return
                     }
                     // Populate views with message data
-                    Task { @MainActor in
-                        let toLabels: [UILabel] = message.to.map {
+                    Task {
+                        var toAddresses = message.to
+                        // If message was received via a mask, show the mask address instead of the real address
+                        if let maskId = message.emailMaskId {
+                            do {
+                                let masks = try await self.emailClient.listEmailMasksForOwner(withInput: ListEmailMasksForOwnerInput())
+                                if let mask = masks.items.first(where: { $0.id == maskId }) {
+                                    toAddresses = [EmailAddressAndName(address: mask.maskAddress)]
+                                }
+                            } catch {
+                                // Fall back to showing the original to addresses
+                            }
+                        }
+                        let toLabels: [UILabel] = toAddresses.map {
                             let label = UILabel()
                             label.font = UIFont.systemFont(ofSize: 14.0)
                             label.text = ($0.displayName != nil) ? "\($0.displayName ?? "") <\($0.address)>" : $0.address
@@ -375,7 +388,8 @@ class ReadEmailMessageViewController: UIViewController, ActivityAlertViewControl
                 cc: replyCc,
                 subject: replySubject.replacingOccurrences(of: "Re:", with: ""),
                 body: replyBody.replacingOccurrences(of: "\n\n---------------\n\n", with: ""),
-                scheduledAt: self.scheduledAt
+                scheduledAt: self.scheduledAt,
+                emailMaskId: emailMessage.emailMaskId
             )
         }
         return sendEmailInput
@@ -399,7 +413,8 @@ class ReadEmailMessageViewController: UIViewController, ActivityAlertViewControl
             sendEmailInput = SendEmailInputData(
                 draftEmailMessageId: emailMessage.id,
                 subject: forwardSubject.replacingOccurrences(of: "Fwd:", with: ""),
-                body: forwardBody.replacingOccurrences(of: "\n\n---------------\n\n", with: "")
+                body: forwardBody.replacingOccurrences(of: "\n\n---------------\n\n", with: ""),
+                emailMaskId: emailMessage.emailMaskId
             )
         }
         return sendEmailInput

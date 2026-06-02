@@ -7,6 +7,7 @@
 import XCTest
 @testable import EmailExample
 
+@MainActor
 class LearnMoreViewTests: XCTestCase, LearnMoreViewDelegate {
 
     // MARK: - Properties

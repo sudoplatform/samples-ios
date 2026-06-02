@@ -16,6 +16,7 @@ protocol ActivityAlertViewControllerDelegate: AnyObject {
 /// Custom view controller to overlay an indicator to the user that an operation is occurring.
 ///
 /// For example. "Creating a funding source", "Checking status" overlays use this view.
+@MainActor
 class ActivityAlertViewController: UIViewController {
 
     // MARK: - Outlets

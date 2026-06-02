@@ -122,6 +122,25 @@
 		CF2571C12444EBB80053334E /* SudoListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF2571C02444EBB80053334E /* SudoListViewController.swift */; };
 		CF2571C32444EC0B0053334E /* CreateSudoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF2571C22444EC0B0053334E /* CreateSudoViewController.swift */; };
 		CF2571D2245109BF0053334E /* UIViewController+AlertPresentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF2571D1245109BF0053334E /* UIViewController+AlertPresentation.swift */; };
+		EM0001012E5A000000000001 /* EmailMaskListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EM0001002E5A000000000001 /* EmailMaskListViewController.swift */; };
+		EM0001032E5A000000000002 /* EmailMaskListViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = EM0001020E5A000000000002 /* EmailMaskListViewController.xib */; };
+		EM0002012E5A000000000003 /* CreateEmailMaskViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EM0002002E5A000000000003 /* CreateEmailMaskViewController.swift */; };
+		EM0002032E5A000000000004 /* CreateEmailMaskViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = EM0002020E5A000000000004 /* CreateEmailMaskViewController.xib */; };
+		EM0003012E5A000000000005 /* UpdateEmailMaskViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EM0003002E5A000000000005 /* UpdateEmailMaskViewController.swift */; };
+		EM0003032E5A000000000006 /* UpdateEmailMaskViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = EM0003020E5A000000000006 /* UpdateEmailMaskViewController.xib */; };
+		EM0004012E5A000000000007 /* EmailValidation.swift in Sources */ = {isa = PBXBuildFile; fileRef = EM0004002E5A000000000007 /* EmailValidation.swift */; };
+		EM0005012E5A000000000008 /* MaskListFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = EM0005002E5A000000000008 /* MaskListFilter.swift */; };
+		EM0006012E5A000000000009 /* MaskStatusColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = EM0006002E5A000000000009 /* MaskStatusColor.swift */; };
+		EM0007012E5A00000000000A /* MaskTypeSegment.swift in Sources */ = {isa = PBXBuildFile; fileRef = EM0007002E5A00000000000A /* MaskTypeSegment.swift */; };
+		EM0008012E5A00000000000B /* SwipeActionResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = EM0008002E5A00000000000B /* SwipeActionResolver.swift */; };
+		EM0009012E5A00000000000C /* VerificationCodeValidation.swift in Sources */ = {isa = PBXBuildFile; fileRef = EM0009002E5A00000000000C /* VerificationCodeValidation.swift */; };
+		EM00T1012E5A00000000000D /* EmailValidationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EM00T1002E5A00000000000D /* EmailValidationTests.swift */; };
+		EM00T2012E5A00000000000E /* MaskListFilterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EM00T2002E5A00000000000E /* MaskListFilterTests.swift */; };
+		EM00T3012E5A00000000000F /* SwipeActionResolverTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EM00T3002E5A00000000000F /* SwipeActionResolverTests.swift */; };
+		EM00T4012E5A000000000010 /* VerificationCodeValidationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EM00T4002E5A000000000010 /* VerificationCodeValidationTests.swift */; };
+		EM01CM012E5B000000000002 /* CreateEmailMaskViewControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EM01CM022E5B000000000002 /* CreateEmailMaskViewControllerTests.swift */; };
+		EM01ML012E5B000000000001 /* EmailMaskListViewControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EM01ML022E5B000000000001 /* EmailMaskListViewControllerTests.swift */; };
+		EM01UM012E5B000000000003 /* UpdateEmailMaskViewControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EM01UM022E5B000000000003 /* UpdateEmailMaskViewControllerTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -278,6 +297,25 @@
 		CF2571C02444EBB80053334E /* SudoListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SudoListViewController.swift; sourceTree = "<group>"; };
 		CF2571C22444EC0B0053334E /* CreateSudoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateSudoViewController.swift; sourceTree = "<group>"; };
 		CF2571D1245109BF0053334E /* UIViewController+AlertPresentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+AlertPresentation.swift"; sourceTree = "<group>"; };
+		EM0001002E5A000000000001 /* EmailMaskListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmailMaskListViewController.swift; sourceTree = "<group>"; };
+		EM0001020E5A000000000002 /* EmailMaskListViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = EmailMaskListViewController.xib; sourceTree = "<group>"; };
+		EM0002002E5A000000000003 /* CreateEmailMaskViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateEmailMaskViewController.swift; sourceTree = "<group>"; };
+		EM0002020E5A000000000004 /* CreateEmailMaskViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = CreateEmailMaskViewController.xib; sourceTree = "<group>"; };
+		EM0003002E5A000000000005 /* UpdateEmailMaskViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateEmailMaskViewController.swift; sourceTree = "<group>"; };
+		EM0003020E5A000000000006 /* UpdateEmailMaskViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = UpdateEmailMaskViewController.xib; sourceTree = "<group>"; };
+		EM0004002E5A000000000007 /* EmailValidation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmailValidation.swift; sourceTree = "<group>"; };
+		EM0005002E5A000000000008 /* MaskListFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MaskListFilter.swift; sourceTree = "<group>"; };
+		EM0006002E5A000000000009 /* MaskStatusColor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MaskStatusColor.swift; sourceTree = "<group>"; };
+		EM0007002E5A00000000000A /* MaskTypeSegment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MaskTypeSegment.swift; sourceTree = "<group>"; };
+		EM0008002E5A00000000000B /* SwipeActionResolver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwipeActionResolver.swift; sourceTree = "<group>"; };
+		EM0009002E5A00000000000C /* VerificationCodeValidation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerificationCodeValidation.swift; sourceTree = "<group>"; };
+		EM00T1002E5A00000000000D /* EmailValidationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmailValidationTests.swift; sourceTree = "<group>"; };
+		EM00T2002E5A00000000000E /* MaskListFilterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MaskListFilterTests.swift; sourceTree = "<group>"; };
+		EM00T3002E5A00000000000F /* SwipeActionResolverTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwipeActionResolverTests.swift; sourceTree = "<group>"; };
+		EM00T4002E5A000000000010 /* VerificationCodeValidationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerificationCodeValidationTests.swift; sourceTree = "<group>"; };
+		EM01CM022E5B000000000002 /* CreateEmailMaskViewControllerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateEmailMaskViewControllerTests.swift; sourceTree = "<group>"; };
+		EM01ML022E5B000000000001 /* EmailMaskListViewControllerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmailMaskListViewControllerTests.swift; sourceTree = "<group>"; };
+		EM01UM022E5B000000000003 /* UpdateEmailMaskViewControllerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateEmailMaskViewControllerTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -455,6 +493,7 @@
 			isa = PBXGroup;
 			children = (
 				840D86CE249312E2008E4BE5 /* Email Addresses */,
+				EM000G002E5A000000000010 /* Email Masks */,
 				67014B5524983DFD008733E8 /* Email Messages */,
 				8470C8EF245AD0C600439F92 /* Main Menu */,
 				84403FDA245AAF5C00B2EBF2 /* Registration */,
@@ -467,9 +506,15 @@
 			isa = PBXGroup;
 			children = (
 				AB93CAD2240EF6FB0065AF50 /* Authenticator.swift */,
+				EM0004002E5A000000000007 /* EmailValidation.swift */,
 				8403256224C5213A0049C403 /* FileReadable.swift */,
+				EM0005002E5A000000000008 /* MaskListFilter.swift */,
+				EM0006002E5A000000000009 /* MaskStatusColor.swift */,
+				EM0007002E5A00000000000A /* MaskTypeSegment.swift */,
 				67C8207B24A9ABC400E5D113 /* RFC822Util.swift */,
 				9F4A78872E446B0C00F64B7D /* SubscriptionUtilities.swift */,
+				EM0008002E5A00000000000B /* SwipeActionResolver.swift */,
+				EM0009002E5A00000000000C /* VerificationCodeValidation.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -761,7 +806,11 @@
 			isa = PBXGroup;
 			children = (
 				8403255E24C51C000049C403 /* AuthenticatorTests.swift */,
+				EM00T1002E5A00000000000D /* EmailValidationTests.swift */,
+				EM00T2002E5A00000000000E /* MaskListFilterTests.swift */,
 				67C8207D24AAA1FA00E5D113 /* RFC822UtilTest.swift */,
+				EM00T3002E5A00000000000F /* SwipeActionResolverTests.swift */,
+				EM00T4002E5A000000000010 /* VerificationCodeValidationTests.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -770,6 +819,7 @@
 			isa = PBXGroup;
 			children = (
 				9566E3CA2505E84F002A2DD3 /* Email Addresses */,
+				EM01MG012E5B000000000004 /* Email Masks */,
 				84A4560224B5988A002DBF0D /* Email Messages */,
 				84A4560524B598B5002DBF0D /* Registration */,
 				9566E3D12509ABAA002A2DD3 /* Sudos */,
@@ -938,6 +988,77 @@
 			path = EmailExample;
 			sourceTree = "<group>";
 		};
+		EM000G002E5A000000000010 /* Email Masks */ = {
+			isa = PBXGroup;
+			children = (
+				EM000G022E5A000000000012 /* CreateEmailMask */,
+				EM000G012E5A000000000011 /* EmailMaskList */,
+				EM000G032E5A000000000013 /* UpdateEmailMask */,
+			);
+			path = "Email Masks";
+			sourceTree = "<group>";
+		};
+		EM000G012E5A000000000011 /* EmailMaskList */ = {
+			isa = PBXGroup;
+			children = (
+				EM0001002E5A000000000001 /* EmailMaskListViewController.swift */,
+				EM0001020E5A000000000002 /* EmailMaskListViewController.xib */,
+			);
+			path = EmailMaskList;
+			sourceTree = "<group>";
+		};
+		EM000G022E5A000000000012 /* CreateEmailMask */ = {
+			isa = PBXGroup;
+			children = (
+				EM0002002E5A000000000003 /* CreateEmailMaskViewController.swift */,
+				EM0002020E5A000000000004 /* CreateEmailMaskViewController.xib */,
+			);
+			path = CreateEmailMask;
+			sourceTree = "<group>";
+		};
+		EM000G032E5A000000000013 /* UpdateEmailMask */ = {
+			isa = PBXGroup;
+			children = (
+				EM0003002E5A000000000005 /* UpdateEmailMaskViewController.swift */,
+				EM0003020E5A000000000006 /* UpdateEmailMaskViewController.xib */,
+			);
+			path = UpdateEmailMask;
+			sourceTree = "<group>";
+		};
+		EM01MG012E5B000000000004 /* Email Masks */ = {
+			isa = PBXGroup;
+			children = (
+				EM01MG032E5B000000000006 /* CreateEmailMask */,
+				EM01MG022E5B000000000005 /* EmailMaskList */,
+				EM01MG042E5B000000000007 /* UpdateEmailMask */,
+			);
+			path = "Email Masks";
+			sourceTree = "<group>";
+		};
+		EM01MG022E5B000000000005 /* EmailMaskList */ = {
+			isa = PBXGroup;
+			children = (
+				EM01ML022E5B000000000001 /* EmailMaskListViewControllerTests.swift */,
+			);
+			path = EmailMaskList;
+			sourceTree = "<group>";
+		};
+		EM01MG032E5B000000000006 /* CreateEmailMask */ = {
+			isa = PBXGroup;
+			children = (
+				EM01CM022E5B000000000002 /* CreateEmailMaskViewControllerTests.swift */,
+			);
+			path = CreateEmailMask;
+			sourceTree = "<group>";
+		};
+		EM01MG042E5B000000000007 /* UpdateEmailMask */ = {
+			isa = PBXGroup;
+			children = (
+				EM01UM022E5B000000000003 /* UpdateEmailMaskViewControllerTests.swift */,
+			);
+			path = UpdateEmailMask;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -1057,6 +1178,7 @@
 				9F528F0D2E444C5D00A77C5F /* XCRemoteSwiftPackageReference "MimeParser" */,
 				9F64D4122E45C37A005DDC55 /* XCRemoteSwiftPackageReference "sudo-notification-ios" */,
 				9F6821F92E4981BB00D3D0F9 /* XCRemoteSwiftPackageReference "sudo-key-manager-ios" */,
+				EM528F022E444C0E00B88D1A /* XCRemoteSwiftPackageReference "sudo-user-ios" */,
 			);
 			productRefGroup = AB5B9DB0240EC5D100E4E5D8 /* Products */;
 			projectDirPath = "";
@@ -1107,9 +1229,11 @@
 				84EC6CAE24C1652B008FDED4 /* BodyTableViewCell.xib in Resources */,
 				9FF1729D2D273D6800C3BFF8 /* CreateCustomFolderViewController.xib in Resources */,
 				840D86DA24932C8A008E4BE5 /* CreateEmailAddressViewController.xib in Resources */,
+				EM0002032E5A000000000004 /* CreateEmailMaskViewController.xib in Resources */,
 				8440400D245AB56D00B2EBF2 /* CreateSudoViewController.xib in Resources */,
 				840D86D3249315C8008E4BE5 /* EmailAddressListViewController.xib in Resources */,
 				5DD45E312C298210004E2979 /* EmailAddressSettingsViewController.xib in Resources */,
+				EM0001032E5A000000000002 /* EmailMaskListViewController.xib in Resources */,
 				67014B5924983E77008733E8 /* EmailMessageListViewController.xib in Resources */,
 				67014B60249AC360008733E8 /* EmailMessageTableViewCell.xib in Resources */,
 				84EC6CB224C169E3008FDED4 /* HeaderTableViewCell.xib in Resources */,
@@ -1123,6 +1247,7 @@
 				84288921249AE44F00D39E6C /* SendEmailMessageViewController.xib in Resources */,
 				8470C8F5245AD55700439F92 /* SudoListViewController.xib in Resources */,
 				9FAAE9CC2D2B4E6800687D4C /* UpdateCustomFolderViewController.xib in Resources */,
+				EM0003032E5A000000000006 /* UpdateEmailMaskViewController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1145,7 +1270,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if which swiftlint > /dev/null; then\n    swiftlint --path ${PROJECT_DIR}\nelif [ -x /usr/local/bin/swiftlint ]; then\n    /usr/local/bin/swiftlint --path ${PROJECT_DIR}\nelif [ -x /usr/homebrew/bin/swiftlint ]; then\n    /usr/homebrew/bin/swiftlint --path ${PROJECT_DIR}\nelif [ -x /opt/homebrew/bin/swiftlint ]; then\n    /opt/homebrew/bin/swiftlint --path ${PROJECT_DIR}\nelse\n    echo \"Warning: SwiftLint not installed, run 'brew install swiftlint'\"\n    exit 1\nfi\n";
+			shellScript = "if which swiftlint > /dev/null; then\n    swiftlint ${PROJECT_DIR}\nelif [ -x /usr/local/bin/swiftlint ]; then\n    /usr/local/bin/swiftlint ${PROJECT_DIR}\nelif [ -x /usr/homebrew/bin/swiftlint ]; then\n    /usr/homebrew/bin/swiftlint ${PROJECT_DIR}\nelif [ -x /opt/homebrew/bin/swiftlint ]; then\n    /opt/homebrew/bin/swiftlint ${PROJECT_DIR}\nelse\n    echo \"Warning: SwiftLint not installed, run 'brew install swiftlint'\"\n    exit 1\nfi\n";
 		};
 		AB93CAE6240F006C0065AF50 /* Copy Test Keys (Debug) */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1194,6 +1319,7 @@
 				848314EA24B7E564004E89EA /* AuthenticatorMock.swift in Sources */,
 				8403255F24C51C000049C403 /* AuthenticatorTests.swift in Sources */,
 				9566E3CD2505E8E2002A2DD3 /* CreateEmailAddressViewControllerTests.swift in Sources */,
+				EM01CM012E5B000000000002 /* CreateEmailMaskViewControllerTests.swift in Sources */,
 				9566E3D72509F638002A2DD3 /* CreateSudoViewControllerTests.swift in Sources */,
 				847EF2C424BE799000423B74 /* DataFactory+EmailSDK.swift in Sources */,
 				95A92DB9286D5CE900D9FAA2 /* DataFactory+EntitlementsSDK.swift in Sources */,
@@ -1202,12 +1328,15 @@
 				847EF2D024BFE5EB00423B74 /* DateLabelTests.swift in Sources */,
 				9566E3D025084FB9002A2DD3 /* EmailAddressListViewControllerTests.swift in Sources */,
 				9557448124A5C1120057A845 /* EmailExampleTestUtility.swift in Sources */,
+				EM01ML012E5B000000000001 /* EmailMaskListViewControllerTests.swift in Sources */,
 				847EF2C024BE790C00423B74 /* EmailMessage+CreatedDescendingTests.swift in Sources */,
 				84A4560B24B59916002DBF0D /* EmailMessageListViewControllerTests.swift in Sources */,
 				8483151124B84ABF004E89EA /* EmailMessageTableViewCellTests.swift in Sources */,
+				EM00T1012E5A00000000000D /* EmailValidationTests.swift in Sources */,
 				8403256524C5214B0049C403 /* FileReadableMock.swift in Sources */,
 				8403256124C51CB50049C403 /* KeyManagerMock.swift in Sources */,
 				8403255D24C5194A0049C403 /* LearnMoreViewTests.swift in Sources */,
+				EM00T2012E5A00000000000E /* MaskListFilterTests.swift in Sources */,
 				95C0CE0824AACE190024BFBB /* ReadEmailMessageViewControllerTests.swift in Sources */,
 				9557447E24A5C0320057A845 /* RegistrationViewControllerTests.swift in Sources */,
 				67C8207E24AAA1FA00E5D113 /* RFC822UtilTest.swift in Sources */,
@@ -1218,8 +1347,11 @@
 				9566E3D42509ABFD002A2DD3 /* SudoListViewControllerTests.swift in Sources */,
 				5D22F42E2C1AA78200AE54C9 /* SudoNotificationClientMock.swift in Sources */,
 				9557448424A5C2BD0057A845 /* SudoProfilesClientMock.swift in Sources */,
+				EM00T3012E5A00000000000F /* SwipeActionResolverTests.swift in Sources */,
 				8483150D24B82BC7004E89EA /* UITableViewCellMockSpy.swift in Sources */,
 				8483150B24B82113004E89EA /* UITableViewMockSpy.swift in Sources */,
+				EM01UM012E5B000000000003 /* UpdateEmailMaskViewControllerTests.swift in Sources */,
+				EM00T4012E5A000000000010 /* VerificationCodeValidationTests.swift in Sources */,
 				95C0CE0224AAAECC0024BFBB /* XCTestCase+CustomAssertions.swift in Sources */,
 				95C0CE0424AAC8AB0024BFBB /* XCTestCase+Utility.swift in Sources */,
 				95C0CE0624AAC90E0024BFBB /* XCTestCaseExpectation+Convenience.swift in Sources */,
@@ -1240,6 +1372,7 @@
 				84EC6CAD24C1652B008FDED4 /* BodyTableViewCell.swift in Sources */,
 				9FF172972D265CDD00C3BFF8 /* CreateCustomFolderViewController.swift in Sources */,
 				840D86D924932C8A008E4BE5 /* CreateEmailAddressViewController.swift in Sources */,
+				EM0002012E5A000000000003 /* CreateEmailMaskViewController.swift in Sources */,
 				CF2571C32444EC0B0053334E /* CreateSudoViewController.swift in Sources */,
 				5D22F4322C1AAD6A00AE54C9 /* Data+Print.swift in Sources */,
 				67014B64249ADBCD008733E8 /* Date+Formatting.swift in Sources */,
@@ -1247,9 +1380,11 @@
 				840D86D2249315C8008E4BE5 /* EmailAddressListViewController.swift in Sources */,
 				5DD45E2F2C29327F004E2979 /* EmailAddressSettingsViewController.swift in Sources */,
 				511C50742BE0B99E006A377E /* EmailAttachmentsListController.swift in Sources */,
+				EM0001012E5A000000000001 /* EmailMaskListViewController.swift in Sources */,
 				847EF2BD24BE77B400423B74 /* EmailMessage+CreatedDescending.swift in Sources */,
 				67014B5D24983FC6008733E8 /* EmailMessageListViewController.swift in Sources */,
 				67014B62249AC482008733E8 /* EmailMessageTableViewCell.swift in Sources */,
+				EM0004012E5A000000000007 /* EmailValidation.swift in Sources */,
 				51B8E1622BD8B1D4000366F4 /* FilePickerViewController.swift in Sources */,
 				8403256324C5213A0049C403 /* FileReadable.swift in Sources */,
 				953890802963F6E100EE81EA /* FolderSwitcherView.swift in Sources */,
@@ -1258,6 +1393,9 @@
 				841252602533D7A100C98ED3 /* InputFormTableViewCell.swift in Sources */,
 				84309D5F2463FFEC00F48ECC /* LearnMoreView.swift in Sources */,
 				8470C8F2245AD0E200439F92 /* MainMenuViewController.swift in Sources */,
+				EM0005012E5A000000000008 /* MaskListFilter.swift in Sources */,
+				EM0006012E5A000000000009 /* MaskStatusColor.swift in Sources */,
+				EM0007012E5A00000000000A /* MaskTypeSegment.swift in Sources */,
 				8428891C249AE3EB00D39E6C /* ReadEmailMessageViewController.swift in Sources */,
 				CF2571BF2444EB7B0053334E /* RegistrationViewController.swift in Sources */,
 				67C8207C24A9ABC400E5D113 /* RFC822Util.swift in Sources */,
@@ -1265,12 +1403,15 @@
 				84288920249AE44F00D39E6C /* SendEmailMessageViewController.swift in Sources */,
 				9F4A78882E446B0C00F64B7D /* SubscriptionUtilities.swift in Sources */,
 				CF2571C12444EBB80053334E /* SudoListViewController.swift in Sources */,
+				EM0008012E5A00000000000B /* SwipeActionResolver.swift in Sources */,
 				511C50772BE14BF1006A377E /* UIImage+ToAttributedString.swift in Sources */,
 				511C50712BE0ACC5006A377E /* UIView+Clickable.swift in Sources */,
 				84309D3F2463DC7600F48ECC /* UIView+NibLoadable.swift in Sources */,
 				CF2571D2245109BF0053334E /* UIViewController+AlertPresentation.swift in Sources */,
 				9FAAE9CA2D2B484D00687D4C /* UpdateCustomFolderInputData.swift in Sources */,
 				9FAAE9C72D2B417700687D4C /* UpdateCustomFolderViewController.swift in Sources */,
+				EM0003012E5A000000000005 /* UpdateEmailMaskViewController.swift in Sources */,
+				EM0009012E5A00000000000C /* VerificationCodeValidation.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1329,7 +1470,7 @@
 				INFOPLIST_FILE = EmailExampleNotificationServiceExtension/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = EmailExampleNotificationServiceExtension;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2024 Anonyome Labs. All rights reserved.";
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1362,7 +1503,7 @@
 				INFOPLIST_FILE = EmailExampleNotificationServiceExtension/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = EmailExampleNotificationServiceExtension;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2024 Anonyome Labs. All rights reserved.";
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1392,7 +1533,7 @@
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.sudoplatform.EmailExample.EmailExampleNotificationServiceExtensionTests;
@@ -1419,7 +1560,7 @@
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.sudoplatform.EmailExample.EmailExampleNotificationServiceExtensionTests;
@@ -1440,11 +1581,15 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 33X5MJEM2D;
 				INFOPLIST_FILE = EmailExampleTests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
+				);
+				OTHER_LDFLAGS = (
+					"-framework",
+					SudoEmailCommon,
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.sudoplatform.EmailExampleTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1462,11 +1607,15 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 33X5MJEM2D;
 				INFOPLIST_FILE = EmailExampleTests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
+				);
+				OTHER_LDFLAGS = (
+					"-framework",
+					SudoEmailCommon,
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.sudoplatform.EmailExampleTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1528,7 +1677,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -1584,7 +1733,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
@@ -1602,7 +1751,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 33X5MJEM2D;
 				INFOPLIST_FILE = EmailExample/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1622,7 +1771,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 33X5MJEM2D;
 				INFOPLIST_FILE = EmailExample/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1690,7 +1839,7 @@
 			repositoryURL = "https://github.com/sudoplatform/sudo-email-ios";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 20.2.1;
+				minimumVersion = 24.2.1;
 			};
 		};
 		9F528F072E444C3600A77C5F /* XCRemoteSwiftPackageReference "sudo-profiles-ios" */ = {
@@ -1698,7 +1847,7 @@
 			repositoryURL = "https://github.com/sudoplatform/sudo-profiles-ios";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 20.1.0;
+				minimumVersion = 21.0.0;
 			};
 		};
 		9F528F0A2E444C4F00A77C5F /* XCRemoteSwiftPackageReference "sudo-entitlements-ios" */ = {
@@ -1706,7 +1855,7 @@
 			repositoryURL = "https://github.com/sudoplatform/sudo-entitlements-ios";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 13.0.0;
+				minimumVersion = 14.0.0;
 			};
 		};
 		9F528F0D2E444C5D00A77C5F /* XCRemoteSwiftPackageReference "MimeParser" */ = {
@@ -1722,7 +1871,7 @@
 			repositoryURL = "https://github.com/sudoplatform/sudo-notification-ios";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 5.1.0;
+				minimumVersion = 6.0.0;
 			};
 		};
 		9F6821F92E4981BB00D3D0F9 /* XCRemoteSwiftPackageReference "sudo-key-manager-ios" */ = {
@@ -1730,7 +1879,15 @@
 			repositoryURL = "https://github.com/sudoplatform/sudo-key-manager-ios";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 4.1.3;
+				minimumVersion = 5.0.0;
+			};
+		};
+		EM528F022E444C0E00B88D1A /* XCRemoteSwiftPackageReference "sudo-user-ios" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sudoplatform/sudo-user-ios";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 19.0.0;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */

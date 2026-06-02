@@ -10,6 +10,7 @@ import SudoEmail
 import SudoProfiles
 @testable import EmailExample
 
+@MainActor
 class CreateSudoViewControllerTests: XCTestCase {
 
     // MARK: - Properties
@@ -19,7 +20,6 @@ class CreateSudoViewControllerTests: XCTestCase {
 
     // MARK: - Lifecycle
 
-    @MainActor
     override func setUp() {
         testUtility = EmailExampleTestUtility()
         instanceUnderTest = testUtility.storyBoard.instantiateViewController(identifier: "createSudo")
@@ -34,7 +34,6 @@ class CreateSudoViewControllerTests: XCTestCase {
 
     // MARK: - Tests
 
-    @MainActor
     func test_CreateSudoViewDisplaysCorrectly() async throws {
         try await waitForAsync()
         XCTAssertEqual(
@@ -44,7 +43,6 @@ class CreateSudoViewControllerTests: XCTestCase {
         XCTAssertEqual(instanceUnderTest.learnMoreView.label.text?.starts(with: "Email addresses must belong to a Sudo"), true)
     }
 
-    @MainActor
     func test_CreateSudoFailureIsPropagated() async {
         await instanceUnderTest.createSudo()
         XCTAssertTrue(

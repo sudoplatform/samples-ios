@@ -10,6 +10,7 @@ import SudoEmail
 @testable import SudoProfiles
 @testable import EmailExample
 
+@MainActor
 class CreateEmailAddressViewControllerTests: XCTestCase {
 
     // MARK: - Properties
@@ -58,7 +59,6 @@ class CreateEmailAddressViewControllerTests: XCTestCase {
 
     // MARK: - Lifecycle
 
-    @MainActor
     override func setUp() async throws {
         testUtility = EmailExampleTestUtility()
         instanceUnderTest = testUtility.storyBoard.instantiateViewController(identifier: "createEmailAddressList")
@@ -77,7 +77,6 @@ class CreateEmailAddressViewControllerTests: XCTestCase {
         testUtility.clearWindow()
     }
 
-    @MainActor
     func displayCreateEmailAddressViewController() async throws {
         testUtility.emailClient.getSupportedEmailDomainsResult = ["test.org"]
         testUtility.emailClient.checkEmailAddressAvailabilityResult = [
@@ -96,7 +95,6 @@ class CreateEmailAddressViewControllerTests: XCTestCase {
         XCTAssertTrue(result)
     }
 
-    @MainActor
     func generateInputFormTableViewCell() -> InputFormTableViewCell {
         let cell = InputFormTableViewCell()
         cell.awakeFromNib()
@@ -107,7 +105,6 @@ class CreateEmailAddressViewControllerTests: XCTestCase {
 
     // MARK: - Tests
 
-    @MainActor
     func test_checkInputEmailAddressAvailability_CallsClient() async {
         instanceUnderTest.domain = "domain.com"
         instanceUnderTest.formData[.localPart] = "localPart"
@@ -119,7 +116,6 @@ class CreateEmailAddressViewControllerTests: XCTestCase {
         XCTAssertEqual(testUtility.emailClient.checkEmailAddressAvailabilityParameters?.domains?.first, "domain.com")
     }
 
-    @MainActor
     func test_createEmailAddress_CallsClient() async {
         testUtility.profilesClient.getOwnershipProofResult = "dummyOwnershipProofToken"
         testUtility.emailClient.provisionEmailAddressResult = DataFactory.EmailSDK.generateEmailAddress()
@@ -149,7 +145,6 @@ class CreateEmailAddressViewControllerTests: XCTestCase {
         XCTAssertTrue(instanceUnderTest.tableView.tableFooterView === instanceUnderTest.tableFooterView)
     }
 
-    @MainActor
     func test_configureFooterValues_NilSudoLabel_willPresentsError() async throws {
         instanceUnderTest.sudo = sudoWithNoLabel
         instanceUnderTest.configureFooterValues()
@@ -162,7 +157,6 @@ class CreateEmailAddressViewControllerTests: XCTestCase {
         XCTAssertEqual(presentedAlert.actions.first?.title, "OK")
     }
 
-    @MainActor
     func test_configureFooterValues_EmptySudoLabel_willPresentsError() async throws {
         instanceUnderTest.sudo = sudoWithEmptyLabel
         instanceUnderTest.configureFooterValues()
@@ -175,7 +169,6 @@ class CreateEmailAddressViewControllerTests: XCTestCase {
         XCTAssertEqual(presentedAlert.actions.first?.title, "OK")
     }
 
-    @MainActor
     func test_configureFooterValues_EmptySudoId_willPresentsError() async throws {
         instanceUnderTest.sudo = sudoWithEmptySudoId
         instanceUnderTest.configureFooterValues()
@@ -188,7 +181,6 @@ class CreateEmailAddressViewControllerTests: XCTestCase {
         XCTAssertEqual(presentedAlert.actions.first?.title, "OK")
     }
 
-    @MainActor
     func test_configureFooterValues_SetsSudoLabel() async throws {
         instanceUnderTest.configureFooterValues()
         try await waitForAsync()
@@ -300,7 +292,6 @@ class CreateEmailAddressViewControllerTests: XCTestCase {
         XCTAssertEqual(cell.textField.placeholder, "Enter display name (Optional)")
     }
 
-    @MainActor
     func test_inputCell_didUpdateInput_InvalidatesTimer() async throws {
         mockTimer = Timer(fire: .distantFuture, interval: .infinity, repeats: false, block: { _ in})
         RunLoop.main.add(mockTimer!, forMode: .common)
@@ -312,7 +303,6 @@ class CreateEmailAddressViewControllerTests: XCTestCase {
         XCTAssertEqual(mockTimer?.isValid, false)
     }
 
-    @MainActor
     func test_inputCell_didUpdateInput_SetsCreateButtonEnabledToFalse() async throws {
         let cell = generateInputFormTableViewCell()
         instanceUnderTest.inputCell(cell, didUpdateInput: nil)
@@ -328,7 +318,6 @@ class CreateEmailAddressViewControllerTests: XCTestCase {
         XCTAssertFalse(isEnabled)
     }
 
-    @MainActor
     func test_inputCell_didUpdateInput_SetsTextFieldColorToLabel() async throws {
         let cell = generateInputFormTableViewCell()
         instanceUnderTest.inputCell(cell, didUpdateInput: nil)
@@ -338,7 +327,6 @@ class CreateEmailAddressViewControllerTests: XCTestCase {
         XCTAssertEqual(cell.textField.textColor, .label)
     }
 
-    @MainActor
     func test_inputCell_didUpdateInput_localPart_SetsFormDataToNilIfInputNil() async throws {
         let localPart = CreateEmailAddressViewController.InputField.localPart
         let indexPath = IndexPath(row: localPart.rawValue, section: 0)
@@ -349,7 +337,6 @@ class CreateEmailAddressViewControllerTests: XCTestCase {
         XCTAssertNil(instanceUnderTest.formData[.localPart])
     }
 
-    @MainActor
     func test_inputCell_didUpdateInput_localPart_SetsFormDataToNilIfInputEmpty() async throws {
         let localPart = CreateEmailAddressViewController.InputField.localPart
         let indexPath = IndexPath(row: localPart.rawValue, section: 0)
@@ -360,7 +347,6 @@ class CreateEmailAddressViewControllerTests: XCTestCase {
         XCTAssertNil(instanceUnderTest.formData[.localPart])
     }
 
-    @MainActor
     func test_inputCell_didUpdateInput_localPart_UpdatesFormData() async throws {
         let localPart = CreateEmailAddressViewController.InputField.localPart
         let indexPath = IndexPath(row: localPart.rawValue, section: 0)
@@ -371,7 +357,6 @@ class CreateEmailAddressViewControllerTests: XCTestCase {
         XCTAssertEqual(instanceUnderTest.formData[.localPart], "Foobar")
     }
 
-    @MainActor
     func test_inputCell_didUpdateInput_localPart_SetsUpTimerCorrectly() async throws {
         let localPart = CreateEmailAddressViewController.InputField.localPart
         let indexPath = IndexPath(row: localPart.rawValue, section: 0)

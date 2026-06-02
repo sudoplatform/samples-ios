@@ -9,6 +9,7 @@ import UIKit
 import SudoEmail
 @testable import EmailExample
 
+@MainActor
 class EmailMessageTableViewCellTests: XCTestCase {
 
     // MARK: - Properties

@@ -10,6 +10,7 @@ import SudoEmail
 @testable import SudoProfiles
 @testable import EmailExample
 
+@MainActor
 class EmailAddressListViewControllerTests: XCTestCase {
 
     // MARK: - Properties
@@ -32,7 +33,6 @@ class EmailAddressListViewControllerTests: XCTestCase {
 
     // MARK: - Lifecycle
 
-    @MainActor
     override func setUp() {
         testUtility = EmailExampleTestUtility()
         instanceUnderTest = testUtility.storyBoard.instantiateViewController(identifier: "emailAddressList")
@@ -46,7 +46,6 @@ class EmailAddressListViewControllerTests: XCTestCase {
         testUtility.clearWindow()
     }
 
-    @MainActor
     func test_tableView_CellForRowAt_SingleEmailAddressIsDisplayed() throws {
         let emailAddress = DataFactory.EmailSDK.generateEmailAddress()
         instanceUnderTest.emailAddresses = [emailAddress]
@@ -58,7 +57,6 @@ class EmailAddressListViewControllerTests: XCTestCase {
         XCTAssertEqual(result.textLabel?.text?.contains(alias), true)
     }
 
-    @MainActor
     func test_viewWillAppear_ErrorIsDisplayedForNoSudoLabel() async throws {
         instanceUnderTest.sudo = sudoWithNoLabel
         instanceUnderTest.viewWillAppear(false)
@@ -69,7 +67,6 @@ class EmailAddressListViewControllerTests: XCTestCase {
         XCTAssertEqual(presentedAlert?.message, "An error has occurred: no sudo label found")
     }
 
-    @MainActor
     func test_tableView_didSelectRowAt_ZeroIndexSequesToCreateScreen() async throws {
         instanceUnderTest.tableView(instanceUnderTest.tableView, didSelectRowAt: [0, 0])
         try await waitForAsync()
@@ -78,7 +75,6 @@ class EmailAddressListViewControllerTests: XCTestCase {
         XCTAssertTrue(resultTableViewController is CreateEmailAddressViewController)
     }
 
-    @MainActor
     func test_tableView_didSelectRowAt_AddressIndexSequesToListViewScreen() async throws {
         instanceUnderTest.emailAddresses = [DataFactory.EmailSDK.generateEmailAddress()]
         instanceUnderTest.tableView(instanceUnderTest.tableView, didSelectRowAt: [0, 0])
@@ -88,7 +84,6 @@ class EmailAddressListViewControllerTests: XCTestCase {
         XCTAssertTrue(resultTableViewController is EmailMessageListViewController)
     }
 
-    @MainActor
     func test_EmailAddressRowSwipeRequiresConfirmDelete() {
         instanceUnderTest.emailAddresses = [DataFactory.EmailSDK.generateEmailAddress()]
         let swipeActionsConfig = instanceUnderTest.tableView(
@@ -98,7 +93,6 @@ class EmailAddressListViewControllerTests: XCTestCase {
         XCTAssertEqual(swipeActionsConfig?.actions[0].title, "Delete")
     }
 
-    @MainActor
     func test_EmailAddressDeletionSucceeds() async {
         testUtility.emailClient.deprovisionEmailAddressResult = DataFactory.EmailSDK.generateEmailAddress()
         do {
@@ -115,7 +109,6 @@ class EmailAddressListViewControllerTests: XCTestCase {
         }
     }
 
-    @MainActor
     func test_EmailAddressDeletionPropagatesFailure() async {
         // setup for failure
         testUtility.emailClient.emailAddress = DataFactory.EmailSDK.generateEmailAddress(

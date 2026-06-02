@@ -30,7 +30,7 @@ extension UIViewController {
 
     /// Presents a `UIAlertController` containing a `UIActivityIndicatorView` and the given message.
     func presentActivityAlert(message: String, completion: UIAlertPresentationCompletion? = nil) {
-        Task { @MainActor in
+        Task {
             let alert = ActivityAlertViewController(message: message)
             alert.view.accessibilityIdentifier = activityIdentifier
             present(alert, animated: false, completion: completion)
@@ -55,6 +55,7 @@ extension UIViewController {
                 presentedAlert.view.accessibilityIdentifier == activityIdentifier
             else {
                 print("No activity indicator found")
+                completion?()
                 return
             }
             dismiss(animated: false, completion: completion)
@@ -63,7 +64,7 @@ extension UIViewController {
 
     /// Presents a `UIAlertController` presenting with the `title` and `message`.
     func presentAlert(title: String, message: String, confirm: UIAlertActionHandler? = nil) {
-        Task { @MainActor in
+        Task {
             let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
             let okAction = UIAlertAction(title: "OK", style: .default, handler: confirm)
             alert.addAction(okAction)
@@ -73,7 +74,7 @@ extension UIViewController {
 
     /// Presents a `UIAlertController` containing the given error message along with a detailed description from the `Error`.
     func presentErrorAlert(message: String, error: Error? = nil, okHandler: UIAlertActionHandler? = nil) {
-        Task { @MainActor in
+        Task {
             var message = message
             if let error = error {
                 message = "\(message):\n\(error.localizedDescription)"

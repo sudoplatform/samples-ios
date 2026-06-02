@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="32700.99.1234" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_1" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22685"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="UpdateEmailMaskViewController" customModule="EmailExample" customModuleProvider="target">
+            <connections>
+                <outlet property="metadataTextField" destination="update-mask-tf-001" id="update-mask-tf-conn"/>
+                <outlet property="expiryDatePicker" destination="update-mask-dp-001" id="update-mask-dp-conn"/>
+                <outlet property="expirySwitch" destination="update-mask-sw-001" id="update-mask-sw-conn"/>
+                <outlet property="saveButton" destination="update-mask-btn-001" id="update-mask-btn-conn"/>
+                <outlet property="view" destination="update-mask-root-view" id="update-mask-view-conn"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="update-mask-root-view">
+            <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="12" translatesAutoresizingMaskIntoConstraints="NO" id="update-mask-stack-001">
+                    <rect key="frame" x="20" y="68" width="374" height="340"/>
+                    <subviews>
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Metadata:" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="update-mask-lbl-meta">
+                            <rect key="frame" x="0.0" y="0.0" width="374" height="20"/>
+                            <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="15"/>
+                        </label>
+                        <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="key1: value1, key2: value2" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="update-mask-tf-001">
+                            <rect key="frame" x="0.0" y="32" width="374" height="34"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                            <textInputTraits key="textInputTraits" autocapitalizationType="none" autocorrectionType="no"/>
+                        </textField>
+                        <stackView opaque="NO" contentMode="scaleToFill" axis="horizontal" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="update-mask-expiry-row">
+                            <rect key="frame" x="0.0" y="78" width="374" height="31"/>
+                            <subviews>
+                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Expires:" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="update-mask-lbl-expiry">
+                                    <rect key="frame" x="0.0" y="0.0" width="60" height="31"/>
+                                    <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="15"/>
+                                </label>
+                                <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="update-mask-sw-001">
+                                    <rect key="frame" x="68" y="0.0" width="51" height="31"/>
+                                    <connections>
+                                        <action selector="expirySwitchChanged:" destination="-1" eventType="valueChanged" id="update-mask-sw-action"/>
+                                    </connections>
+                                </switch>
+                                <view contentMode="scaleToFill" horizontalHuggingPriority="249" translatesAutoresizingMaskIntoConstraints="NO" id="update-mask-spacer">
+                                    <rect key="frame" x="127" y="0.0" width="247" height="31"/>
+                                    <color key="backgroundColor" white="0.0" alpha="0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                </view>
+                            </subviews>
+                        </stackView>
+                        <datePicker contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" datePickerMode="date" preferredDatePickerStyle="wheels" translatesAutoresizingMaskIntoConstraints="NO" id="update-mask-dp-001">
+                            <rect key="frame" x="0.0" y="121" width="374" height="194"/>
+                        </datePicker>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="update-mask-btn-001">
+                            <rect key="frame" x="0.0" y="327" width="374" height="44"/>
+                            <constraints>
+                                <constraint firstAttribute="height" constant="44" id="update-mask-btn-h"/>
+                            </constraints>
+                            <state key="normal" title="Save"/>
+                            <connections>
+                                <action selector="didTapSaveButton:" destination="-1" eventType="touchUpInside" id="update-mask-btn-action"/>
+                            </connections>
+                        </button>
+                    </subviews>
+                </stackView>
+            </subviews>
+            <viewLayoutGuide key="safeArea" id="update-mask-safe-area"/>
+            <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+            <constraints>
+                <constraint firstItem="update-mask-stack-001" firstAttribute="top" secondItem="update-mask-safe-area" secondAttribute="top" constant="20" id="update-mask-c-top"/>
+                <constraint firstItem="update-mask-stack-001" firstAttribute="leading" secondItem="update-mask-safe-area" secondAttribute="leading" constant="20" id="update-mask-c-lead"/>
+                <constraint firstItem="update-mask-safe-area" firstAttribute="trailing" secondItem="update-mask-stack-001" secondAttribute="trailing" constant="20" id="update-mask-c-trail"/>
+            </constraints>
+            <point key="canvasLocation" x="139" y="154"/>
+        </view>
+    </objects>
+    <resources>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+    </resources>
+</document>

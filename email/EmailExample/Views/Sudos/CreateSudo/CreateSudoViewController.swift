@@ -14,6 +14,7 @@ import SudoProfiles
 ///     - `SudoListViewController`: A user chooses the "Create Sudo" option at the bottom of the table view list.
 /// - Links To:
 ///     - `CardListViewController`: If a user successfully creates a Sudo, the `CardListViewController` will be presented so the user can create a card.
+@MainActor
 class CreateSudoViewController: UIViewController, LearnMoreViewDelegate {
 
     // MARK: - Outlets
@@ -66,7 +67,7 @@ class CreateSudoViewController: UIViewController, LearnMoreViewDelegate {
     ///
     /// This action will initiate the sequence of  creating a Sudo via the `profilesClient`.
     @objc func didTapCreateSudoButton() {
-        Task.detached(priority: .medium) {
+        Task {
             await self.createSudo()
         }
     }
@@ -82,7 +83,7 @@ class CreateSudoViewController: UIViewController, LearnMoreViewDelegate {
             dismissActivityAlert()
             performSegue(withIdentifier: Segue.returnToSudoList.rawValue,sender: self)
         } catch let error {
-            Task { @MainActor in
+            Task {
                 dismiss(animated: true) {
                     self.presentErrorAlert(message: "Failed to create sudo", error: error)
                 }

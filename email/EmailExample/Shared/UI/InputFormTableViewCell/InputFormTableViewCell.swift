@@ -16,6 +16,7 @@ protocol InputFormCellDelegate: AnyObject {
 }
 
 /// Custom `UITableViewCell` used for an input form. Contains a `UILabel` and `UITextField` in a vertical `UIStackView`.
+@MainActor
 class InputFormTableViewCell: UITableViewCell {
 
     // MARK: - Outlets

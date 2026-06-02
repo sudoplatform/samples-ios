@@ -17,6 +17,7 @@ import SudoProfiles
 ///         be presented so the user can view or choose to create Sudos.
 ///     - `RegistrationViewController`: If a user taps the "Deregister" button, the`RegistrationViewController` will
 ///         be presented so the user can perform registration again.
+@MainActor
 class MainMenuViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
 
     // MARK: - Outlets
@@ -101,7 +102,7 @@ class MainMenuViewController: UIViewController, UITableViewDelegate, UITableView
             try self.profilesClient.generateEncryptionKey()
             try await self.userClient.reset()
 
-            Task { @MainActor in
+            Task {
                 self.dismissActivityAlert()
                 self.performSegue(withIdentifier: "returnToRegistration", sender: self)
             }
@@ -138,7 +139,7 @@ class MainMenuViewController: UIViewController, UITableViewDelegate, UITableView
             preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
         alert.addAction(UIAlertAction(title: "Deregister", style: .default) { _ in
-            Task.detached(priority: .medium) {
+            Task {
                 await self.deregister()
             }
         })

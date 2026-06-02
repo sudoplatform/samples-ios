@@ -8,6 +8,7 @@ import XCTest
 import SudoEmail
 @testable import EmailExample
 
+@MainActor
 class ReadEmailMessageViewControllerTests: XCTestCase {
 
     // MARK: - Properties
@@ -17,7 +18,6 @@ class ReadEmailMessageViewControllerTests: XCTestCase {
 
     // MARK: - Lifecycle
 
-    @MainActor
     override func setUp() {
         testUtility = EmailExampleTestUtility()
         instanceUnderTest = testUtility.storyBoard.instantiateViewController(identifier: "readEmailMessage")
@@ -147,7 +147,6 @@ class ReadEmailMessageViewControllerTests: XCTestCase {
         }
     }
 
-    @MainActor
     func test_loadEmailMessage_RetrievesAttachments() {
         let dummyAttachment = DataFactory.EmailSDK.generateEmailAttachment()
         testUtility.emailClient.getEmailMessageWithBodyResult = EmailMessageWithBody(

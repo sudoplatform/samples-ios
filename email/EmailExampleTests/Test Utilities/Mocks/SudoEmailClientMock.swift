@@ -20,15 +20,8 @@ class SudoEmailClientMockSpy: SudoEmailClientSpy {
         address: "testie@test.org"
     )
 
-    override func reset() throws {
+    override func reset() async throws {
         // no-op
-    }
-
-    override func getEmailMessageRfc822Data(withInput input: GetEmailMessageRfc822DataInput) async throws -> Data {
-        guard let result = DataFactory.TestData.complexDataEmail.data(using: .utf8) else {
-            fatalError("Failed to convert to UTF8")
-        }
-        return result
     }
 
     override func provisionEmailAddress(withInput input: ProvisionEmailAddressInput) async throws -> EmailAddress {
@@ -43,6 +36,9 @@ class SudoEmailClientMockSpy: SudoEmailClientSpy {
 
     override func listEmailAddresses(withInput input: ListEmailAddressesInput) async throws -> ListOutput<EmailAddress> {
         _ = try await super.listEmailAddresses(withInput: input)
+        if let result = listEmailAddressesResult {
+            return result
+        }
         return ListOutput(items: [emailAddress])
     }
 
@@ -62,5 +58,78 @@ class SudoEmailClientMockSpy: SudoEmailClientSpy {
 
         let lookupEmailAddressesResult = try await super.lookupEmailAddressesPublicInfo(withInput: input)
         return lookupEmailAddressesResult
+    }
+
+    // MARK: - Email Mask Overrides
+
+    override func getEmailMaskDomains() async throws -> [String] {
+        getEmailMaskDomainsCalled = true
+        if let result = getEmailMaskDomainsResult {
+            return result
+        }
+        return ["mask.example.com"]
+    }
+
+    override func provisionEmailMask(withInput input: ProvisionEmailMaskInput) async throws -> EmailMask {
+        provisionEmailMaskCalled = true
+        provisionEmailMaskParameter = input
+        if let result = provisionEmailMaskResult {
+            return result
+        }
+        return DataFactory.EmailSDK.generateEmailMask(maskAddress: input.maskAddress, realAddress: input.realAddress)
+    }
+
+    override func deprovisionEmailMask(withInput input: DeprovisionEmailMaskInput) async throws -> EmailMask {
+        deprovisionEmailMaskCalled = true
+        deprovisionEmailMaskParameter = input
+        if let result = deprovisionEmailMaskResult {
+            return result
+        }
+        return DataFactory.EmailSDK.generateEmailMask(id: input.emailMaskId)
+    }
+
+    override func updateEmailMask(withInput input: UpdateEmailMaskInput) async throws -> EmailMask {
+        updateEmailMaskCalled = true
+        updateEmailMaskParameter = input
+        if let result = updateEmailMaskResult {
+            return result
+        }
+        return DataFactory.EmailSDK.generateEmailMask(id: input.emailMaskId, expiresAt: input.expiresAt, metadata: input.metadata)
+    }
+
+    override func enableEmailMask(withInput input: EnableEmailMaskInput) async throws -> EmailMask {
+        enableEmailMaskCalled = true
+        enableEmailMaskParameter = input
+        if let result = enableEmailMaskResult {
+            return result
+        }
+        return DataFactory.EmailSDK.generateEmailMask(id: input.emailMaskId, status: .enabled)
+    }
+
+    override func disableEmailMask(withInput input: DisableEmailMaskInput) async throws -> EmailMask {
+        disableEmailMaskCalled = true
+        disableEmailMaskParameter = input
+        if let result = disableEmailMaskResult {
+            return result
+        }
+        return DataFactory.EmailSDK.generateEmailMask(id: input.emailMaskId, status: .disabled)
+    }
+
+    override func verifyExternalEmailAddress(withInput input: VerifyExternalEmailAddressInput) async throws -> VerifyExternalEmailAddressResult {
+        verifyExternalEmailAddressCalled = true
+        verifyExternalEmailAddressParameter = input
+        if let result = verifyExternalEmailAddressResult {
+            return result
+        }
+        return VerifyExternalEmailAddressResult(isVerified: true)
+    }
+
+    override func listEmailMasksForOwner(withInput input: ListEmailMasksForOwnerInput) async throws -> ListOutput<EmailMask> {
+        listEmailMasksForOwnerCalled = true
+        listEmailMasksForOwnerParameter = input
+        if let result = listEmailMasksForOwnerResult {
+            return result
+        }
+        return ListOutput<EmailMask>(items: [DataFactory.EmailSDK.generateEmailMask()])
     }
 }

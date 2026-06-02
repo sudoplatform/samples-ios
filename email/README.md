@@ -8,9 +8,9 @@ This project provides examples for interacting with the Sudo Email iOS SDK on th
 
 | Technology             | Supported version |
 | ---------------------- | ----------------- |
-| iOS Deployment Target  | 13.0+             |
+| iOS Deployment Target  | 18.0+             |
 | Swift language version | 5.0               |
-| Xcode version          | 12.0+             |
+| Xcode version          | 26.0+             |
 
 ## Getting Started
 

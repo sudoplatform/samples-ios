@@ -8,6 +8,7 @@ import UIKit
 import SudoEmail
 import SudoProfiles
 
+@MainActor
 class UpdateCustomFolderViewController: UIViewController,
     UITableViewDataSource,
     UITableViewDelegate,
@@ -113,7 +114,7 @@ class UpdateCustomFolderViewController: UIViewController,
             guard let returnToEmailMessages = segue.destination as? EmailMessageListViewController else {
                 break
             }
-            Task.detached(priority: .medium) {
+            Task {
                 await returnToEmailMessages.refresh(folder: .string(self.customFolderName))
             }
         default:
@@ -127,7 +128,7 @@ class UpdateCustomFolderViewController: UIViewController,
     ///
     /// This action will initiate the sequence of validating inputs and custom email folder via the `emailClient`.
     @objc func didTapUpdateCustomFolderButton() {
-        Task.detached(priority: .medium) {
+        Task {
             await self.updateCustomEmailFolder()
         }
     }
@@ -137,7 +138,7 @@ class UpdateCustomFolderViewController: UIViewController,
         view.endEditing(true)
         setUpdateButtonEnabled(false)
         guard validateFormData() else {
-            Task { @MainActor in
+            Task {
                 presentErrorAlert(message: "Please ensure all fields are filled out")
             }
             return
@@ -151,7 +152,7 @@ class UpdateCustomFolderViewController: UIViewController,
                 values: UpdateCustomEmailFolderValues(customFolderName: customFolderName)
             )
             _ = try await emailClient.updateCustomEmailFolder(withInput: updateCustomEmailFolderInput)
-            Task { @MainActor in
+            Task {
                 self.dismissActivityAlert {
                     self.performSegue(withIdentifier: Segue.returnToEmailMessageList.rawValue, sender: self)
                 }
@@ -283,7 +284,7 @@ class UpdateCustomFolderViewController: UIViewController,
     // MARK: - Conformance: InputFormCellDelegate
 
     func inputCell(_ cell: InputFormTableViewCell, didUpdateInput input: String?) {
-        Task { @MainActor in
+        Task {
             cell.textField.textColor = .label
             guard let indexPath = self.tableView.indexPath(for: cell), let field = InputField(rawValue: indexPath.row) else {
                 return

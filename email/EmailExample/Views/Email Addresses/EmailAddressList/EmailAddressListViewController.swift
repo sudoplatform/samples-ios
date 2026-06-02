@@ -17,6 +17,7 @@ import SudoProfiles
 /// - Links To:
 ///     - `CreateEmailAddressViewController`: If a user taps the "Create Email Address" button, the `CreateEmailAddressViewController` will be presented so the
 ///         user can add a new email address to their sudo.
+@MainActor
 class EmailAddressListViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
 
     // MARK: - Outlets
@@ -41,6 +42,8 @@ class EmailAddressListViewController: UIViewController, UITableViewDataSource, U
         case navigateToCreateEmailAddress
         /// Used to navigate to the `EmailMessageListViewController`.
         case navigateToEmailMessageList
+        /// Used to navigate to the `EmailMaskListViewController`.
+        case navigateToEmailMaskList
         /// Used to navigate back to the `SudoListViewController`.
         case returnToSudoList
     }
@@ -68,6 +71,7 @@ class EmailAddressListViewController: UIViewController, UITableViewDataSource, U
     override func viewDidLoad() {
         super.viewDidLoad()
         configureTableView()
+        configureMasksButton()
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -91,7 +95,7 @@ class EmailAddressListViewController: UIViewController, UITableViewDataSource, U
             return
         }
 
-        Task.detached(priority: .medium) {
+        Task {
             await self.loadCacheEmailAddressesAndFetchRemote()
         }
     }
@@ -120,7 +124,7 @@ class EmailAddressListViewController: UIViewController, UITableViewDataSource, U
     ///
     /// This action will ensure that the email address list is up to date when returning from views - e.g. `CreateEmailAddressViewController`.
     @IBAction func returnToEmailAddressList(segue: UIStoryboardSegue) {
-        Task.detached(priority: .medium) {
+        Task {
             await self.loadCacheEmailAddressesAndFetchRemote()
         }
     }
@@ -158,6 +162,24 @@ class EmailAddressListViewController: UIViewController, UITableViewDataSource, U
         tableView.tableFooterView = UIView()
     }
 
+    /// Adds a "Masks" button to the navigation bar for accessing the global email masks list.
+    func configureMasksButton() {
+        let masksButton = UIBarButtonItem(
+            image: UIImage(systemName: "theatermasks"),
+            style: .plain,
+            target: self,
+            action: #selector(didTapMasksButton)
+        )
+        // Preserve any existing right bar button items
+        var items = navigationItem.rightBarButtonItems ?? []
+        items.append(masksButton)
+        navigationItem.rightBarButtonItems = items
+    }
+
+    @objc func didTapMasksButton() {
+        performSegue(withIdentifier: Segue.navigateToEmailMaskList.rawValue, sender: self)
+    }
+
     // MARK: - Helpers
 
     /// Firstly, attempts to load all the email addresses from the device's cache, and then update via a remote call.
@@ -167,7 +189,7 @@ class EmailAddressListViewController: UIViewController, UITableViewDataSource, U
     /// All email addresses will be filtered using the `sudoId` to ensure only email addresses associated with the sudo are listed.
     func loadCacheEmailAddressesAndFetchRemote() async {
         guard let sudo = sudo else {
-            Task { @MainActor in
+            Task {
                 presentErrorAlert(message: "Sudo not found")
             }
             return
@@ -175,12 +197,12 @@ class EmailAddressListViewController: UIViewController, UITableViewDataSource, U
         do {
             let addresses = try await listEmailAddresses()
 
-            Task { @MainActor in
+            Task {
                 self.emailAddresses = self.filterEmailAddresses(addresses, withSudoId: sudo.id)
                 self.tableView.reloadData()
             }
         } catch {
-            Task { @MainActor in
+            Task {
                 self.presentErrorAlert(message: "Failed to list Email Addresses", error: error)
             }
         }
@@ -202,12 +224,10 @@ class EmailAddressListViewController: UIViewController, UITableViewDataSource, U
         return 1
     }
 
-    @MainActor
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return emailAddresses.count + 1
     }
 
-    @MainActor
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell: UITableViewCell
         if indexPath.row == emailAddresses.count {
@@ -237,7 +257,6 @@ class EmailAddressListViewController: UIViewController, UITableViewDataSource, U
 
     // MARK: - Conformance: UITableViewDelegate
 
-    @MainActor
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         assert(indexPath.section == 0)
         if indexPath.row == emailAddresses.count {
@@ -248,7 +267,6 @@ class EmailAddressListViewController: UIViewController, UITableViewDataSource, U
         tableView.deselectRow(at: indexPath, animated: true)
     }
 
-    @MainActor
     func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         guard indexPath.row < emailAddresses.count else {
             return nil
@@ -256,10 +274,10 @@ class EmailAddressListViewController: UIViewController, UITableViewDataSource, U
         let cancel = UIContextualAction(style: .destructive, title: "Delete") { _, _, completion in
             let emailAddress = self.emailAddresses[indexPath.row]
 
-            Task.detached(priority: .medium) {
+            Task {
                 do {
                     _ = try await self.deleteEmailAddressWithId(emailAddress.id)
-                    Task { @MainActor in
+                    Task {
                         self.emailAddresses.remove(at: indexPath.row)
                         self.tableView.deleteRows(at: [indexPath], with: .automatic)
                         completion(true)

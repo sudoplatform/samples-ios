@@ -8,6 +8,7 @@ import UIKit
 import SudoEmail
 import SudoProfiles
 
+@MainActor
 class CreateCustomFolderViewController: UIViewController,
     UITableViewDataSource,
     UITableViewDelegate,
@@ -106,7 +107,7 @@ class CreateCustomFolderViewController: UIViewController,
             guard let returnToEmailMessages = segue.destination as? EmailMessageListViewController else {
                 break
             }
-            Task.detached(priority: .medium) {
+            Task {
                 await returnToEmailMessages.refresh(folder: .string(self.customFolderName))
             }
         default:
@@ -120,7 +121,7 @@ class CreateCustomFolderViewController: UIViewController,
     ///
     /// This action will initiate the sequence of validating inputs and custom email folder via the `emailClient`.
     @objc func didTapCreateCustomFolderButton() {
-        Task.detached(priority: .medium) {
+        Task {
             await self.createCustomEmailFolder()
         }
     }
@@ -130,7 +131,7 @@ class CreateCustomFolderViewController: UIViewController,
         view.endEditing(true)
         setCreateButtonEnabled(false)
         guard validateFormData() else {
-            Task { @MainActor in
+            Task {
                 presentErrorAlert(message: "Please ensure all fields are filled out")
             }
             return
@@ -143,7 +144,7 @@ class CreateCustomFolderViewController: UIViewController,
                 customFolderName: self.customFolderName
             )
             _ = try await emailClient.createCustomEmailFolder(withInput: createCustomEmailFolderInput)
-            Task { @MainActor in
+            Task {
                 self.dismissActivityAlert {
                     self.performSegue(withIdentifier: Segue.returnToEmailMessageList.rawValue, sender: self)
                 }
@@ -267,7 +268,7 @@ class CreateCustomFolderViewController: UIViewController,
     // MARK: - Conformance: InputFormCellDelegate
 
     func inputCell(_ cell: InputFormTableViewCell, didUpdateInput input: String?) {
-        Task { @MainActor in
+        Task {
             cell.textField.textColor = .label
             guard let indexPath = self.tableView.indexPath(for: cell), let field = InputField(rawValue: indexPath.row) else {
                 return

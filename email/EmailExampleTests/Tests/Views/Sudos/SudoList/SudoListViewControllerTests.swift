@@ -10,6 +10,7 @@ import SudoEmail
 @testable import SudoProfiles
 @testable import EmailExample
 
+@MainActor
 class SudoListViewControllerTests: XCTestCase {
 
     // MARK: - Properties
@@ -19,7 +20,6 @@ class SudoListViewControllerTests: XCTestCase {
 
     // MARK: - Lifecycle
 
-    @MainActor
     override func setUp() async throws {
         testUtility = EmailExampleTestUtility()
         instanceUnderTest = testUtility.storyBoard.instantiateViewController(identifier: "sudoList")
@@ -35,7 +35,6 @@ class SudoListViewControllerTests: XCTestCase {
 
     // MARK: - Tests
 
-    @MainActor
     func test_ListSudosSucceeds() async throws {
         await waitForAsyncNoFail()
         instanceUnderTest.viewWillAppear(true)
@@ -45,7 +44,6 @@ class SudoListViewControllerTests: XCTestCase {
         try await waitForAsync()
     }
 
-    @MainActor
     func test_SudoListViewPropagatesError() async {
         await waitForAsyncNoFail()
         testUtility.profilesClient.listSudosResult = nil
@@ -59,7 +57,6 @@ class SudoListViewControllerTests: XCTestCase {
         await waitForAsyncNoFail()
     }
 
-    @MainActor
     func test_SudoListViewDeleteSudoPropagatesError() async throws {
         instanceUnderTest.viewWillAppear(true)
         let testSudo = Sudo(id: "id", claims: [], metadata: [:], createdAt: Date(), updatedAt: Date(), version: 0)
@@ -67,7 +64,6 @@ class SudoListViewControllerTests: XCTestCase {
         XCTAssertFalse(status)
     }
 
-    @MainActor
     func test_SudoLIstDeleteSudoSucceeds() async {
         testUtility.profilesClient.deleteSudoFailure = false
         instanceUnderTest.viewWillAppear(true)

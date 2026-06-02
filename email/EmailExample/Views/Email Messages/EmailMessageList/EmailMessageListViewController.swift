@@ -19,6 +19,7 @@ import SudoProfiles
 ///         user can send a new email message.
 ///     - `CreateCustomFolderViewController`: If a user taps the "Create Custom Folder" tab in the folder drop-down, the `CreateCustomFolderController`
 ///     will be presented so the user can create a custom folder.
+@MainActor
 final class EmailMessageListViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, FolderSwitcherViewDelegate {
 
     // MARK: - Outlets
@@ -51,6 +52,8 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
         case navigateToUpdateCustomFolder
         /// Used to navigate back to the `EmailAddressListViewController`.
         case returnToEmailAddressList
+        /// Used to navigate to the `EmailMaskListViewController`.
+        case navigateToEmailMaskList
     }
 
     // MARK: - Properties
@@ -106,7 +109,7 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         guard validateViewInputEmailAddress() else {
-            Task { @MainActor in
+            Task {
                 presentErrorAlert(message: "An error has occurred: no email address found") { _ in
                     self.performSegue(withIdentifier: Segue.returnToEmailAddressList.rawValue, sender: self)
                 }
@@ -119,20 +122,20 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
             }
         }
         do {
-            Task.detached(priority: .medium) { [weak self] in
+            Task { [weak self] in
                 guard let weakSelf = self else { return }
                 do {
                     try await weakSelf.subscribeToAllEmailMessagesCreated()
                     try await weakSelf.subscribeToAllEmailMessagesDeleted()
                     try await weakSelf.subscribeToAllEmailMessagesUpdated()
                 } catch {
-                    Task { @MainActor in
+                    Task {
                         weakSelf.presentErrorAlert(message: "Failed to subscribe to email message events", error: error)
                     }
                 }
             }
         }
-        Task.detached(priority: .medium) {
+        Task {
             await self.fetchEmailMessages()
         }
     }
@@ -190,6 +193,12 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
                 updateCustomFolder.emailFolderId = selectedFolder!.id
             }
 
+        case .navigateToEmailMaskList:
+            guard segue.destination is EmailMaskListViewController else {
+                break
+            }
+            // Masks are now independent of a specific email address
+
         default:
             break
         }
@@ -204,7 +213,7 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
         if selectedFolderSwitcherLabel == .special(.create) {
             self.selectedFolderSwitcherLabel = .standard(.inbox)
         }
-        Task.detached(priority: .medium) {
+        Task {
             await self.fetchEmailMessages()
             await self.loadEmailFolders()
         }
@@ -218,11 +227,15 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
         performSegue(withIdentifier: Segue.navigateToEmailAddressSettings.rawValue, sender: self)
     }
 
+    @objc func didTapMasksButton() {
+        performSegue(withIdentifier: Segue.navigateToEmailMaskList.rawValue, sender: self)
+    }
+
     // MARK: - Operations
 
     func listEmailMessages() async throws -> [EmailMessage] {
         guard let emailAddress = emailAddress else {
-            Task { @MainActor in
+            Task {
                 presentErrorAlert(message: "An error has occurred: no email address found") { _ in
                     self.performSegue(withIdentifier: Segue.returnToEmailAddressList.rawValue, sender: self)
                 }
@@ -255,7 +268,7 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
 
     func listDraftEmailMessages() async throws -> [EmailMessage] {
         guard let emailAddressId = emailAddress?.id else {
-            Task { @MainActor in
+            Task {
                 presentErrorAlert(message: "An error has occurred: no email address found") { _ in
                     self.performSegue(withIdentifier: Segue.returnToEmailAddressList.rawValue, sender: self)
                 }
@@ -263,14 +276,32 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
             return []
         }
         presentActivityAlert(message: "Listing Draft Email Messages")
-        let draftsMetadata = try await emailClient.listDraftEmailMessageMetadataForEmailAddressId(emailAddressId: emailAddressId)
+        var allDraftMetadata: [DraftEmailMessageMetadata] = []
+        var nextToken: String?
+        
+        // Loop through all pages of draft metadata
+        repeat {
+            let input = ListDraftEmailMessageMetadataForEmailAddressIdInput(
+                emailAddressId: emailAddressId,
+                limit: 5,
+                nextToken: nextToken
+            )
+            let draftsMetadata = try await emailClient.listDraftEmailMessageMetadataForEmailAddressId(
+                withInput: input
+            )
+            allDraftMetadata.append(contentsOf: draftsMetadata.items)
+            nextToken = draftsMetadata.nextToken
+        } while nextToken != nil
+        
         var draftMessages: [EmailMessage] = []
-        if draftsMetadata.isEmpty {
+        if allDraftMetadata.isEmpty {
             dismissActivityAlert()
             return draftMessages
         }
-        for i in 0...draftsMetadata.count - 1 {
-            let input = GetDraftEmailMessageInput(id: draftsMetadata[i].id, emailAddressId: emailAddressId)
+        
+        // Fetch full draft messages for all metadata items
+        for metadata in allDraftMetadata {
+            let input = GetDraftEmailMessageInput(id: metadata.id, emailAddressId: emailAddressId, emailMaskId: metadata.emailMaskId)
             guard let draft = try await emailClient.getDraftEmailMessage(withInput: input) else {
                 continue
             }
@@ -288,7 +319,7 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
 
     func listScheduledDraftMessages() async throws -> [ScheduledDraftMessage] {
         guard let emailAddressId = emailAddress?.id else {
-            Task { @MainActor in
+            Task {
                 presentErrorAlert(message: "An error has occurred: no email address found") { _ in
                     self.performSegue(withIdentifier: Segue.returnToEmailAddressList.rawValue, sender: self)
                 }
@@ -313,7 +344,7 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
 
     func listEmailFolders() async throws -> [EmailFolder] {
         guard let emailAddressId = emailAddress?.id else {
-            Task { @MainActor in
+            Task {
                 presentErrorAlert(message: "An error has occurred: no email address found") { _ in
                     self.performSegue(withIdentifier: Segue.returnToEmailAddressList.rawValue, sender: self)
                 }
@@ -343,7 +374,7 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
         createSubscription.messageCancellable = createSubscription.messagesSubject
             .sink(receiveCompletion: { [weak self] completion in
                 if case .failure(let error) = completion {
-                    Task { @MainActor in
+                    Task {
                         self?.presentErrorAlert(message: "Email message created subscription failure", error: error)
                     }
                 }
@@ -351,12 +382,12 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
                 guard let weakSelf = self else { return }
                 // Only act on the latest message
                 guard let latestMessage = messages.last else { return }
-                Task.detached(priority: .medium) {
+                Task {
                     do {
                         NSLog("Created subscription callback")
                         NSLog(latestMessage.id)
                         let messages = try await weakSelf.listEmailMessages()
-                        Task { @MainActor in
+                        Task {
                             let emailAddress = weakSelf.emailAddress?.emailAddress ?? ""
                             let sortedMessages = weakSelf
                                 .filterEmailMessages(messages, withEmailAddress: emailAddress)
@@ -378,19 +409,19 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
         deleteSubscription.messageCancellable = deleteSubscription.messagesSubject
             .sink(receiveCompletion: { [weak self] completion in
                 if case .failure(let error) = completion {
-                    Task { @MainActor in
+                    Task {
                         self?.presentErrorAlert(message: "Email message deleted subscription failure", error: error)
                     }
                 }
             }, receiveValue: { [weak self] messages in
                 guard let weakSelf = self else { return }
                 guard let latestMessage = messages.last else { return }
-                Task.detached(priority: .medium) {
+                Task {
                     do {
                         NSLog("Deleted subscription callback")
                         NSLog(latestMessage.id)
                         let messages = try await weakSelf.listEmailMessages()
-                        Task { @MainActor in
+                        Task {
                             let emailAddress = weakSelf.emailAddress?.emailAddress ?? ""
                             let sortedMessages = weakSelf
                                 .filterEmailMessages(messages, withEmailAddress: emailAddress)
@@ -412,19 +443,19 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
         updateSubscription.messageCancellable = updateSubscription.messagesSubject
             .sink(receiveCompletion: { [weak self] completion in
                 if case .failure(let error) = completion {
-                    Task { @MainActor in
+                    Task {
                         self?.presentErrorAlert(message: "Email message updated subscription failure", error: error)
                     }
                 }
             }, receiveValue: { [weak self] messages in
                 guard let weakSelf = self else { return }
                 guard let latestMessage = messages.last else { return }
-                Task.detached(priority: .medium) {
+                Task {
                     do {
                         NSLog("Updated subscription callback")
                         NSLog(latestMessage.id)
                         let messages = try await weakSelf.listEmailMessages()
-                        Task { @MainActor in
+                        Task {
                             let emailAddress = weakSelf.emailAddress?.emailAddress ?? ""
                             let sortedMessages = weakSelf
                                 .filterEmailMessages(messages, withEmailAddress: emailAddress)
@@ -469,7 +500,13 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
         )
 
         let composeBarButton = UIBarButtonItem(barButtonSystemItem: .compose, target: self, action: #selector(didTapComposeEmailButton))
-        navigationItem.rightBarButtonItems = [emailAddressSettingsBarButton, composeBarButton]
+        let masksBarButton = UIBarButtonItem(
+            image: UIImage(systemName: "theatermasks"),
+            style: .plain,
+            target: self,
+            action: #selector(didTapMasksButton)
+        )
+        navigationItem.rightBarButtonItems = [emailAddressSettingsBarButton, composeBarButton, masksBarButton]
     }
 
     // MARK: - Helpers
@@ -487,7 +524,7 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
                 if !draftMessages.isEmpty {
                     self.scheduledDraftMessages = try await listScheduledDraftMessages()
                 }
-                Task { @MainActor in
+                Task {
                     self.tableView.reloadData()
                 }
                 return
@@ -496,11 +533,11 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
             let messages = try await listEmailMessages()
 
             self.emailMessages = messages.sortedByCreatedDescending()
-            Task { @MainActor in
+            Task {
                 self.tableView.reloadData()
             }
         } catch {
-            Task { @MainActor in
+            Task {
                 self.presentErrorAlert(message: "Failed to list Email Messages", error: error)
             }
         }
@@ -521,11 +558,11 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
                 }
             }
             self.blockedAddresses = cleartextAddresses
-            Task { @MainActor in
+            Task {
                 self.tableView.reloadData()
             }
         } catch {
-            Task { @MainActor in
+            Task {
                 self.presentErrorAlert(message: "Failed to list blocked addresses", error: error)
             }
         }
@@ -542,12 +579,12 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
                     return $0.folderName
                 }
             }
-            Task { @MainActor in
+            Task {
                 self.tableView.reloadData()
                 self.folderNameSwitcher.populateMenu()
             }
         } catch {
-            Task { @MainActor in
+            Task {
                 self.presentErrorAlert(message: "Failed to list email folders", error: error)
             }
         }
@@ -582,7 +619,7 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
 
     func deleteEmailMessage(forIndexPath indexPath: IndexPath) async -> Bool {
         guard let emailAddress = emailAddress else {
-            Task { @MainActor in
+            Task {
                 presentErrorAlert(message: "An error has occurred: no email address found") { _ in
                     self.performSegue(withIdentifier: Segue.returnToEmailAddressList.rawValue, sender: self)
                 }
@@ -592,7 +629,7 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
         let emailMessage = emailMessages.remove(at: indexPath.row)
         if folderNameSwitcher.currentFolder == .standard(.trash) {
             // permanently delete email message
-            Task { @MainActor in
+            Task {
                 self.tableView.reloadData()
             }
             do {
@@ -602,7 +639,7 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
                 self.dismissActivityAlert()
                 return true
             } catch {
-                Task { @MainActor in
+                Task {
                     self.emailMessages.insert(emailMessage, at: indexPath.row)
                     self.tableView.reloadData()
                     self.dismissActivityAlert()
@@ -611,16 +648,16 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
             }
         } else if folderNameSwitcher.currentFolder == .special(.drafts) {
             do {
-                let input = DeleteDraftEmailMessagesInput(ids: [emailMessage.id], emailAddressId: emailAddress.id)
+                let input = DeleteDraftEmailMessagesInput(ids: [emailMessage.id], emailAddressId: emailAddress.id, emailMaskId: emailMessage.emailMaskId)
                 presentActivityAlert(message: "Deleting Draft Email Message")
                 _ = try await emailClient.deleteDraftEmailMessages(withInput: input)
-                Task { @MainActor in
+                Task {
                     self.tableView.reloadData()
                     self.dismissActivityAlert()
                 }
                 return true
             } catch {
-                Task { @MainActor in
+                Task {
                     self.emailMessages.insert(emailMessage, at: indexPath.row)
                     self.tableView.reloadData()
                     self.dismissActivityAlert()
@@ -651,7 +688,7 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
                     self.dismissActivityAlert()
                     return true
                 default:
-                    Task { @MainActor in
+                    Task {
                         self.emailMessages.insert(emailMessage, at: indexPath.row)
                         self.tableView.reloadData()
                         self.dismissActivityAlert()
@@ -659,7 +696,7 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
                     return false
                 }
             } catch {
-                Task { @MainActor in
+                Task {
                     self.emailMessages.insert(emailMessage, at: indexPath.row)
                     self.tableView.reloadData()
                     self.dismissActivityAlert()
@@ -680,7 +717,7 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
         do {
             rfc822Message = try RFC822Util.fromPlainText(draft.rfc822Data)
         } catch {
-            Task { @MainActor in
+            Task {
                 self.presentErrorAlert(message: "Failed to parse draft email message", error: error)
             }
             return nil
@@ -692,6 +729,7 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
             owner: "draftOwnerId",
             owners: [.init(id: "draftOwnerId", issuer: "drafts")],
             emailAddressId: emailAddressId,
+            emailMaskId: draft.emailMaskId,
             folderId: generateFolderId(
                 emailAddressId: emailAddressId,
                 folderName: folderNameSwitcher.titleForCurrentFolder()
@@ -752,7 +790,7 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
             self.presentActivityAlert(message: "Deleting custom folder")
             let folderToDelete = self.getSelectedCustomFolder()
             if folderToDelete == nil {
-                Task { @MainActor in
+                Task {
                     self.dismissActivityAlert()
                     self.presentErrorAlert(message: "Could not delete folder.")
                 }
@@ -766,7 +804,7 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
                 self.dismissActivityAlert()
             }
         } catch {
-            Task { @MainActor in
+            Task {
                 self.dismissActivityAlert()
                 self.presentErrorAlert(message: "Failed to delete folder. Please try again", error: error)
             }
@@ -853,7 +891,6 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
 
     // MARK: - Conformance: UITableViewDelegate
 
-    @MainActor
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if selectedFolderSwitcherLabel == .special(.blocklist) {
             let address = blockedAddresses[indexPath.row]
@@ -869,10 +906,9 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
         }
     }
 
-    @MainActor
     func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         let cancel = UIContextualAction(style: .destructive, title: "Delete") { _, _, completion in
-            Task.detached(priority: .medium) {
+            Task {
                 _ = await self.deleteEmailMessage(forIndexPath: indexPath)
                 completion(true)
             }
@@ -897,24 +933,23 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
         blockedAddresses = []
         emailMessages = []
         if self.selectedFolderSwitcherLabel == .special(.blocklist) {
-            Task { @MainActor in
+            Task {
                 await self.loadBlockedAddresses()
             }
         } else if self.selectedFolderSwitcherLabel == .special(.create) {
-            Task { @MainActor in
+            Task {
                 self.performSegue(
                     withIdentifier: Segue.navigateToCreateCustomFolder.rawValue,
                     sender: self
                 )
             }
         } else {
-            Task { @MainActor in
+            Task {
                 await self.fetchEmailMessages()
             }
         }
     }
 
-    @MainActor
     func emptyTrash() {
         let alert = UIAlertController(
             title: "Empty Trash Folder",
@@ -922,14 +957,13 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
             preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
         alert.addAction(UIAlertAction(title: "Empty Trash", style: .default) { _ in
-            Task.detached(priority: .medium) {
+            Task {
                 await self.deleteEmailMessages()
             }
         })
         present(alert, animated: true, completion: nil)
     }
 
-    @MainActor
     func unblockEmailAddresses() {
         presentActivityAlert(message: "Unblocking Email Address")
         Task.init {
@@ -955,11 +989,11 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
                 @unknown default:
                     fatalError("Unhandled unknown status \(String(describing: result.status))")
                 }
-                Task { @MainActor in
+                Task {
                     self.tableView.reloadData()
                 }
             } catch {
-                Task { @MainActor in
+                Task {
                     self.dismissActivityAlert()
                     self.presentErrorAlert(message: "Failed to unblock email address(es). Please try again", error: error)
                 }
@@ -967,7 +1001,6 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
         }
     }
 
-    @MainActor
     func deleteCustomFolder() {
         let alert = UIAlertController(
             title: "Delete Custom Folder",
@@ -975,14 +1008,13 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
             preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
         alert.addAction(UIAlertAction(title: "Delete", style: .default) { _ in
-            Task.detached(priority: .medium) {
+            Task {
                 await self.deleteCustomFolder()
             }
         })
         present(alert, animated: true, completion: nil)
     }
     
-    @MainActor 
     func updateCustomFolder() {
         performSegue(withIdentifier: Segue.navigateToUpdateCustomFolder.rawValue, sender: self)
     }

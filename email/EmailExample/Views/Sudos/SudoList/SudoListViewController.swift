@@ -18,6 +18,7 @@ import SudoLogging
 ///         be presented so the user can create a new Sudo.
 ///     - `EmailAddressListViewController`:  If a user chooses a `Sudo` from the list, the `EmailAddressListViewController` will be presented so the user can
 ///     add a new email address to their sudo.
+@MainActor
 class SudoListViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
 
     // MARK: - Outlets
@@ -61,7 +62,7 @@ class SudoListViewController: UIViewController, UITableViewDelegate, UITableView
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        Task.detached(priority: .medium) {
+        Task {
             await self.loadSudos()
         }
     }
@@ -85,7 +86,7 @@ class SudoListViewController: UIViewController, UITableViewDelegate, UITableView
     ///
     /// This action will ensure that the Sudo list is up to date when returning from views - e.g. `CreateSudoViewController`.
     @IBAction func returnToSudoList(segue: UIStoryboardSegue) {
-        Task.detached(priority: .medium) {
+        Task {
             await self.loadSudos()
         }
     }
@@ -178,9 +179,9 @@ class SudoListViewController: UIViewController, UITableViewDelegate, UITableView
         if indexPath.row != sudos.count {
             let delete = UIContextualAction(style: .destructive, title: "Delete") { _, _, completion in
                 let sudo = self.sudos[indexPath.row]
-                Task.detached(priority: .medium) {
+                Task {
                     if await self.deleteSudo(sudo: sudo) {
-                        Task { @MainActor in
+                        Task {
                             self.sudos.remove(at: indexPath.row)
                             self.tableView.deleteRows(at: [indexPath], with: .automatic)
                             completion(true)

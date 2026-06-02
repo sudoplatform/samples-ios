@@ -39,7 +39,7 @@ protocol Authenticator {
 
 }
 
-class DefaultAuthenticator: Authenticator {
+class DefaultAuthenticator: Authenticator, @unchecked Sendable {
 
     // MARK: - Properties
 

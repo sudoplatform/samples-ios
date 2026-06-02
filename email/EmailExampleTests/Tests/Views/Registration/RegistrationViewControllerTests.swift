@@ -8,6 +8,7 @@ import XCTest
 import SudoUser
 @testable import EmailExample
 
+@MainActor
 class RegistrationViewControllerTests: XCTestCase {
 
     // MARK: - Properties
@@ -17,7 +18,6 @@ class RegistrationViewControllerTests: XCTestCase {
 
     // MARK: - Lifecycle
 
-    @MainActor
     override func setUp() {
         testUtility = EmailExampleTestUtility()
         instanceUnderTest = testUtility.storyBoard.instantiateViewController(identifier: "registration")
@@ -50,7 +50,6 @@ class RegistrationViewControllerTests: XCTestCase {
         XCTAssertFalse(testUtility.userClient.signInWithKeyCalled)
     }
 
-    @MainActor
     func test_registerButtonTapped_whenNotSignedIn_willInvokeSignInWithKeyOnUserClient() throws {
         testUtility.userClient.isSignedInReturn = false
         Task {
@@ -72,7 +71,6 @@ class RegistrationViewControllerTests: XCTestCase {
         XCTAssertTrue(instanceUnderTest.activityIndicator.isAnimating)
     }
 
-    @MainActor
     func test_registerButtonTapped_signInSuccessful_willNavigateToMainMenu() throws {
         let resultTokens = AuthenticationTokens(idToken: "", accessToken: "", refreshToken: "")
         testUtility.userClient.isSignedInReturn = false
@@ -87,7 +85,6 @@ class RegistrationViewControllerTests: XCTestCase {
         XCTAssertTrue(presentedNavigation?.viewControllers.first is MainMenuViewController)
     }
 
-    @MainActor
     func test_registerButtonTapped_signInFailure_willPresentErrorAlert() async throws {
         testUtility.userClient.isSignedInReturn = false
         testUtility.userClient.signInWithKeyError = createError()
@@ -102,7 +99,6 @@ class RegistrationViewControllerTests: XCTestCase {
         try await waitForAsync()
     }
 
-    @MainActor
     func test_registerButtonTapped_signInThrowsError_willPresentErrorAlert() throws {
         testUtility.userClient.isSignedInReturn = false
         testUtility.userClient.signInWithKeyError = createError()

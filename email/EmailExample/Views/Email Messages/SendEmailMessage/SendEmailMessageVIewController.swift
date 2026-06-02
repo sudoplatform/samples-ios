@@ -9,6 +9,7 @@ import MobileCoreServices
 import UniformTypeIdentifiers
 import SudoEmail
 
+@MainActor
 class SendEmailMessageViewController: UIViewController, UITextViewDelegate, UITableViewDelegate, UITableViewDataSource, HeaderCellDelegate, BodyCellDelegate {
 
     // MARK: - Outlets
@@ -110,6 +111,12 @@ class SendEmailMessageViewController: UIViewController, UITextViewDelegate, UITa
     /// ID of message that this message is forwarding
     var forwardingMessageId: String?
 
+    /// Available email masks for the current email address.
+    var emailMasks: [EmailMask] = []
+
+    /// The currently selected email mask for sending (nil means send without mask).
+    var selectedMask: EmailMask?
+
     // MARK: - Properties: Computed
 
     /// Email client used to get and create email addresses.
@@ -129,7 +136,7 @@ class SendEmailMessageViewController: UIViewController, UITextViewDelegate, UITa
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         guard emailAddress?.emailAddress != nil else {
-            Task { @MainActor in
+            Task {
                 presentErrorAlert(message: "An error has occurred: no email address found") { _ in
                     self.performSegue(withIdentifier: Segue.returnToEmailMessageList.rawValue, sender: self)
                 }
@@ -141,6 +148,9 @@ class SendEmailMessageViewController: UIViewController, UITextViewDelegate, UITa
             formData[.cc] = inputData.cc
             formData[.body] = inputData.body
             formData[.subject] = inputData.subject
+        }
+        Task {
+            await self.loadEmailMasks()
         }
     }
 
@@ -195,17 +205,36 @@ class SendEmailMessageViewController: UIViewController, UITextViewDelegate, UITa
             bcc: addressesToArray(bcc),
             subject: subject
         )
-        let sendEmailMessageInput = SendEmailMessageInput(
-            senderEmailAddressId: emailAddressId,
-            emailMessageHeader: emailMessageHeader,
-            body: body,
-            attachments: Array(attachments),
-            replyingMessageId: replyingMessageId,
-            forwardingMessageId: forwardingMessageId
-        )
 
-        Task.detached(priority: .medium) {
-            await self.sendEmailMessage(sendEmailMessageInput)
+        if let mask = selectedMask {
+            let maskedHeader = InternetMessageFormatHeader(
+                from: EmailAddressAndName(address: mask.maskAddress),
+                to: addressesToArray(to),
+                cc: addressesToArray(cc),
+                bcc: addressesToArray(bcc),
+                subject: subject
+            )
+            let maskedInput = SendEmailMessageInput(
+                senderMaskId: mask.id,
+                emailMessageHeader: maskedHeader,
+                body: body,
+                attachments: Array(attachments)
+            )
+            Task {
+                await self.sendMaskedEmailMessage(maskedInput)
+            }
+        } else {
+            let sendEmailMessageInput = SendEmailMessageInput(
+                senderEmailAddressId: emailAddressId,
+                emailMessageHeader: emailMessageHeader,
+                body: body,
+                attachments: Array(attachments),
+                replyingMessageId: replyingMessageId,
+                forwardingMessageId: forwardingMessageId
+            )
+            Task {
+                await self.sendEmailMessage(sendEmailMessageInput)
+            }
         }
     }
 
@@ -217,7 +246,7 @@ class SendEmailMessageViewController: UIViewController, UITextViewDelegate, UITa
         )
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
         alert.addAction(UIAlertAction(title: "Delete", style: .default) { _ in
-            Task { @MainActor in
+            Task {
                 self.presentActivityAlert(message: "Deleting...")
                 await self.deleteDraft()
                 self.dismissActivityAlert {
@@ -270,11 +299,13 @@ class SendEmailMessageViewController: UIViewController, UITextViewDelegate, UITa
                 self.presentErrorAlert(message: "Please select a future date and time.")
                 return
             }
-            Task { @MainActor in
+            Task {
                 self.presentActivityAlert(message: "Scheduling...")
+                let maskId = self.selectedMask?.id ?? self.inputData?.emailMaskId
                 let input = ScheduleSendDraftMessageInput(
                     id: draftId,
                     emailAddressId: self.emailAddress.id,
+                    emailMaskId: maskId,
                     sendAt: sendAt
                 )
                 do {
@@ -283,6 +314,7 @@ class SendEmailMessageViewController: UIViewController, UITextViewDelegate, UITa
                         self.performSegue(withIdentifier: Segue.returnToEmailMessageList.rawValue, sender: self)
                     }
                 } catch {
+                    NSLog("Schedule draft error: \(error)")
                     self.dismissActivityAlert {
                         self.presentErrorAlert(message: "Failed to schedule message", error: error)
                     }
@@ -303,9 +335,11 @@ class SendEmailMessageViewController: UIViewController, UITextViewDelegate, UITa
             preferredStyle: .alert
         )
         alert.addAction(UIAlertAction(title: "Cancel", style: .default) { _ in
-            Task { @MainActor in
+            Task {
                 self.presentActivityAlert(message: "Cancelling...")
-                let input = CancelScheduledDraftMessageInput(id: draftId, emailAddressId: self.emailAddress.id)
+                let maskId = self.selectedMask?.id ?? self.inputData?.emailMaskId
+                NSLog("Cancel schedule - draftId: \(draftId), maskId: \(maskId ?? "nil")")
+                let input = CancelScheduledDraftMessageInput(id: draftId, emailAddressId: self.emailAddress.id, emailMaskId: maskId)
                 do {
                     let _ = try await self.emailClient.cancelScheduledDraftMessage(withInput: input)
                     self.dismissActivityAlert {
@@ -337,7 +371,7 @@ class SendEmailMessageViewController: UIViewController, UITextViewDelegate, UITa
         do {
             _ = try await emailClient.sendEmailMessage(withInput: sendEmailMessageInput)
                 await self.deleteDraft()
-            Task { @MainActor in
+            Task {
                 self.dismissActivityAlert {
                     self.performSegue(withIdentifier: Segue.returnToEmailMessageList.rawValue, sender: self)
                 }
@@ -346,6 +380,42 @@ class SendEmailMessageViewController: UIViewController, UITextViewDelegate, UITa
             self.dismissActivityAlert {
                 self.presentErrorAlert(message: "Failed to send email message", error: error)
             }
+        }
+    }
+
+    func sendMaskedEmailMessage(_ input: SendEmailMessageInput) async {
+        presentActivityAlert(message: "Sending Masked Email Message")
+        do {
+            _ = try await emailClient.sendMaskedEmailMessage(withInput: input)
+            await self.deleteDraft()
+            Task {
+                self.dismissActivityAlert {
+                    self.performSegue(withIdentifier: Segue.returnToEmailMessageList.rawValue, sender: self)
+                }
+            }
+        } catch {
+            self.dismissActivityAlert {
+                self.presentErrorAlert(message: "Failed to send masked email message", error: error)
+            }
+        }
+    }
+
+    func loadEmailMasks() async {
+        guard let currentAddress = emailAddress?.emailAddress else { return }
+        do {
+            let input = ListEmailMasksForOwnerInput()
+            let output = try await emailClient.listEmailMasksForOwner(withInput: input)
+            self.emailMasks = output.items.filter { $0.realAddress == currentAddress && $0.status == .enabled }
+            // Restore mask selection from draft if applicable
+            if self.selectedMask == nil, let maskId = self.inputData?.emailMaskId {
+                self.selectedMask = self.emailMasks.first { $0.id == maskId }
+            }
+            await MainActor.run {
+                self.tableView.reloadData()
+            }
+        } catch {
+            // Silently fail - masks are optional for sending
+            NSLog("Failed to load email masks: \(error)")
         }
     }
 
@@ -389,10 +459,11 @@ class SendEmailMessageViewController: UIViewController, UITextViewDelegate, UITa
         let input = LookupEmailAddressesPublicInfoInput(emailAddresses: emailAddresses)
         let emailAddressesPublicInfo = try await emailClient.lookupEmailAddressesPublicInfo(withInput: input)
 
-        // Verify all request email addresses were included in the `emailAddressesPublicInfo` response
-        let resultEmailAddresses = emailAddressesPublicInfo.map { $0.emailAddress }
-        let result = emailAddresses.allSatisfy { emailAddress in
-            resultEmailAddresses.contains(emailAddress)
+        // Verify all requested email addresses are in the response AND have encryption enabled
+        let result = emailAddresses.allSatisfy { address in
+            emailAddressesPublicInfo.contains { info in
+                info.emailAddress == address && info.enableEncryption
+            }
         }
 
         return result
@@ -429,7 +500,6 @@ class SendEmailMessageViewController: UIViewController, UITextViewDelegate, UITa
         try await encryptedIndicatorTask?.value
     }
 
-    @MainActor
     func cancelSend() {
         let alert = UIAlertController(
             title: "Cancel Sending",
@@ -437,7 +507,7 @@ class SendEmailMessageViewController: UIViewController, UITextViewDelegate, UITa
             preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
         alert.addAction(UIAlertAction(title: "Save Draft", style: .default) { _ in
-            Task.detached(priority: .medium) {
+            Task {
                 await self.saveDraft()
             }
         })
@@ -483,22 +553,25 @@ class SendEmailMessageViewController: UIViewController, UITextViewDelegate, UITa
                 let input = UpdateDraftEmailMessageInput(
                     id: draftEmailMessageId,
                     rfc822Data: data,
-                    senderEmailAddressId: emailAddressId
+                    senderEmailAddressId: emailAddressId,
+                    emailMaskId: selectedMask?.id
                 )
                 _ = try await self.emailClient.updateDraftEmailMessage(withInput: input)
             } else {
                 let input = CreateDraftEmailMessageInput(
                     rfc822Data: data,
-                    senderEmailAddressId: emailAddressId
+                    senderEmailAddressId: emailAddressId,
+                    emailMaskId: selectedMask?.id
                 )
                 _ = try await self.emailClient.createDraftEmailMessage(withInput: input)
             }
-            Task { @MainActor in
+            Task {
                 self.dismissActivityAlert {
                     self.performSegue(withIdentifier: Segue.returnToEmailMessageList.rawValue, sender: self)
                 }
             }
         } catch {
+            NSLog("Failed to save draft: \(error)")
             self.dismissActivityAlert {
                 self.presentErrorAlert(message: "Failed to save draft email message", error: error)
             }
@@ -508,9 +581,11 @@ class SendEmailMessageViewController: UIViewController, UITextViewDelegate, UITa
     func deleteDraft() async {
         do {
             if let draftEmailMessageId = inputData?.draftEmailMessageId {
+                let maskId = selectedMask?.id ?? inputData?.emailMaskId
                 let input = DeleteDraftEmailMessagesInput(
                     ids: [draftEmailMessageId],
-                    emailAddressId: emailAddress.id
+                    emailAddressId: emailAddress.id,
+                    emailMaskId: maskId
                 )
                 _ = try await emailClient.deleteDraftEmailMessages(withInput: input)
             }
@@ -723,10 +798,13 @@ class SendEmailMessageViewController: UIViewController, UITextViewDelegate, UITa
     // MARK: - Conformance: UITableViewDataSource
 
     func numberOfSections(in tableView: UITableView) -> Int {
-        1
+        return 2
     }
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        if section == 0 {
+            return 1 // Mask picker row
+        }
         return inputFields.count
     }
 
@@ -752,6 +830,20 @@ class SendEmailMessageViewController: UIViewController, UITextViewDelegate, UITa
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        // Section 0: Mask picker row
+        if indexPath.section == 0 {
+            let cell = UITableViewCell(style: .value1, reuseIdentifier: "maskPickerCell")
+            cell.textLabel?.text = "Send as Mask:"
+            if let mask = selectedMask {
+                cell.detailTextLabel?.text = mask.maskAddress
+            } else {
+                cell.detailTextLabel?.text = "None"
+            }
+            cell.accessoryType = .disclosureIndicator
+            return cell
+        }
+
+        // Section 1: Existing input fields
         if isHeaderField(forIndexPath: indexPath) {
             guard let cell = tableView.dequeueReusableCell(withIdentifier: "headerCell") as? HeaderTableViewCell else {
                 return HeaderTableViewCell()
@@ -790,12 +882,59 @@ class SendEmailMessageViewController: UIViewController, UITextViewDelegate, UITa
 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
+        if indexPath.section == 0 {
+            showMaskPicker()
+            return
+        }
         if let cell = tableView.cellForRow(at: indexPath) as? HeaderTableViewCell {
             cell.textField.becomeFirstResponder()
         }
         if let cell = tableView.cellForRow(at: indexPath) as? BodyTableViewCell {
             cell.textView.becomeFirstResponder()
         }
+    }
+
+    // MARK: - Helpers: Mask Picker
+
+    func showMaskPicker() {
+        if emailMasks.isEmpty {
+            presentActivityAlert(message: "Loading masks...")
+            Task {
+                await self.loadEmailMasks()
+                Task {
+                    self.dismissActivityAlert {
+                        self.presentMaskPickerAlert()
+                    }
+                }
+            }
+        } else {
+            presentMaskPickerAlert()
+        }
+    }
+
+    private func presentMaskPickerAlert() {
+        let alert = UIAlertController(title: "Select Email Mask", message: "Choose a mask to send from, or select None.", preferredStyle: .actionSheet)
+        alert.addAction(UIAlertAction(title: "None", style: .default) { _ in
+            self.selectedMask = nil
+            self.tableView.reloadRows(at: [IndexPath(row: 0, section: 0)], with: .automatic)
+        })
+        for mask in emailMasks where mask.status == .enabled {
+            alert.addAction(UIAlertAction(title: mask.maskAddress, style: .default) { _ in
+                self.selectedMask = mask
+                self.tableView.reloadRows(at: [IndexPath(row: 0, section: 0)], with: .automatic)
+            })
+        }
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+
+        // Required for iPad: action sheets are presented as popovers and need a source location.
+        if let popover = alert.popoverPresentationController {
+            let maskCell = tableView.cellForRow(at: IndexPath(row: 0, section: 0))
+            popover.sourceView = maskCell ?? self.view
+            popover.sourceRect = maskCell?.bounds ?? CGRect(x: self.view.bounds.midX, y: self.view.bounds.midY, width: 0, height: 0)
+            popover.permittedArrowDirections = .any
+        }
+
+        present(alert, animated: true)
     }
 
     func headerCell(_ cell: HeaderTableViewCell, didUpdateInput input: String?) {
@@ -822,7 +961,7 @@ class SendEmailMessageViewController: UIViewController, UITextViewDelegate, UITa
         }
 
         if fieldName != nil {
-            Task { @MainActor in
+            Task {
                 try await self.handleEncryptedIndicatorView(input ?? "", fieldName!)
             }
         }

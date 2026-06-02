@@ -91,6 +91,7 @@
                     <connections>
                         <segue destination="Q5b-Pg-S2T" kind="show" identifier="navigateToCreateEmailAddress" id="8m2-jT-ZFl"/>
                         <segue destination="Alc-eI-aBz" kind="show" identifier="navigateToEmailMessageList" id="DvY-a5-WXK"/>
+                        <segue destination="eMk-Li-st1" kind="show" identifier="navigateToEmailMaskList" id="aLs-Mk-sg1"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="3V9-IM-SiJ" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -136,6 +137,7 @@
                         <segue destination="zQo-F7-lRo" kind="show" identifier="navigateToEmailAddressSettings" id="tB2-24-TNg"/>
                         <segue destination="MnW-ZM-kOj" kind="show" identifier="navigateToCreateCustomFolder" id="XTb-gZ-OWc"/>
                         <segue destination="mDf-wc-Rsa" kind="show" identifier="navigateToUpdateCustomFolder" id="vRW-Ny-jBC"/>
+                        <segue destination="eMk-Li-st1" kind="show" identifier="navigateToEmailMaskList" id="mSk-Nv-g8t"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="6Zy-8b-Wgz" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -174,6 +176,7 @@
                     <connections>
                         <segue destination="swp-Gg-aeJ" kind="unwind" identifier="returnToEmailMessageList" unwindAction="returnToEmailMessageListWithSegue:" id="a2F-bJ-JKl"/>
                         <segue destination="oij-Dx-RIa" kind="show" identifier="replyToEmailMessage" id="caM-Uq-BNH"/>
+                        <segue destination="oij-Dx-RIa" kind="show" identifier="forwardEmailMessage" id="fwd-Em-Msg"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="QuA-su-9vr" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -208,6 +211,47 @@
                 <exit id="Alc-eI-aBZ" userLabel="Exit" sceneMemberID="exit"/>
             </objects>
             <point key="canvasLocation" x="3868" y="1569"/>
+        </scene>
+        <!--Email Masks-->
+        <scene sceneID="eMk-Sc-n01">
+            <objects>
+                <viewController storyboardIdentifier="emailMaskList" id="eMk-Li-st1" customClass="EmailMaskListViewController" customModule="EmailExample" customModuleProvider="target" sceneMemberID="viewController">
+                    <navigationItem key="navigationItem" title="Email Masks" id="eMk-Nv-it1"/>
+                    <connections>
+                        <segue destination="cMk-Cr-ea1" kind="show" identifier="navigateToCreateEmailMask" id="eMk-Sg-cr1"/>
+                        <segue destination="uMk-Up-da1" kind="show" identifier="navigateToUpdateEmailMask" id="eMk-Sg-up1"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="eMk-Fr-sp1" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+                <exit id="eMk-Ex-it1" userLabel="Exit" sceneMemberID="exit"/>
+            </objects>
+            <point key="canvasLocation" x="4724" y="2200"/>
+        </scene>
+        <!--Create Email Mask-->
+        <scene sceneID="cMk-Sc-n01">
+            <objects>
+                <viewController storyboardIdentifier="createEmailMask" title="Create Email Mask" id="cMk-Cr-ea1" customClass="CreateEmailMaskViewController" customModule="EmailExample" customModuleProvider="target" sceneMemberID="viewController">
+                    <navigationItem key="navigationItem" title="Create Email Mask" id="cMk-Nv-it1"/>
+                    <connections>
+                        <segue destination="eMk-Ex-it1" kind="unwind" identifier="returnToEmailMaskList" unwindAction="returnToEmailMaskListWithSegue:" id="cMk-Sg-un1"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="cMk-Fr-sp1" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="5850" y="2200"/>
+        </scene>
+        <!--Update Email Mask-->
+        <scene sceneID="uMk-Sc-n01">
+            <objects>
+                <viewController storyboardIdentifier="updateEmailMask" title="Update Email Mask" id="uMk-Up-da1" customClass="UpdateEmailMaskViewController" customModule="EmailExample" customModuleProvider="target" sceneMemberID="viewController">
+                    <navigationItem key="navigationItem" title="Update Email Mask" id="uMk-Nv-it1"/>
+                    <connections>
+                        <segue destination="eMk-Ex-it1" kind="unwind" identifier="returnToEmailMaskList" unwindAction="returnToEmailMaskListWithSegue:" id="uMk-Sg-un1"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="uMk-Fr-sp1" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="5850" y="2800"/>
         </scene>
     </scenes>
     <inferredMetricsTieBreakers>

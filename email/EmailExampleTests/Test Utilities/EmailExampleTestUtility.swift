@@ -11,6 +11,7 @@ import SudoUser
 import SudoProfiles
 @testable import EmailExample
 
+@MainActor
 class EmailExampleTestUtility {
 
     // MARK: - Properties
@@ -45,9 +46,6 @@ class EmailExampleTestUtility {
             authenticator: authenticator)
     }
 
-    deinit {
-        clearWindow()
-    }
 
     /// Will remove all subviews from the window and `nil` out the root view controller
     func clearWindow() {

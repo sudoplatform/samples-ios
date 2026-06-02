@@ -7,6 +7,7 @@
 import UIKit
 
 /// UILabel for formatting dates for emails.
+@MainActor
 class DateLabel: UILabel {
 
     // MARK: - Supplementary

@@ -26,7 +26,7 @@ enum SubscriptionError: Error {
 /// // Then wait for the result
 /// updateSubscription.waitForMessage(withId: updatedMessage.id)
 /// ```
-class Subscription: SudoEmail.Subscriber {
+class Subscription: SudoEmail.Subscriber, @unchecked Sendable {
 
     // MARK: - Properties
 

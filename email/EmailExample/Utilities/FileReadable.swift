@@ -12,7 +12,7 @@ protocol FileReadable {
     func contentsOfFile(forPath path: String) throws -> String
 }
 
-class DefaultFileReadable: FileReadable {
+class DefaultFileReadable: FileReadable, @unchecked Sendable {
 
     // MARK: - Properties
 

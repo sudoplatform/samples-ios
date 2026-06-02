@@ -15,6 +15,7 @@ import SudoNotification
 /// - Links To:
 ///     - `MainMenuViewController`: If a user successfully registers or logs in, the `MainMenuViewController` will be presented so that the user can perform
 ///      "Sudo ID Verfication", "Sudo Creation" or "Funding Source Creation".
+@MainActor
 class RegistrationViewController: UIViewController {
 
     // MARK: - Outlets
@@ -45,7 +46,7 @@ class RegistrationViewController: UIViewController {
     var authenticator: Authenticator = AppDelegate.dependencies.authenticator
 
     /// Notification client is used to load current notification configuration after sign in
-    var notificationClient: SudoNotificationClient = AppDelegate.dependencies.notificationClient
+    var notificationClient: SudoNotificationClient? = AppDelegate.dependencies.notificationClient
 
     // MARK: - Lifecycle
 
@@ -53,7 +54,7 @@ class RegistrationViewController: UIViewController {
         super.viewDidAppear(animated)
 
         // Sign in automatically if the user is registered.
-        Task.detached(priority: .medium) {
+        Task {
             if try await self.userClient.isRegistered() {
                 await self.registerButtonTapped()
             }
@@ -73,16 +74,16 @@ class RegistrationViewController: UIViewController {
         activityIndicator.startAnimating()
         registerButton.isEnabled = false
 
-        Task.detached(priority: .medium) {
+        Task {
             do {
                 try await self.registerAndSignIn()
-                Task { @MainActor in
+                Task {
                     self.activityIndicator.stopAnimating()
                     self.registerButton.isEnabled = true
                     self.navigateToMainMenu()
                 }
             } catch {
-                Task { @MainActor in
+                Task {
                     self.showSignInFailureAlert(error: error)
                 }
             }

@@ -47,6 +47,7 @@ extension DataFactory {
                 owner: owner,
                 owners: owners,
                 emailAddressId: emailAddressId,
+                emailMaskId: nil,
                 folderId: folderId,
                 previousFolderId: previousFolderId,
                 createdAt: createdAt,
@@ -102,7 +103,6 @@ extension DataFactory {
             owner: String = UUID().uuidString,
             owners: [Owner] = [Owner(id: "dummyOwnerId", issuer: "dummyIssuerId")],
             identityId: String = UUID().uuidString,
-            keyRingId: String = UUID().uuidString,
             keyIds: [String] = [UUID().uuidString],
             address: String = randomEmailAddress(),
             folders: [EmailFolder] = [],
@@ -119,7 +119,6 @@ extension DataFactory {
                 owner: owner,
                 owners: owners,
                 identityId: identityId,
-                keyRingId: keyRingId,
                 keyIds: keyIds,
                 emailAddress: address,
                 folders: folders,
@@ -169,7 +168,11 @@ extension DataFactory {
             emailMessageMaxInboundMessageSize: Int = 3,
             emailMessageMaxOutboundMessageSize: Int = 4,
             emailMessageRecipientsLimit: Int = 2,
-            encryptedEmailMessageRecipientsLimit: Int = 2
+            encryptedEmailMessageRecipientsLimit: Int = 2,
+            prohibitedFileExtensions: [String] = [],
+            emailMasksEnabled: Bool = true,
+            externalEmailMasksEnabled: Bool = false,
+            allowOwnerEmailAddressReuse: Bool = false
         ) -> ConfigurationData {
             return ConfigurationData(
                 deleteEmailMessagesLimit: deleteEmailMessagesLimit,
@@ -177,7 +180,11 @@ extension DataFactory {
                 emailMessageMaxInboundMessageSize: emailMessageMaxInboundMessageSize,
                 emailMessageMaxOutboundMessageSize: emailMessageMaxOutboundMessageSize,
                 emailMessageRecipientsLimit: emailMessageRecipientsLimit,
-                encryptedEmailMessageRecipientsLimit: encryptedEmailMessageRecipientsLimit
+                encryptedEmailMessageRecipientsLimit: encryptedEmailMessageRecipientsLimit,
+                prohibitedFileExtensions: prohibitedFileExtensions,
+                emailMasksEnabled: emailMasksEnabled,
+                externalEmailMasksEnabled: externalEmailMasksEnabled,
+                allowOwnerEmailAddressReuse: allowOwnerEmailAddressReuse
             )
         }
 
@@ -207,6 +214,7 @@ extension DataFactory {
                 owner: owner,
                 owners: owners,
                 emailAddressId: emailAddressId,
+                emailMaskId: nil,
                 folderId: folderId,
                 previousFolderId: previousFolderId,
                 createdAt: createdAt,
@@ -246,6 +254,50 @@ extension DataFactory {
                 mimetype: "dummyMimeType",
                 inlineAttachment: false,
                 data: Data("dummyAttachmentData".utf8)
+            )
+        }
+
+        static func generateEmailMask(
+            id: String = UUID().uuidString,
+            owner: String = UUID().uuidString,
+            owners: [Owner] = [Owner(id: "dummyOwnerId", issuer: "dummyIssuerId")],
+            identityId: String = UUID().uuidString,
+            maskAddress: String = "mask@example.com",
+            realAddress: String = "real@example.com",
+            realAddressType: EmailMask.RealAddressType = .internal,
+            status: EmailMask.EmailMaskStatus = .enabled,
+            inboundReceived: Int = 0,
+            inboundDelivered: Int = 0,
+            outboundReceived: Int = 0,
+            outboundDelivered: Int = 0,
+            spamCount: Int = 0,
+            virusCount: Int = 0,
+            createdAt: Date = randomDate(),
+            updatedAt: Date = randomDate(),
+            version: Int = 1,
+            expiresAt: Date? = nil,
+            metadata: [String: String]? = nil
+        ) -> EmailMask {
+            return EmailMask(
+                id: id,
+                owner: owner,
+                owners: owners,
+                identityId: identityId,
+                maskAddress: maskAddress,
+                realAddress: realAddress,
+                realAddressType: realAddressType,
+                status: status,
+                inboundReceived: inboundReceived,
+                inboundDelivered: inboundDelivered,
+                outboundReceived: outboundReceived,
+                outboundDelivered: outboundDelivered,
+                spamCount: spamCount,
+                virusCount: virusCount,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                version: version,
+                expiresAt: expiresAt,
+                metadata: metadata
             )
         }
     }

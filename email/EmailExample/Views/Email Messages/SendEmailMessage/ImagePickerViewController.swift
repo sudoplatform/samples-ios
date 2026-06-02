@@ -8,6 +8,7 @@ import UIKit
 import UniformTypeIdentifiers
 import SudoEmail
 
+@MainActor
 public class ImagePickerViewController: UIImagePickerController, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
 
     // MARK: - Properties

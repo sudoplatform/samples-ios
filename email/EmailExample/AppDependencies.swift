@@ -33,7 +33,7 @@ struct AppDependencies {
     let profilesClient: SudoProfilesClient
     let entitlementsClient: SudoEntitlementsClient
     let emailNotificationFilterClient: SudoNotificationFilterClient
-    let notificationClient: SudoNotificationClient
+    let notificationClient: SudoNotificationClient?
     let emailClient: SudoEmailClient
     let authenticator: Authenticator
 
@@ -48,7 +48,7 @@ struct AppDependencies {
         emailClient: SudoEmailClient,
         entitlementsClient: SudoEntitlementsClient,
         emailNotificationFilterClient: SudoNotificationFilterClient,
-        notificationClient: SudoNotificationClient,
+        notificationClient: SudoNotificationClient?,
         authenticator: Authenticator
     ) {
         self.userClient = userClient
@@ -77,13 +77,18 @@ struct AppDependencies {
 
         let emailNotificationFilterClient = DefaultSudoEmailNotificationFilterClient()
 
+        let notificationClient: SudoNotificationClient? = try? DefaultSudoNotificationClient(
+            userClient: newUserClient,
+            notifiableServices: [emailNotificationFilterClient]
+        )
+
         self.init(
             userClient: newUserClient,
             profilesClient: try DefaultSudoProfilesClient(sudoUserClient: newUserClient),
             emailClient: try DefaultSudoEmailClient(keyNamespace: "eml", userClient: newUserClient),
             entitlementsClient: try DefaultSudoEntitlementsClient(userClient: newUserClient),
             emailNotificationFilterClient: emailNotificationFilterClient,
-            notificationClient: try DefaultSudoNotificationClient(userClient: newUserClient, notifiableServices: [emailNotificationFilterClient]),
+            notificationClient: notificationClient,
             authenticator: DefaultAuthenticator(userClient: newUserClient, keyManager: keyManager)
         )
     }

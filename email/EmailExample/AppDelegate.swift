@@ -11,11 +11,12 @@ import SudoProfiles
 import SudoNotification
 
 @UIApplicationMain
+@MainActor
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     // MARK: - Properties: Static
 
-    static var dependencies: AppDependencies!
+    nonisolated(unsafe) static var dependencies: AppDependencies!
 
     // MARK: - Properties
 
@@ -49,12 +50,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         UNUserNotificationCenter.current().delegate = self
 
-        let authOptions: UNAuthorizationOptions = [.alert, .badge, .sound]
-        UNUserNotificationCenter.current().requestAuthorization(
-          options: authOptions,
-          completionHandler: {_, _ in })
+        if AppDelegate.dependencies.notificationClient != nil {
+            let authOptions: UNAuthorizationOptions = [.alert, .badge, .sound]
+            UNUserNotificationCenter.current().requestAuthorization(
+              options: authOptions,
+              completionHandler: {_, _ in })
 
-        application.registerForRemoteNotifications()
+            application.registerForRemoteNotifications()
+        }
 
         window = UIWindow(frame: UIScreen.main.bounds)
         window!.rootViewController = UIStoryboard(name: "Main", bundle: nil).instantiateInitialViewController()!
@@ -66,7 +69,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         NSLog("Successfully registered for push notifications with token: \(deviceToken.hexString)")
 
         let userClient = AppDelegate.dependencies.userClient
-        let notificationClient = AppDelegate.dependencies.notificationClient
+        guard let notificationClient = AppDelegate.dependencies.notificationClient else {
+            NSLog("Notification client not available — skipping push registration")
+            return
+        }
 
         let device = DefaultNotificationDeviceInputProvider(
             deviceIdentifier: AppDelegate.dependencies.deviceInfo.deviceId,
@@ -130,17 +136,19 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
 
         Task {
+            guard let notificationClient = AppDelegate.dependencies.notificationClient else { return }
+
             var configuration = NotificationConfiguration(configs: [])
-            if let existingConfiguration = try? await AppDelegate.dependencies.notificationClient
+            if let existingConfiguration = try? await notificationClient
                 .getNotificationConfiguration(device: device) {
                 configuration = existingConfiguration
             }
             configuration = configuration.initEmailNotifications()
 
-            let services = AppDelegate.dependencies.notificationClient.notifiableServices.map { $0.getSchema() }
+            let services = notificationClient.notifiableServices.map { $0.getSchema() }
 
             do {
-                configuration = try await AppDelegate.dependencies.notificationClient.setNotificationConfiguration(
+                configuration = try await notificationClient.setNotificationConfiguration(
                     config: NotificationSettingsInput(
                         bundleId: device.bundleIdentifier,
                         deviceId: device.deviceIdentifier,
@@ -151,6 +159,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 AppDelegate.dependencies.notificationConfiguration = configuration
             } catch let error as SudoNotificationError {
                 NSLog("Could not set notification configuration: \(error)")
+                Task { @MainActor in
+                    guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+                          let rootVC = windowScene.windows.first?.rootViewController else { return }
+                    let alert = UIAlertController(
+                        title: "Notifications Disabled",
+                        message: "Push notifications could not be configured. Please deregister and register again to retry.",
+                        preferredStyle: .alert
+                    )
+                    alert.addAction(UIAlertAction(title: "OK", style: .default))
+                    rootVC.present(alert, animated: true)
+                }
             }
         }
     }

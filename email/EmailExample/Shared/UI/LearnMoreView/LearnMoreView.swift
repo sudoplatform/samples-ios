@@ -16,6 +16,7 @@ protocol LearnMoreViewDelegate: AnyObject {
 }
 
 /// View that houses information for a Learn More view shown at the bottom of sample app views.
+@MainActor
 class LearnMoreView: UIView {
 
     // MARK: - Outlets

@@ -8,6 +8,7 @@ import UIKit
 import SudoEmail
 import SudoProfiles
 
+@MainActor
 class CreateEmailAddressViewController: UIViewController,
     UITableViewDataSource,
     UITableViewDelegate,
@@ -123,10 +124,10 @@ class CreateEmailAddressViewController: UIViewController,
         super.viewWillAppear(animated)
         startListeningForKeyboardNotifications()
         presentCancellableActivityAlert(message: "Loading", delegate: self) {
-            Task.detached(priority: .medium) {
+            Task {
                 guard let domain = try await self.getSupportedEmailDomains().first else {
                     await self.dismissActivityAlert {
-                        Task { @MainActor in
+                        Task {
                             self.presentErrorAlert(message: "Failed to get supported domain") {_ in
                                 self.performSegue(withIdentifier: Segue.returnToEmailAddressList.rawValue, sender: self)
                             }
@@ -134,7 +135,7 @@ class CreateEmailAddressViewController: UIViewController,
                     }
                     return
                 }
-                Task { @MainActor in
+                Task {
                     self.domain = domain
                     self.dismissActivityAlert()
                 }
@@ -153,7 +154,7 @@ class CreateEmailAddressViewController: UIViewController,
     ///
     /// This action will initiate the sequence of validating inputs and provisioning an email address via the `emailClient`.
     @objc func didTapCreateEmailAddressButton() {
-        Task.detached(priority: .medium) {
+        Task {
             await self.createEmailAddress()
         }
     }
@@ -162,7 +163,7 @@ class CreateEmailAddressViewController: UIViewController,
     ///
     /// This action will initiate the checking of validity of the users input with the email service.
     @objc func didFireCheckEmailAddressTimer() {
-        Task.detached(priority: .medium) {
+        Task {
             await self.checkInputEmailAddressAvailability()
         }
     }
@@ -177,7 +178,7 @@ class CreateEmailAddressViewController: UIViewController,
             let validAddresses = try await emailClient.checkEmailAddressAvailability(withInput: checkAddressInput)
 
             let indexPath = IndexPath(item: InputField.localPart.rawValue, section: 0)
-            Task { @MainActor in
+            Task {
                 guard let cell = self.tableView.cellForRow(at: indexPath)  as? InputFormTableViewCell else {
                     return
                 }
@@ -191,7 +192,7 @@ class CreateEmailAddressViewController: UIViewController,
             }
         } catch {
             self.setCreateButtonEnabled(false)
-            Task { @MainActor in
+            Task {
                 self.presentErrorAlert(message: "Failed to check email address availability", error: error)
             }
         }
@@ -200,7 +201,7 @@ class CreateEmailAddressViewController: UIViewController,
     /// Create the email address on the email service.
     func createEmailAddress() async {
         guard let sudo = sudo else {
-            Task { @MainActor in
+            Task {
                 presentErrorAlert(message: "Sudo not found")
             }
             return
@@ -208,7 +209,7 @@ class CreateEmailAddressViewController: UIViewController,
         view.endEditing(true)
         setCreateButtonEnabled(false)
         guard validateFormData() else {
-            Task { @MainActor in
+            Task {
                 presentErrorAlert(message: "Please ensure all fields are filled out")
             }
             return
@@ -225,7 +226,7 @@ class CreateEmailAddressViewController: UIViewController,
                 alias: alias
             )
             _ = try await emailClient.provisionEmailAddress(withInput: provisionAddressInput)
-            Task { @MainActor in
+            Task {
                 self.dismissActivityAlert {
                     self.performSegue(withIdentifier: Segue.returnToEmailAddressList.rawValue, sender: self)
                 }
@@ -387,7 +388,7 @@ class CreateEmailAddressViewController: UIViewController,
     // MARK: - Conformance: InputFormCellDelegate
 
     func inputCell(_ cell: InputFormTableViewCell, didUpdateInput input: String?) {
-        Task { @MainActor in
+        Task {
             self.checkEmailAddressTimer?.invalidate()
             self.setCreateButtonEnabled(false)
             cell.textField.textColor = .label

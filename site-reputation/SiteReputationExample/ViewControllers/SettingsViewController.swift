@@ -30,7 +30,7 @@ class SettingsViewController: UITableViewController {
         case 0:
             signOut()
         case 1:
-            clearData()
+            navigationController?.pushViewController(EntitlementsViewController(), animated: true)
         default:
             break
         }
@@ -44,23 +44,8 @@ class SettingsViewController: UITableViewController {
         }
     }
 
-    func clearData() {
-        let alert = UIAlertController(title: "Clear Stored Data?", message: "This will clear all cached site reputation data.", preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
-        alert.addAction(UIAlertAction(title: "Clear Storage", style: .default, handler: { _ in
-            Task {
-                do {
-                    try await Clients.legacySiteReputationClient.clearStorage()
-                } catch {
-                    print("Failed to clear data: \(error)")
-                }
-            }
-        }))
-        present(alert, animated: true, completion: nil)
-    }
-
     func signOutFSSOWithAlert() {
-        let alert = UIAlertController(title: "Are you sure?", message: "This will sign out of your account and will clear all cached site reputation data.", preferredStyle: .alert)
+        let alert = UIAlertController(title: "Are you sure?", message: "This will sign out of your account.", preferredStyle: .alert)
 
         alert.addAction(UIAlertAction(title: "Sign Out", style: .destructive, handler: { (_) in
             UIApplication.shared.topController?.presentActivityAlert(message: "Signing out")

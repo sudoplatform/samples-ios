@@ -3,15 +3,20 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 51;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXBuildFile section */
+		09E7545730818C84006256C4 /* SudoSiteReputation in Frameworks */ = {isa = PBXBuildFile; productRef = 09E7545630818C84006256C4 /* SudoSiteReputation */; };
+		3194F64BA88AD89E1B5A6C31 /* SudoEntitlements in Frameworks */ = {isa = PBXBuildFile; productRef = 2F70A082C6EFFD1B8001921B /* SudoEntitlements */; };
 		327CA7B825683A8C0062650C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 327CA7B725683A8C0062650C /* AppDelegate.swift */; };
 		327CA7BA25683A8C0062650C /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 327CA7B925683A8C0062650C /* SceneDelegate.swift */; };
 		327CA7BF25683A8C0062650C /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 327CA7BD25683A8C0062650C /* Main.storyboard */; };
 		327CA7C125683A8F0062650C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 327CA7C025683A8F0062650C /* Assets.xcassets */; };
 		327CA7C425683A8F0062650C /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 327CA7C225683A8F0062650C /* LaunchScreen.storyboard */; };
+		563B991D95B5A685F71BFFC2 /* SudoKeyManager in Frameworks */ = {isa = PBXBuildFile; productRef = 01980CA431AFA57C5F9DD7DE /* SudoKeyManager */; };
+		8F077C683359A8E346049F75 /* SudoEntitlementsAdmin in Frameworks */ = {isa = PBXBuildFile; productRef = BA656F61DAE075B99FD4B7FA /* SudoEntitlementsAdmin */; };
+		C226FF385D3DAFA94C9E6004 /* EntitlementsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AE7CFB51BD70049570874AC /* EntitlementsViewController.swift */; };
 		C3715E3425806AEF00F452AC /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3715E3325806AEF00F452AC /* SettingsViewController.swift */; };
 		C3AD068F257FFEEB0049644E /* RegisterViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3AD068E257FFEEB0049644E /* RegisterViewController.swift */; };
 		C3AD0693257FFFEE0049644E /* Clients.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3AD0692257FFFEE0049644E /* Clients.swift */; };
@@ -19,7 +24,7 @@
 		C3AD0699258005870049644E /* NiceThings.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3AD0698258005870049644E /* NiceThings.swift */; };
 		C3AD069C258008410049644E /* UIViewController+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3AD069B258008400049644E /* UIViewController+Extensions.swift */; };
 		CE7CAB4725A9001600DBA48E /* ExploreViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE7CAB4625A9001600DBA48E /* ExploreViewController.swift */; };
-		E0CBC6DDD50B3B23D521E2A9 /* Pods_SiteReputationExample.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F20829600CE4B4E82C565103 /* Pods_SiteReputationExample.framework */; };
+		FFF2F76A1997F6A7BFF93CC7 /* SudoUser in Frameworks */ = {isa = PBXBuildFile; productRef = 529DF390BAB31670A4B498BD /* SudoUser */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -43,9 +48,7 @@
 		327CA7C025683A8F0062650C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		327CA7C325683A8F0062650C /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		327CA7C525683A8F0062650C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		36BC7ADE9E7A7A34487AAEBF /* Pods-SiteReputationExample-metadata.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-SiteReputationExample-metadata.plist"; sourceTree = "<group>"; };
-		57C3D25172B2B48F0D3285CA /* Pods-SiteReputationExample.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SiteReputationExample.debug.xcconfig"; path = "Target Support Files/Pods-SiteReputationExample/Pods-SiteReputationExample.debug.xcconfig"; sourceTree = "<group>"; };
-		8FFBD70475518A9DA1FFF8F6 /* Pods-SiteReputationExample.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SiteReputationExample.release.xcconfig"; path = "Target Support Files/Pods-SiteReputationExample/Pods-SiteReputationExample.release.xcconfig"; sourceTree = "<group>"; };
+		9AE7CFB51BD70049570874AC /* EntitlementsViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = EntitlementsViewController.swift; sourceTree = "<group>"; };
 		C3715E3325806AEF00F452AC /* SettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
 		C3AD068E257FFEEB0049644E /* RegisterViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterViewController.swift; sourceTree = "<group>"; };
 		C3AD0692257FFFEE0049644E /* Clients.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Clients.swift; sourceTree = "<group>"; };
@@ -53,7 +56,6 @@
 		C3AD0698258005870049644E /* NiceThings.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NiceThings.swift; sourceTree = "<group>"; };
 		C3AD069B258008400049644E /* UIViewController+Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIViewController+Extensions.swift"; sourceTree = "<group>"; };
 		CE7CAB4625A9001600DBA48E /* ExploreViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExploreViewController.swift; sourceTree = "<group>"; };
-		F20829600CE4B4E82C565103 /* Pods_SiteReputationExample.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_SiteReputationExample.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -61,7 +63,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E0CBC6DDD50B3B23D521E2A9 /* Pods_SiteReputationExample.framework in Frameworks */,
+				FFF2F76A1997F6A7BFF93CC7 /* SudoUser in Frameworks */,
+				09E7545730818C84006256C4 /* SudoSiteReputation in Frameworks */,
+				563B991D95B5A685F71BFFC2 /* SudoKeyManager in Frameworks */,
+				3194F64BA88AD89E1B5A6C31 /* SudoEntitlements in Frameworks */,
+				8F077C683359A8E346049F75 /* SudoEntitlementsAdmin in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -73,8 +79,6 @@
 			children = (
 				327CA7B625683A8C0062650C /* SiteReputationExample */,
 				327CA7B525683A8C0062650C /* Products */,
-				97EE317704F291B071461D3E /* Pods */,
-				76CA327438C76B77B75A12D4 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -104,30 +108,13 @@
 			path = SiteReputationExample;
 			sourceTree = "<group>";
 		};
-		76CA327438C76B77B75A12D4 /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				F20829600CE4B4E82C565103 /* Pods_SiteReputationExample.framework */,
-			);
-			name = Frameworks;
-			sourceTree = "<group>";
-		};
-		97EE317704F291B071461D3E /* Pods */ = {
-			isa = PBXGroup;
-			children = (
-				57C3D25172B2B48F0D3285CA /* Pods-SiteReputationExample.debug.xcconfig */,
-				8FFBD70475518A9DA1FFF8F6 /* Pods-SiteReputationExample.release.xcconfig */,
-				36BC7ADE9E7A7A34487AAEBF /* Pods-SiteReputationExample-metadata.plist */,
-			);
-			path = Pods;
-			sourceTree = "<group>";
-		};
 		C3AD068D257FFEC90049644E /* ViewControllers */ = {
 			isa = PBXGroup;
 			children = (
 				C3AD068E257FFEEB0049644E /* RegisterViewController.swift */,
 				C3715E3325806AEF00F452AC /* SettingsViewController.swift */,
 				CE7CAB4625A9001600DBA48E /* ExploreViewController.swift */,
+				9AE7CFB51BD70049570874AC /* EntitlementsViewController.swift */,
 			);
 			path = ViewControllers;
 			sourceTree = "<group>";
@@ -139,19 +126,24 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 327CA7C825683A8F0062650C /* Build configuration list for PBXNativeTarget "SiteReputationExample" */;
 			buildPhases = (
-				D0C8E1FE12A7832F4346821F /* [CP] Check Pods Manifest.lock */,
 				327CA7B025683A8C0062650C /* Sources */,
 				327CA7B125683A8C0062650C /* Frameworks */,
 				327CA7B225683A8C0062650C /* Resources */,
 				C3AD069E25801ACD0049644E /* Copy Test Keys and Config */,
 				C3BA76DC258D239C00A06854 /* Embed App Extensions */,
-				8DBB5895083EFC6C28A7C40C /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
 			name = SiteReputationExample;
+			packageProductDependencies = (
+				529DF390BAB31670A4B498BD /* SudoUser */,
+				01980CA431AFA57C5F9DD7DE /* SudoKeyManager */,
+				2F70A082C6EFFD1B8001921B /* SudoEntitlements */,
+				BA656F61DAE075B99FD4B7FA /* SudoEntitlementsAdmin */,
+				09E7545630818C84006256C4 /* SudoSiteReputation */,
+			);
 			productName = SiteReputationExample;
 			productReference = 327CA7B425683A8C0062650C /* SiteReputationExample.app */;
 			productType = "com.apple.product-type.application";
@@ -179,6 +171,13 @@
 				Base,
 			);
 			mainGroup = 327CA7AB25683A8C0062650C;
+			packageReferences = (
+				AB88586D55DC981D15D68CB6 /* XCRemoteSwiftPackageReference "sudo-user-ios" */,
+				938AA04E2572976B17D0DEB2 /* XCRemoteSwiftPackageReference "sudo-key-manager-ios" */,
+				F81D02252B6B3F4D5E3D360C /* XCRemoteSwiftPackageReference "sudo-entitlements-ios" */,
+				09B80ABFC1B0927305DAA508 /* XCRemoteSwiftPackageReference "sudo-entitlements-admin-ios" */,
+				09E7545530818C84006256C4 /* XCRemoteSwiftPackageReference "sudo-site-reputation-ios" */,
+			);
 			productRefGroup = 327CA7B525683A8C0062650C /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -202,23 +201,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		8DBB5895083EFC6C28A7C40C /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-SiteReputationExample/Pods-SiteReputationExample-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-SiteReputationExample/Pods-SiteReputationExample-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-SiteReputationExample/Pods-SiteReputationExample-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
 		C3AD069E25801ACD0049644E /* Copy Test Keys and Config */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -235,29 +217,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "returncode=0\n\necho \"Copy test key to bundle\"\nSOURCE=${PROJECT_DIR}/config/register_key.private \ncp -f ${SOURCE} \"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/\"\nif [ $? -ne 0 ]\nthen\n    echo \"Warning: Failed to copy test registration key. Make sure the file config/register_key.private exists in the project directory (see README.md). TEST key registration will not work\"\n    returncode=0\nfi\n\necho \"Copy test key ID to bundle\"\nSOURCE=${PROJECT_DIR}/config/register_key.id \ncp -f ${SOURCE} \"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/\"\nif [ $? -ne 0 ]\nthen\n    echo \"Warning: Failed to copy test registration key ID. Make sure the file config/register_key.id exists in the project directory (see README.md). TEST key registration will not work\"\n    returncode=0\nfi\n\necho \"Copy Sudo Platform config to bundle\"\nSOURCE=${PROJECT_DIR}/config/sudoplatformconfig.json\ncp -f ${SOURCE} \"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/\"\nif [ $? -ne 0 ]\nthen\n    echo \"error: Failed to copy sudoplatformconfig.json. Make sure the file config/sudoplatformconfig.json exists in the project directory (see README.md).\"\n    returncode=1\nfi\n\nexit ${returncode}\n";
-		};
-		D0C8E1FE12A7832F4346821F /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-SiteReputationExample-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
+			shellScript = "returncode=0\n\necho \"Copy test key to bundle\"\nSOURCE=${PROJECT_DIR}/config/register_key.private \ncp -f ${SOURCE} \"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/\"\nif [ $? -ne 0 ]\nthen\n    echo \"Warning: Failed to copy test registration key. Make sure the file config/register_key.private exists in the project directory (see README.md). TEST key registration will not work\"\n    returncode=0\nfi\n\necho \"Copy test key ID to bundle\"\nSOURCE=${PROJECT_DIR}/config/register_key.id \ncp -f ${SOURCE} \"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/\"\nif [ $? -ne 0 ]\nthen\n    echo \"Warning: Failed to copy test registration key ID. Make sure the file config/register_key.id exists in the project directory (see README.md). TEST key registration will not work\"\n    returncode=0\nfi\n\necho \"Copy Sudo Platform config to bundle\"\nSOURCE=${PROJECT_DIR}/config/sudoplatformconfig.json\ncp -f ${SOURCE} \"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/\"\nif [ $? -ne 0 ]\nthen\n    echo \"error: Failed to copy sudoplatformconfig.json. Make sure the file config/sudoplatformconfig.json exists in the project directory (see README.md).\"\n    returncode=1\nfi\n\necho \"Copy entitlements admin API key to bundle (if present)\"\nSOURCE=${PROJECT_DIR}/config/api.key\nif [ -f ${SOURCE} ]\nthen\n    cp -f ${SOURCE} \"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/\"\nelse\n    echo \"Note: config/api.key not found. The app will not be able to grant site reputation entitlements itself (see README.md).\"\nfi\n\nexit ${returncode}\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -275,6 +235,7 @@
 				327CA7BA25683A8C0062650C /* SceneDelegate.swift in Sources */,
 				C3AD0699258005870049644E /* NiceThings.swift in Sources */,
 				C3715E3425806AEF00F452AC /* SettingsViewController.swift in Sources */,
+				C226FF385D3DAFA94C9E6004 /* EntitlementsViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -352,7 +313,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -408,7 +369,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
@@ -420,7 +381,6 @@
 		};
 		327CA7C925683A8F0062650C /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 57C3D25172B2B48F0D3285CA /* Pods-SiteReputationExample.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = "$(inherited)";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -428,7 +388,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = SiteReputationExample/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -442,7 +402,6 @@
 		};
 		327CA7CA25683A8F0062650C /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 8FFBD70475518A9DA1FFF8F6 /* Pods-SiteReputationExample.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = "$(inherited)";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -450,7 +409,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = SiteReputationExample/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -484,6 +443,77 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		09B80ABFC1B0927305DAA508 /* XCRemoteSwiftPackageReference "sudo-entitlements-admin-ios" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sudoplatform/sudo-entitlements-admin-ios";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 9.0.0;
+			};
+		};
+		09E7545530818C84006256C4 /* XCRemoteSwiftPackageReference "sudo-site-reputation-ios" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sudoplatform/sudo-site-reputation-ios.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 12.0.0;
+			};
+		};
+		938AA04E2572976B17D0DEB2 /* XCRemoteSwiftPackageReference "sudo-key-manager-ios" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sudoplatform/sudo-key-manager-ios";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.0.0;
+			};
+		};
+		AB88586D55DC981D15D68CB6 /* XCRemoteSwiftPackageReference "sudo-user-ios" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sudoplatform/sudo-user-ios";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 19.0.0;
+			};
+		};
+		F81D02252B6B3F4D5E3D360C /* XCRemoteSwiftPackageReference "sudo-entitlements-ios" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sudoplatform/sudo-entitlements-ios";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 14.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		01980CA431AFA57C5F9DD7DE /* SudoKeyManager */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 938AA04E2572976B17D0DEB2 /* XCRemoteSwiftPackageReference "sudo-key-manager-ios" */;
+			productName = SudoKeyManager;
+		};
+		09E7545630818C84006256C4 /* SudoSiteReputation */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 09E7545530818C84006256C4 /* XCRemoteSwiftPackageReference "sudo-site-reputation-ios" */;
+			productName = SudoSiteReputation;
+		};
+		2F70A082C6EFFD1B8001921B /* SudoEntitlements */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F81D02252B6B3F4D5E3D360C /* XCRemoteSwiftPackageReference "sudo-entitlements-ios" */;
+			productName = SudoEntitlements;
+		};
+		529DF390BAB31670A4B498BD /* SudoUser */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = AB88586D55DC981D15D68CB6 /* XCRemoteSwiftPackageReference "sudo-user-ios" */;
+			productName = SudoUser;
+		};
+		BA656F61DAE075B99FD4B7FA /* SudoEntitlementsAdmin */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 09B80ABFC1B0927305DAA508 /* XCRemoteSwiftPackageReference "sudo-entitlements-admin-ios" */;
+			productName = SudoEntitlementsAdmin;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 327CA7AC25683A8C0062650C /* Project object */;
 }

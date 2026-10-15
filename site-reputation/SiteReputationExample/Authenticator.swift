@@ -5,6 +5,7 @@
 //
 
 import Foundation
+import SudoEntitlements
 import SudoUser
 import SudoKeyManager
 import UIKit
@@ -29,8 +30,11 @@ enum AuthenticatorError: LocalizedError {
 
 class Authenticator {
 
+    static let siteReputationEntitlementName = "sudoplatform.sr.srUserEntitled"
+
     let userClient: SudoUserClient
     let keyManager: SudoKeyManager
+    let entitlementsClient: SudoEntitlementsClient
 
     // Keep track of the last method used to sign in.  It helps know what kind of UI to show and actions to perform to get back to a clean state.
     @UserDefaultsBackedWithDefault(key: "lastSignInMethod", defaultValue: ChallengeType.unknown.rawValue)
@@ -45,9 +49,14 @@ class Authenticator {
         }
     }
 
-    init(userClient: SudoUserClient, keyManager: SudoKeyManager) {
+    init(
+        userClient: SudoUserClient,
+        keyManager: SudoKeyManager,
+        entitlementsClient: SudoEntitlementsClient
+    ) {
         self.userClient = userClient
         self.keyManager = keyManager
+        self.entitlementsClient = entitlementsClient
     }
 
     func authenticationProvider() throws -> TESTAuthenticationProvider {
@@ -60,8 +69,8 @@ class Authenticator {
         }
 
         do {
-            let testKey = try String(contentsOfFile: testKeyPath)
-            let testKeyId = try String(contentsOfFile: testKeyIdPath).trimmingCharacters(in: .whitespacesAndNewlines)
+            let testKey = try String(contentsOfFile: testKeyPath, encoding: .utf8)
+            let testKeyId = try String(contentsOfFile: testKeyIdPath, encoding: .utf8).trimmingCharacters(in: .whitespacesAndNewlines)
             return try TESTAuthenticationProvider(
                 name: "testRegisterAudience",
                 key: testKey,
@@ -139,11 +148,14 @@ class Authenticator {
         default:
             break
         }
+
+        // Redeem the entitlements the environment grants the user. They can be granted or revoked
+        // from the Entitlements screen if an admin API key has been provided.
+        _ = try await entitlementsClient.redeemEntitlements()
     }
 
-    func deregister() async throws -> String {
-        let deregisteredUserId = try await self.userClient.deregister()
+    func deregister() async throws {
+        try await self.userClient.deregister()
         self.lastSignInMethod = .unknown
-        return deregisteredUserId
     }
 }

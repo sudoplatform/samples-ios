@@ -4,32 +4,50 @@
 // SPDX-License-Identifier: Apache-2.0
 //
 
-import AWSMobileClient
 import Foundation
+import SudoEntitlements
+import SudoEntitlementsAdmin
 import SudoSiteReputation
 import SudoKeyManager
 import SudoUser
+import UIKit
 
 class Clients {
     static private(set) var userClient: SudoUserClient!
     static private(set) var keyManager: SudoKeyManager!
+    static private(set) var entitlementsClient: SudoEntitlementsClient!
+    static private(set) var entitlementsAdminClient: SudoEntitlementsAdminClient?
     static private(set) var authenticator: Authenticator!
-    static private(set) var legacySiteReputationClient: LegacySudoSiteReputationClient!
     static private(set) var siteReputationClient: SudoSiteReputationClient!
-    
 
     static func configure() throws {
         self.userClient = try DefaultSudoUserClient(keyNamespace: "ids")
         self.keyManager = LegacySudoKeyManager(serviceName: "com.sudoplatform.sitereputation", keyTag: "com.sudoplatform", namespace: "client")
-        self.authenticator = Authenticator(userClient: userClient, keyManager: keyManager)
-        self.legacySiteReputationClient = try DefaultLegacySiteReputationClient(userClient: userClient)
+        self.entitlementsClient = try DefaultSudoEntitlementsClient(userClient: userClient)
+        self.entitlementsAdminClient = try makeEntitlementsAdminClient()
+        self.authenticator = Authenticator(
+            userClient: userClient,
+            keyManager: keyManager,
+            entitlementsClient: entitlementsClient
+        )
         self.siteReputationClient = try DefaultSudoSiteReputationClient(userClient: self.userClient)
+    }
+
+    /// Creates an entitlements admin client if an admin API key has been bundled with the app (see README.md).
+    /// Without one the app can only redeem the entitlements the environment already grants the user.
+    private static func makeEntitlementsAdminClient() throws -> SudoEntitlementsAdminClient? {
+        guard
+            let apiKeyPath = Bundle.main.path(forResource: "api", ofType: "key"),
+            let apiKey = try? String(contentsOfFile: apiKeyPath, encoding: .utf8)
+        else {
+            return nil
+        }
+        return try DefaultSudoEntitlementsAdminClient(apiKey: apiKey.trimmingCharacters(in: .whitespacesAndNewlines))
     }
 
     static func resetClients() async {
         do {
             try await userClient.reset()
-            try await legacySiteReputationClient.clearStorage()
         } catch let error {
             NSLog("Failed to reset clients: \(error)")
         }
@@ -38,7 +56,7 @@ class Clients {
 
     static func deregisterClients() async throws {
         do {
-            _ = try await authenticator.deregister()
+            try await authenticator.deregister()
         } catch {
             NSLog("Failed to deregister: \(error)")
         }

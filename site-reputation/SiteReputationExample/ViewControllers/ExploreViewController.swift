@@ -7,16 +7,13 @@
 import UIKit
 
 class ExploreViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDelegate {
-    @IBOutlet weak var updateButton: UIButton!
-    @IBOutlet weak var lastUpdatedLabel: UILabel!
     @IBOutlet weak var pickerView: UIPickerView!
     @IBOutlet weak var urlTextField: UITextField!
     @IBOutlet weak var resultLabel: UILabel!
     @IBOutlet weak var checkButton: UIButton!
     @IBOutlet weak var loadingView: UIView!
     @IBOutlet weak var loadingLabel: UILabel!
-    @IBOutlet weak var realtimeReputationSwitch: UISwitch!
-    
+
     private let testUrls = [
         "aboveandbelow.com.au",
         "wildnights.co.uk",
@@ -41,12 +38,6 @@ class ExploreViewController: UIViewController, UIPickerViewDataSource, UIPickerV
         pickerView.dataSource = self
         pickerView.reloadAllComponents()
         urlTextField.text = testUrls[0]
-        self.realtimeReputationSwitch.isOn = false
-    }
-
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        setUpdatedText()
     }
 
     @objc func settingsTapped() {
@@ -54,22 +45,6 @@ class ExploreViewController: UIViewController, UIPickerViewDataSource, UIPickerV
         guard let nav = self.navigationController else { return }
         let vc = storyboard.instantiateViewController(identifier: "SettingsViewController")
         nav.pushViewController(vc, animated: true)
-    }
-
-    @IBAction func updateTapped(_ sender: Any) {
-        showLoading(text: "Updating")
-
-        Task {
-            do {
-                try await Clients.legacySiteReputationClient.update()
-                self.setUpdatedText()
-            } catch {
-                let alert = UIAlertController(title: "Update Failed", message: error.localizedDescription, preferredStyle: .alert)
-                alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
-                self.present(alert, animated: true, completion: nil)
-            }
-            self.hideLoading()
-        }
     }
 
     @IBAction func checkTapped(_ sender: Any) {
@@ -107,35 +82,18 @@ class ExploreViewController: UIViewController, UIPickerViewDataSource, UIPickerV
     }
     
     private func checkSiteSafety(site: String) async throws -> Bool {
-        if self.realtimeReputationSwitch.isOn {
-            var url = site
-            if !site.starts(with: "http") {
-                url = "https://" + site
-            }
-            let rep = try await Clients.siteReputationClient.getSiteReputation(url: url)
-            // For simplicity, this demo assumes .unknown is safe. However, in production this should
-            // be handled differently.
-            return rep.status == .malicious
-        } else {
-            return try await Clients.legacySiteReputationClient.getSiteReputation(url: site).isMalicious
+        var url = site
+        if !site.starts(with: "http") {
+            url = "https://" + site
         }
+        let rep = try await Clients.siteReputationClient.getSiteReputation(url: url)
+        // For simplicity, this demo assumes .unknown is safe. However, in production this should
+        // be handled differently.
+        return rep.status == .malicious
     }
 
     @IBAction func textFieldDone(_ sender: Any) {
         checkTapped(sender)
-    }
-
-    private func setUpdatedText() {
-        Task {
-            let date = await Clients.legacySiteReputationClient.lastUpdatePerformedAt()
-            if let date = date {
-                let formatter = DateFormatter()
-                formatter.dateFormat = "yyyy-MM-dd hh:mm:ss"
-                lastUpdatedLabel.text = "Last updated at: \(formatter.string(from: date))"
-            } else {
-                lastUpdatedLabel.text = "Update Required"
-            }
-        }
     }
 
     private func showLoading(text: String = "") {

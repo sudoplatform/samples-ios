@@ -34,6 +34,8 @@ class SettingsViewController: UITableViewController {
             }
         case 1:
             clearData()
+        case 2:
+            navigationController?.pushViewController(EntitlementsViewController(), animated: true)
         default:
             break
         }

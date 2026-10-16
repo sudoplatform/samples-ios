@@ -5,10 +5,10 @@
 //  Copyright © 2020 Sudo Platform. All rights reserved.
 //
 
-import AWSMobileClient
 import Foundation
 import SudoAdTrackerBlocker
-import SudoConfigManager
+import SudoEntitlements
+import SudoEntitlementsAdmin
 import SudoKeyManager
 import SudoUser
 import UIKit
@@ -16,15 +16,35 @@ import UIKit
 class Clients {
     static private(set) var userClient: SudoUserClient!
     static private(set) var keyManager: SudoKeyManager!
+    static private(set) var entitlementsClient: SudoEntitlementsClient!
+    static private(set) var entitlementsAdminClient: SudoEntitlementsAdminClient?
     static private(set) var authenticator: Authenticator!
     static private(set) var adTrackerBlockerClient: SudoAdTrackerBlockerClient!
 
     static func configure() throws {
         self.userClient = try DefaultSudoUserClient(keyNamespace: "ids")
         self.keyManager = LegacySudoKeyManager(serviceName: "com.sudoplatform.adtrackerblocker", keyTag: "com.sudoplatform", namespace: "client")
-        self.authenticator = Authenticator(userClient: userClient, keyManager: keyManager)
-        let adTrackerBlockerConfig = try SudoAdTrackerBlockerConfig(userClient: userClient)
-        self.adTrackerBlockerClient = DefaultSudoAdTrackerBlockerClient(config: adTrackerBlockerConfig)
+        self.entitlementsClient = try DefaultSudoEntitlementsClient(userClient: userClient)
+        self.entitlementsAdminClient = try makeEntitlementsAdminClient()
+        self.authenticator = Authenticator(
+            userClient: userClient,
+            keyManager: keyManager,
+            entitlementsClient: entitlementsClient
+        )
+        let adTrackerBlockerConfig = try SudoAdTrackerBlockerConfig()
+        self.adTrackerBlockerClient = try DefaultSudoAdTrackerBlockerClient(config: adTrackerBlockerConfig, userClient: userClient)
+    }
+
+    /// Creates an entitlements admin client if an admin API key has been bundled with the app (see README.md).
+    /// Without one the app can only redeem the entitlements the environment already grants the user.
+    private static func makeEntitlementsAdminClient() throws -> SudoEntitlementsAdminClient? {
+        guard
+            let apiKeyPath = Bundle.main.path(forResource: "api", ofType: "key"),
+            let apiKey = try? String(contentsOfFile: apiKeyPath, encoding: .utf8)
+        else {
+            return nil
+        }
+        return try DefaultSudoEntitlementsAdminClient(apiKey: apiKey.trimmingCharacters(in: .whitespacesAndNewlines))
     }
 
     static func resetClients() async {
@@ -38,7 +58,7 @@ class Clients {
 
     static func deregisterClients() async throws {
         do {
-            _ = try await authenticator.deregister()
+            try await authenticator.deregister()
         } catch {
             NSLog("Failed to deregister: \(error)")
         }

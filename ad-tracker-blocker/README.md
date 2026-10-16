@@ -8,9 +8,9 @@ This project provides examples for interacting with the Sudo Ad/Tracker Blocker 
 
 | Technology             | Supported version |
 | ---------------------- | ----------------- |
-| iOS Deployment Target  | 13.2+             |
+| iOS Deployment Target  | 18.0+             |
 | Swift language version | 5.0               |
-| Xcode version          | 12.0+             |
+| Xcode version          | 16.0+             |
 
 ## Getting Started
 
@@ -31,7 +31,21 @@ ${PROJECT_DIR}/config/register_key.private
 ${PROJECT_DIR}/config/register_key.id
 ```
 
+### Entitlements
+
+The user must be entitled to `sudoplatform.atb.atbUserEntitled` to use the Ad/Tracker Blocker service. The app redeems
+the entitlements your environment grants the user after signing in.
+
+You can view your entitlements from Settings → Entitlements. If your environment doesn't grant the entitlement, you can
+grant or revoke it from that screen by placing an entitlements admin API key at:
+
+```
+${PROJECT_DIR}/config/api.key
+```
+
 ## Running the app
+
+Open `AdTrackerBlockerExample.xcodeproj` in Xcode. Dependencies are managed with Swift Package Manager and will be resolved automatically.
 
 App will build and run on the simulator out of the box, and physical devices will require some minor setup.
 

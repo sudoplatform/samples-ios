@@ -100,8 +100,11 @@ extension PhoneNumber {
             switch failureReason {
             case .numberUnavailable: return "Failed: number unavailable"
             case .carrierError: return "Failed: carrier error"
+            case .ownerDeleted: return "Failed: Sudo deleted"
+            case .unknown(let reason): return "Failed: \(reason)"
             case nil: return "Failed"
             }
+        case .unknown(let state): return state
         }
     }
 }

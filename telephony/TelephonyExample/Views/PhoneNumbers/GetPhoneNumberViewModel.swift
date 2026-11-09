@@ -84,7 +84,7 @@ final class GetPhoneNumberViewModel {
         defer { isLoading = false }
         do {
             let input = SearchAvailablePhoneNumbersInput(countryCode: selectedCountry, areaCode: areaCode.isEmpty ? nil : areaCode, limit: 20)
-            searchResult = try await telephonyClient.searchAvailablePhoneNumbers(input)
+            searchResult = try await telephonyClient.searchAvailablePhoneNumbers(withInput: input)
         } catch {
             Logger.sampleLogger.error("Failed to search for phone numbers: \(error)")
             await presentError(error)
@@ -123,7 +123,7 @@ final class GetPhoneNumberViewModel {
                 ownershipProofToken: ownershipProof,
                 clientRefId: UUID().uuidString
             )
-            provisionedNumber = try await telephonyClient.provisionPhoneNumber(input)
+            provisionedNumber = try await telephonyClient.provisionPhoneNumber(withInput: input)
         } catch SudoTelephonyError.insufficientEntitlements {
             // Worded to cover the limit per user today and the limit per Sudo to come.
             Logger.sampleLogger.error("Failed to provision phone number: insufficient entitlements")

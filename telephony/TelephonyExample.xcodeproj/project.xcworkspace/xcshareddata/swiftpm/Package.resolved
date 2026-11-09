@@ -141,8 +141,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/sudoplatform/sudo-telephony-ios",
       "state" : {
-        "revision" : "a3d542f4b4c2a7a7b5e7f81238f749b157538212",
-        "version" : "2.0.0"
+        "revision" : "6823a812e6030a79ab542cc34e289f7e873d4f50",
+        "version" : "3.0.0"
       }
     },
     {

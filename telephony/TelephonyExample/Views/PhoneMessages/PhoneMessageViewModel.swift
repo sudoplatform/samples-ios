@@ -50,7 +50,7 @@ final class PhoneMessageViewModel {
     func didAppear() async {
         guard !message.seen, let telephonyClient = dependencies.telephonyClient else { return }
         do {
-            _ = try await telephonyClient.updatePhoneMessages(ids: [message.id], seen: true)
+            _ = try await telephonyClient.updatePhoneMessages(withInput: UpdatePhoneMessagesInput(ids: [message.id], seen: true))
             Logger.sampleLogger.info("Marked phone message \(message.id) as read")
         } catch {
             // Not worth interrupting the user for; the message stays unread and is marked next time it's opened.

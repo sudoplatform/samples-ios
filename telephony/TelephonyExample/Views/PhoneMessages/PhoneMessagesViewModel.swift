@@ -55,7 +55,7 @@ final class PhoneMessagesViewModel {
 
     var errorMessage = ""
 
-    @ObservationIgnored private var eventsToken: SubscriptionToken?
+    @ObservationIgnored private var eventsSubscription: ActiveSubscription?
 
     @ObservationIgnored private let dependencies: AppDependencies
 
@@ -76,8 +76,8 @@ final class PhoneMessagesViewModel {
     }
 
     func didDisappear() {
-        eventsToken?.cancel()
-        eventsToken = nil
+        eventsSubscription?.cancel()
+        eventsSubscription = nil
     }
 
     func didTapRelease() {
@@ -90,7 +90,7 @@ final class PhoneMessagesViewModel {
         isReleasing = true
         defer { isReleasing = false }
         do {
-            releasedNumber = try await telephonyClient.deprovisionPhoneNumber(id: phoneNumber.id)
+            releasedNumber = try await telephonyClient.deprovisionPhoneNumber(withId: phoneNumber.id)
         } catch {
             Logger.sampleLogger.error("Failed to release phone number: \(error)")
             await presentError(error)
@@ -146,7 +146,7 @@ final class PhoneMessagesViewModel {
             var nextToken: String?
             repeat {
                 let input = ListPhoneMessagesForPhoneNumberIdInput(phoneNumberId: phoneNumber.id, sortOrder: .descending, nextToken: nextToken)
-                switch try await telephonyClient.listPhoneMessagesForPhoneNumberId(input) {
+                switch try await telephonyClient.listPhoneMessagesForPhoneNumberId(withInput: input) {
                 case .success(let page):
                     loaded += page.items
                     nextToken = page.nextToken
@@ -166,19 +166,26 @@ final class PhoneMessagesViewModel {
     }
 
     private func subscribeToEvents(_ telephonyClient: SudoTelephonyClient) async {
-        guard eventsToken == nil else { return }
-        do {
-            eventsToken = try await telephonyClient.subscribeToPhoneMessageEvents { [weak self] result in
+        guard eventsSubscription == nil else { return }
+        let subscriber = PhoneMessageEventsSubscriber(
+            onEvent: { [weak self] event in
                 Task { @MainActor in
-                    switch result {
-                    case .success(let event):
-                        Logger.sampleLogger.info("Phone message event: \(event.id) \(event.changeType.rawValue)")
-                        await self?.apply(event, telephonyClient: telephonyClient)
-                    case .failure(let error):
-                        Logger.sampleLogger.error("Phone message subscription failed: \(error)")
-                    }
+                    Logger.sampleLogger.info("Phone message event: \(event.id) \(event.changeType.rawValue)")
+                    await self?.apply(event, telephonyClient: telephonyClient)
+                }
+            },
+            onConnectionChange: { [weak self] state in
+                Task { @MainActor in
+                    // The subscription has ended; it's opened again the next time the screen appears.
+                    guard case .disconnected(let cause) = state else { return }
+                    Logger.sampleLogger.error("Phone message subscription disconnected: \(String(describing: cause))")
+                    self?.eventsSubscription = nil
                 }
             }
+        )
+        do {
+            let token = try await telephonyClient.subscribeToPhoneMessages(subscriber: subscriber)
+            eventsSubscription = ActiveSubscription(token: token, subscriber: subscriber)
             Logger.sampleLogger.info("Subscribed to phone message events")
         } catch {
             Logger.sampleLogger.error("Failed to subscribe to phone message events: \(error)")
@@ -191,7 +198,7 @@ final class PhoneMessagesViewModel {
         messages.removeAll { $0.id == event.id }
         guard event.changeType != .deleted else { return }
         do {
-            if let message = try await telephonyClient.getPhoneMessage(id: event.id) {
+            if let message = try await telephonyClient.getPhoneMessage(withId: event.id) {
                 messages.append(message)
                 messages.sort { $0.receivedAt > $1.receivedAt }
             }

@@ -45,9 +45,9 @@ final class PhoneNumbersViewModel {
         dependencies.telephonyClient != nil
     }
 
-    @ObservationIgnored private var updatesToken: SubscriptionToken?
+    @ObservationIgnored private var updatesSubscription: ActiveSubscription?
 
-    @ObservationIgnored private var messageEventsToken: SubscriptionToken?
+    @ObservationIgnored private var messageEventsSubscription: ActiveSubscription?
 
     @ObservationIgnored private let dependencies: AppDependencies
 
@@ -71,10 +71,10 @@ final class PhoneNumbersViewModel {
     }
 
     func didDisappear() {
-        updatesToken?.cancel()
-        updatesToken = nil
-        messageEventsToken?.cancel()
-        messageEventsToken = nil
+        updatesSubscription?.cancel()
+        updatesSubscription = nil
+        messageEventsSubscription?.cancel()
+        messageEventsSubscription = nil
     }
 
     func unreadCount(for phoneNumber: PhoneNumber) -> Int {
@@ -102,7 +102,7 @@ final class PhoneNumbersViewModel {
         isLoading = true
         defer { isLoading = false }
         do {
-            apply(try await telephonyClient.deprovisionPhoneNumber(id: phoneNumber.id))
+            apply(try await telephonyClient.deprovisionPhoneNumber(withId: phoneNumber.id))
         } catch {
             Logger.sampleLogger.error("Failed to release phone number: \(error)")
             await presentError(error)
@@ -118,7 +118,7 @@ final class PhoneNumbersViewModel {
             var numbers: [PhoneNumber] = []
             var nextToken: String?
             repeat {
-                let page = try await telephonyClient.listPhoneNumbersForSudoId(ListPhoneNumbersForSudoIdInput(sudoId: sudoId, nextToken: nextToken))
+                let page = try await telephonyClient.listPhoneNumbersForSudoId(withInput: ListPhoneNumbersForSudoIdInput(sudoId: sudoId, nextToken: nextToken))
                 numbers += page.items
                 nextToken = page.nextToken
             } while nextToken != nil
@@ -141,7 +141,7 @@ final class PhoneNumbersViewModel {
                     let input = ListPhoneMessagesForPhoneNumberIdInput(phoneNumberId: phoneNumber.id, nextToken: nextToken)
                     // Messages this device can't decrypt still count: whether they're read isn't sealed.
                     let unseen: [String]
-                    switch try await telephonyClient.listPhoneMessagesForPhoneNumberId(input) {
+                    switch try await telephonyClient.listPhoneMessagesForPhoneNumberId(withInput: input) {
                     case .success(let page):
                         unseen = page.items.filter { !$0.seen }.map(\.id)
                         nextToken = page.nextToken
@@ -159,19 +159,26 @@ final class PhoneNumbersViewModel {
     }
 
     private func subscribeToUpdates(_ telephonyClient: SudoTelephonyClient) async {
-        guard updatesToken == nil else { return }
-        do {
-            updatesToken = try await telephonyClient.subscribeToPhoneNumberUpdates { [weak self] result in
+        guard updatesSubscription == nil else { return }
+        let subscriber = PhoneNumberUpdatesSubscriber(
+            onUpdate: { [weak self] phoneNumber in
                 Task { @MainActor in
-                    switch result {
-                    case .success(let phoneNumber):
-                        Logger.sampleLogger.info("Phone number update: \(phoneNumber.id) is \(phoneNumber.state.rawValue)")
-                        self?.apply(phoneNumber)
-                    case .failure(let error):
-                        Logger.sampleLogger.error("Phone number subscription failed: \(error)")
-                    }
+                    Logger.sampleLogger.info("Phone number update: \(phoneNumber.id) is \(phoneNumber.state.rawValue)")
+                    self?.apply(phoneNumber)
+                }
+            },
+            onConnectionChange: { [weak self] state in
+                Task { @MainActor in
+                    // The subscription has ended; it's opened again the next time the screen appears.
+                    guard case .disconnected(let cause) = state else { return }
+                    Logger.sampleLogger.error("Phone number subscription disconnected: \(String(describing: cause))")
+                    self?.updatesSubscription = nil
                 }
             }
+        )
+        do {
+            let token = try await telephonyClient.subscribeToPhoneNumbers(subscriber: subscriber)
+            updatesSubscription = ActiveSubscription(token: token, subscriber: subscriber)
             Logger.sampleLogger.info("Subscribed to phone number updates")
         } catch {
             Logger.sampleLogger.error("Failed to subscribe to phone number updates: \(error)")
@@ -180,19 +187,26 @@ final class PhoneNumbersViewModel {
 
     /// Keeps the unread counts current as messages arrive, are read, or are deleted.
     private func subscribeToMessageEvents(_ telephonyClient: SudoTelephonyClient) async {
-        guard messageEventsToken == nil else { return }
-        do {
-            messageEventsToken = try await telephonyClient.subscribeToPhoneMessageEvents { [weak self] result in
+        guard messageEventsSubscription == nil else { return }
+        let subscriber = PhoneMessageEventsSubscriber(
+            onEvent: { [weak self] event in
                 Task { @MainActor in
-                    switch result {
-                    case .success(let event):
-                        Logger.sampleLogger.info("Phone message event: \(event.id) \(event.changeType.rawValue)")
-                        self?.apply(event)
-                    case .failure(let error):
-                        Logger.sampleLogger.error("Phone message subscription failed: \(error)")
-                    }
+                    Logger.sampleLogger.info("Phone message event: \(event.id) \(event.changeType.rawValue)")
+                    self?.apply(event)
+                }
+            },
+            onConnectionChange: { [weak self] state in
+                Task { @MainActor in
+                    // The subscription has ended; it's opened again the next time the screen appears.
+                    guard case .disconnected(let cause) = state else { return }
+                    Logger.sampleLogger.error("Phone message subscription disconnected: \(String(describing: cause))")
+                    self?.messageEventsSubscription = nil
                 }
             }
+        )
+        do {
+            let token = try await telephonyClient.subscribeToPhoneMessages(subscriber: subscriber)
+            messageEventsSubscription = ActiveSubscription(token: token, subscriber: subscriber)
         } catch {
             Logger.sampleLogger.error("Failed to subscribe to phone message events: \(error)")
         }

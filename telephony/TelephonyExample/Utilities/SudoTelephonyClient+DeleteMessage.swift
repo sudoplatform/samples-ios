@@ -23,7 +23,7 @@ extension SudoTelephonyClient {
     /// Deletes a single message. The SDK deletes in batches and reports messages it couldn't delete in `failedIds` rather than
     /// throwing, so this throws if the message wasn't deleted.
     func deletePhoneMessage(id: String) async throws {
-        let result = try await deletePhoneMessages(ids: [id])
+        let result = try await deletePhoneMessages(withInput: DeletePhoneMessagesInput(ids: [id]))
         guard result.succeededIds.contains(id) else {
             throw DeletePhoneMessageError.notDeleted
         }

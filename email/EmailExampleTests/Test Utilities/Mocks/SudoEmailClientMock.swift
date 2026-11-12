@@ -60,59 +60,59 @@ class SudoEmailClientMockSpy: SudoEmailClientSpy {
         return lookupEmailAddressesResult
     }
 
-    // MARK: - Email Mask Overrides
+    // MARK: - Email Alias Overrides
 
-    override func getEmailMaskDomains() async throws -> [String] {
-        getEmailMaskDomainsCalled = true
-        if let result = getEmailMaskDomainsResult {
+    override func getEmailAliasDomains() async throws -> [String] {
+        getEmailAliasDomainsCalled = true
+        if let result = getEmailAliasDomainsResult {
             return result
         }
-        return ["mask.example.com"]
+        return ["alias.example.com"]
     }
 
-    override func provisionEmailMask(withInput input: ProvisionEmailMaskInput) async throws -> EmailMask {
-        provisionEmailMaskCalled = true
-        provisionEmailMaskParameter = input
-        if let result = provisionEmailMaskResult {
+    override func provisionEmailAlias(withInput input: ProvisionEmailAliasInput) async throws -> EmailAlias {
+        provisionEmailAliasCalled = true
+        provisionEmailAliasParameter = input
+        if let result = provisionEmailAliasResult {
             return result
         }
-        return DataFactory.EmailSDK.generateEmailMask(maskAddress: input.maskAddress, realAddress: input.realAddress)
+        return DataFactory.EmailSDK.generateEmailAlias(aliasAddress: input.aliasAddress, realAddress: input.realAddress)
     }
 
-    override func deprovisionEmailMask(withInput input: DeprovisionEmailMaskInput) async throws -> EmailMask {
-        deprovisionEmailMaskCalled = true
-        deprovisionEmailMaskParameter = input
-        if let result = deprovisionEmailMaskResult {
+    override func deprovisionEmailAlias(withInput input: DeprovisionEmailAliasInput) async throws -> EmailAlias {
+        deprovisionEmailAliasCalled = true
+        deprovisionEmailAliasParameter = input
+        if let result = deprovisionEmailAliasResult {
             return result
         }
-        return DataFactory.EmailSDK.generateEmailMask(id: input.emailMaskId)
+        return DataFactory.EmailSDK.generateEmailAlias(id: input.emailAliasId)
     }
 
-    override func updateEmailMask(withInput input: UpdateEmailMaskInput) async throws -> EmailMask {
-        updateEmailMaskCalled = true
-        updateEmailMaskParameter = input
-        if let result = updateEmailMaskResult {
+    override func updateEmailAlias(withInput input: UpdateEmailAliasInput) async throws -> EmailAlias {
+        updateEmailAliasCalled = true
+        updateEmailAliasParameter = input
+        if let result = updateEmailAliasResult {
             return result
         }
-        return DataFactory.EmailSDK.generateEmailMask(id: input.emailMaskId, expiresAt: input.expiresAt, metadata: input.metadata)
+        return DataFactory.EmailSDK.generateEmailAlias(id: input.emailAliasId, expiresAt: input.expiresAt, metadata: input.metadata)
     }
 
-    override func enableEmailMask(withInput input: EnableEmailMaskInput) async throws -> EmailMask {
-        enableEmailMaskCalled = true
-        enableEmailMaskParameter = input
-        if let result = enableEmailMaskResult {
+    override func enableEmailAlias(withInput input: EnableEmailAliasInput) async throws -> EmailAlias {
+        enableEmailAliasCalled = true
+        enableEmailAliasParameter = input
+        if let result = enableEmailAliasResult {
             return result
         }
-        return DataFactory.EmailSDK.generateEmailMask(id: input.emailMaskId, status: .enabled)
+        return DataFactory.EmailSDK.generateEmailAlias(id: input.emailAliasId, status: .enabled)
     }
 
-    override func disableEmailMask(withInput input: DisableEmailMaskInput) async throws -> EmailMask {
-        disableEmailMaskCalled = true
-        disableEmailMaskParameter = input
-        if let result = disableEmailMaskResult {
+    override func disableEmailAlias(withInput input: DisableEmailAliasInput) async throws -> EmailAlias {
+        disableEmailAliasCalled = true
+        disableEmailAliasParameter = input
+        if let result = disableEmailAliasResult {
             return result
         }
-        return DataFactory.EmailSDK.generateEmailMask(id: input.emailMaskId, status: .disabled)
+        return DataFactory.EmailSDK.generateEmailAlias(id: input.emailAliasId, status: .disabled)
     }
 
     override func verifyExternalEmailAddress(withInput input: VerifyExternalEmailAddressInput) async throws -> VerifyExternalEmailAddressResult {
@@ -124,12 +124,12 @@ class SudoEmailClientMockSpy: SudoEmailClientSpy {
         return VerifyExternalEmailAddressResult(isVerified: true)
     }
 
-    override func listEmailMasksForOwner(withInput input: ListEmailMasksForOwnerInput) async throws -> ListOutput<EmailMask> {
-        listEmailMasksForOwnerCalled = true
-        listEmailMasksForOwnerParameter = input
-        if let result = listEmailMasksForOwnerResult {
+    override func listEmailAliasesForOwner(withInput input: ListEmailAliasesForOwnerInput) async throws -> ListOutput<EmailAlias> {
+        listEmailAliasesForOwnerCalled = true
+        listEmailAliasesForOwnerParameter = input
+        if let result = listEmailAliasesForOwnerResult {
             return result
         }
-        return ListOutput<EmailMask>(items: [DataFactory.EmailSDK.generateEmailMask()])
+        return ListOutput<EmailAlias>(items: [DataFactory.EmailSDK.generateEmailAlias()])
     }
 }

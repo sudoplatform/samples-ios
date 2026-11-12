@@ -111,11 +111,11 @@ class SendEmailMessageViewController: UIViewController, UITextViewDelegate, UITa
     /// ID of message that this message is forwarding
     var forwardingMessageId: String?
 
-    /// Available email masks for the current email address.
-    var emailMasks: [EmailMask] = []
+    /// Available email aliases for the current email address.
+    var emailAlias: [EmailAlias] = []
 
-    /// The currently selected email mask for sending (nil means send without mask).
-    var selectedMask: EmailMask?
+    /// The currently selected email alias for sending (nil means send without alias).
+    var selectedAlias: EmailAlias?
 
     // MARK: - Properties: Computed
 
@@ -150,7 +150,7 @@ class SendEmailMessageViewController: UIViewController, UITextViewDelegate, UITa
             formData[.subject] = inputData.subject
         }
         Task {
-            await self.loadEmailMasks()
+            await self.loadEmailAliases()
         }
     }
 
@@ -199,29 +199,29 @@ class SendEmailMessageViewController: UIViewController, UITextViewDelegate, UITa
         }
 
         let emailMessageHeader = InternetMessageFormatHeader(
-            from: EmailAddressAndName(address: from, displayName: emailAddress.alias),
+            from: EmailAddressAndName(address: from, displayName: emailAddress.displayName),
             to: addressesToArray(to),
             cc: addressesToArray(cc),
             bcc: addressesToArray(bcc),
             subject: subject
         )
 
-        if let mask = selectedMask {
-            let maskedHeader = InternetMessageFormatHeader(
-                from: EmailAddressAndName(address: mask.maskAddress),
+        if let alias = selectedAlias {
+            let aliasedHeader = InternetMessageFormatHeader(
+                from: EmailAddressAndName(address: alias.aliasAddress),
                 to: addressesToArray(to),
                 cc: addressesToArray(cc),
                 bcc: addressesToArray(bcc),
                 subject: subject
             )
-            let maskedInput = SendEmailMessageInput(
-                senderMaskId: mask.id,
-                emailMessageHeader: maskedHeader,
+            let aliasedInput = SendEmailMessageInput(
+                senderAliasId: alias.id,
+                emailMessageHeader: aliasedHeader,
                 body: body,
                 attachments: Array(attachments)
             )
             Task {
-                await self.sendMaskedEmailMessage(maskedInput)
+                await self.sendAliasedEmailMessage(aliasedInput)
             }
         } else {
             let sendEmailMessageInput = SendEmailMessageInput(
@@ -301,11 +301,11 @@ class SendEmailMessageViewController: UIViewController, UITextViewDelegate, UITa
             }
             Task {
                 self.presentActivityAlert(message: "Scheduling...")
-                let maskId = self.selectedMask?.id ?? self.inputData?.emailMaskId
+                let aliasId = self.selectedAlias?.id ?? self.inputData?.emailAliasId
                 let input = ScheduleSendDraftMessageInput(
                     id: draftId,
                     emailAddressId: self.emailAddress.id,
-                    emailMaskId: maskId,
+                    emailAliasId: aliasId,
                     sendAt: sendAt
                 )
                 do {
@@ -337,9 +337,9 @@ class SendEmailMessageViewController: UIViewController, UITextViewDelegate, UITa
         alert.addAction(UIAlertAction(title: "Cancel", style: .default) { _ in
             Task {
                 self.presentActivityAlert(message: "Cancelling...")
-                let maskId = self.selectedMask?.id ?? self.inputData?.emailMaskId
-                NSLog("Cancel schedule - draftId: \(draftId), maskId: \(maskId ?? "nil")")
-                let input = CancelScheduledDraftMessageInput(id: draftId, emailAddressId: self.emailAddress.id, emailMaskId: maskId)
+                let aliasId = self.selectedAlias?.id ?? self.inputData?.emailAliasId
+                NSLog("Cancel schedule - draftId: \(draftId), aliasId: \(aliasId ?? "nil")")
+                let input = CancelScheduledDraftMessageInput(id: draftId, emailAddressId: self.emailAddress.id, emailAliasId: aliasId)
                 do {
                     let _ = try await self.emailClient.cancelScheduledDraftMessage(withInput: input)
                     self.dismissActivityAlert {
@@ -383,10 +383,12 @@ class SendEmailMessageViewController: UIViewController, UITextViewDelegate, UITa
         }
     }
 
-    func sendMaskedEmailMessage(_ input: SendEmailMessageInput) async {
-        presentActivityAlert(message: "Sending Masked Email Message")
+    func sendAliasedEmailMessage(_ input: SendEmailMessageInput) async {
+        presentActivityAlert(message: "Sending Aliased Email Message")
         do {
-            _ = try await emailClient.sendMaskedEmailMessage(withInput: input)
+            // SudoEmail 25.0.0 renamed the aliased-send method to
+            // sendEmailMessageViaAlias(withInput:).
+            _ = try await emailClient.sendEmailMessageViaAlias(withInput: input)
             await self.deleteDraft()
             Task {
                 self.dismissActivityAlert {
@@ -395,27 +397,27 @@ class SendEmailMessageViewController: UIViewController, UITextViewDelegate, UITa
             }
         } catch {
             self.dismissActivityAlert {
-                self.presentErrorAlert(message: "Failed to send masked email message", error: error)
+                self.presentErrorAlert(message: "Failed to send aliased email message", error: error)
             }
         }
     }
 
-    func loadEmailMasks() async {
+    func loadEmailAliases() async {
         guard let currentAddress = emailAddress?.emailAddress else { return }
         do {
-            let input = ListEmailMasksForOwnerInput()
-            let output = try await emailClient.listEmailMasksForOwner(withInput: input)
-            self.emailMasks = output.items.filter { $0.realAddress == currentAddress && $0.status == .enabled }
-            // Restore mask selection from draft if applicable
-            if self.selectedMask == nil, let maskId = self.inputData?.emailMaskId {
-                self.selectedMask = self.emailMasks.first { $0.id == maskId }
+            let input = ListEmailAliasesForOwnerInput()
+            let output = try await emailClient.listEmailAliasesForOwner(withInput: input)
+            self.emailAlias = output.items.filter { $0.realAddress == currentAddress && $0.status == .enabled }
+            // Restore alias selection from draft if applicable
+            if self.selectedAlias == nil, let aliasId = self.inputData?.emailAliasId {
+                self.selectedAlias = self.emailAlias.first { $0.id == aliasId }
             }
             await MainActor.run {
                 self.tableView.reloadData()
             }
         } catch {
-            // Silently fail - masks are optional for sending
-            NSLog("Failed to load email masks: \(error)")
+            // Silently fail - aliases are optional for sending
+            NSLog("Failed to load email aliases: \(error)")
         }
     }
 
@@ -554,14 +556,14 @@ class SendEmailMessageViewController: UIViewController, UITextViewDelegate, UITa
                     id: draftEmailMessageId,
                     rfc822Data: data,
                     senderEmailAddressId: emailAddressId,
-                    emailMaskId: selectedMask?.id
+                    emailAliasId: selectedAlias?.id
                 )
                 _ = try await self.emailClient.updateDraftEmailMessage(withInput: input)
             } else {
                 let input = CreateDraftEmailMessageInput(
                     rfc822Data: data,
                     senderEmailAddressId: emailAddressId,
-                    emailMaskId: selectedMask?.id
+                    emailAliasId: selectedAlias?.id
                 )
                 _ = try await self.emailClient.createDraftEmailMessage(withInput: input)
             }
@@ -581,11 +583,11 @@ class SendEmailMessageViewController: UIViewController, UITextViewDelegate, UITa
     func deleteDraft() async {
         do {
             if let draftEmailMessageId = inputData?.draftEmailMessageId {
-                let maskId = selectedMask?.id ?? inputData?.emailMaskId
+                let aliasId = selectedAlias?.id ?? inputData?.emailAliasId
                 let input = DeleteDraftEmailMessagesInput(
                     ids: [draftEmailMessageId],
                     emailAddressId: emailAddress.id,
-                    emailMaskId: maskId
+                    emailAliasId: aliasId
                 )
                 _ = try await emailClient.deleteDraftEmailMessages(withInput: input)
             }
@@ -803,7 +805,7 @@ class SendEmailMessageViewController: UIViewController, UITextViewDelegate, UITa
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if section == 0 {
-            return 1 // Mask picker row
+            return 1 // Alias picker row
         }
         return inputFields.count
     }
@@ -830,12 +832,12 @@ class SendEmailMessageViewController: UIViewController, UITextViewDelegate, UITa
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        // Section 0: Mask picker row
+        // Section 0: Alias picker row
         if indexPath.section == 0 {
-            let cell = UITableViewCell(style: .value1, reuseIdentifier: "maskPickerCell")
-            cell.textLabel?.text = "Send as Mask:"
-            if let mask = selectedMask {
-                cell.detailTextLabel?.text = mask.maskAddress
+            let cell = UITableViewCell(style: .value1, reuseIdentifier: "aliasPickerCell")
+            cell.textLabel?.text = "Send as Alias:"
+            if let alias = selectedAlias {
+                cell.detailTextLabel?.text = alias.aliasAddress
             } else {
                 cell.detailTextLabel?.text = "None"
             }
@@ -883,7 +885,7 @@ class SendEmailMessageViewController: UIViewController, UITextViewDelegate, UITa
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         if indexPath.section == 0 {
-            showMaskPicker()
+            showAliasPicker()
             return
         }
         if let cell = tableView.cellForRow(at: indexPath) as? HeaderTableViewCell {
@@ -894,33 +896,33 @@ class SendEmailMessageViewController: UIViewController, UITextViewDelegate, UITa
         }
     }
 
-    // MARK: - Helpers: Mask Picker
+    // MARK: - Helpers: Alias Picker
 
-    func showMaskPicker() {
-        if emailMasks.isEmpty {
-            presentActivityAlert(message: "Loading masks...")
+    func showAliasPicker() {
+        if emailAlias.isEmpty {
+            presentActivityAlert(message: "Loading aliases...")
             Task {
-                await self.loadEmailMasks()
+                await self.loadEmailAliases()
                 Task {
                     self.dismissActivityAlert {
-                        self.presentMaskPickerAlert()
+                        self.presentAliasPickerAlert()
                     }
                 }
             }
         } else {
-            presentMaskPickerAlert()
+            presentAliasPickerAlert()
         }
     }
 
-    private func presentMaskPickerAlert() {
-        let alert = UIAlertController(title: "Select Email Mask", message: "Choose a mask to send from, or select None.", preferredStyle: .actionSheet)
+    private func presentAliasPickerAlert() {
+        let alert = UIAlertController(title: "Select Email Alias", message: "Choose a alias to send from, or select None.", preferredStyle: .actionSheet)
         alert.addAction(UIAlertAction(title: "None", style: .default) { _ in
-            self.selectedMask = nil
+            self.selectedAlias = nil
             self.tableView.reloadRows(at: [IndexPath(row: 0, section: 0)], with: .automatic)
         })
-        for mask in emailMasks where mask.status == .enabled {
-            alert.addAction(UIAlertAction(title: mask.maskAddress, style: .default) { _ in
-                self.selectedMask = mask
+        for alias in emailAlias where alias.status == .enabled {
+            alert.addAction(UIAlertAction(title: alias.aliasAddress, style: .default) { _ in
+                self.selectedAlias = alias
                 self.tableView.reloadRows(at: [IndexPath(row: 0, section: 0)], with: .automatic)
             })
         }
@@ -928,9 +930,9 @@ class SendEmailMessageViewController: UIViewController, UITextViewDelegate, UITa
 
         // Required for iPad: action sheets are presented as popovers and need a source location.
         if let popover = alert.popoverPresentationController {
-            let maskCell = tableView.cellForRow(at: IndexPath(row: 0, section: 0))
-            popover.sourceView = maskCell ?? self.view
-            popover.sourceRect = maskCell?.bounds ?? CGRect(x: self.view.bounds.midX, y: self.view.bounds.midY, width: 0, height: 0)
+            let aliasCell = tableView.cellForRow(at: IndexPath(row: 0, section: 0))
+            popover.sourceView = aliasCell ?? self.view
+            popover.sourceRect = aliasCell?.bounds ?? CGRect(x: self.view.bounds.midX, y: self.view.bounds.midY, width: 0, height: 0)
             popover.permittedArrowDirections = .any
         }
 

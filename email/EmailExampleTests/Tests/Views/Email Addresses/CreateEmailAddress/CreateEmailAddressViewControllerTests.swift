@@ -78,7 +78,7 @@ class CreateEmailAddressViewControllerTests: XCTestCase {
     }
 
     func displayCreateEmailAddressViewController() async throws {
-        testUtility.emailClient.getSupportedEmailDomainsResult = ["test.org"]
+        testUtility.emailClient.listEmailDomainsResult = [DataFactory.EmailSDK.generateEmailDomain(domain: "test.org", isAliasDomain: false)]
         testUtility.emailClient.checkEmailAddressAvailabilityResult = [
             "foo1@test.org",
             "foo2@test.org",

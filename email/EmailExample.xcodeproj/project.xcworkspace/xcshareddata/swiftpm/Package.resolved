@@ -123,8 +123,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/sudoplatform/sudo-email-ios",
       "state" : {
-        "revision" : "a035a3170e6941cc0cc0fa8ee9d669036771f9c9",
-        "version" : "24.2.1"
+        "revision" : "a57aa8d88452527b5707dcbd8a76c88821da280c",
+        "version" : "25.0.0"
       }
     },
     {

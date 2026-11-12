@@ -10,18 +10,18 @@ import SudoEmail
 @testable import EmailExample
 
 @MainActor
-class CreateEmailMaskViewControllerTests: XCTestCase {
+class CreateEmailAliasViewControllerTests: XCTestCase {
 
     // MARK: - Properties
 
     var testUtility: EmailExampleTestUtility!
-    var instanceUnderTest: CreateEmailMaskViewController!
+    var instanceUnderTest: CreateEmailAliasViewController!
 
     // MARK: - Lifecycle
 
     override func setUp() async throws {
         testUtility = EmailExampleTestUtility()
-        instanceUnderTest = testUtility.storyBoard.instantiateViewController(identifier: "createEmailMask")
+        instanceUnderTest = testUtility.storyBoard.instantiateViewController(identifier: "createEmailAlias")
         instanceUnderTest.loadViewIfNeeded()
         testUtility.window.rootViewController = instanceUnderTest
         testUtility.window.makeKeyAndVisible()
@@ -34,11 +34,11 @@ class CreateEmailMaskViewControllerTests: XCTestCase {
     // MARK: - Helpers
 
     func setupLoadedState() async throws {
-        testUtility.emailClient.getEmailMaskDomainsResult = ["mask.example.com"]
+        testUtility.emailClient.listEmailDomainsResult = [DataFactory.EmailSDK.generateEmailDomain(domain: "alias.example.com", isAliasDomain: true)]
         testUtility.emailClient.listEmailAddressesResult = ListOutput<EmailAddress>(
             items: [DataFactory.EmailSDK.generateEmailAddress(address: "test@example.com")]
         )
-        testUtility.emailClient.checkEmailAddressAvailabilityResult = ["localpart@mask.example.com"]
+        testUtility.emailClient.checkEmailAddressAvailabilityResult = ["localpart@alias.example.com"]
         await instanceUnderTest.loadInitialData()
         try await waitForAsync()
     }
@@ -46,23 +46,23 @@ class CreateEmailMaskViewControllerTests: XCTestCase {
     // MARK: - Tests: loadInitialData
 
     func test_loadInitialData_CallsGetConfigurationData() async throws {
-        testUtility.emailClient.getEmailMaskDomainsResult = ["mask.example.com"]
+        testUtility.emailClient.listEmailDomainsResult = [DataFactory.EmailSDK.generateEmailDomain(domain: "alias.example.com", isAliasDomain: true)]
         testUtility.emailClient.listEmailAddressesResult = ListOutput<EmailAddress>(items: [])
         await instanceUnderTest.loadInitialData()
         try await waitForAsync()
         XCTAssertTrue(testUtility.emailClient.getConfigurationDataCalled)
     }
 
-    func test_loadInitialData_CallsGetEmailMaskDomains() async throws {
-        testUtility.emailClient.getEmailMaskDomainsResult = ["mask.example.com"]
+    func test_loadInitialData_CallsListEmailDomains() async throws {
+        testUtility.emailClient.listEmailDomainsResult = [DataFactory.EmailSDK.generateEmailDomain(domain: "alias.example.com", isAliasDomain: true)]
         testUtility.emailClient.listEmailAddressesResult = ListOutput<EmailAddress>(items: [])
         await instanceUnderTest.loadInitialData()
         try await waitForAsync()
-        XCTAssertTrue(testUtility.emailClient.getEmailMaskDomainsCalled)
+        XCTAssertTrue(testUtility.emailClient.listEmailDomainsCalled)
     }
 
     func test_loadInitialData_CallsListEmailAddresses() async throws {
-        testUtility.emailClient.getEmailMaskDomainsResult = ["mask.example.com"]
+        testUtility.emailClient.listEmailDomainsResult = [DataFactory.EmailSDK.generateEmailDomain(domain: "alias.example.com", isAliasDomain: true)]
         testUtility.emailClient.listEmailAddressesResult = ListOutput<EmailAddress>(items: [])
         await instanceUnderTest.loadInitialData()
         try await waitForAsync()
@@ -70,15 +70,18 @@ class CreateEmailMaskViewControllerTests: XCTestCase {
     }
 
     func test_loadInitialData_SetsDomain() async throws {
-        testUtility.emailClient.getEmailMaskDomainsResult = ["mask.example.com"]
+        testUtility.emailClient.listEmailDomainsResult = [DataFactory.EmailSDK.generateEmailDomain(domain: "alias.example.com", isAliasDomain: true)]
         testUtility.emailClient.listEmailAddressesResult = ListOutput<EmailAddress>(items: [])
         await instanceUnderTest.loadInitialData()
         try await waitForAsync()
-        XCTAssertEqual(instanceUnderTest.domain, "mask.example.com")
+        XCTAssertEqual(instanceUnderTest.domain, "alias.example.com")
     }
 
     func test_loadInitialData_SetsAvailableDomains() async throws {
-        testUtility.emailClient.getEmailMaskDomainsResult = ["mask1.example.com", "mask2.example.com"]
+        testUtility.emailClient.listEmailDomainsResult = [
+            DataFactory.EmailSDK.generateEmailDomain(domain: "alias1.example.com", isAliasDomain: true),
+            DataFactory.EmailSDK.generateEmailDomain(domain: "alias2.example.com", isAliasDomain: true)
+        ]
         testUtility.emailClient.listEmailAddressesResult = ListOutput<EmailAddress>(items: [])
         await instanceUnderTest.loadInitialData()
         try await waitForAsync()
@@ -87,7 +90,7 @@ class CreateEmailMaskViewControllerTests: XCTestCase {
 
     func test_loadInitialData_SetsEmailAddresses() async throws {
         let emailAddress = DataFactory.EmailSDK.generateEmailAddress(address: "test@example.com")
-        testUtility.emailClient.getEmailMaskDomainsResult = ["mask.example.com"]
+        testUtility.emailClient.listEmailDomainsResult = [DataFactory.EmailSDK.generateEmailDomain(domain: "alias.example.com", isAliasDomain: true)]
         testUtility.emailClient.listEmailAddressesResult = ListOutput<EmailAddress>(items: [emailAddress])
         await instanceUnderTest.loadInitialData()
         try await waitForAsync()
@@ -97,54 +100,54 @@ class CreateEmailMaskViewControllerTests: XCTestCase {
 
     // MARK: - Tests: Availability Check
 
-    func test_checkMaskAddressAvailability_CallsClient() async throws {
+    func test_checkAliasAddressAvailability_CallsClient() async throws {
         try await setupLoadedState()
         instanceUnderTest.localPartText = "testlocal"
-        instanceUnderTest.domain = "mask.example.com"
-        testUtility.emailClient.checkEmailAddressAvailabilityResult = ["testlocal@mask.example.com"]
-        await instanceUnderTest.checkMaskAddressAvailability()
+        instanceUnderTest.domain = "alias.example.com"
+        testUtility.emailClient.checkEmailAddressAvailabilityResult = ["testlocal@alias.example.com"]
+        await instanceUnderTest.checkAliasAddressAvailability()
         try await waitForAsync()
         XCTAssertTrue(testUtility.emailClient.checkEmailAddressAvailabilityCalled)
     }
 
-    func test_checkMaskAddressAvailability_Available_SetsIsAddressAvailableTrue() async throws {
+    func test_checkAliasAddressAvailability_Available_SetsIsAddressAvailableTrue() async throws {
         try await setupLoadedState()
         instanceUnderTest.localPartText = "testlocal"
-        instanceUnderTest.domain = "mask.example.com"
-        testUtility.emailClient.checkEmailAddressAvailabilityResult = ["testlocal@mask.example.com"]
-        await instanceUnderTest.checkMaskAddressAvailability()
+        instanceUnderTest.domain = "alias.example.com"
+        testUtility.emailClient.checkEmailAddressAvailabilityResult = ["testlocal@alias.example.com"]
+        await instanceUnderTest.checkAliasAddressAvailability()
         try await waitForAsync()
         XCTAssertTrue(instanceUnderTest.isAddressAvailable)
     }
 
-    func test_checkMaskAddressAvailability_NotAvailable_SetsIsAddressAvailableFalse() async throws {
+    func test_checkAliasAddressAvailability_NotAvailable_SetsIsAddressAvailableFalse() async throws {
         try await setupLoadedState()
         instanceUnderTest.localPartText = "testlocal"
-        instanceUnderTest.domain = "mask.example.com"
+        instanceUnderTest.domain = "alias.example.com"
         testUtility.emailClient.checkEmailAddressAvailabilityResult = []
-        await instanceUnderTest.checkMaskAddressAvailability()
+        await instanceUnderTest.checkAliasAddressAvailability()
         try await waitForAsync()
         XCTAssertFalse(instanceUnderTest.isAddressAvailable)
     }
 
     // MARK: - Tests: Mode Switching
 
-    func test_maskTypeChanged_SwitchesToExternalMode() async throws {
+    func test_aliasTypeChanged_SwitchesToExternalMode() async throws {
         try await setupLoadedState()
-        instanceUnderTest.externalMasksEnabled = true
+        instanceUnderTest.externalAliasEnabled = true
         instanceUnderTest.configureTableHeader()
         let control = UISegmentedControl(items: ["Internal", "External"])
         control.selectedSegmentIndex = 1
-        instanceUnderTest.maskTypeChanged(control)
+        instanceUnderTest.aliasTypeChanged(control)
         XCTAssertTrue(instanceUnderTest.isExternalMode)
     }
 
-    func test_maskTypeChanged_SwitchesToInternalMode() async throws {
+    func test_aliasTypeChanged_SwitchesToInternalMode() async throws {
         try await setupLoadedState()
         instanceUnderTest.isExternalMode = true
         let control = UISegmentedControl(items: ["Internal", "External"])
         control.selectedSegmentIndex = 0
-        instanceUnderTest.maskTypeChanged(control)
+        instanceUnderTest.aliasTypeChanged(control)
         XCTAssertFalse(instanceUnderTest.isExternalMode)
     }
 
@@ -196,7 +199,7 @@ class CreateEmailMaskViewControllerTests: XCTestCase {
 
     func test_configureNavigationBar_SetsTitle() async throws {
         instanceUnderTest.configureNavigationBar()
-        XCTAssertEqual(instanceUnderTest.title, "Create Email Mask")
+        XCTAssertEqual(instanceUnderTest.title, "Create Email Alias")
     }
 
     func test_configureNavigationBar_SetsRightBarButtonItem() async throws {

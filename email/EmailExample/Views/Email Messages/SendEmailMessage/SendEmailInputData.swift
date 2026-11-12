@@ -26,8 +26,8 @@ struct SendEmailInputData {
     /// The datetime of when the message is scheduled to be sent
     let scheduledAt: Date?
 
-    /// The ID of the email mask selected for sending (nil means no mask)
-    let emailMaskId: String?
+    /// The ID of the email alias selected for sending (nil means no alias)
+    let emailAliasId: String?
 
     init(
         draftEmailMessageId: String? = nil,
@@ -36,7 +36,7 @@ struct SendEmailInputData {
         subject: String,
         body: String,
         scheduledAt: Date? = nil,
-        emailMaskId: String? = nil
+        emailAliasId: String? = nil
     ) {
         self.draftEmailMessageId = draftEmailMessageId
         self.to = to
@@ -44,6 +44,6 @@ struct SendEmailInputData {
         self.subject = subject
         self.body = body
         self.scheduledAt = scheduledAt
-        self.emailMaskId = emailMaskId
+        self.emailAliasId = emailAliasId
     }
 }

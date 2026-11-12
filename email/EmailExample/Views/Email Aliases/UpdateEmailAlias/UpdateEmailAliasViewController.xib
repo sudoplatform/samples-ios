@@ -9,7 +9,7 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
-        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="UpdateEmailMaskViewController" customModule="EmailExample" customModuleProvider="target">
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="UpdateEmailAliasViewController" customModule="EmailExample" customModuleProvider="target">
             <connections>
                 <outlet property="metadataTextField" destination="update-mask-tf-001" id="update-mask-tf-conn"/>
                 <outlet property="expiryDatePicker" destination="update-mask-dp-001" id="update-mask-dp-conn"/>

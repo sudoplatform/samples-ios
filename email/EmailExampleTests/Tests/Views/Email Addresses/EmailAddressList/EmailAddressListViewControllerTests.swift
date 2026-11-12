@@ -51,10 +51,10 @@ class EmailAddressListViewControllerTests: XCTestCase {
         instanceUnderTest.emailAddresses = [emailAddress]
         let result = instanceUnderTest.tableView(instanceUnderTest.tableView, cellForRowAt: [0, 0])
         XCTAssertEqual(result.textLabel?.text?.contains(emailAddress.emailAddress), true)
-        guard let alias = emailAddress.alias else {
-            return XCTFail("alias unexpectedly nil")
+        guard let displayName = emailAddress.displayName else {
+            return XCTFail("displayName unexpectedly nil")
         }
-        XCTAssertEqual(result.textLabel?.text?.contains(alias), true)
+        XCTAssertEqual(result.textLabel?.text?.contains(displayName), true)
     }
 
     func test_viewWillAppear_ErrorIsDisplayedForNoSudoLabel() async throws {
@@ -101,8 +101,8 @@ class EmailAddressListViewControllerTests: XCTestCase {
                 result.emailAddress,
                 self.testUtility.emailClient.emailAddress.emailAddress)
             XCTAssertEqual(
-                result.alias,
-                self.testUtility.emailClient.emailAddress.alias
+                result.displayName,
+                self.testUtility.emailClient.emailAddress.displayName
             )
         } catch {
             XCTFail(error.localizedDescription)

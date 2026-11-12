@@ -173,8 +173,8 @@ class ReadEmailMessageViewController: UIViewController, ActivityAlertViewControl
         return try await emailClient.getEmailMessageWithBody(withInput: getEmailMessageInput)
     }
 
-    func readDraftEmailMessage(messageId: String, emailMaskId: String? = nil) async throws -> Data {
-        let getDraftInput = GetDraftEmailMessageInput(id: messageId, emailAddressId: self.emailAddress.id, emailMaskId: emailMaskId)
+    func readDraftEmailMessage(messageId: String, emailAliasId: String? = nil) async throws -> Data {
+        let getDraftInput = GetDraftEmailMessageInput(id: messageId, emailAddressId: self.emailAddress.id, emailAliasId: emailAliasId)
         guard let draftEmailMessage = try await emailClient.getDraftEmailMessage(withInput: getDraftInput) else {
             throw SudoEmailError.emailMessageNotFound
         }
@@ -251,7 +251,7 @@ class ReadEmailMessageViewController: UIViewController, ActivityAlertViewControl
                 do {
                     // Handle draft messages
                     if message.folderId.contains("DRAFTS") {
-                        let rfc822Data = try await self.readDraftEmailMessage(messageId: message.id, emailMaskId: message.emailMaskId)
+                        let rfc822Data = try await self.readDraftEmailMessage(messageId: message.id, emailAliasId: message.emailAliasId)
                         let parsedMessage = try RFC822Util.fromPlainText(rfc822Data)
                         Task {
                             self.bodyLabel.text = parsedMessage.body
@@ -306,12 +306,12 @@ class ReadEmailMessageViewController: UIViewController, ActivityAlertViewControl
                     // Populate views with message data
                     Task {
                         var toAddresses = message.to
-                        // If message was received via a mask, show the mask address instead of the real address
-                        if let maskId = message.emailMaskId {
+                        // If message was received via a alias, show the alias address instead of the real address
+                        if let aliasId = message.emailAliasId {
                             do {
-                                let masks = try await self.emailClient.listEmailMasksForOwner(withInput: ListEmailMasksForOwnerInput())
-                                if let mask = masks.items.first(where: { $0.id == maskId }) {
-                                    toAddresses = [EmailAddressAndName(address: mask.maskAddress)]
+                                let aliases = try await self.emailClient.listEmailAliasesForOwner(withInput: ListEmailAliasesForOwnerInput())
+                                if let alias = aliases.items.first(where: { $0.id == aliasId }) {
+                                    toAddresses = [EmailAddressAndName(address: alias.aliasAddress)]
                                 }
                             } catch {
                                 // Fall back to showing the original to addresses
@@ -389,7 +389,7 @@ class ReadEmailMessageViewController: UIViewController, ActivityAlertViewControl
                 subject: replySubject.replacingOccurrences(of: "Re:", with: ""),
                 body: replyBody.replacingOccurrences(of: "\n\n---------------\n\n", with: ""),
                 scheduledAt: self.scheduledAt,
-                emailMaskId: emailMessage.emailMaskId
+                emailAliasId: emailMessage.emailAliasId
             )
         }
         return sendEmailInput
@@ -414,7 +414,7 @@ class ReadEmailMessageViewController: UIViewController, ActivityAlertViewControl
                 draftEmailMessageId: emailMessage.id,
                 subject: forwardSubject.replacingOccurrences(of: "Fwd:", with: ""),
                 body: forwardBody.replacingOccurrences(of: "\n\n---------------\n\n", with: ""),
-                emailMaskId: emailMessage.emailMaskId
+                emailAliasId: emailMessage.emailAliasId
             )
         }
         return sendEmailInput

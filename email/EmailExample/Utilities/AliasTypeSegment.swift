@@ -1,8 +1,8 @@
 import Foundation
 
-/// Represents the selected segment in the mask type filter control.
+/// Represents the selected segment in the alias type filter control.
 /// Maps directly to UISegmentedControl segment indices.
-enum MaskTypeSegment: Int {
+enum AliasTypeSegment: Int {
     case `internal` = 0
     case external = 1
 }

@@ -10,23 +10,23 @@ import SudoEmail
 
 /// Property-based tests for SwipeActionResolver.
 ///
-/// These tests generate randomized EmailMask inputs and verify that swipe actions
+/// These tests generate randomized EmailAlias inputs and verify that swipe actions
 /// are correctly determined by realAddressType and status.
 final class SwipeActionResolverTests: XCTestCase {
 
     // MARK: - Test Helpers
 
-    private func makeMockMask(
+    private func makeMockAlias(
         id: String = UUID().uuidString,
-        realAddressType: EmailMask.RealAddressType,
-        status: EmailMask.EmailMaskStatus
-    ) -> EmailMask {
-        return EmailMask(
+        realAddressType: EmailAlias.RealAddressType,
+        status: EmailAlias.EmailAliasStatus
+    ) -> EmailAlias {
+        return EmailAlias(
             id: id,
             owner: "test-owner",
             owners: [],
             identityId: "test-identity",
-            maskAddress: "mask-\(id)@example.com",
+            aliasAddress: "alias-\(id)@example.com",
             realAddress: "real-\(id)@example.com",
             realAddressType: realAddressType,
             status: status,
@@ -42,19 +42,19 @@ final class SwipeActionResolverTests: XCTestCase {
         )
     }
 
-    private func randomStatus() -> EmailMask.EmailMaskStatus {
-        let statuses: [EmailMask.EmailMaskStatus] = [.enabled, .disabled, .pending, .locked]
+    private func randomStatus() -> EmailAlias.EmailAliasStatus {
+        let statuses: [EmailAlias.EmailAliasStatus] = [.enabled, .disabled, .pending, .locked]
         return statuses.randomElement()!
     }
 
     // MARK: - Tests
 
-    /// External mask swipe actions are determined by status.
-    func testExternalMaskSwipeActionsDeterminedByStatus() {
+    /// External alias swipe actions are determined by status.
+    func testExternalAliasSwipeActionsDeterminedByStatus() {
         for _ in 0..<100 {
             let status = randomStatus()
-            let mask = makeMockMask(realAddressType: .external, status: status)
-            let actions = SwipeActionResolver.actions(for: mask)
+            let alias = makeMockAlias(realAddressType: .external, status: status)
+            let actions = SwipeActionResolver.actions(for: alias)
 
             let expectedActions: [String]
             switch status {
@@ -69,43 +69,43 @@ final class SwipeActionResolverTests: XCTestCase {
             }
 
             XCTAssertEqual(actions, expectedActions,
-                "External mask with status \(status) should have actions \(expectedActions), got \(actions)")
+                "External alias with status \(status) should have actions \(expectedActions), got \(actions)")
         }
     }
 
-    /// Internal masks always return empty actions.
-    func testInternalMasksAlwaysReturnEmptyActions() {
+    /// Internal aliases always return empty actions.
+    func testInternalAliasAlwaysReturnEmptyActions() {
         for _ in 0..<100 {
             let status = randomStatus()
-            let mask = makeMockMask(realAddressType: .internal, status: status)
-            let actions = SwipeActionResolver.actions(for: mask)
+            let alias = makeMockAlias(realAddressType: .internal, status: status)
+            let actions = SwipeActionResolver.actions(for: alias)
 
             XCTAssertTrue(actions.isEmpty,
-                "Internal mask with status \(status) should have empty actions, got \(actions)")
+                "Internal alias with status \(status) should have empty actions, got \(actions)")
         }
     }
 
-    /// Delete is always the last action for external masks (when actions exist).
-    func testDeleteIsAlwaysLastActionForExternalMasks() {
+    /// Delete is always the last action for external aliases (when actions exist).
+    func testDeleteIsAlwaysLastActionForExternalAlias() {
         for _ in 0..<100 {
             let status = randomStatus()
-            let mask = makeMockMask(realAddressType: .external, status: status)
-            let actions = SwipeActionResolver.actions(for: mask)
+            let alias = makeMockAlias(realAddressType: .external, status: status)
+            let actions = SwipeActionResolver.actions(for: alias)
 
-            XCTAssertFalse(actions.isEmpty, "External masks should always have actions")
+            XCTAssertFalse(actions.isEmpty, "External aliases should always have actions")
             XCTAssertEqual(actions.last, "Delete",
-                "External mask should have 'Delete' as last action, got '\(actions.last ?? "nil")'")
+                "External alias should have 'Delete' as last action, got '\(actions.last ?? "nil")'")
         }
     }
 
-    /// Each status produces a distinct first action for external masks.
+    /// Each status produces a distinct first action for external aliases.
     func testAllStatusesProduceDistinctFirstActions() {
-        let statuses: [EmailMask.EmailMaskStatus] = [.pending, .enabled, .disabled]
+        let statuses: [EmailAlias.EmailAliasStatus] = [.pending, .enabled, .disabled]
         var firstActions: Set<String> = []
 
         for status in statuses {
-            let mask = makeMockMask(realAddressType: .external, status: status)
-            let actions = SwipeActionResolver.actions(for: mask)
+            let alias = makeMockAlias(realAddressType: .external, status: status)
+            let actions = SwipeActionResolver.actions(for: alias)
             firstActions.insert(actions[0])
         }
 

@@ -8,25 +8,25 @@ import XCTest
 @testable import EmailExample
 import SudoEmail
 
-/// Property-based tests for MaskListFilter.
+/// Property-based tests for AliasListFilter.
 ///
 /// These tests generate randomized inputs and verify that filtering by realAddressType
-/// correctly partitions the mask list without losing or misclassifying any items.
-final class MaskListFilterTests: XCTestCase {
+/// correctly partitions the alias list without losing or misclassifying any items.
+final class AliasListFilterTests: XCTestCase {
 
     // MARK: - Test Helpers
 
-    private func makeMockMask(
+    private func makeMockAlias(
         id: String,
-        realAddressType: EmailMask.RealAddressType,
-        status: EmailMask.EmailMaskStatus = .enabled
-    ) -> EmailMask {
-        return EmailMask(
+        realAddressType: EmailAlias.RealAddressType,
+        status: EmailAlias.EmailAliasStatus = .enabled
+    ) -> EmailAlias {
+        return EmailAlias(
             id: id,
             owner: "test-owner",
             owners: [],
             identityId: "test-identity",
-            maskAddress: "mask-\(id)@example.com",
+            aliasAddress: "alias-\(id)@example.com",
             realAddress: "real-\(id)@example.com",
             realAddressType: realAddressType,
             status: status,
@@ -42,14 +42,14 @@ final class MaskListFilterTests: XCTestCase {
         )
     }
 
-    private func randomRealAddressType() -> EmailMask.RealAddressType {
+    private func randomRealAddressType() -> EmailAlias.RealAddressType {
         return Bool.random() ? .internal : .external
     }
 
-    private func generateRandomMasks(maxCount: Int = 50) -> [EmailMask] {
+    private func generateRandomAlias(maxCount: Int = 50) -> [EmailAlias] {
         let count = Int.random(in: 0...maxCount)
         return (0..<count).map { index in
-            makeMockMask(
+            makeMockAlias(
                 id: "\(index)-\(UUID().uuidString.prefix(8))",
                 realAddressType: randomRealAddressType()
             )
@@ -61,35 +61,35 @@ final class MaskListFilterTests: XCTestCase {
     /// Filtering preserves and partitions by type.
     func testFilteringPreservesAndPartitionsByType() {
         for _ in 0..<100 {
-            let masks = generateRandomMasks()
+            let aliases = generateRandomAlias()
 
-            let internalFiltered = MaskListFilter.filter(masks: masks, byType: .internal)
-            let externalFiltered = MaskListFilter.filter(masks: masks, byType: .external)
+            let internalFiltered = AliasListFilter.filter(aliases: aliases, byType: .internal)
+            let externalFiltered = AliasListFilter.filter(aliases: aliases, byType: .external)
 
             // Every item in .internal result has realAddressType == .internal
-            for mask in internalFiltered {
-                XCTAssertEqual(mask.realAddressType, .internal,
-                    "Found mask '\(mask.id)' in internal results with wrong type")
+            for alias in internalFiltered {
+                XCTAssertEqual(alias.realAddressType, .internal,
+                    "Found alias '\(alias.id)' in internal results with wrong type")
             }
 
             // Every item in .external result has realAddressType == .external
-            for mask in externalFiltered {
-                XCTAssertEqual(mask.realAddressType, .external,
-                    "Found mask '\(mask.id)' in external results with wrong type")
+            for alias in externalFiltered {
+                XCTAssertEqual(alias.realAddressType, .external,
+                    "Found alias '\(alias.id)' in external results with wrong type")
             }
 
             // Partition counts sum to total
-            XCTAssertEqual(internalFiltered.count + externalFiltered.count, masks.count,
+            XCTAssertEqual(internalFiltered.count + externalFiltered.count, aliases.count,
                 "Partition counts don't sum to total")
         }
     }
 
     /// Empty list returns empty results.
     func testEmptyListReturnsEmptyResults() {
-        let masks: [EmailMask] = []
+        let aliases: [EmailAlias] = []
 
-        let internalFiltered = MaskListFilter.filter(masks: masks, byType: .internal)
-        let externalFiltered = MaskListFilter.filter(masks: masks, byType: .external)
+        let internalFiltered = AliasListFilter.filter(aliases: aliases, byType: .internal)
+        let externalFiltered = AliasListFilter.filter(aliases: aliases, byType: .external)
 
         XCTAssertTrue(internalFiltered.isEmpty)
         XCTAssertTrue(externalFiltered.isEmpty)
@@ -99,14 +99,14 @@ final class MaskListFilterTests: XCTestCase {
     func testAllSameTypePartitionsCorrectly() {
         for _ in 0..<20 {
             let count = Int.random(in: 1...30)
-            let type: EmailMask.RealAddressType = Bool.random() ? .internal : .external
+            let type: EmailAlias.RealAddressType = Bool.random() ? .internal : .external
 
-            let masks = (0..<count).map { index in
-                makeMockMask(id: "\(index)", realAddressType: type)
+            let aliases = (0..<count).map { index in
+                makeMockAlias(id: "\(index)", realAddressType: type)
             }
 
-            let internalFiltered = MaskListFilter.filter(masks: masks, byType: .internal)
-            let externalFiltered = MaskListFilter.filter(masks: masks, byType: .external)
+            let internalFiltered = AliasListFilter.filter(aliases: aliases, byType: .internal)
+            let externalFiltered = AliasListFilter.filter(aliases: aliases, byType: .external)
 
             if type == .internal {
                 XCTAssertEqual(internalFiltered.count, count)

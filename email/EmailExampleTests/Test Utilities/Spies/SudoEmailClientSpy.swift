@@ -65,10 +65,6 @@ class SudoEmailClientSpy: SudoEmailClient {
         return BatchOperationResult<String, String>(status: .success)
     }
 
-    func unblockEmailAddresses(addresses: [String]) async throws -> BatchOperationResult<String, String> {
-        return BatchOperationResult<String, String>(status: .success)
-    }
-
     func unblockEmailAddressesByHashedValue(hashedValues: [String]) async throws -> BatchOperationResult<String, String> {
         return BatchOperationResult<String, String>(status: .success)
     }
@@ -367,7 +363,7 @@ class SudoEmailClientSpy: SudoEmailClient {
         withInput input: ProvisionEmailAddressInput
     ) async throws -> EmailAddress {
         provisionEmailAddressCalled = true
-        provisionEmailAddressParameters = (input.emailAddress, input.ownershipProofToken, input.alias)
+        provisionEmailAddressParameters = (input.emailAddress, input.ownershipProofToken, input.displayName)
 
         if provisionEmailAddressResult != nil {
             return provisionEmailAddressResult!
@@ -652,19 +648,19 @@ class SudoEmailClientSpy: SudoEmailClient {
         return getEncodedEmailMessageSizeResult
     }
 
-    // MARK: - Email Mask Methods
+    // MARK: - Email Alias Methods
 
-    var getEmailMaskDomainsCalled: Bool = false
-    var getEmailMaskDomainsResult: [String]?
-    var getEmailMaskDomainsError = AnyError(
-        "Please add base result to `SudoEmailClientSpy.getEmailMaskDomains`"
+    var getEmailAliasDomainsCalled: Bool = false
+    var getEmailAliasDomainsResult: [String]?
+    var getEmailAliasDomainsError = AnyError(
+        "Please add base result to `SudoEmailClientSpy.getEmailAliasDomains`"
     )
-    func getEmailMaskDomains() async throws -> [String] {
-        getEmailMaskDomainsCalled = true
-        if let result = getEmailMaskDomainsResult {
+    func getEmailAliasDomains() async throws -> [String] {
+        getEmailAliasDomainsCalled = true
+        if let result = getEmailAliasDomainsResult {
             return result
         }
-        throw getEmailMaskDomainsError
+        throw getEmailAliasDomainsError
     }
 
     var listEmailDomainsCalled: Bool = false
@@ -680,79 +676,79 @@ class SudoEmailClientSpy: SudoEmailClient {
         throw listEmailDomainsError
     }
 
-    var provisionEmailMaskCalled: Bool = false
-    var provisionEmailMaskParameter: ProvisionEmailMaskInput?
-    var provisionEmailMaskResult: EmailMask?
-    var provisionEmailMaskError = AnyError(
-        "Please add base result to `SudoEmailClientSpy.provisionEmailMask`"
+    var provisionEmailAliasCalled: Bool = false
+    var provisionEmailAliasParameter: ProvisionEmailAliasInput?
+    var provisionEmailAliasResult: EmailAlias?
+    var provisionEmailAliasError = AnyError(
+        "Please add base result to `SudoEmailClientSpy.provisionEmailAlias`"
     )
-    func provisionEmailMask(withInput input: ProvisionEmailMaskInput) async throws -> EmailMask {
-        provisionEmailMaskCalled = true
-        provisionEmailMaskParameter = input
-        if let result = provisionEmailMaskResult {
+    func provisionEmailAlias(withInput input: ProvisionEmailAliasInput) async throws -> EmailAlias {
+        provisionEmailAliasCalled = true
+        provisionEmailAliasParameter = input
+        if let result = provisionEmailAliasResult {
             return result
         }
-        throw provisionEmailMaskError
+        throw provisionEmailAliasError
     }
 
-    var deprovisionEmailMaskCalled: Bool = false
-    var deprovisionEmailMaskParameter: DeprovisionEmailMaskInput?
-    var deprovisionEmailMaskResult: EmailMask?
-    var deprovisionEmailMaskError = AnyError(
-        "Please add base result to `SudoEmailClientSpy.deprovisionEmailMask`"
+    var deprovisionEmailAliasCalled: Bool = false
+    var deprovisionEmailAliasParameter: DeprovisionEmailAliasInput?
+    var deprovisionEmailAliasResult: EmailAlias?
+    var deprovisionEmailAliasError = AnyError(
+        "Please add base result to `SudoEmailClientSpy.deprovisionEmailAlias`"
     )
-    func deprovisionEmailMask(withInput input: DeprovisionEmailMaskInput) async throws -> EmailMask {
-        deprovisionEmailMaskCalled = true
-        deprovisionEmailMaskParameter = input
-        if let result = deprovisionEmailMaskResult {
+    func deprovisionEmailAlias(withInput input: DeprovisionEmailAliasInput) async throws -> EmailAlias {
+        deprovisionEmailAliasCalled = true
+        deprovisionEmailAliasParameter = input
+        if let result = deprovisionEmailAliasResult {
             return result
         }
-        throw deprovisionEmailMaskError
+        throw deprovisionEmailAliasError
     }
 
-    var updateEmailMaskCalled: Bool = false
-    var updateEmailMaskParameter: UpdateEmailMaskInput?
-    var updateEmailMaskResult: EmailMask?
-    var updateEmailMaskError = AnyError(
-        "Please add base result to `SudoEmailClientSpy.updateEmailMask`"
+    var updateEmailAliasCalled: Bool = false
+    var updateEmailAliasParameter: UpdateEmailAliasInput?
+    var updateEmailAliasResult: EmailAlias?
+    var updateEmailAliasError = AnyError(
+        "Please add base result to `SudoEmailClientSpy.updateEmailAlias`"
     )
-    func updateEmailMask(withInput input: UpdateEmailMaskInput) async throws -> EmailMask {
-        updateEmailMaskCalled = true
-        updateEmailMaskParameter = input
-        if let result = updateEmailMaskResult {
+    func updateEmailAlias(withInput input: UpdateEmailAliasInput) async throws -> EmailAlias {
+        updateEmailAliasCalled = true
+        updateEmailAliasParameter = input
+        if let result = updateEmailAliasResult {
             return result
         }
-        throw updateEmailMaskError
+        throw updateEmailAliasError
     }
 
-    var enableEmailMaskCalled: Bool = false
-    var enableEmailMaskParameter: EnableEmailMaskInput?
-    var enableEmailMaskResult: EmailMask?
-    var enableEmailMaskError = AnyError(
-        "Please add base result to `SudoEmailClientSpy.enableEmailMask`"
+    var enableEmailAliasCalled: Bool = false
+    var enableEmailAliasParameter: EnableEmailAliasInput?
+    var enableEmailAliasResult: EmailAlias?
+    var enableEmailAliasError = AnyError(
+        "Please add base result to `SudoEmailClientSpy.enableEmailAlias`"
     )
-    func enableEmailMask(withInput input: EnableEmailMaskInput) async throws -> EmailMask {
-        enableEmailMaskCalled = true
-        enableEmailMaskParameter = input
-        if let result = enableEmailMaskResult {
+    func enableEmailAlias(withInput input: EnableEmailAliasInput) async throws -> EmailAlias {
+        enableEmailAliasCalled = true
+        enableEmailAliasParameter = input
+        if let result = enableEmailAliasResult {
             return result
         }
-        throw enableEmailMaskError
+        throw enableEmailAliasError
     }
 
-    var disableEmailMaskCalled: Bool = false
-    var disableEmailMaskParameter: DisableEmailMaskInput?
-    var disableEmailMaskResult: EmailMask?
-    var disableEmailMaskError = AnyError(
-        "Please add base result to `SudoEmailClientSpy.disableEmailMask`"
+    var disableEmailAliasCalled: Bool = false
+    var disableEmailAliasParameter: DisableEmailAliasInput?
+    var disableEmailAliasResult: EmailAlias?
+    var disableEmailAliasError = AnyError(
+        "Please add base result to `SudoEmailClientSpy.disableEmailAlias`"
     )
-    func disableEmailMask(withInput input: DisableEmailMaskInput) async throws -> EmailMask {
-        disableEmailMaskCalled = true
-        disableEmailMaskParameter = input
-        if let result = disableEmailMaskResult {
+    func disableEmailAlias(withInput input: DisableEmailAliasInput) async throws -> EmailAlias {
+        disableEmailAliasCalled = true
+        disableEmailAliasParameter = input
+        if let result = disableEmailAliasResult {
             return result
         }
-        throw disableEmailMaskError
+        throw disableEmailAliasError
     }
 
     var verifyExternalEmailAddressCalled: Bool = false
@@ -770,34 +766,34 @@ class SudoEmailClientSpy: SudoEmailClient {
         throw verifyExternalEmailAddressError
     }
 
-    var listEmailMasksForOwnerCalled: Bool = false
-    var listEmailMasksForOwnerParameter: ListEmailMasksForOwnerInput?
-    var listEmailMasksForOwnerResult: ListOutput<EmailMask>?
-    var listEmailMasksForOwnerError = AnyError(
-        "Please add base result to `SudoEmailClientSpy.listEmailMasksForOwner`"
+    var listEmailAliasesForOwnerCalled: Bool = false
+    var listEmailAliasesForOwnerParameter: ListEmailAliasesForOwnerInput?
+    var listEmailAliasesForOwnerResult: ListOutput<EmailAlias>?
+    var listEmailAliasesForOwnerError = AnyError(
+        "Please add base result to `SudoEmailClientSpy.listEmailAliasesForOwner`"
     )
-    func listEmailMasksForOwner(withInput input: ListEmailMasksForOwnerInput) async throws -> ListOutput<EmailMask> {
-        listEmailMasksForOwnerCalled = true
-        listEmailMasksForOwnerParameter = input
-        if let result = listEmailMasksForOwnerResult {
+    func listEmailAliasesForOwner(withInput input: ListEmailAliasesForOwnerInput) async throws -> ListOutput<EmailAlias> {
+        listEmailAliasesForOwnerCalled = true
+        listEmailAliasesForOwnerParameter = input
+        if let result = listEmailAliasesForOwnerResult {
             return result
         }
-        throw listEmailMasksForOwnerError
+        throw listEmailAliasesForOwnerError
     }
 
-    var sendMaskedEmailMessageCalled: Bool = false
-    var sendMaskedEmailMessageParameter: SendEmailMessageInput?
-    var sendMaskedEmailMessageResult: SendEmailMessageResult?
-    var sendMaskedEmailMessageError = AnyError(
-        "Please add base result to `SudoEmailClientSpy.sendMaskedEmailMessage`"
+    var sendEmailMessageViaAliasCalled: Bool = false
+    var sendEmailMessageViaAliasParameter: SendEmailMessageInput?
+    var sendEmailMessageViaAliasResult: SendEmailMessageResult?
+    var sendEmailMessageViaAliasError = AnyError(
+        "Please add base result to `SudoEmailClientSpy.sendEmailMessageViaAlias`"
     )
-    func sendMaskedEmailMessage(withInput input: SendEmailMessageInput) async throws -> SendEmailMessageResult {
-        sendMaskedEmailMessageCalled = true
-        sendMaskedEmailMessageParameter = input
-        if let result = sendMaskedEmailMessageResult {
+    func sendEmailMessageViaAlias(withInput input: SendEmailMessageInput) async throws -> SendEmailMessageResult {
+        sendEmailMessageViaAliasCalled = true
+        sendEmailMessageViaAliasParameter = input
+        if let result = sendEmailMessageViaAliasResult {
             return result
         }
-        throw sendMaskedEmailMessageError
+        throw sendEmailMessageViaAliasError
     }
 
     var setSignInDelegateCalled: Bool = false

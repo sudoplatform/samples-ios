@@ -1,7 +1,7 @@
 import Foundation
 
 /// Utility for validating verification code input.
-/// Used by EmailMaskListViewController to enable/disable the confirm button
+/// Used by EmailAliasListViewController to enable/disable the confirm button
 /// in the verification code entry dialog.
 struct VerificationCodeValidation {
 

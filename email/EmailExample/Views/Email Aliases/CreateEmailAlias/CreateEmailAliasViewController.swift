@@ -8,17 +8,17 @@ import UIKit
 import SudoEmail
 import SudoProfiles
 
-/// This View Controller presents a form to provision a new `EmailMask`.
+/// This View Controller presents a form to provision a new `EmailAlias`.
 ///
 /// Follows the same table-based input form design as `CreateEmailAddressViewController`.
-/// Supports both internal and external mask creation modes when external masks are enabled.
+/// Supports both internal and external alias creation modes when external aliases are enabled.
 ///
 /// - Links From:
-///     - `EmailMaskListViewController`: A user taps the "Create Email Mask" row.
+///     - `EmailAliasListViewController`: A user taps the "Create Email Alias" row.
 /// - Links To:
-///     - `EmailMaskListViewController`: On successful provisioning, navigates back via unwind segue.
+///     - `EmailAliasListViewController`: On successful provisioning, navigates back via unwind segue.
 @MainActor
-class CreateEmailMaskViewController: UIViewController,
+class CreateEmailAliasViewController: UIViewController,
     UITableViewDataSource,
     UITableViewDelegate {
 
@@ -29,33 +29,33 @@ class CreateEmailMaskViewController: UIViewController,
     // MARK: - Supplementary
 
     enum Segue: String {
-        case returnToEmailMaskList
+        case returnToEmailAliasList
     }
 
     /// Input fields for the form.
     enum InputField: Int, CaseIterable {
-        /// Local part of the mask address
+        /// Local part of the alias address
         case localPart
     }
 
     // MARK: - Properties
 
-    /// Available mask domains retrieved from `getEmailMaskDomains()`.
+    /// Available alias domains retrieved from `listEmailDomains()` (alias domains only).
     var availableDomains: [String] = []
 
-    /// The mask domain to use (first available).
+    /// The alias domain to use (first available).
     var domain: String = ""
 
-    /// All email addresses belonging to the user (for internal mask picker).
+    /// All email addresses belonging to the user (for internal alias picker).
     var emailAddresses: [EmailAddress] = []
 
     /// The currently selected email address index in the picker (-1 means none selected).
     var selectedEmailIndex: Int = -1
 
-    /// Cached configuration flag indicating whether external masks are supported.
-    var externalMasksEnabled: Bool = false
+    /// Cached configuration flag indicating whether external aliases are supported.
+    var externalAliasEnabled: Bool = false
 
-    /// Tracks whether the form is currently in external mask mode.
+    /// Tracks whether the form is currently in external alias mode.
     var isExternalMode: Bool = false
 
     /// Form data entered by user.
@@ -73,7 +73,7 @@ class CreateEmailMaskViewController: UIViewController,
     // MARK: - UI Elements
 
     /// Segmented control in the table header for switching modes.
-    private var maskTypeSegmentedControl: UISegmentedControl?
+    private var aliasTypeSegmentedControl: UISegmentedControl?
 
     /// Picker view for selecting email address (internal mode).
     private var emailDropdownButton: UIButton?
@@ -118,7 +118,7 @@ class CreateEmailMaskViewController: UIViewController,
     // MARK: - Configuration
 
     func configureNavigationBar() {
-        title = "Create Email Mask"
+        title = "Create Email Alias"
         let createButton = UIBarButtonItem(title: "Create", style: .plain, target: self, action: #selector(didTapCreateButton))
         navigationItem.rightBarButtonItem = createButton
         setCreateButtonEnabled(false)
@@ -137,18 +137,18 @@ class CreateEmailMaskViewController: UIViewController,
         var configEnabled = false
         do {
             let config = try await emailClient.getConfigurationData()
-            configEnabled = config.externalEmailMasksEnabled
+            configEnabled = config.externalEmailAliasesEnabled
         } catch {
             configEnabled = false
         }
 
-        // Load mask domains
+        // Load alias domains
         var domains: [String] = []
         do {
-            domains = try await emailClient.getEmailMaskDomains()
+            domains = try await emailClient.listEmailDomains().filter { $0.isAliasDomain }.map { $0.domain }
         } catch {
             Task {
-                self.presentErrorAlert(message: "Failed to load email mask domains", error: error)
+                self.presentErrorAlert(message: "Failed to load email alias domains", error: error)
             }
             return
         }
@@ -166,7 +166,7 @@ class CreateEmailMaskViewController: UIViewController,
         }
 
         Task {
-            self.externalMasksEnabled = configEnabled
+            self.externalAliasEnabled = configEnabled
             self.availableDomains = domains
             self.domain = domains.first ?? ""
             self.emailAddresses = addresses
@@ -190,14 +190,14 @@ class CreateEmailMaskViewController: UIViewController,
 
         var currentY: CGFloat = 16
 
-        // Segmented control (only if external masks enabled)
-        if externalMasksEnabled {
+        // Segmented control (only if external aliases enabled)
+        if externalAliasEnabled {
             let control = UISegmentedControl(items: ["Internal", "External"])
             control.selectedSegmentIndex = isExternalMode ? 1 : 0
-            control.addTarget(self, action: #selector(maskTypeChanged(_:)), for: .valueChanged)
+            control.addTarget(self, action: #selector(aliasTypeChanged(_:)), for: .valueChanged)
             control.frame = CGRect(x: 20, y: currentY, width: headerWidth - 40, height: 32)
             headerContainer.addSubview(control)
-            maskTypeSegmentedControl = control
+            aliasTypeSegmentedControl = control
             currentY += 32 + 16
         }
 
@@ -212,7 +212,7 @@ class CreateEmailMaskViewController: UIViewController,
 
         // Local Part text field
         let localPartField = UITextField()
-        localPartField.placeholder = "Enter local part of the mask address"
+        localPartField.placeholder = "Enter local part of the alias address"
         localPartField.borderStyle = .roundedRect
         localPartField.autocapitalizationType = .none
         localPartField.autocorrectionType = .no
@@ -223,9 +223,9 @@ class CreateEmailMaskViewController: UIViewController,
         localPartTextField = localPartField
         currentY += 36 + 4
 
-        // Mask domain info
+        // Alias domain info
         let domainLabel = UILabel()
-        domainLabel.text = "Mask domain: @\(domain)"
+        domainLabel.text = "Alias domain: @\(domain)"
         domainLabel.font = UIFont.systemFont(ofSize: 13)
         domainLabel.textColor = .secondaryLabel
         domainLabel.frame = CGRect(x: 20, y: currentY, width: headerWidth - 40, height: 18)
@@ -377,8 +377,8 @@ class CreateEmailMaskViewController: UIViewController,
 
     // MARK: - Mode Switching
 
-    @objc func maskTypeChanged(_ sender: UISegmentedControl) {
-        guard let segment = MaskTypeSegment(rawValue: sender.selectedSegmentIndex) else { return }
+    @objc func aliasTypeChanged(_ sender: UISegmentedControl) {
+        guard let segment = AliasTypeSegment(rawValue: sender.selectedSegmentIndex) else { return }
 
         switch segment {
         case .internal:
@@ -394,14 +394,14 @@ class CreateEmailMaskViewController: UIViewController,
 
     // MARK: - Availability Check
 
-    /// Checks if the entered local part is available as a mask address.
+    /// Checks if the entered local part is available as a alias address.
     @objc func didFireCheckAddressTimer() {
         Task {
-            await self.checkMaskAddressAvailability()
+            await self.checkAliasAddressAvailability()
         }
     }
 
-    func checkMaskAddressAvailability() async {
+    func checkAliasAddressAvailability() async {
         guard !localPartText.isEmpty, !domain.isEmpty else { return }
 
         do {
@@ -467,15 +467,15 @@ class CreateEmailMaskViewController: UIViewController,
 
     @objc func didTapCreateButton() {
         if isExternalMode {
-            createExternalMask()
+            createExternalAlias()
         } else {
-            createInternalMask()
+            createInternalAlias()
         }
     }
 
-    // MARK: - Internal Mask Provisioning
+    // MARK: - Internal Alias Provisioning
 
-    private func createInternalMask() {
+    private func createInternalAlias() {
         guard !localPartText.isEmpty else {
             presentErrorAlert(message: "Please enter a local part")
             return
@@ -486,31 +486,31 @@ class CreateEmailMaskViewController: UIViewController,
         }
 
         let selectedEmail = emailAddresses[selectedEmailIndex]
-        let maskAddress = "\(localPartText)@\(domain)"
+        let aliasAddress = "\(localPartText)@\(domain)"
         let sudoId = selectedEmail.owners.first?.id ?? ""
 
         view.endEditing(true)
         setCreateButtonEnabled(false)
-        presentActivityAlert(message: "Provisioning Email Mask")
+        presentActivityAlert(message: "Provisioning Email Alias")
 
         Task {
             do {
                 let ownershipProof = try await self.profilesClient.getOwnershipProof(sudoId: sudoId, audience: "sudoplatform.email.email-address")
-                let input = ProvisionEmailMaskInput(
-                    maskAddress: maskAddress,
+                let input = ProvisionEmailAliasInput(
+                    aliasAddress: aliasAddress,
                     realAddress: selectedEmail.emailAddress,
                     ownershipProofToken: ownershipProof
                 )
-                _ = try await self.emailClient.provisionEmailMask(withInput: input)
+                _ = try await self.emailClient.provisionEmailAlias(withInput: input)
                 Task {
                     self.dismissActivityAlert {
-                        self.performSegue(withIdentifier: Segue.returnToEmailMaskList.rawValue, sender: self)
+                        self.performSegue(withIdentifier: Segue.returnToEmailAliasList.rawValue, sender: self)
                     }
                 }
             } catch {
                 Task {
                     self.dismissActivityAlert {
-                        self.presentErrorAlert(message: "Failed to provision email mask", error: error)
+                        self.presentErrorAlert(message: "Failed to provision email alias", error: error)
                         self.setCreateButtonEnabled(true)
                     }
                 }
@@ -518,11 +518,11 @@ class CreateEmailMaskViewController: UIViewController,
         }
     }
 
-    // MARK: - External Mask Provisioning
+    // MARK: - External Alias Provisioning
 
-    private func createExternalMask() {
+    private func createExternalAlias() {
         guard !localPartText.isEmpty else {
-            presentErrorAlert(message: "Please enter a local part for the mask address")
+            presentErrorAlert(message: "Please enter a local part for the alias address")
             return
         }
 
@@ -538,30 +538,30 @@ class CreateEmailMaskViewController: UIViewController,
             return
         }
 
-        let maskAddress = "\(localPartText)@\(domain)"
+        let aliasAddress = "\(localPartText)@\(domain)"
 
         view.endEditing(true)
         setCreateButtonEnabled(false)
-        presentActivityAlert(message: "Provisioning External Email Mask")
+        presentActivityAlert(message: "Provisioning External Email Alias")
 
         Task {
             do {
                 let ownershipProof = try await self.profilesClient.getOwnershipProof(sudoId: sudoId, audience: "sudoplatform.email.email-address")
-                let input = ProvisionEmailMaskInput(
-                    maskAddress: maskAddress,
+                let input = ProvisionEmailAliasInput(
+                    aliasAddress: aliasAddress,
                     realAddress: realAddress,
                     ownershipProofToken: ownershipProof
                 )
-                _ = try await self.emailClient.provisionEmailMask(withInput: input)
+                _ = try await self.emailClient.provisionEmailAlias(withInput: input)
                 Task {
                     self.dismissActivityAlert {
-                        self.performSegue(withIdentifier: Segue.returnToEmailMaskList.rawValue, sender: self)
+                        self.performSegue(withIdentifier: Segue.returnToEmailAliasList.rawValue, sender: self)
                     }
                 }
             } catch {
                 Task {
                     self.dismissActivityAlert {
-                        self.presentErrorAlert(message: "Failed to provision external email mask", error: error)
+                        self.presentErrorAlert(message: "Failed to provision external email alias", error: error)
                         self.setCreateButtonEnabled(true)
                     }
                 }

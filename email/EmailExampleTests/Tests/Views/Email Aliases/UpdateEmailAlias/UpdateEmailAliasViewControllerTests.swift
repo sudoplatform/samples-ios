@@ -10,19 +10,19 @@ import SudoEmail
 @testable import EmailExample
 
 @MainActor
-class UpdateEmailMaskViewControllerTests: XCTestCase {
+class UpdateEmailAliasViewControllerTests: XCTestCase {
 
     // MARK: - Properties
 
     var testUtility: EmailExampleTestUtility!
-    var instanceUnderTest: UpdateEmailMaskViewController!
+    var instanceUnderTest: UpdateEmailAliasViewController!
 
     // MARK: - Lifecycle
 
     override func setUp() async throws {
         testUtility = EmailExampleTestUtility()
-        instanceUnderTest = testUtility.storyBoard.instantiateViewController(identifier: "updateEmailMask")
-        instanceUnderTest.emailMask = DataFactory.EmailSDK.generateEmailMask(
+        instanceUnderTest = testUtility.storyBoard.instantiateViewController(identifier: "updateEmailAlias")
+        instanceUnderTest.emailAlias = DataFactory.EmailSDK.generateEmailAlias(
             expiresAt: Date().addingTimeInterval(86400),
             metadata: ["key1": "value1", "key2": "value2"]
         )
@@ -56,7 +56,7 @@ class UpdateEmailMaskViewControllerTests: XCTestCase {
     }
 
     func test_viewWillAppear_NoExpiry_SwitchIsOff() async throws {
-        instanceUnderTest.emailMask = DataFactory.EmailSDK.generateEmailMask(expiresAt: nil)
+        instanceUnderTest.emailAlias = DataFactory.EmailSDK.generateEmailAlias(expiresAt: nil)
         instanceUnderTest.viewWillAppear(true)
         try await waitForAsync()
         XCTAssertFalse(instanceUnderTest.expirySwitch.isOn)
@@ -64,7 +64,7 @@ class UpdateEmailMaskViewControllerTests: XCTestCase {
     }
 
     func test_viewWillAppear_NoMetadata_TextFieldIsEmpty() async throws {
-        instanceUnderTest.emailMask = DataFactory.EmailSDK.generateEmailMask(metadata: nil)
+        instanceUnderTest.emailAlias = DataFactory.EmailSDK.generateEmailAlias(metadata: nil)
         instanceUnderTest.viewWillAppear(true)
         try await waitForAsync()
         let text = instanceUnderTest.metadataTextField.text ?? ""
@@ -72,7 +72,7 @@ class UpdateEmailMaskViewControllerTests: XCTestCase {
     }
 
     func test_viewWillAppear_EmptyMetadata_TextFieldIsEmpty() async throws {
-        instanceUnderTest.emailMask = DataFactory.EmailSDK.generateEmailMask(metadata: [:])
+        instanceUnderTest.emailAlias = DataFactory.EmailSDK.generateEmailAlias(metadata: [:])
         instanceUnderTest.viewWillAppear(true)
         try await waitForAsync()
         let text = instanceUnderTest.metadataTextField.text ?? ""
@@ -94,29 +94,29 @@ class UpdateEmailMaskViewControllerTests: XCTestCase {
         XCTAssertTrue(presentedAlert.message?.contains("No changes detected") ?? false)
     }
 
-    func test_didTapSaveButton_MetadataChanged_CallsUpdateEmailMask() async throws {
+    func test_didTapSaveButton_MetadataChanged_CallsUpdateEmailAlias() async throws {
         instanceUnderTest.viewWillAppear(true)
         try await waitForAsync()
         // Change metadata
         instanceUnderTest.metadataTextField.text = "newKey: newValue"
-        testUtility.emailClient.updateEmailMaskResult = DataFactory.EmailSDK.generateEmailMask()
+        testUtility.emailClient.updateEmailAliasResult = DataFactory.EmailSDK.generateEmailAlias()
         instanceUnderTest.didTapSaveButton(instanceUnderTest.saveButton!)
         try await waitForAsync()
         try await waitForAsync()
-        XCTAssertTrue(testUtility.emailClient.updateEmailMaskCalled)
+        XCTAssertTrue(testUtility.emailClient.updateEmailAliasCalled)
     }
 
     func test_didTapSaveButton_MetadataChanged_PassesCorrectInput() async throws {
         instanceUnderTest.viewWillAppear(true)
         try await waitForAsync()
         instanceUnderTest.metadataTextField.text = "name: test"
-        testUtility.emailClient.updateEmailMaskResult = DataFactory.EmailSDK.generateEmailMask()
+        testUtility.emailClient.updateEmailAliasResult = DataFactory.EmailSDK.generateEmailAlias()
         instanceUnderTest.didTapSaveButton(instanceUnderTest.saveButton!)
         try await waitForAsync()
         try await waitForAsync()
-        let parameter = testUtility.emailClient.updateEmailMaskParameter
+        let parameter = testUtility.emailClient.updateEmailAliasParameter
         XCTAssertNotNil(parameter)
-        XCTAssertEqual(parameter?.emailMaskId, instanceUnderTest.emailMask.id)
+        XCTAssertEqual(parameter?.emailAliasId, instanceUnderTest.emailAlias.id)
         XCTAssertEqual(parameter?.metadata?["name"], "test")
     }
 
@@ -146,11 +146,11 @@ class UpdateEmailMaskViewControllerTests: XCTestCase {
         instanceUnderTest.viewWillAppear(true)
         try await waitForAsync()
         instanceUnderTest.metadataTextField.text = "key1: val1, key2: val2"
-        testUtility.emailClient.updateEmailMaskResult = DataFactory.EmailSDK.generateEmailMask()
+        testUtility.emailClient.updateEmailAliasResult = DataFactory.EmailSDK.generateEmailAlias()
         instanceUnderTest.didTapSaveButton(instanceUnderTest.saveButton!)
         try await waitForAsync()
         try await waitForAsync()
-        let parameter = testUtility.emailClient.updateEmailMaskParameter
+        let parameter = testUtility.emailClient.updateEmailAliasParameter
         XCTAssertNotNil(parameter)
         XCTAssertEqual(parameter?.metadata?["key1"], "val1")
         XCTAssertEqual(parameter?.metadata?["key2"], "val2")
@@ -161,11 +161,11 @@ class UpdateEmailMaskViewControllerTests: XCTestCase {
         try await waitForAsync()
         // Clear the metadata text
         instanceUnderTest.metadataTextField.text = ""
-        testUtility.emailClient.updateEmailMaskResult = DataFactory.EmailSDK.generateEmailMask()
+        testUtility.emailClient.updateEmailAliasResult = DataFactory.EmailSDK.generateEmailAlias()
         instanceUnderTest.didTapSaveButton(instanceUnderTest.saveButton!)
         try await waitForAsync()
         try await waitForAsync()
-        let parameter = testUtility.emailClient.updateEmailMaskParameter
+        let parameter = testUtility.emailClient.updateEmailAliasParameter
         XCTAssertNotNil(parameter)
         XCTAssertEqual(parameter?.metadata, [:])
     }

@@ -52,8 +52,8 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
         case navigateToUpdateCustomFolder
         /// Used to navigate back to the `EmailAddressListViewController`.
         case returnToEmailAddressList
-        /// Used to navigate to the `EmailMaskListViewController`.
-        case navigateToEmailMaskList
+        /// Used to navigate to the `EmailAliasListViewController`.
+        case navigateToEmailAliasList
     }
 
     // MARK: - Properties
@@ -193,11 +193,11 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
                 updateCustomFolder.emailFolderId = selectedFolder!.id
             }
 
-        case .navigateToEmailMaskList:
-            guard segue.destination is EmailMaskListViewController else {
+        case .navigateToEmailAliasList:
+            guard segue.destination is EmailAliasListViewController else {
                 break
             }
-            // Masks are now independent of a specific email address
+            // Alias are now independent of a specific email address
 
         default:
             break
@@ -227,8 +227,8 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
         performSegue(withIdentifier: Segue.navigateToEmailAddressSettings.rawValue, sender: self)
     }
 
-    @objc func didTapMasksButton() {
-        performSegue(withIdentifier: Segue.navigateToEmailMaskList.rawValue, sender: self)
+    @objc func didTapAliasButton() {
+        performSegue(withIdentifier: Segue.navigateToEmailAliasList.rawValue, sender: self)
     }
 
     // MARK: - Operations
@@ -301,7 +301,7 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
         
         // Fetch full draft messages for all metadata items
         for metadata in allDraftMetadata {
-            let input = GetDraftEmailMessageInput(id: metadata.id, emailAddressId: emailAddressId, emailMaskId: metadata.emailMaskId)
+            let input = GetDraftEmailMessageInput(id: metadata.id, emailAddressId: emailAddressId, emailAliasId: metadata.emailAliasId)
             guard let draft = try await emailClient.getDraftEmailMessage(withInput: input) else {
                 continue
             }
@@ -500,13 +500,13 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
         )
 
         let composeBarButton = UIBarButtonItem(barButtonSystemItem: .compose, target: self, action: #selector(didTapComposeEmailButton))
-        let masksBarButton = UIBarButtonItem(
-            image: UIImage(systemName: "theatermasks"),
+        let aliasesBarButton = UIBarButtonItem(
+            image: UIImage(systemName: "theateraliases"),
             style: .plain,
             target: self,
-            action: #selector(didTapMasksButton)
+            action: #selector(didTapAliasButton)
         )
-        navigationItem.rightBarButtonItems = [emailAddressSettingsBarButton, composeBarButton, masksBarButton]
+        navigationItem.rightBarButtonItems = [emailAddressSettingsBarButton, composeBarButton, aliasesBarButton]
     }
 
     // MARK: - Helpers
@@ -648,7 +648,7 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
             }
         } else if folderNameSwitcher.currentFolder == .special(.drafts) {
             do {
-                let input = DeleteDraftEmailMessagesInput(ids: [emailMessage.id], emailAddressId: emailAddress.id, emailMaskId: emailMessage.emailMaskId)
+                let input = DeleteDraftEmailMessagesInput(ids: [emailMessage.id], emailAddressId: emailAddress.id, emailAliasId: emailMessage.emailAliasId)
                 presentActivityAlert(message: "Deleting Draft Email Message")
                 _ = try await emailClient.deleteDraftEmailMessages(withInput: input)
                 Task {
@@ -729,7 +729,7 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
             owner: "draftOwnerId",
             owners: [.init(id: "draftOwnerId", issuer: "drafts")],
             emailAddressId: emailAddressId,
-            emailMaskId: draft.emailMaskId,
+            emailAliasId: draft.emailAliasId,
             folderId: generateFolderId(
                 emailAddressId: emailAddressId,
                 folderName: folderNameSwitcher.titleForCurrentFolder()
@@ -968,7 +968,16 @@ final class EmailMessageListViewController: UIViewController, UITableViewDataSou
         presentActivityAlert(message: "Unblocking Email Address")
         Task.init {
             do {
-                let result = try await self.emailClient.unblockEmailAddresses(addresses: selectedBlockedAddresses)
+                // SudoEmail 25.0.0 removed the cleartext-address unblock; addresses must be
+                // unblocked by their hashed blocked value. Resolve each selected plaintext
+                // address to its hashedBlockedValue from the current blocklist.
+                let blocklist = try await self.emailClient.getEmailAddressBlocklist()
+                let hashedValueByAddress = Dictionary(
+                    blocklist.map { ($0.address, $0.hashedBlockedValue) },
+                    uniquingKeysWith: { first, _ in first }
+                )
+                let hashedValues = selectedBlockedAddresses.compactMap { hashedValueByAddress[$0] }
+                let result = try await self.emailClient.unblockEmailAddressesByHashedValue(hashedValues: hashedValues)
 
                 switch result.status {
                 case .success:

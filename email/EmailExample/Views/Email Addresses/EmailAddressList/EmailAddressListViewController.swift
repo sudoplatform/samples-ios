@@ -42,8 +42,8 @@ class EmailAddressListViewController: UIViewController, UITableViewDataSource, U
         case navigateToCreateEmailAddress
         /// Used to navigate to the `EmailMessageListViewController`.
         case navigateToEmailMessageList
-        /// Used to navigate to the `EmailMaskListViewController`.
-        case navigateToEmailMaskList
+        /// Used to navigate to the `EmailAliasListViewController`.
+        case navigateToEmailAliasList
         /// Used to navigate back to the `SudoListViewController`.
         case returnToSudoList
     }
@@ -71,7 +71,7 @@ class EmailAddressListViewController: UIViewController, UITableViewDataSource, U
     override func viewDidLoad() {
         super.viewDidLoad()
         configureTableView()
-        configureMasksButton()
+        configureAliasButton()
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -162,22 +162,22 @@ class EmailAddressListViewController: UIViewController, UITableViewDataSource, U
         tableView.tableFooterView = UIView()
     }
 
-    /// Adds a "Masks" button to the navigation bar for accessing the global email masks list.
-    func configureMasksButton() {
-        let masksButton = UIBarButtonItem(
-            image: UIImage(systemName: "theatermasks"),
+    /// Adds a "Alias" button to the navigation bar for accessing the global email aliases list.
+    func configureAliasButton() {
+        let aliasesButton = UIBarButtonItem(
+            image: UIImage(systemName: "theateraliases"),
             style: .plain,
             target: self,
-            action: #selector(didTapMasksButton)
+            action: #selector(didTapAliasButton)
         )
         // Preserve any existing right bar button items
         var items = navigationItem.rightBarButtonItems ?? []
-        items.append(masksButton)
+        items.append(aliasesButton)
         navigationItem.rightBarButtonItems = items
     }
 
-    @objc func didTapMasksButton() {
-        performSegue(withIdentifier: Segue.navigateToEmailMaskList.rawValue, sender: self)
+    @objc func didTapAliasButton() {
+        performSegue(withIdentifier: Segue.navigateToEmailAliasList.rawValue, sender: self)
     }
 
     // MARK: - Helpers
@@ -239,7 +239,7 @@ class EmailAddressListViewController: UIViewController, UITableViewDataSource, U
         } else {
             let emailAddress = emailAddresses[indexPath.row]
             cell = tableView.dequeueReusableCell(withIdentifier: "default", for: indexPath)
-            if let displayName = emailAddress.alias {
+            if let displayName = emailAddress.displayName {
                 if displayName.isEmpty {
                     cell.textLabel?.text = "\(emailAddress.emailAddress)"
                 } else {

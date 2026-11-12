@@ -1,7 +1,7 @@
 import Foundation
 
 /// Utility for validating email address format.
-/// Used by CreateEmailMaskViewController to validate external email input.
+/// Used by CreateEmailAliasViewController to validate external email input.
 struct EmailValidation {
 
     /// Maximum allowed length for an email address (RFC 5321).

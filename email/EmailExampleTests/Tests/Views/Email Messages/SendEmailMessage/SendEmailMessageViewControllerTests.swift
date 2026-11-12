@@ -93,7 +93,17 @@ class SendEmailMessageViewControllerTests: XCTestCase {
     func test_validateEncryptedEmailAddresses_valid() async {
         let emailAddressInput = "valid_address@sudomail.com"
         let emailAddresses = [emailAddressInput]
-        let expectedResult = [EmailAddressPublicInfo(emailAddress: emailAddressInput, keyId: "keyId", publicKey: "publicKey")]
+        let expectedResult = [
+            EmailAddressPublicInfo(
+                emailAddress: emailAddressInput,
+                keyId: "keyId",
+                publicKeyDetails: EmailAddressPublicKey(
+                    publicKey: "publicKey",
+                    keyFormat: .rsaPublicKey,
+                    algorithm: "RSAEncryptionOAEPAESCBC"
+                )
+            )
+        ]
 
         testUtility.emailClient.lookupEmailAddressesPublicInfoResult = expectedResult
         do {
@@ -307,7 +317,17 @@ class SendEmailMessageViewControllerTests: XCTestCase {
     func test_handleEncryptedIndicatorView_togglesViewForEncryptedEmailAddress() async {
         let emailAddress = "valid_address@sudomail.com"
         let emailAddresses = [emailAddress]
-        var expectedResult = [EmailAddressPublicInfo(emailAddress: emailAddress, keyId: "keyId", publicKey: "publicKey")]
+        var expectedResult = [
+            EmailAddressPublicInfo(
+                emailAddress: emailAddress,
+                keyId: "keyId",
+                publicKeyDetails: EmailAddressPublicKey(
+                    publicKey: "publicKey",
+                    keyFormat: .rsaPublicKey,
+                    algorithm: "RSAEncryptionOAEPAESCBC"
+                )
+            )
+        ]
         testUtility.emailClient.lookupEmailAddressesPublicInfoResult = expectedResult
 
         // Set the result status for 'cc' field to true, to mock a successful outcome of
@@ -390,143 +410,143 @@ class SendEmailMessageViewControllerTests: XCTestCase {
         }
     }
 
-    // MARK: - Tests: Send Masked Email Message
+    // MARK: - Tests: Send Aliased Email Message
 
-    func test_sendMaskedEmailMessage_CallsSendMaskedEmailMessage() async {
-        let maskId = "dummyMaskId"
-        let maskAddress = "mask@example.com"
+    func test_sendAliasedEmailMessage_CallsSendAliasedEmailMessage() async {
+        let aliasId = "dummyAliasId"
+        let aliasAddress = "alias@example.com"
         let subject = "dummySubject"
         let body = "dummyBody"
-        let maskedHeader = InternetMessageFormatHeader(
-            from: EmailAddressAndName(address: maskAddress),
+        let aliasedHeader = InternetMessageFormatHeader(
+            from: EmailAddressAndName(address: aliasAddress),
             to: [],
             cc: [],
             bcc: [],
             subject: subject
         )
-        let maskedInput = SendEmailMessageInput(
-            senderMaskId: maskId,
-            emailMessageHeader: maskedHeader,
+        let aliasedInput = SendEmailMessageInput(
+            senderAliasId: aliasId,
+            emailMessageHeader: aliasedHeader,
             body: body
         )
-        testUtility.emailClient.sendMaskedEmailMessageResult = SendEmailMessageResult(id: "sentMaskedId", createdAt: Date.now)
-        _ = await instanceUnderTest.sendMaskedEmailMessage(maskedInput)
-        XCTAssertTrue(testUtility.emailClient.sendMaskedEmailMessageCalled)
-        XCTAssertEqual(testUtility.emailClient.sendMaskedEmailMessageParameter?.senderMaskId, maskId)
-        XCTAssertEqual(testUtility.emailClient.sendMaskedEmailMessageParameter?.body, body)
-        XCTAssertEqual(testUtility.emailClient.sendMaskedEmailMessageParameter?.emailMessageHeader.subject, subject)
-        XCTAssertEqual(testUtility.emailClient.sendMaskedEmailMessageParameter?.emailMessageHeader.from.address, maskAddress)
+        testUtility.emailClient.sendEmailMessageViaAliasResult = SendEmailMessageResult(id: "sentAliasedId", createdAt: Date.now)
+        _ = await instanceUnderTest.sendAliasedEmailMessage(aliasedInput)
+        XCTAssertTrue(testUtility.emailClient.sendEmailMessageViaAliasCalled)
+        XCTAssertEqual(testUtility.emailClient.sendEmailMessageViaAliasParameter?.senderAliasId, aliasId)
+        XCTAssertEqual(testUtility.emailClient.sendEmailMessageViaAliasParameter?.body, body)
+        XCTAssertEqual(testUtility.emailClient.sendEmailMessageViaAliasParameter?.emailMessageHeader.subject, subject)
+        XCTAssertEqual(testUtility.emailClient.sendEmailMessageViaAliasParameter?.emailMessageHeader.from.address, aliasAddress)
     }
 
-    func test_sendMaskedEmailMessage_DeletesDraftOnSuccess() async {
+    func test_sendAliasedEmailMessage_DeletesDraftOnSuccess() async {
         let draftId = "dummyDraftId"
-        let maskId = "dummyMaskId"
-        let maskAddress = "mask@example.com"
+        let aliasId = "dummyAliasId"
+        let aliasAddress = "alias@example.com"
         let subject = "dummySubject"
         let body = "dummyBody"
-        let maskedHeader = InternetMessageFormatHeader(
-            from: EmailAddressAndName(address: maskAddress),
+        let aliasedHeader = InternetMessageFormatHeader(
+            from: EmailAddressAndName(address: aliasAddress),
             to: [],
             cc: [],
             bcc: [],
             subject: subject
         )
-        let maskedInput = SendEmailMessageInput(
-            senderMaskId: maskId,
-            emailMessageHeader: maskedHeader,
+        let aliasedInput = SendEmailMessageInput(
+            senderAliasId: aliasId,
+            emailMessageHeader: aliasedHeader,
             body: body
         )
-        testUtility.emailClient.sendMaskedEmailMessageResult = SendEmailMessageResult(id: "sentMaskedId", createdAt: Date.now)
+        testUtility.emailClient.sendEmailMessageViaAliasResult = SendEmailMessageResult(id: "sentAliasedId", createdAt: Date.now)
         instanceUnderTest.inputData = SendEmailInputData(
             draftEmailMessageId: draftId,
             to: "to@test.org",
             subject: subject,
             body: body
         )
-        _ = await instanceUnderTest.sendMaskedEmailMessage(maskedInput)
-        XCTAssertTrue(testUtility.emailClient.sendMaskedEmailMessageCalled)
+        _ = await instanceUnderTest.sendAliasedEmailMessage(aliasedInput)
+        XCTAssertTrue(testUtility.emailClient.sendEmailMessageViaAliasCalled)
         XCTAssertTrue(testUtility.emailClient.deleteDraftEmailMessagesCalled)
         XCTAssertEqual(testUtility.emailClient.deleteDraftEmailMessagesParameter?.ids, [draftId])
     }
 
-    // MARK: - Tests: Load Email Masks
+    // MARK: - Tests: Load Email Alias
 
-    func test_loadEmailMasks_FiltersbyRealAddressAndEnabledStatus() async {
+    func test_loadEmailAliases_FiltersbyRealAddressAndEnabledStatus() async {
         let currentAddress = instanceUnderTest.emailAddress.emailAddress
-        let matchingMask = DataFactory.EmailSDK.generateEmailMask(
+        let matchingAlias = DataFactory.EmailSDK.generateEmailAlias(
             realAddress: currentAddress,
             status: .enabled
         )
-        let differentAddressMask = DataFactory.EmailSDK.generateEmailMask(
+        let differentAddressAlias = DataFactory.EmailSDK.generateEmailAlias(
             realAddress: "other@example.com",
             status: .enabled
         )
-        let disabledMask = DataFactory.EmailSDK.generateEmailMask(
+        let disabledAlias = DataFactory.EmailSDK.generateEmailAlias(
             realAddress: currentAddress,
             status: .disabled
         )
-        testUtility.emailClient.listEmailMasksForOwnerResult = ListOutput<EmailMask>(
-            items: [matchingMask, differentAddressMask, disabledMask]
+        testUtility.emailClient.listEmailAliasesForOwnerResult = ListOutput<EmailAlias>(
+            items: [matchingAlias, differentAddressAlias, disabledAlias]
         )
-        await instanceUnderTest.loadEmailMasks()
-        XCTAssertEqual(instanceUnderTest.emailMasks.count, 1)
-        XCTAssertEqual(instanceUnderTest.emailMasks.first?.id, matchingMask.id)
+        await instanceUnderTest.loadEmailAliases()
+        XCTAssertEqual(instanceUnderTest.emailAlias.count, 1)
+        XCTAssertEqual(instanceUnderTest.emailAlias.first?.id, matchingAlias.id)
     }
 
-    func test_loadEmailMasks_RestoresMaskSelectionFromDraft() async {
+    func test_loadEmailAliases_RestoresAliasSelectionFromDraft() async {
         let currentAddress = instanceUnderTest.emailAddress.emailAddress
-        let mask = DataFactory.EmailSDK.generateEmailMask(
-            id: "savedMaskId",
+        let alias = DataFactory.EmailSDK.generateEmailAlias(
+            id: "savedAliasId",
             realAddress: currentAddress,
             status: .enabled
         )
-        testUtility.emailClient.listEmailMasksForOwnerResult = ListOutput<EmailMask>(items: [mask])
+        testUtility.emailClient.listEmailAliasesForOwnerResult = ListOutput<EmailAlias>(items: [alias])
         instanceUnderTest.inputData = SendEmailInputData(
             draftEmailMessageId: "draftId",
             subject: "test",
             body: "test",
-            emailMaskId: "savedMaskId"
+            emailAliasId: "savedAliasId"
         )
-        await instanceUnderTest.loadEmailMasks()
-        XCTAssertNotNil(instanceUnderTest.selectedMask)
-        XCTAssertEqual(instanceUnderTest.selectedMask?.id, "savedMaskId")
+        await instanceUnderTest.loadEmailAliases()
+        XCTAssertNotNil(instanceUnderTest.selectedAlias)
+        XCTAssertEqual(instanceUnderTest.selectedAlias?.id, "savedAliasId")
     }
 
-    func test_loadEmailMasks_DoesNotRestoreMaskWhenAlreadySelected() async {
+    func test_loadEmailAliases_DoesNotRestoreAliasWhenAlreadySelected() async {
         let currentAddress = instanceUnderTest.emailAddress.emailAddress
-        let mask1 = DataFactory.EmailSDK.generateEmailMask(
-            id: "mask1",
+        let alias1 = DataFactory.EmailSDK.generateEmailAlias(
+            id: "alias1",
             realAddress: currentAddress,
             status: .enabled
         )
-        let mask2 = DataFactory.EmailSDK.generateEmailMask(
-            id: "mask2",
+        let alias2 = DataFactory.EmailSDK.generateEmailAlias(
+            id: "alias2",
             realAddress: currentAddress,
             status: .enabled
         )
-        testUtility.emailClient.listEmailMasksForOwnerResult = ListOutput<EmailMask>(items: [mask1, mask2])
-        instanceUnderTest.selectedMask = mask1
+        testUtility.emailClient.listEmailAliasesForOwnerResult = ListOutput<EmailAlias>(items: [alias1, alias2])
+        instanceUnderTest.selectedAlias = alias1
         instanceUnderTest.inputData = SendEmailInputData(
             draftEmailMessageId: "draftId",
             subject: "test",
             body: "test",
-            emailMaskId: "mask2"
+            emailAliasId: "alias2"
         )
-        await instanceUnderTest.loadEmailMasks()
-        // Should keep the already-selected mask, not override with draft's mask
-        XCTAssertEqual(instanceUnderTest.selectedMask?.id, "mask1")
+        await instanceUnderTest.loadEmailAliases()
+        // Should keep the already-selected alias, not override with draft's alias
+        XCTAssertEqual(instanceUnderTest.selectedAlias?.id, "alias1")
     }
 
-    // MARK: - Tests: Save Draft with Email Mask
+    // MARK: - Tests: Save Draft with Email Alias
 
-    func test_saveDraft_WithMaskSelected_PassesMaskIdToCreateInput() async {
+    func test_saveDraft_WithAliasSelected_PassesAliasIdToCreateInput() async {
         let currentAddress = instanceUnderTest.emailAddress.emailAddress
-        let mask = DataFactory.EmailSDK.generateEmailMask(
-            id: "selectedMaskId",
+        let alias = DataFactory.EmailSDK.generateEmailAlias(
+            id: "selectedAliasId",
             realAddress: currentAddress,
             status: .enabled
         )
-        instanceUnderTest.selectedMask = mask
+        instanceUnderTest.selectedAlias = alias
         instanceUnderTest.formData = [
             SendEmailMessageViewController.InputField.to: "to@test.org",
             SendEmailMessageViewController.InputField.cc: "",
@@ -536,11 +556,11 @@ class SendEmailMessageViewControllerTests: XCTestCase {
         ]
         await instanceUnderTest.saveDraft()
         XCTAssertTrue(testUtility.emailClient.createDraftEmailMessageCalled)
-        XCTAssertEqual(testUtility.emailClient.createDraftEmailMessageParameter?.emailMaskId, "selectedMaskId")
+        XCTAssertEqual(testUtility.emailClient.createDraftEmailMessageParameter?.emailAliasId, "selectedAliasId")
     }
 
-    func test_saveDraft_WithoutMask_PassesNilMaskId() async {
-        instanceUnderTest.selectedMask = nil
+    func test_saveDraft_WithoutAlias_PassesNilAliasId() async {
+        instanceUnderTest.selectedAlias = nil
         instanceUnderTest.formData = [
             SendEmailMessageViewController.InputField.to: "to@test.org",
             SendEmailMessageViewController.InputField.cc: "",
@@ -550,17 +570,17 @@ class SendEmailMessageViewControllerTests: XCTestCase {
         ]
         await instanceUnderTest.saveDraft()
         XCTAssertTrue(testUtility.emailClient.createDraftEmailMessageCalled)
-        XCTAssertNil(testUtility.emailClient.createDraftEmailMessageParameter?.emailMaskId)
+        XCTAssertNil(testUtility.emailClient.createDraftEmailMessageParameter?.emailAliasId)
     }
 
-    func test_saveDraft_UpdateExistingDraftWithMask_PassesMaskIdToUpdateInput() async {
+    func test_saveDraft_UpdateExistingDraftWithAlias_PassesAliasIdToUpdateInput() async {
         let currentAddress = instanceUnderTest.emailAddress.emailAddress
-        let mask = DataFactory.EmailSDK.generateEmailMask(
-            id: "updatedMaskId",
+        let alias = DataFactory.EmailSDK.generateEmailAlias(
+            id: "updatedAliasId",
             realAddress: currentAddress,
             status: .enabled
         )
-        instanceUnderTest.selectedMask = mask
+        instanceUnderTest.selectedAlias = alias
         instanceUnderTest.inputData = SendEmailInputData(
             draftEmailMessageId: "existingDraftId",
             to: "to@test.org",
@@ -577,38 +597,38 @@ class SendEmailMessageViewControllerTests: XCTestCase {
         await instanceUnderTest.saveDraft()
         XCTAssertTrue(testUtility.emailClient.updateDraftEmailMessageCalled)
         XCTAssertFalse(testUtility.emailClient.createDraftEmailMessageCalled)
-        XCTAssertEqual(testUtility.emailClient.updateDraftEmailMessageParameter?.emailMaskId, "updatedMaskId")
+        XCTAssertEqual(testUtility.emailClient.updateDraftEmailMessageParameter?.emailAliasId, "updatedAliasId")
         XCTAssertEqual(testUtility.emailClient.updateDraftEmailMessageParameter?.id, "existingDraftId")
     }
 
-    // MARK: - Tests: Show Mask Picker
+    // MARK: - Tests: Show Alias Picker
 
-    func test_showMaskPicker_LoadsMasksWhenEmpty() async throws {
+    func test_showAliasPicker_LoadsAliasWhenEmpty() async throws {
         let currentAddress = instanceUnderTest.emailAddress.emailAddress
-        let mask = DataFactory.EmailSDK.generateEmailMask(
+        let alias = DataFactory.EmailSDK.generateEmailAlias(
             realAddress: currentAddress,
             status: .enabled
         )
-        testUtility.emailClient.listEmailMasksForOwnerResult = ListOutput<EmailMask>(items: [mask])
-        instanceUnderTest.emailMasks = []
-        instanceUnderTest.showMaskPicker()
+        testUtility.emailClient.listEmailAliasesForOwnerResult = ListOutput<EmailAlias>(items: [alias])
+        instanceUnderTest.emailAlias = []
+        instanceUnderTest.showAliasPicker()
         try await waitForAsync()
         try await waitForAsync()
-        XCTAssertTrue(testUtility.emailClient.listEmailMasksForOwnerCalled)
-        XCTAssertEqual(instanceUnderTest.emailMasks.count, 1)
+        XCTAssertTrue(testUtility.emailClient.listEmailAliasesForOwnerCalled)
+        XCTAssertEqual(instanceUnderTest.emailAlias.count, 1)
     }
 
-    // MARK: - Tests: Delete Draft with Email Mask
+    // MARK: - Tests: Delete Draft with Email Alias
 
     @MainActor
-    func test_deleteDraft_WithMaskSelected_PassesMaskIdToDeleteInput() async {
+    func test_deleteDraft_WithAliasSelected_PassesAliasIdToDeleteInput() async {
         let currentAddress = instanceUnderTest.emailAddress.emailAddress
-        let mask = DataFactory.EmailSDK.generateEmailMask(
-            id: "deleteMaskId",
+        let alias = DataFactory.EmailSDK.generateEmailAlias(
+            id: "deleteAliasId",
             realAddress: currentAddress,
             status: .enabled
         )
-        instanceUnderTest.selectedMask = mask
+        instanceUnderTest.selectedAlias = alias
         instanceUnderTest.inputData = SendEmailInputData(
             draftEmailMessageId: "draftToDelete",
             subject: "test",
@@ -617,27 +637,27 @@ class SendEmailMessageViewControllerTests: XCTestCase {
         await instanceUnderTest.deleteDraft()
         XCTAssertTrue(testUtility.emailClient.deleteDraftEmailMessagesCalled)
         XCTAssertEqual(testUtility.emailClient.deleteDraftEmailMessagesParameter?.ids, ["draftToDelete"])
-        XCTAssertEqual(testUtility.emailClient.deleteDraftEmailMessagesParameter?.emailMaskId, "deleteMaskId")
+        XCTAssertEqual(testUtility.emailClient.deleteDraftEmailMessagesParameter?.emailAliasId, "deleteAliasId")
     }
 
     @MainActor
-    func test_deleteDraft_WithMaskFromInputData_PassesMaskIdToDeleteInput() async {
-        instanceUnderTest.selectedMask = nil
+    func test_deleteDraft_WithAliasFromInputData_PassesAliasIdToDeleteInput() async {
+        instanceUnderTest.selectedAlias = nil
         instanceUnderTest.inputData = SendEmailInputData(
             draftEmailMessageId: "draftToDelete",
             subject: "test",
             body: "test",
-            emailMaskId: "inputDataMaskId"
+            emailAliasId: "inputDataAliasId"
         )
         await instanceUnderTest.deleteDraft()
         XCTAssertTrue(testUtility.emailClient.deleteDraftEmailMessagesCalled)
         XCTAssertEqual(testUtility.emailClient.deleteDraftEmailMessagesParameter?.ids, ["draftToDelete"])
-        XCTAssertEqual(testUtility.emailClient.deleteDraftEmailMessagesParameter?.emailMaskId, "inputDataMaskId")
+        XCTAssertEqual(testUtility.emailClient.deleteDraftEmailMessagesParameter?.emailAliasId, "inputDataAliasId")
     }
 
     @MainActor
-    func test_deleteDraft_WithoutMask_PassesNilMaskId() async {
-        instanceUnderTest.selectedMask = nil
+    func test_deleteDraft_WithoutAlias_PassesNilAliasId() async {
+        instanceUnderTest.selectedAlias = nil
         instanceUnderTest.inputData = SendEmailInputData(
             draftEmailMessageId: "draftToDelete",
             subject: "test",
@@ -646,20 +666,20 @@ class SendEmailMessageViewControllerTests: XCTestCase {
         await instanceUnderTest.deleteDraft()
         XCTAssertTrue(testUtility.emailClient.deleteDraftEmailMessagesCalled)
         XCTAssertEqual(testUtility.emailClient.deleteDraftEmailMessagesParameter?.ids, ["draftToDelete"])
-        XCTAssertNil(testUtility.emailClient.deleteDraftEmailMessagesParameter?.emailMaskId)
+        XCTAssertNil(testUtility.emailClient.deleteDraftEmailMessagesParameter?.emailAliasId)
     }
 
-    // MARK: - Tests: Cancel Schedule with Email Mask
+    // MARK: - Tests: Cancel Schedule with Email Alias
 
     @MainActor
-    func test_cancelSchedule_WithMaskSelected_PassesMaskIdToInput() async throws {
+    func test_cancelSchedule_WithAliasSelected_PassesAliasIdToInput() async throws {
         let currentAddress = instanceUnderTest.emailAddress.emailAddress
-        let mask = DataFactory.EmailSDK.generateEmailMask(
-            id: "scheduleMaskId",
+        let alias = DataFactory.EmailSDK.generateEmailAlias(
+            id: "scheduleAliasId",
             realAddress: currentAddress,
             status: .enabled
         )
-        instanceUnderTest.selectedMask = mask
+        instanceUnderTest.selectedAlias = alias
         instanceUnderTest.inputData = SendEmailInputData(
             draftEmailMessageId: "scheduledDraftId",
             subject: "test",
@@ -684,7 +704,7 @@ class SendEmailMessageViewControllerTests: XCTestCase {
         try await waitForAsync()
         XCTAssertTrue(testUtility.emailClient.cancelScheduledDraftMessageCalled)
         XCTAssertEqual(testUtility.emailClient.cancelScheduledDraftMessageParameter?.id, "scheduledDraftId")
-        XCTAssertEqual(testUtility.emailClient.cancelScheduledDraftMessageParameter?.emailMaskId, "scheduleMaskId")
+        XCTAssertEqual(testUtility.emailClient.cancelScheduledDraftMessageParameter?.emailAliasId, "scheduleAliasId")
     }
 
 }

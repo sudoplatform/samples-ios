@@ -7,65 +7,64 @@
 import UIKit
 import SudoEmail
 
-/// This View Controller presents a global list of all `EmailMask` objects for the current user.
+/// This View Controller presents a global list of all `EmailAlias` objects for the current user.
 ///
-/// Supports segmented filtering between internal and external mask types when external
-/// masks are enabled via configuration.
+/// Supports segmented filtering between internal and external alias types when external
+/// aliases are enabled via configuration.
 ///
 /// - Links From:
-///     - `EmailMessageListViewController`: A user taps the "Masks" button in the navigation bar.
-///     - `EmailAddressListViewController`: A user taps the "Masks" button in the navigation bar.
+///     - `EmailMessageListViewController`: A user taps the "Alias" button in the navigation bar.
 /// - Links To:
-///     - `CreateEmailMaskViewController`: If a user taps the "Create Email Mask" row, the `CreateEmailMaskViewController` will
-///         be presented so the user can provision a new email mask.
-///     - `UpdateEmailMaskViewController`: If a user taps an existing mask row, the `UpdateEmailMaskViewController` will be
-///         presented so the user can edit the mask's metadata and expiry.
+///     - `CreateEmailAliasViewController`: If a user taps the "Create Email Alias" row, the `CreateEmailAliasViewController` will
+///         be presented so the user can provision a new email alias.
+///     - `UpdateEmailAliasViewController`: If a user taps an existing alias row, the `UpdateEmailAliasViewController` will be
+///         presented so the user can edit the alias's metadata and expiry.
 @MainActor
-class EmailMaskListViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
+class EmailAliasListViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
 
     // MARK: - Outlets
 
-    /// The table view that lists each email mask.
+    /// The table view that lists each email alias.
     ///
-    /// If the user does not have any email masks, only the "Create Email Mask" entry will be seen.
+    /// If the user does not have any email aliases, only the "Create Email Alias" entry will be seen.
     @IBOutlet weak var tableView: UITableView!
 
     // MARK: - Supplementary
 
-    /// Segues that are performed in `EmailMaskListViewController`.
+    /// Segues that are performed in `EmailAliasListViewController`.
     enum Segue: String {
-        /// Used to navigate to the `CreateEmailMaskViewController`.
-        case navigateToCreateEmailMask
-        /// Used to navigate to the `UpdateEmailMaskViewController`.
-        case navigateToUpdateEmailMask
-        /// Used to navigate back to the `EmailMaskListViewController` (unwind).
-        case returnToEmailMaskList
+        /// Used to navigate to the `CreateEmailAliasViewController`.
+        case navigateToCreateEmailAlias
+        /// Used to navigate to the `UpdateEmailAliasViewController`.
+        case navigateToUpdateEmailAlias
+        /// Used to navigate back to the `EmailAliasListViewController` (unwind).
+        case returnToEmailAliasList
     }
 
     // MARK: - Properties
 
-    /// A list of all `EmailMask` objects for the current user.
-    var emailMasks: [EmailMask] = []
+    /// A list of all `EmailAlias` objects for the current user.
+    var emailAlias: [EmailAlias] = []
 
-    /// The filtered subset of masks matching the currently selected segment.
-    var filteredMasks: [EmailMask] = []
+    /// The filtered subset of aliases matching the currently selected segment.
+    var filteredAlias: [EmailAlias] = []
 
-    /// Whether email masks are enabled in the service configuration.
-    var masksEnabled: Bool = true
+    /// Whether email aliases are enabled in the service configuration.
+    var aliasesEnabled: Bool = true
 
-    /// Cached configuration flag indicating whether external masks are supported.
-    var externalMasksEnabled: Bool = false
+    /// Cached configuration flag indicating whether external aliases are supported.
+    var externalAliasEnabled: Bool = false
 
-    /// The segmented control for switching between Internal and External mask views.
-    /// Only created when `externalMasksEnabled` is true.
+    /// The segmented control for switching between Internal and External alias views.
+    /// Only created when `externalAliasEnabled` is true.
     var segmentedControl: UISegmentedControl?
 
     /// Tracks the currently selected segment (defaults to .internal).
-    var selectedSegment: MaskTypeSegment = .internal
+    var selectedSegment: AliasTypeSegment = .internal
 
     // MARK: - Properties: Computed
 
-    /// Email client used to manage email masks.
+    /// Email client used to manage email aliases.
     var emailClient: SudoEmailClient {
         return AppDelegate.dependencies.emailClient
     }
@@ -80,14 +79,14 @@ class EmailMaskListViewController: UIViewController, UITableViewDataSource, UITa
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         Task {
-            await self.loadMasks()
+            await self.loadAlias()
         }
     }
 
     // MARK: - Actions
 
     /// Action associated with returning to this view from a segue.
-    @IBAction func returnToEmailMaskList(segue: UIStoryboardSegue) {
+    @IBAction func returnToEmailAliasList(segue: UIStoryboardSegue) {
     }
 
     // MARK: - Navigation
@@ -95,17 +94,17 @@ class EmailMaskListViewController: UIViewController, UITableViewDataSource, UITa
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         let segueType = Segue(rawValue: segue.identifier ?? "")
         switch segueType {
-        case .navigateToCreateEmailMask:
-            // CreateEmailMaskViewController now loads its own email addresses
+        case .navigateToCreateEmailAlias:
+            // CreateEmailAliasViewController now loads its own email addresses
             break
 
-        case .navigateToUpdateEmailMask:
-            guard let updateVC = segue.destination as? UpdateEmailMaskViewController,
+        case .navigateToUpdateEmailAlias:
+            guard let updateVC = segue.destination as? UpdateEmailAliasViewController,
                   let row = tableView.indexPathForSelectedRow?.row,
-                  row < filteredMasks.count else {
+                  row < filteredAlias.count else {
                 break
             }
-            updateVC.emailMask = filteredMasks[row]
+            updateVC.emailAlias = filteredAlias[row]
 
         default:
             break
@@ -123,53 +122,53 @@ class EmailMaskListViewController: UIViewController, UITableViewDataSource, UITa
 
     // MARK: - Helpers
 
-    /// Checks the email mask configuration and loads all masks for the current user.
+    /// Checks the email alias configuration and loads all aliases for the current user.
     ///
-    /// If masks are not enabled in the configuration, an informational label is displayed and the "Create" row is hidden.
-    /// Also checks whether external masks are enabled to show the segmented filter control.
-    func loadMasks() async {
+    /// If aliases are not enabled in the configuration, an informational label is displayed and the "Create" row is hidden.
+    /// Also checks whether external aliases are enabled to show the segmented filter control.
+    func loadAlias() async {
         // Step 1: Check configuration
         var configExternalEnabled = false
         do {
             let configData = try await emailClient.getConfigurationData()
-            if !configData.emailMasksEnabled {
-                self.masksEnabled = false
+            if !configData.emailAliasesEnabled {
+                self.aliasesEnabled = false
                 Task {
-                    self.showMasksDisabledLabel()
+                    self.showAliasDisabledLabel()
                     self.tableView.reloadData()
                 }
                 return
             }
-            configExternalEnabled = configData.externalEmailMasksEnabled
+            configExternalEnabled = configData.externalEmailAliasesEnabled
         } catch {
             Task {
-                self.presentErrorAlert(message: "Failed to get email mask configuration", error: error)
+                self.presentErrorAlert(message: "Failed to get email alias configuration", error: error)
             }
             return
         }
 
-        // Step 2: Load all masks for the current user
+        // Step 2: Load all aliases for the current user
         do {
-            let input = ListEmailMasksForOwnerInput()
-            let output = try await emailClient.listEmailMasksForOwner(withInput: input)
+            let input = ListEmailAliasesForOwnerInput()
+            let output = try await emailClient.listEmailAliasesForOwner(withInput: input)
             Task {
-                self.externalMasksEnabled = configExternalEnabled
-                self.emailMasks = output.items
+                self.externalAliasEnabled = configExternalEnabled
+                self.emailAlias = output.items
                 self.configureSegmentedControl()
-                self.filterMasks()
+                self.filterAlias()
                 self.tableView.reloadData()
             }
         } catch {
             Task {
-                self.presentErrorAlert(message: "Failed to list email masks", error: error)
+                self.presentErrorAlert(message: "Failed to list email aliases", error: error)
             }
         }
     }
 
-    /// Displays an informational label indicating that email masks are not available.
-    func showMasksDisabledLabel() {
+    /// Displays an informational label indicating that email aliases are not available.
+    func showAliasDisabledLabel() {
         let label = UILabel()
-        label.text = "Email masks are not enabled for this account."
+        label.text = "Email aliases are not enabled for this account."
         label.textAlignment = .center
         label.textColor = .secondaryLabel
         label.numberOfLines = 0
@@ -180,12 +179,12 @@ class EmailMaskListViewController: UIViewController, UITableViewDataSource, UITa
 
     // MARK: - Segmented Control
 
-    /// Configures the segmented control based on the `externalMasksEnabled` flag.
+    /// Configures the segmented control based on the `externalAliasEnabled` flag.
     func configureSegmentedControl() {
-        if externalMasksEnabled {
+        if externalAliasEnabled {
             if segmentedControl == nil {
                 let control = UISegmentedControl(items: ["Internal", "External"])
-                control.selectedSegmentIndex = MaskTypeSegment.internal.rawValue
+                control.selectedSegmentIndex = AliasTypeSegment.internal.rawValue
                 control.addTarget(self, action: #selector(segmentChanged(_:)), for: .valueChanged)
 
                 let headerView = UIView(frame: CGRect(x: 0, y: 0, width: tableView.bounds.width, height: 44))
@@ -212,21 +211,21 @@ class EmailMaskListViewController: UIViewController, UITableViewDataSource, UITa
     }
 
     @objc func segmentChanged(_ sender: UISegmentedControl) {
-        guard let segment = MaskTypeSegment(rawValue: sender.selectedSegmentIndex) else { return }
+        guard let segment = AliasTypeSegment(rawValue: sender.selectedSegmentIndex) else { return }
         selectedSegment = segment
-        filterMasks()
+        filterAlias()
         tableView.reloadData()
     }
 
     // MARK: - Filtering
 
-    /// Filters `emailMasks` into `filteredMasks` based on the currently selected segment.
-    func filterMasks() {
-        if externalMasksEnabled {
-            let type: EmailMask.RealAddressType = selectedSegment == .external ? .external : .internal
-            filteredMasks = MaskListFilter.filter(masks: emailMasks, byType: type)
+    /// Filters `emailAlias` into `filteredAlias` based on the currently selected segment.
+    func filterAlias() {
+        if externalAliasEnabled {
+            let type: EmailAlias.RealAddressType = selectedSegment == .external ? .external : .internal
+            filteredAlias = AliasListFilter.filter(aliases: emailAlias, byType: type)
         } else {
-            filteredMasks = emailMasks
+            filteredAlias = emailAlias
         }
     }
 
@@ -237,13 +236,13 @@ class EmailMaskListViewController: UIViewController, UITableViewDataSource, UITa
     }
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if !masksEnabled {
+        if !aliasesEnabled {
             return 0
         }
 
-        if filteredMasks.isEmpty {
+        if filteredAlias.isEmpty {
             let emptyLabel = UILabel()
-            emptyLabel.text = "No email masks. Tap 'Create Email Mask' to get started."
+            emptyLabel.text = "No email aliases. Tap 'Create Email Alias' to get started."
             emptyLabel.textAlignment = .center
             emptyLabel.textColor = .secondaryLabel
             emptyLabel.numberOfLines = 0
@@ -253,28 +252,28 @@ class EmailMaskListViewController: UIViewController, UITableViewDataSource, UITa
             tableView.backgroundView = nil
         }
 
-        return filteredMasks.count + 1
+        return filteredAlias.count + 1
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell: UITableViewCell
-        if indexPath.row == filteredMasks.count {
+        if indexPath.row == filteredAlias.count {
             cell = tableView.dequeueReusableCell(withIdentifier: "create", for: indexPath)
-            cell.textLabel?.text = "Create Email Mask"
+            cell.textLabel?.text = "Create Email Alias"
             cell.textLabel?.textColor = UIColor.systemBlue
             cell.accessoryView = UIImageView(image: UIImage(systemName: "plus"))
             cell.semanticContentAttribute = .forceRightToLeft
         } else {
-            let mask = filteredMasks[indexPath.row]
+            let alias = filteredAlias[indexPath.row]
             cell = tableView.dequeueReusableCell(withIdentifier: "default", for: indexPath)
 
             var content = cell.defaultContentConfiguration()
-            content.text = mask.maskAddress
+            content.text = alias.aliasAddress
 
             var detailParts: [String] = []
-            detailParts.append(mask.realAddress)
+            detailParts.append(alias.realAddress)
 
-            switch mask.status {
+            switch alias.status {
             case .pending:
                 detailParts.append("Pending")
             case .enabled:
@@ -285,13 +284,13 @@ class EmailMaskListViewController: UIViewController, UITableViewDataSource, UITa
                 detailParts.append("Locked")
             }
 
-            if let metadata = mask.metadata, !metadata.isEmpty {
+            if let metadata = alias.metadata, !metadata.isEmpty {
                 let metadataStr = metadata.map { "\($0.key): \($0.value)" }.joined(separator: ", ")
                 let truncated = metadataStr.count > 30 ? String(metadataStr.prefix(30)) + "…" : metadataStr
                 detailParts.append(truncated)
             }
 
-            if let expiresAt = mask.expiresAt {
+            if let expiresAt = alias.expiresAt {
                 detailParts.append("Expires: \(expiresAt.getFormattedDate(format: "yyyy-MM-dd"))")
             }
 
@@ -301,24 +300,24 @@ class EmailMaskListViewController: UIViewController, UITableViewDataSource, UITa
 
             cell.contentConfiguration = content
 
-            // Status tag for external masks
-            if mask.realAddressType == .external {
+            // Status tag for external aliases
+            if alias.realAddressType == .external {
                 let statusLabel = UILabel()
                 let statusColor: UIColor
 
-                switch mask.status {
+                switch alias.status {
                 case .pending:
                     statusLabel.text = "PENDING"
-                    statusColor = MaskStatusColor.pending
+                    statusColor = AliasStatusColor.pending
                 case .enabled:
                     statusLabel.text = "ENABLED"
-                    statusColor = MaskStatusColor.enabled
+                    statusColor = AliasStatusColor.enabled
                 case .disabled:
                     statusLabel.text = "DISABLED"
-                    statusColor = MaskStatusColor.disabled
+                    statusColor = AliasStatusColor.disabled
                 case .locked:
                     statusLabel.text = "LOCKED"
-                    statusColor = MaskStatusColor.disabled
+                    statusColor = AliasStatusColor.disabled
                 }
 
                 statusLabel.textColor = statusColor
@@ -337,55 +336,55 @@ class EmailMaskListViewController: UIViewController, UITableViewDataSource, UITa
 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         assert(indexPath.section == 0)
-        if indexPath.row == filteredMasks.count {
-            performSegue(withIdentifier: Segue.navigateToCreateEmailMask.rawValue, sender: self)
+        if indexPath.row == filteredAlias.count {
+            performSegue(withIdentifier: Segue.navigateToCreateEmailAlias.rawValue, sender: self)
         } else {
-            let mask = filteredMasks[indexPath.row]
-            if mask.realAddressType == .external && mask.status == .pending {
-                showVerificationInitiationAlert(for: mask, at: indexPath)
+            let alias = filteredAlias[indexPath.row]
+            if alias.realAddressType == .external && alias.status == .pending {
+                showVerificationInitiationAlert(for: alias, at: indexPath)
             } else {
-                performSegue(withIdentifier: Segue.navigateToUpdateEmailMask.rawValue, sender: self)
+                performSegue(withIdentifier: Segue.navigateToUpdateEmailAlias.rawValue, sender: self)
             }
         }
         tableView.deselectRow(at: indexPath, animated: true)
     }
 
     func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
-        guard indexPath.row < filteredMasks.count else {
+        guard indexPath.row < filteredAlias.count else {
             return nil
         }
 
-        let mask = filteredMasks[indexPath.row]
+        let alias = filteredAlias[indexPath.row]
 
-        if mask.realAddressType == .external {
-            return buildExternalMaskSwipeActions(for: mask, at: indexPath)
+        if alias.realAddressType == .external {
+            return buildExternalAliasSwipeActions(for: alias, at: indexPath)
         }
 
-        return buildInternalMaskSwipeActions(for: mask, at: indexPath)
+        return buildInternalAliasSwipeActions(for: alias, at: indexPath)
     }
 
-    // MARK: - Swipe Actions: Internal Masks
+    // MARK: - Swipe Actions: Internal Alias
 
-    private func buildInternalMaskSwipeActions(for mask: EmailMask, at indexPath: IndexPath) -> UISwipeActionsConfiguration {
+    private func buildInternalAliasSwipeActions(for alias: EmailAlias, at indexPath: IndexPath) -> UISwipeActionsConfiguration {
         let deleteAction = UIContextualAction(style: .destructive, title: "Delete") { _, _, completion in
-            self.presentActivityAlert(message: "Deleting Email Mask")
+            self.presentActivityAlert(message: "Deleting Email Alias")
             Task {
                 do {
-                    let input = DeprovisionEmailMaskInput(emailMaskId: mask.id)
-                    _ = try await self.emailClient.deprovisionEmailMask(withInput: input)
+                    let input = DeprovisionEmailAliasInput(emailAliasId: alias.id)
+                    _ = try await self.emailClient.deprovisionEmailAlias(withInput: input)
                     Task {
                         self.dismissActivityAlert()
-                        if let idx = self.emailMasks.firstIndex(where: { $0.id == mask.id }) {
-                            self.emailMasks.remove(at: idx)
+                        if let idx = self.emailAlias.firstIndex(where: { $0.id == alias.id }) {
+                            self.emailAlias.remove(at: idx)
                         }
-                        self.filterMasks()
+                        self.filterAlias()
                         self.tableView.reloadData()
                         completion(true)
                     }
                 } catch {
                     Task {
                         self.dismissActivityAlert()
-                        self.presentErrorAlert(message: "Failed to delete email mask", error: error)
+                        self.presentErrorAlert(message: "Failed to delete email alias", error: error)
                         completion(false)
                     }
                 }
@@ -394,23 +393,23 @@ class EmailMaskListViewController: UIViewController, UITableViewDataSource, UITa
         deleteAction.backgroundColor = .red
 
         let toggleAction: UIContextualAction
-        if mask.status == .enabled {
+        if alias.status == .enabled {
             toggleAction = UIContextualAction(style: .normal, title: "Disable") { _, _, completion in
                 Task {
                     do {
-                        let input = DisableEmailMaskInput(emailMaskId: mask.id)
-                        let updatedMask = try await self.emailClient.disableEmailMask(withInput: input)
+                        let input = DisableEmailAliasInput(emailAliasId: alias.id)
+                        let updatedAlias = try await self.emailClient.disableEmailAlias(withInput: input)
                         Task {
-                            if let idx = self.emailMasks.firstIndex(where: { $0.id == mask.id }) {
-                                self.emailMasks[idx] = updatedMask
+                            if let idx = self.emailAlias.firstIndex(where: { $0.id == alias.id }) {
+                                self.emailAlias[idx] = updatedAlias
                             }
-                            self.filterMasks()
+                            self.filterAlias()
                             self.tableView.reloadData()
                             completion(true)
                         }
                     } catch {
                         Task {
-                            self.presentErrorAlert(message: "Failed to disable email mask", error: error)
+                            self.presentErrorAlert(message: "Failed to disable email alias", error: error)
                             completion(false)
                         }
                     }
@@ -421,19 +420,19 @@ class EmailMaskListViewController: UIViewController, UITableViewDataSource, UITa
             toggleAction = UIContextualAction(style: .normal, title: "Enable") { _, _, completion in
                 Task {
                     do {
-                        let input = EnableEmailMaskInput(emailMaskId: mask.id)
-                        let updatedMask = try await self.emailClient.enableEmailMask(withInput: input)
+                        let input = EnableEmailAliasInput(emailAliasId: alias.id)
+                        let updatedAlias = try await self.emailClient.enableEmailAlias(withInput: input)
                         Task {
-                            if let idx = self.emailMasks.firstIndex(where: { $0.id == mask.id }) {
-                                self.emailMasks[idx] = updatedMask
+                            if let idx = self.emailAlias.firstIndex(where: { $0.id == alias.id }) {
+                                self.emailAlias[idx] = updatedAlias
                             }
-                            self.filterMasks()
+                            self.filterAlias()
                             self.tableView.reloadData()
                             completion(true)
                         }
                     } catch {
                         Task {
-                            self.presentErrorAlert(message: "Failed to enable email mask", error: error)
+                            self.presentErrorAlert(message: "Failed to enable email alias", error: error)
                             completion(false)
                         }
                     }
@@ -445,10 +444,10 @@ class EmailMaskListViewController: UIViewController, UITableViewDataSource, UITa
         return UISwipeActionsConfiguration(actions: [deleteAction, toggleAction])
     }
 
-    // MARK: - Swipe Actions: External Masks
+    // MARK: - Swipe Actions: External Alias
 
-    private func buildExternalMaskSwipeActions(for mask: EmailMask, at indexPath: IndexPath) -> UISwipeActionsConfiguration? {
-        let actionTitles = SwipeActionResolver.actions(for: mask)
+    private func buildExternalAliasSwipeActions(for alias: EmailAlias, at indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        let actionTitles = SwipeActionResolver.actions(for: alias)
         guard !actionTitles.isEmpty else { return nil }
 
         let actions: [UIContextualAction] = actionTitles.compactMap { title in
@@ -456,7 +455,7 @@ class EmailMaskListViewController: UIViewController, UITableViewDataSource, UITa
             case "Verify":
                 let action = UIContextualAction(style: .normal, title: "Verify") { [weak self] _, _, completion in
                     guard let self = self else { completion(false); return }
-                    self.showVerificationInitiationAlert(for: mask, at: indexPath)
+                    self.showVerificationInitiationAlert(for: alias, at: indexPath)
                     completion(true)
                 }
                 action.backgroundColor = .systemBlue
@@ -467,19 +466,19 @@ class EmailMaskListViewController: UIViewController, UITableViewDataSource, UITa
                     guard let self = self else { completion(false); return }
                     Task {
                         do {
-                            let input = EnableEmailMaskInput(emailMaskId: mask.id)
-                            let updatedMask = try await self.emailClient.enableEmailMask(withInput: input)
+                            let input = EnableEmailAliasInput(emailAliasId: alias.id)
+                            let updatedAlias = try await self.emailClient.enableEmailAlias(withInput: input)
                             Task {
-                                if let idx = self.emailMasks.firstIndex(where: { $0.id == mask.id }) {
-                                    self.emailMasks[idx] = updatedMask
+                                if let idx = self.emailAlias.firstIndex(where: { $0.id == alias.id }) {
+                                    self.emailAlias[idx] = updatedAlias
                                 }
-                                self.filterMasks()
+                                self.filterAlias()
                                 self.tableView.reloadData()
                             }
                             completion(true)
                         } catch {
                             Task {
-                                self.presentErrorAlert(message: "Failed to enable mask", error: error)
+                                self.presentErrorAlert(message: "Failed to enable alias", error: error)
                             }
                             completion(false)
                         }
@@ -493,19 +492,19 @@ class EmailMaskListViewController: UIViewController, UITableViewDataSource, UITa
                     guard let self = self else { completion(false); return }
                     Task {
                         do {
-                            let input = DisableEmailMaskInput(emailMaskId: mask.id)
-                            let updatedMask = try await self.emailClient.disableEmailMask(withInput: input)
+                            let input = DisableEmailAliasInput(emailAliasId: alias.id)
+                            let updatedAlias = try await self.emailClient.disableEmailAlias(withInput: input)
                             Task {
-                                if let idx = self.emailMasks.firstIndex(where: { $0.id == mask.id }) {
-                                    self.emailMasks[idx] = updatedMask
+                                if let idx = self.emailAlias.firstIndex(where: { $0.id == alias.id }) {
+                                    self.emailAlias[idx] = updatedAlias
                                 }
-                                self.filterMasks()
+                                self.filterAlias()
                                 self.tableView.reloadData()
                             }
                             completion(true)
                         } catch {
                             Task {
-                                self.presentErrorAlert(message: "Failed to disable mask", error: error)
+                                self.presentErrorAlert(message: "Failed to disable alias", error: error)
                             }
                             completion(false)
                         }
@@ -517,24 +516,24 @@ class EmailMaskListViewController: UIViewController, UITableViewDataSource, UITa
             case "Delete":
                 let action = UIContextualAction(style: .destructive, title: "Delete") { [weak self] _, _, completion in
                     guard let self = self else { completion(false); return }
-                    self.presentActivityAlert(message: "Deleting Email Mask")
+                    self.presentActivityAlert(message: "Deleting Email Alias")
                     Task {
                         do {
-                            let input = DeprovisionEmailMaskInput(emailMaskId: mask.id)
-                            _ = try await self.emailClient.deprovisionEmailMask(withInput: input)
+                            let input = DeprovisionEmailAliasInput(emailAliasId: alias.id)
+                            _ = try await self.emailClient.deprovisionEmailAlias(withInput: input)
                             Task {
                                 self.dismissActivityAlert()
-                                if let idx = self.emailMasks.firstIndex(where: { $0.id == mask.id }) {
-                                    self.emailMasks.remove(at: idx)
+                                if let idx = self.emailAlias.firstIndex(where: { $0.id == alias.id }) {
+                                    self.emailAlias.remove(at: idx)
                                 }
-                                self.filterMasks()
+                                self.filterAlias()
                                 self.tableView.reloadData()
                             }
                             completion(true)
                         } catch {
                             Task {
                                 self.dismissActivityAlert()
-                                self.presentErrorAlert(message: "Failed to delete mask", error: error)
+                                self.presentErrorAlert(message: "Failed to delete alias", error: error)
                             }
                             completion(false)
                         }
@@ -554,15 +553,15 @@ class EmailMaskListViewController: UIViewController, UITableViewDataSource, UITa
 
     // MARK: - Verification Flow
 
-    func showVerificationInitiationAlert(for mask: EmailMask, at indexPath: IndexPath) {
+    func showVerificationInitiationAlert(for alias: EmailAlias, at indexPath: IndexPath) {
         presentActivityAlert(message: "Sending verification code...")
 
         Task { [weak self] in
             guard let self = self else { return }
 
             let input = VerifyExternalEmailAddressInput(
-                emailAddress: mask.realAddress,
-                emailMaskId: mask.id,
+                emailAddress: alias.realAddress,
+                emailAliasId: alias.id,
                 verificationCode: nil
             )
 
@@ -570,7 +569,7 @@ class EmailMaskListViewController: UIViewController, UITableViewDataSource, UITa
                 _ = try await self.emailClient.verifyExternalEmailAddress(withInput: input)
                 Task {
                     self.dismissActivityAlert {
-                        self.showCodeEntryDialog(for: mask, at: indexPath)
+                        self.showCodeEntryDialog(for: alias, at: indexPath)
                     }
                 }
             } catch {
@@ -583,7 +582,7 @@ class EmailMaskListViewController: UIViewController, UITableViewDataSource, UITa
         }
     }
 
-    func showCodeEntryDialog(for mask: EmailMask, at indexPath: IndexPath) {
+    func showCodeEntryDialog(for alias: EmailAlias, at indexPath: IndexPath) {
         let alert = UIAlertController(
             title: "Enter Verification Code",
             message: "Enter the 6-digit code sent to your email",
@@ -593,7 +592,7 @@ class EmailMaskListViewController: UIViewController, UITableViewDataSource, UITa
         let confirmAction = UIAlertAction(title: "Confirm", style: .default) { [weak self] _ in
             guard let self = self,
                   let code = alert.textFields?.first?.text else { return }
-            self.submitVerificationCode(code, for: mask)
+            self.submitVerificationCode(code, for: alias)
         }
         confirmAction.isEnabled = false
 
@@ -617,15 +616,15 @@ class EmailMaskListViewController: UIViewController, UITableViewDataSource, UITa
         present(alert, animated: true)
     }
 
-    func submitVerificationCode(_ code: String, for mask: EmailMask) {
+    func submitVerificationCode(_ code: String, for alias: EmailAlias) {
         presentActivityAlert(message: "Verifying...")
 
         Task { [weak self] in
             guard let self = self else { return }
 
             let input = VerifyExternalEmailAddressInput(
-                emailAddress: mask.realAddress,
-                emailMaskId: mask.id,
+                emailAddress: alias.realAddress,
+                emailAliasId: alias.id,
                 verificationCode: code
             )
 
@@ -637,11 +636,11 @@ class EmailMaskListViewController: UIViewController, UITableViewDataSource, UITa
 
                     if result.isVerified {
                         Task {
-                            await self.loadMasks()
+                            await self.loadAlias()
                         }
                         let successAlert = UIAlertController(
                             title: "Success",
-                            message: "Mask verified successfully",
+                            message: "Alias verified successfully",
                             preferredStyle: .alert
                         )
                         successAlert.addAction(UIAlertAction(title: "OK", style: .default))

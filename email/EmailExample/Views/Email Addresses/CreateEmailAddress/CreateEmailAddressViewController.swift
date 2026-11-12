@@ -223,7 +223,7 @@ class CreateEmailAddressViewController: UIViewController,
             let provisionAddressInput = ProvisionEmailAddressInput(
                 emailAddress: address,
                 ownershipProofToken: ownershipProofToken,
-                alias: alias
+                displayName: alias
             )
             _ = try await emailClient.provisionEmailAddress(withInput: provisionAddressInput)
             Task {
@@ -240,7 +240,7 @@ class CreateEmailAddressViewController: UIViewController,
     }
 
     func getSupportedEmailDomains() async throws -> [String] {
-        return try await emailClient.getSupportedEmailDomains()
+        return try await emailClient.listEmailDomains().filter { !$0.isAliasDomain }.map { $0.domain }
     }
 
     // MARK: - Helpers: Configuration

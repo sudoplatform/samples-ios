@@ -47,7 +47,7 @@ extension DataFactory {
                 owner: owner,
                 owners: owners,
                 emailAddressId: emailAddressId,
-                emailMaskId: nil,
+                emailAliasId: nil,
                 folderId: folderId,
                 previousFolderId: previousFolderId,
                 createdAt: createdAt,
@@ -128,7 +128,7 @@ extension DataFactory {
                 createdAt: createdAt,
                 updatedAt: updatedAt,
                 lastReceivedAt: lastReceivedAt,
-                alias: alias
+                displayName: alias
             )
         }
 
@@ -170,8 +170,8 @@ extension DataFactory {
             emailMessageRecipientsLimit: Int = 2,
             encryptedEmailMessageRecipientsLimit: Int = 2,
             prohibitedFileExtensions: [String] = [],
-            emailMasksEnabled: Bool = true,
-            externalEmailMasksEnabled: Bool = false,
+            emailAliasesEnabled: Bool = true,
+            externalEmailAliasesEnabled: Bool = false,
             allowOwnerEmailAddressReuse: Bool = false
         ) -> ConfigurationData {
             return ConfigurationData(
@@ -182,8 +182,8 @@ extension DataFactory {
                 emailMessageRecipientsLimit: emailMessageRecipientsLimit,
                 encryptedEmailMessageRecipientsLimit: encryptedEmailMessageRecipientsLimit,
                 prohibitedFileExtensions: prohibitedFileExtensions,
-                emailMasksEnabled: emailMasksEnabled,
-                externalEmailMasksEnabled: externalEmailMasksEnabled,
+                emailAliasesEnabled: emailAliasesEnabled,
+                externalEmailAliasesEnabled: externalEmailAliasesEnabled,
                 allowOwnerEmailAddressReuse: allowOwnerEmailAddressReuse
             )
         }
@@ -214,7 +214,7 @@ extension DataFactory {
                 owner: owner,
                 owners: owners,
                 emailAddressId: emailAddressId,
-                emailMaskId: nil,
+                emailAliasId: nil,
                 folderId: folderId,
                 previousFolderId: previousFolderId,
                 createdAt: createdAt,
@@ -257,15 +257,15 @@ extension DataFactory {
             )
         }
 
-        static func generateEmailMask(
+        static func generateEmailAlias(
             id: String = UUID().uuidString,
             owner: String = UUID().uuidString,
             owners: [Owner] = [Owner(id: "dummyOwnerId", issuer: "dummyIssuerId")],
             identityId: String = UUID().uuidString,
-            maskAddress: String = "mask@example.com",
+            aliasAddress: String = "alias@example.com",
             realAddress: String = "real@example.com",
-            realAddressType: EmailMask.RealAddressType = .internal,
-            status: EmailMask.EmailMaskStatus = .enabled,
+            realAddressType: EmailAlias.RealAddressType = .internal,
+            status: EmailAlias.EmailAliasStatus = .enabled,
             inboundReceived: Int = 0,
             inboundDelivered: Int = 0,
             outboundReceived: Int = 0,
@@ -277,13 +277,13 @@ extension DataFactory {
             version: Int = 1,
             expiresAt: Date? = nil,
             metadata: [String: String]? = nil
-        ) -> EmailMask {
-            return EmailMask(
+        ) -> EmailAlias {
+            return EmailAlias(
                 id: id,
                 owner: owner,
                 owners: owners,
                 identityId: identityId,
-                maskAddress: maskAddress,
+                aliasAddress: aliasAddress,
                 realAddress: realAddress,
                 realAddressType: realAddressType,
                 status: status,
@@ -299,6 +299,14 @@ extension DataFactory {
                 expiresAt: expiresAt,
                 metadata: metadata
             )
+        }
+
+        static func generateEmailDomain(
+            domain: String = "example.com",
+            isAliasDomain: Bool = false,
+            metadata: [String: String] = [:]
+        ) -> EmailDomain {
+            return EmailDomain(domain: domain, isAliasDomain: isAliasDomain, metadata: metadata)
         }
     }
 }

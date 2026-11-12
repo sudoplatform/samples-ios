@@ -91,7 +91,7 @@
                     <connections>
                         <segue destination="Q5b-Pg-S2T" kind="show" identifier="navigateToCreateEmailAddress" id="8m2-jT-ZFl"/>
                         <segue destination="Alc-eI-aBz" kind="show" identifier="navigateToEmailMessageList" id="DvY-a5-WXK"/>
-                        <segue destination="eMk-Li-st1" kind="show" identifier="navigateToEmailMaskList" id="aLs-Mk-sg1"/>
+                        <segue destination="eMk-Li-st1" kind="show" identifier="navigateToEmailAliasList" id="aLs-Mk-sg1"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="3V9-IM-SiJ" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -137,7 +137,7 @@
                         <segue destination="zQo-F7-lRo" kind="show" identifier="navigateToEmailAddressSettings" id="tB2-24-TNg"/>
                         <segue destination="MnW-ZM-kOj" kind="show" identifier="navigateToCreateCustomFolder" id="XTb-gZ-OWc"/>
                         <segue destination="mDf-wc-Rsa" kind="show" identifier="navigateToUpdateCustomFolder" id="vRW-Ny-jBC"/>
-                        <segue destination="eMk-Li-st1" kind="show" identifier="navigateToEmailMaskList" id="mSk-Nv-g8t"/>
+                        <segue destination="eMk-Li-st1" kind="show" identifier="navigateToEmailAliasList" id="mSk-Nv-g8t"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="6Zy-8b-Wgz" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -212,14 +212,14 @@
             </objects>
             <point key="canvasLocation" x="3868" y="1569"/>
         </scene>
-        <!--Email Masks-->
+        <!--Email Aliases-->
         <scene sceneID="eMk-Sc-n01">
             <objects>
-                <viewController storyboardIdentifier="emailMaskList" id="eMk-Li-st1" customClass="EmailMaskListViewController" customModule="EmailExample" customModuleProvider="target" sceneMemberID="viewController">
-                    <navigationItem key="navigationItem" title="Email Masks" id="eMk-Nv-it1"/>
+                <viewController storyboardIdentifier="emailAliasList" id="eMk-Li-st1" customClass="EmailAliasListViewController" customModule="EmailExample" customModuleProvider="target" sceneMemberID="viewController">
+                    <navigationItem key="navigationItem" title="Email Aliases" id="eMk-Nv-it1"/>
                     <connections>
-                        <segue destination="cMk-Cr-ea1" kind="show" identifier="navigateToCreateEmailMask" id="eMk-Sg-cr1"/>
-                        <segue destination="uMk-Up-da1" kind="show" identifier="navigateToUpdateEmailMask" id="eMk-Sg-up1"/>
+                        <segue destination="cMk-Cr-ea1" kind="show" identifier="navigateToCreateEmailAlias" id="eMk-Sg-cr1"/>
+                        <segue destination="uMk-Up-da1" kind="show" identifier="navigateToUpdateEmailAlias" id="eMk-Sg-up1"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="eMk-Fr-sp1" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -227,26 +227,26 @@
             </objects>
             <point key="canvasLocation" x="4724" y="2200"/>
         </scene>
-        <!--Create Email Mask-->
+        <!--Create Email Alias-->
         <scene sceneID="cMk-Sc-n01">
             <objects>
-                <viewController storyboardIdentifier="createEmailMask" title="Create Email Mask" id="cMk-Cr-ea1" customClass="CreateEmailMaskViewController" customModule="EmailExample" customModuleProvider="target" sceneMemberID="viewController">
-                    <navigationItem key="navigationItem" title="Create Email Mask" id="cMk-Nv-it1"/>
+                <viewController storyboardIdentifier="createEmailAlias" title="Create Email Alias" id="cMk-Cr-ea1" customClass="CreateEmailAliasViewController" customModule="EmailExample" customModuleProvider="target" sceneMemberID="viewController">
+                    <navigationItem key="navigationItem" title="Create Email Alias" id="cMk-Nv-it1"/>
                     <connections>
-                        <segue destination="eMk-Ex-it1" kind="unwind" identifier="returnToEmailMaskList" unwindAction="returnToEmailMaskListWithSegue:" id="cMk-Sg-un1"/>
+                        <segue destination="eMk-Ex-it1" kind="unwind" identifier="returnToEmailAliasList" unwindAction="returnToEmailAliasListWithSegue:" id="cMk-Sg-un1"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="cMk-Fr-sp1" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="5850" y="2200"/>
         </scene>
-        <!--Update Email Mask-->
+        <!--Update Email Alias-->
         <scene sceneID="uMk-Sc-n01">
             <objects>
-                <viewController storyboardIdentifier="updateEmailMask" title="Update Email Mask" id="uMk-Up-da1" customClass="UpdateEmailMaskViewController" customModule="EmailExample" customModuleProvider="target" sceneMemberID="viewController">
-                    <navigationItem key="navigationItem" title="Update Email Mask" id="uMk-Nv-it1"/>
+                <viewController storyboardIdentifier="updateEmailAlias" title="Update Email Alias" id="uMk-Up-da1" customClass="UpdateEmailAliasViewController" customModule="EmailExample" customModuleProvider="target" sceneMemberID="viewController">
+                    <navigationItem key="navigationItem" title="Update Email Alias" id="uMk-Nv-it1"/>
                     <connections>
-                        <segue destination="eMk-Ex-it1" kind="unwind" identifier="returnToEmailMaskList" unwindAction="returnToEmailMaskListWithSegue:" id="uMk-Sg-un1"/>
+                        <segue destination="eMk-Ex-it1" kind="unwind" identifier="returnToEmailAliasList" unwindAction="returnToEmailAliasListWithSegue:" id="uMk-Sg-un1"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="uMk-Fr-sp1" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>

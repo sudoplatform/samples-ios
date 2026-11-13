@@ -25,11 +25,23 @@ struct HomeView: View {
     var body: some View {
         List {
             Section {
+                if viewModel.showsTelephonyKeyBackupNotice {
+                    Label {
+                        Text(
+                            "This device created a new key for your phone numbers. Export a key backup from Import/Export Keys "
+                            + "below, so their messages can be read on your other devices or after reinstalling."
+                        )
+                    } icon: {
+                        Image(systemName: "key")
+                            .foregroundStyle(.blue)
+                    }
+                }
                 if viewModel.sudosNeedKeyImport {
                     Label {
                         Text(
                             "Your Sudos were created on another device or before this device's data was removed, "
-                            + "so it doesn't have the keys to read them. Import your keys from Import/Export Keys below."
+                            + "so it doesn't have the keys to read them. Import your keys from Import/Export Keys below. "
+                            + "Creating a Sudo is unavailable until then, so new phone numbers aren't sealed to keys your other devices don't have."
                         )
                     } icon: {
                         Image(systemName: "key.slash")
@@ -49,6 +61,9 @@ struct HomeView: View {
                 } label: {
                     Label("Create Sudo", systemImage: "plus")
                 }
+                // Existing Sudos this device can't read mean keys need importing first. With no Sudos at all there is
+                // nothing to import, so this stays enabled for a new user.
+                .disabled(viewModel.sudosNeedKeyImport)
             } header: {
                 HStack {
                     Text("Sudos")

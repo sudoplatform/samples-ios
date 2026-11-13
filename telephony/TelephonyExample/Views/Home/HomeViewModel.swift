@@ -90,8 +90,21 @@ final class HomeViewModel {
         await loadSudos()
     }
 
-    /// Fetches the Sudos again after keys were imported, as ones that couldn't be decrypted before may be readable now.
+    /// True to suggest exporting a key backup, because this device has just created a new shared phone number key. Not shown
+    /// while keys need importing, since importing replaces that key.
+    var showsTelephonyKeyBackupNotice: Bool {
+        dependencies.telephonyKeyNeedsBackup && !sudosNeedKeyImport
+    }
+
+    /// Fetches the Sudos again after keys were imported, as ones that couldn't be decrypted before may be readable now. Also
+    /// creates the shared phone number key if the backup didn't contain one, so provisioning still works.
     func didImportKeys() async {
+        do {
+            try await dependencies.prepareTelephonyKeys()
+        } catch {
+            Logger.sampleLogger.error("Failed to prepare phone number keys after import: \(error)")
+            await presentError(error)
+        }
         await loadSudos()
     }
 

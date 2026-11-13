@@ -104,6 +104,11 @@ final class PhoneNumbersViewModel {
         do {
             apply(try await telephonyClient.deprovisionPhoneNumber(withId: phoneNumber.id))
         } catch {
+            // If only removing the number's key from this device failed, the number was still released: show it as released
+            // before saying why.
+            if case SudoTelephonyError.keyPairRemovalFailed(let released, _) = error {
+                apply(released)
+            }
             Logger.sampleLogger.error("Failed to release phone number: \(error)")
             await presentError(error)
         }

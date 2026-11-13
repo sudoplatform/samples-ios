@@ -16,6 +16,9 @@ struct UserDetailsView: View {
     /// How the user signed in.
     @AppStorage(AuthenticationStrategy.storageKey) private var strategy: AuthenticationStrategy = .test
 
+    /// How phone numbers are keyed for this session.
+    @AppStorage(TelephonyKeyMode.enforceSingletonKeyPairStorageKey) private var enforceSingletonKeyPair = false
+
     // MARK: - View
 
     var body: some View {
@@ -28,6 +31,7 @@ struct UserDetailsView: View {
             }
             Section {
                 LabeledContent("Signed in with", value: strategy.description)
+                LabeledContent("Key Config", value: TelephonyKeyMode.description(enforceSingletonKeyPair: enforceSingletonKeyPair))
                 LabeledContent("Signed in", value: formatted(viewModel.signedInAt))
                 LabeledContent("ID token expires", value: formatted(viewModel.idTokenExpiresAt))
             } header: {

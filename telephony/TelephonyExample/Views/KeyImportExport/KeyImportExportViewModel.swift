@@ -87,6 +87,7 @@ final class KeyImportExportViewModel {
         Self.removeTemporaryBackups()
         do {
             let data = try await dependencies.keyBackupService.exportBackup(password: password)
+            dependencies.didExportKeys()
             let url = FileManager.default.temporaryDirectory.appendingPathComponent(Self.exportFileName())
             try data.write(to: url, options: [.atomic, .completeFileProtection])
             exportedFileAwaitingShare = ExportedFile(url: url)

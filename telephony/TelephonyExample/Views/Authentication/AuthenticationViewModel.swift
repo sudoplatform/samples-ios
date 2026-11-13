@@ -37,17 +37,27 @@ final class AuthenticationViewModel {
     // MARK: - Actions
 
     /// Skips straight to the home screen if a previous session is still valid, without presenting the FSSO UI again.
-    func didAppear() async {
+    ///
+    /// - Parameter enforceSingletonKeyPair: Whether every phone number shares one key pair, for the telephony client.
+    func didAppear(enforceSingletonKeyPair: Bool) async {
         isLoading = true
         defer { isLoading = false }
         do {
-            isSignedIn = try await dependencies.authenticator.isSignedIn()
+            guard try await dependencies.authenticator.isSignedIn() else { return }
+            try dependencies.startTelephony(enforceSingletonKeyPair: enforceSingletonKeyPair)
+            try await dependencies.prepareTelephonyKeys()
+            isSignedIn = true
         } catch {
             Logger.sampleLogger.error("Failed to check sign in state: \(error)")
         }
     }
 
-    func didTapStart(strategy: AuthenticationStrategy) async {
+    /// Registers and signs the user in, then creates the clients that depend on the choices made on the sign in screen.
+    ///
+    /// - Parameters:
+    ///   - strategy: How to sign in.
+    ///   - enforceSingletonKeyPair: Whether every phone number shares one key pair, for the telephony client.
+    func didTapStart(strategy: AuthenticationStrategy, enforceSingletonKeyPair: Bool) async {
         Logger.sampleLogger.info("Signing in with \(strategy)...")
         isLoading = true
         defer { isLoading = false }
@@ -58,7 +68,11 @@ final class AuthenticationViewModel {
             case .fsso:
                 try await dependencies.authenticator.federatedSignIn(presentationAnchor: UIApplication.shared.presentationAnchor)
             }
+            // Before preparing for the user, so a different user's phone number keys are removed along with their other data.
+            try dependencies.startTelephony(enforceSingletonKeyPair: enforceSingletonKeyPair)
             try await dependencies.prepareForSignedInUser()
+            // After preparing for the user, which removes a different user's keys, including a shared phone number key.
+            try await dependencies.prepareTelephonyKeys()
             _ = try await dependencies.entitlementsClient.redeemEntitlements()
             isSignedIn = true
         } catch {

@@ -91,6 +91,11 @@ final class PhoneMessagesViewModel {
         defer { isReleasing = false }
         do {
             releasedNumber = try await telephonyClient.deprovisionPhoneNumber(withId: phoneNumber.id)
+        } catch SudoTelephonyError.keyPairRemovalFailed(let released, let cause) {
+            // The number was released; only removing its key from this device failed. This screen closes once the number is
+            // released, so log the failure instead of showing an alert on the way out.
+            Logger.sampleLogger.error("Released phone number \(released.id), but couldn't remove its key: \(cause ?? "unknown cause")")
+            releasedNumber = released
         } catch {
             Logger.sampleLogger.error("Failed to release phone number: \(error)")
             await presentError(error)

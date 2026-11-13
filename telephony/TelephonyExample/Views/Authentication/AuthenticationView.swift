@@ -21,6 +21,9 @@ struct AuthenticationView: View {
 
     @AppStorage(AuthenticationStrategy.storageKey) private var strategy: AuthenticationStrategy = .test
 
+    /// Whether every phone number shares one key pair. Chosen here because the telephony client is created with it at sign in.
+    @AppStorage(TelephonyKeyMode.enforceSingletonKeyPairStorageKey) private var enforceSingletonKeyPair = false
+
     // MARK: - View
 
     var body: some View {
@@ -40,7 +43,7 @@ struct AuthenticationView: View {
             }
             SampleButton(label: "Start", isLoading: viewModel.isLoading, minWidth: 300) {
                 Task {
-                    await viewModel.didTapStart(strategy: strategy)
+                    await viewModel.didTapStart(strategy: strategy, enforceSingletonKeyPair: enforceSingletonKeyPair)
                 }
             }
             Picker("Sign In Method", selection: $strategy) {
@@ -50,10 +53,24 @@ struct AuthenticationView: View {
             }
             .disabled(viewModel.isLoading)
             .frame(maxWidth: 300, maxHeight: 100)
+            VStack(alignment: .leading, spacing: 4) {
+                Toggle("Single key for all numbers", isOn: $enforceSingletonKeyPair)
+                    .disabled(viewModel.isLoading)
+                Text(
+                    enforceSingletonKeyPair
+                        ? "Single key is used to decrypt content across all numbers. You should backup the key to avoid data loss. "
+                            + "Refer to developer docs for more information."
+                        : "Each number has its own key used to decrypt content. You should backup the keys to avoid data loss. "
+                            + "Refer to developer docs for more information."
+                )
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+            }
+            .frame(maxWidth: 300)
         }
         .padding(.bottom, 128)
         .task {
-            await viewModel.didAppear()
+            await viewModel.didAppear(enforceSingletonKeyPair: enforceSingletonKeyPair)
         }
         .onChange(of: viewModel.isSignedIn) { _, isSignedIn in
             guard isSignedIn else { return }
